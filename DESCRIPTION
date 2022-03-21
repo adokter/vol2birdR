@@ -1,0 +1,26 @@
+Package: vol2birdR
+Type: Package
+Title: R-variant of vol2bird
+Version: 0.1
+Date: 2022-03-21
+Author: Anders Henja
+Maintainer: Adriaan Dokter <your@email.com>
+Description: One paragraph description of what the package does as one
+        or more full sentences.
+License: LGPL (>= 3)
+Imports: 
+    Rcpp (>= 1.0.4), 
+    methods,
+    withr
+Depends: Rcpp (>= 1.0.4)
+LinkingTo: Rcpp, RcppGSL
+RoxygenNote: 7.1.0
+VignetteBuilder: knitr
+SystemRequirements: GNU make
+Collate:
+    'package.R'
+    'install.R'
+    'mistnet_load.R'
+    'RcppExports.R'
+    'vol2birdR.R'
+RcppModules: RaveIO, PolarVolume, Vol2Bird, Vol2BirdConfig

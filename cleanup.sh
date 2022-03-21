@@ -1,0 +1,7 @@
+#!/bin/bash
+
+\rm -fr autom4te.cache
+\rm -f config.log config.status
+\rm -f src/*.o src/*.so src/Makevars
+\rm -f src/libhlhdf/*.o src/libmistnet/*.o src/librsl/*.o src/librave/*.o src/libvol2bird/*.o
+

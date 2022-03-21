@@ -1,0 +1,18 @@
+Copyright 2022- Adriaan M. Dokter and contributors
+
+@author: Anders Henja (anders@henjab.se)
+@date: 2022-03-21
+
+This is the R-version of vol2bird. The original version of vol2bird can be found here: https://github.com/adokter/vol2bird.
+
+Since the building of R-packages needs special attention, several of the dependencies has been integrated into this project
+instead of assuming that they exists on the target OS to simplify the build and installation process.
+Most of the dependencies are licensed as LGPL and as such, this project has also been developed under the LGPL license.
+
+The software this package consists of are:
+Radar Software Library (RSL)  - src/librsl
+High Level HDF (HL-HDF)       - src/libhlhdf
+RAVE                          - src/librave
+VOL2BIRD                      - src/libvol2bird
+
+

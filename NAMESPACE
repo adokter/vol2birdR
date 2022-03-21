@@ -1,0 +1,4 @@
+useDynLib(vol2birdR, .registration = TRUE)
+import(methods, Rcpp)
+exportPattern("^[[:alpha:]]+")
+
