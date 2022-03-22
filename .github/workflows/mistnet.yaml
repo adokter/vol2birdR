@@ -100,7 +100,7 @@ jobs:
         with:
           command: cp
           source: ${{ matrix.artifact }}.zip
-          destination: s3:/vol2bird-builds/vol2birdr/${{ github.ref }}/latest/${{ matrix.upload }}-${{ matrix.hw }}.zip
+          destination: s3://vol2bird-builds/vol2birdr/${{ github.ref }}/latest/${{ matrix.upload }}-${{ matrix.hw }}.zip
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
