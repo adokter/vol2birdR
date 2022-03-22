@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-18.04, macos-10.15]
+        os: [ubuntu-18.04, macos-10.15]
         include:
           - os: ubuntu-18.04
             library: libmistnet.so
