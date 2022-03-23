@@ -12,6 +12,15 @@ install_config <- list(
         ),
         "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-cpu.zip", branch)
       ),
+      "darwin-arm64" = list(
+        "libtorch" = list(
+          url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.10.2.zip",
+          path = "libtorch/",
+          filter = ".dylib",
+          md5hash = "96ebbf1e2e44f30ee80bf3c8e4a31e15"
+        ),
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-arm64-cpu.zip", branch)
+      ),
       "windows" = list(
         "libtorch" = list(
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.10.2%2Bcpu.zip",
@@ -107,7 +116,11 @@ mistnet_install_lib <- function(library_name, library_url,
   uncompress <- if (identical(library_extension, "tgz")) utils::untar else utils::unzip
 
   uncompress(temp_file, exdir = temp_path)
-
+  
+  #if (!file.exists(file.path(install_path, inst_path))){
+  #  dir.create(file.path(install_path, inst_path))
+  #}
+  
   file.copy(
     from = dir(file.path(temp_path, source_path), full.names = TRUE),
     to = file.path(install_path, inst_path),
@@ -133,6 +146,12 @@ mistnet_install_libs <- function(version, type, install_path, install_config) {
     stop("The ", type, " installation type is currently unsupported.")
   }
 
+  if (current_os == "darwin") {
+    if (tolower(Sys.info()[["machine"]]) == "arm64") {
+      current_os <- "darwin-arm64"
+    }
+  }
+
   if (!current_os %in% names(install_config[[version]][[type]])) {
     stop("The ", current_os, " operating system is currently unsupported.")
   }
@@ -145,7 +164,7 @@ mistnet_install_libs <- function(version, type, install_path, install_config) {
     }
 
     library_info <- install_info[[library_name]]
-
+    
     if (!is.list(library_info)) {
       library_info <- list(url = library_info, filter = "", path = "", inst_path = "lib")
     }
