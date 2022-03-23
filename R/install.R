@@ -10,8 +10,7 @@ install_config <- list(
           filter = ".dylib",
           md5hash = "96ebbf1e2e44f30ee80bf3c8e4a31e15"
         ),
-        "libmistnet" = sprintf("http://henjab.se/vol2birdR-artifacts/macOS-cpu.zip")
-        # "libmistnet" = sprintf("https://storage.googleapis.com/vol2birdR-mistnet-builds/refs/heads/%s/latest/macOS-cpu.zip", branch)
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-cpu.zip", branch)
       ),
       "windows" = list(
         "libtorch" = list(
@@ -28,8 +27,7 @@ install_config <- list(
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip",
           md5hash = "99d16043865716f5e38a8d15480b61c6"
         ),
-        "libmistnet" = sprintf("http://henjab.se/vol2birdR-artifacts/Linux-cpu.zip")
-        # "libmistnet" = sprintf("https://storage.googleapis.com/vol2birdR-mistnet-builds/refs/heads/%s/latest/Linux-cpu.zip", branch)
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Linux-cpu.zip", branch)
       )
     )
   )
