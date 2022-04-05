@@ -43,9 +43,15 @@ std::thread::id main_thread_id() noexcept {
 }
 
 // [[Rcpp::export]]
-void cpp_torch_namespace__store_main_thread_id() {
+void cpp_vol2bird_namespace__store_main_thread_id() {
   // called upon package load to remember the thread ID of the main thread
   main_thread_id();
+}
+
+// [[Rcpp::export]]
+void cpp_vol2bird_initialize() {
+  // called upon package load to remember the thread ID of the main thread
+  HL_init();
 }
 
 void call_r_gc() {

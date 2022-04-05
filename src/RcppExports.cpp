@@ -12,12 +12,21 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// cpp_torch_namespace__store_main_thread_id
-void cpp_torch_namespace__store_main_thread_id();
-RcppExport SEXP _vol2birdR_cpp_torch_namespace__store_main_thread_id() {
+// cpp_vol2bird_namespace__store_main_thread_id
+void cpp_vol2bird_namespace__store_main_thread_id();
+RcppExport SEXP _vol2birdR_cpp_vol2bird_namespace__store_main_thread_id() {
 BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
-    cpp_torch_namespace__store_main_thread_id();
+    cpp_vol2bird_namespace__store_main_thread_id();
+    return R_NilValue;
+END_RCPP
+}
+// cpp_vol2bird_initialize
+void cpp_vol2bird_initialize();
+RcppExport SEXP _vol2birdR_cpp_vol2bird_initialize() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    cpp_vol2bird_initialize();
     return R_NilValue;
 END_RCPP
 }
@@ -38,7 +47,8 @@ RcppExport SEXP _rcpp_module_boot_Vol2BirdConfig();
 RcppExport SEXP _rcpp_module_boot_Vol2Bird();
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_vol2birdR_cpp_torch_namespace__store_main_thread_id", (DL_FUNC) &_vol2birdR_cpp_torch_namespace__store_main_thread_id, 0},
+    {"_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id", (DL_FUNC) &_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id, 0},
+    {"_vol2birdR_cpp_vol2bird_initialize", (DL_FUNC) &_vol2birdR_cpp_vol2bird_initialize, 0},
     {"_vol2birdR_cpp_mistnet_init", (DL_FUNC) &_vol2birdR_cpp_mistnet_init, 1},
     {"_rcpp_module_boot_PolarVolume", (DL_FUNC) &_rcpp_module_boot_PolarVolume, 0},
     {"_rcpp_module_boot_RaveIO", (DL_FUNC) &_rcpp_module_boot_RaveIO, 0},

@@ -4315,11 +4315,12 @@ PolarVolume_t* vol2birdGetVolume(char* filenames[], int nInputFiles, float range
     #endif
     
     volume = vol2birdGetODIMVolume(filenames, nInputFiles);
-    
-    PolarVolume_sortByElevations(volume,1);
-    
-    done:
-        return volume;
+
+    if (volume != NULL) {
+      PolarVolume_sortByElevations(volume,1);
+    }
+done:
+    return volume;
 }
 
 #ifdef IRIS
@@ -5006,13 +5007,10 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // segment precipitation using Mistnet deep convolutional neural net
     //#ifdef MISTNET
     if (check_mistnet_loaded_c()) {
-      fprintf(stderr, "Mistnet enabled\n");
       if(alldata->options.useMistNet){
         int result = segmentScansUsingMistnet(volume, scanUse, alldata);
         if (result < 0) return -1;
       }
-    } else {
-      fprintf(stderr, "Mistnet disabled\n");
     }
     //#endif
 

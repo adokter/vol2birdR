@@ -11,8 +11,8 @@ globalVariables(c("..", "self", "private", "N"))
 }
 
 .onLoad <- function(libname, pkgname) {
-  cpp_torch_namespace__store_main_thread_id()
-
+  cpp_vol2bird_namespace__store_main_thread_id()
+  cpp_vol2bird_initialize()
   install_success <- TRUE
 
   if (install_exists() && install_success) {

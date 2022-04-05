@@ -13,8 +13,12 @@ NULL
 #' @export Vol2Bird
 NULL
 
-cpp_torch_namespace__store_main_thread_id <- function() {
-    invisible(.Call(`_vol2birdR_cpp_torch_namespace__store_main_thread_id`))
+cpp_vol2bird_namespace__store_main_thread_id <- function() {
+    invisible(.Call(`_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id`))
+}
+
+cpp_vol2bird_initialize <- function() {
+    invisible(.Call(`_vol2birdR_cpp_vol2bird_initialize`))
 }
 
 cpp_mistnet_init <- function(path) {
