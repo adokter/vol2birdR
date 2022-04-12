@@ -29,6 +29,9 @@
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <zlib.h>
+
+#define CHUNK 16384
 
 /* Prototype definitions within this file. */
 int no_command (char *cmd);
@@ -50,9 +53,10 @@ int rsl_pclose(FILE *fp)
 {
   int rc;
   if ((rc=pclose(fp)) == EOF) {
-	perror ("pclose");  /* This or fclose do the job. */
-	if ((rc=fclose(fp)) == EOF)
-	  perror ("fclose");  /* This or fclose do the job. */
+    //perror ("pclose");  /* This or fclose do the job. */
+    if ((rc=fclose(fp)) == EOF) {
+      //perror ("fclose");  /* This or fclose do the job. */
+    }
   }
   return rc;
 }
@@ -67,26 +71,57 @@ int no_command (char *cmd)
   else return !0;
 }
 
+#ifdef NO_UNZIP_PIPE
+FILE *uncompress_pipe (FILE *fp)
+{
+  FILE *retfp = NULL, *result = NULL;
+  char buffer[CHUNK];
+
+  gzFile gzfp = gzdopen(dup(fileno(fp)), "r");
+
+  if (gzfp == Z_NULL) {
+    return NULL;
+  }
+  retfp = tmpfile(); /* This might cause problems in windows.. Might have to use different tmpfile approach there.*/
+  if (retfp == NULL) {
+    goto done;
+  }
+
+  for (;;) {
+    int len = gzread(gzfp, buffer, sizeof(buffer));
+    if (len <= 0)
+      break;
+    fwrite(buffer, 1, len, retfp);
+  }
+  fseek(retfp, 0, SEEK_SET);
+  result = retfp;
+  retfp = NULL;
+done:
+  if (retfp != NULL) {
+    fclose(retfp);
+  }
+  fclose(fp);
+  gzclose(gzfp);
+  return result;
+}
+#else
 FILE *uncompress_pipe (FILE *fp)
 {
   /* Pass the file pointed to by 'fp' through the gzip pipe. */
-
   FILE *fpipe;
   int save_fd;
-
   if (no_command("gzip --version > /dev/null 2>&1")) return fp;
   save_fd = dup(0);
   close(0); /* Redirect stdin for gzip. */
   dup(fileno(fp));
-
   fpipe = popen("gzip -q -d -f --stdout", "r");
   if (fpipe == NULL) perror("uncompress_pipe");
   close(0);
   dup(save_fd);
   close(save_fd);
-  fclose(fp);
   return fpipe;
 }
+#endif
 
 FILE *compress_pipe (FILE *fp)
 {
@@ -107,5 +142,4 @@ FILE *compress_pipe (FILE *fp)
   dup(save_fd);
   return fpipe;
 }
-
 

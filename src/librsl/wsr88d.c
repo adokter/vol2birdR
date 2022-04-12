@@ -228,8 +228,148 @@ void wsr88d_print_sweep_info(Wsr88d_sweep *s)
   }
 }
 
+int uncompressAr2v(FILE* fpin, FILE* fpout) {
+  char clength[4];
+  char *block = (char*) malloc(8192), *oblock = (char*) malloc(262144);
+  unsigned isize = 8192, osize = 262144, olength;
+  char stid[5] = { 0 }; /* station id: not used */
+  int fdin = fileno(fpin);
+  int fdout = fileno(fpout);
+  int result = 0;
+
+  /*
+   * Loop through the blocks
+   */
+  int go = 1;
+  while (go) {
+    ssize_t i = read(fdin, clength, 4);
+    if (i != 4) {
+      goto done;
+    }
+
+    /*
+     * If this is the first block, read/write the remainder of the
+     * header and continue
+     */
+    if ((memcmp(clength, "ARCH", 4) == 0) || (memcmp(clength, "AR2V", 4) == 0)) {
+      memcpy(block, clength, 4);
+      i = read(fdin, block + 4, 20);
+      if (i != 20) {
+        fprintf( stderr, "Missing header\n");
+        goto done;
+        //exit(1);
+      }
+
+      if (stid[0] != 0)
+        memcpy(block + 20, stid, 4);
+      lseek(fdout, 0, SEEK_SET);
+      if (write(fdout, block, 24) != 24) {
+        // Failure to write...
+        fprintf(stderr, "Failed to write block\n");
+        goto done;
+      }
+      continue;
+    }
+
+    /*
+     * Otherwise, this is a compressed block.
+     */
+
+    int length = 0;
+    for (i = 0; i < 4; i++)
+      length = (length << 8) + (unsigned char) clength[i];
+
+    if (length < 0) { /* signals last compressed block */
+      length = -length;
+      go = 0;
+    }
+
+    if (length > isize) {
+      isize = length;
+      if ((block = (char*) realloc(block, isize)) == NULL) {
+        fprintf( stderr, "Cannot re-allocate input buffer\n");
+        goto done;
+//        exit(1);
+      }
+    }
+
+    /*
+     * Read, uncompress, and write
+     */
+
+    i = read(fdin, block, length);
+    if (i != length) {
+      fprintf( stderr, "Short block read!\n");
+//      exit(1);
+      goto done;
+    }
+    if (length > 10) {
+      int error;
+tryagain:
+      olength = osize;
+#ifdef BZ_CONFIG_ERROR
+      error = BZ2_bzBuffToBuffDecompress(oblock, &olength, block, length, 0, 0);
+#else
+    error = bzBuffToBuffDecompress(oblock, &olength,block, length, 0, 0);
+#endif
+
+      if (error) {
+        if (error == BZ_OUTBUFF_FULL) {
+          osize += 262144;
+          if ((oblock = (char*) realloc(oblock, osize)) == NULL) {
+            fprintf(stderr, "Cannot allocate output buffer\n");
+            goto done;
+//            exit(1);
+          }
+          goto tryagain;
+        }
+        fprintf(stderr, "decompress error - %d\n", error);
+//        exit(1);
+        goto done;
+      }
+      if (write(fdout, oblock, olength) != olength) {
+        fprintf(stderr, "Failed to write outblock\n");
+        goto done;
+      }
+    }
+  }
+
+  result = 1;
+done:
+  if (oblock != NULL) {
+    free(oblock);
+  }
+  if (block != NULL) {
+    free(block);
+  }
+  return result;
+}
 
 // adapted from uncompress_pipe in gzip.c
+#ifdef NO_UNZIP_PIPE
+FILE *uncompress_pipe_ar2v(FILE *fp)
+{
+  FILE *retfp = NULL, *result = NULL;
+
+  retfp = tmpfile(); /* This might cause problems in windows.. Might have to use different tmpfile approach there.*/
+  if (retfp == NULL) {
+    goto done;
+  }
+  if (!uncompressAr2v(fp, retfp)) {
+    goto done;
+  }
+  fseek(retfp, 0, SEEK_SET);
+  fseek(fp, 0, SEEK_SET);
+  result = retfp;
+  retfp = NULL;
+done:
+  if (retfp != NULL) {
+    fclose(retfp);
+  }
+  fclose(fp);
+  return result;
+}
+#else
 FILE *uncompress_pipe_ar2v (FILE *fp)
 {
   /* Pass the file pointed to by 'fp' through the bzip2 pipe. */
@@ -253,7 +393,7 @@ FILE *uncompress_pipe_ar2v (FILE *fp)
   fclose(fp);
   return fpipe;
 }
-
+#endif
 
 /**********************************************************************/
 /*                                                                    */

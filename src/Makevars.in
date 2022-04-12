@@ -12,7 +12,7 @@ PKG_LIBS=@VOL2BIRD_LIBS@
 PKG_CPPFLAGS= @VOL2BIRD_CPPFLAGS@ @HDF5_API_VERS_USE@
 #PKG_CFLAGS=@VOL2BIRD_CFLAGS@ @HDF5_API_VERS_USE@ 
 
-PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -DNOCONFUSE -DRSL=1
+PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -DNOCONFUSE -DNO_UNZIP_PIPE -DRSL=1
 
 PKG_CPPFLAGS+= $(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::CFlags()")
 
