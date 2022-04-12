@@ -84,10 +84,10 @@ private:
   void initialize_config(vol2bird_t *alldata) {
     strcpy(alldata->misc.filename_pvol, "");
     alldata->options.elevMin = 0.0;
-    alldata->options.elevMax = 45.0;
+    alldata->options.elevMax = 90.0;
     strcpy(alldata->options.dbzType, "DBZH");
-    alldata->options.azimMax = 360.0;
     alldata->options.azimMin = 0.0;
+    alldata->options.azimMax = 360.0;
     alldata->options.layerThickness = 200.0;
     alldata->options.nLayers = 25;
     alldata->options.rangeMax = 35000.0;
@@ -112,13 +112,13 @@ private:
     alldata->options.minNyquist = 5.0;
     alldata->options.maxNyquistDealias = 25.0;
     alldata->options.birdRadarCrossSection = 11.0;
-    alldata->options.cellStdDevMax = 0.0; // cfg_getfloat(*cfg,"STDEV_CELL");
+    alldata->options.cellStdDevMax = 5.0;
     alldata->options.stdDevMinBird = 2.0;
     alldata->options.etaMax = 36000.0;
     alldata->options.cellEtaMin = 11500.0;
     alldata->options.requireVrad = FALSE;
-    alldata->options.dealiasVrad = FALSE;
-    alldata->options.dealiasRecycle = FALSE;
+    alldata->options.dealiasVrad = TRUE;
+    alldata->options.dealiasRecycle = TRUE;
     alldata->options.dualPol = TRUE;
     alldata->options.singlePol = TRUE;
     alldata->options.dbzThresMin = 0.0;
@@ -134,7 +134,7 @@ private:
     alldata->options.mistNetElevs[3] = 3.5;
     alldata->options.mistNetElevs[4] = 4.5;
     alldata->options.mistNetElevsOnly = TRUE;
-    alldata->options.useMistNet = TRUE;
+    alldata->options.useMistNet = FALSE;
     strcpy(alldata->options.mistNetPath, "/opt/vol2bird/etc/mistnet_nexrad.pt");
 
     // ------------------------------------------------------------- //
@@ -662,7 +662,7 @@ public:
   virtual ~Vol2Bird() {
   }
 
-  void process(StringVector &files, Vol2BirdConfig &config, std::string &vpOutName, std::string &volOutName) {
+  void process(StringVector &files, Vol2BirdConfig &config, std::string vpOutName, std::string volOutName) {
     PolarVolume_t *volume = NULL;
     char *fileIn[INPUTFILESMAX];
     int initSuccessful = 0;
@@ -710,6 +710,8 @@ public:
     if (!volOutName.empty()) {
       saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
     }
+
+    vol2birdCalcProfiles(config.alldata());
 
     const char *date;
     const char *time;
