@@ -28,7 +28,7 @@ install_config <- list(
           filter = ".dll",
           md5hash = "c49ddfd07ba65e0ff4a54e041ed22c42"
         ),
-        "libmistnet" = sprintf("https://storage.googleapis.com/vol2birdR-mistnet-builds/refs/heads/%s/latest/Windows-cpu.zip", branch)
+        "libmistnet" = sprintf(https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Windows-cpu.zip", branch)
       ),
       "linux" = list(
         "libtorch" = list(
