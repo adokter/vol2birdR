@@ -38,6 +38,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "rave_utilities.h"
 #include "raveobject_hashtable.h"
 #include "rave_attribute.h"
+#include "rave_attribute_table.h"
 
 /**
  * Represents one vertical profile
@@ -53,7 +54,8 @@ struct _VerticalProfile_t {
   char* product; /**< The product, in this case VP */
   char* source;    /**< the source string */
   char* prodname;  /**< the product name */
-  RaveObjectHashTable_t* attrs; /**< attributes */
+  //RaveObjectHashTable_t* attrs; /**< attributes */
+  RaveAttributeTable_t* attrs; /**< attributes */
   RaveObjectHashTable_t* fields; /**< the fields */
   double lon; /**< the longitude in radians */
   double lat; /**< the latitude in radians */
@@ -85,7 +87,7 @@ static int VerticalProfile_constructor(RaveCoreObject* obj)
   self->startdatetime = NULL;
   self->enddatetime = NULL;
   self->product = NULL;
-  self->attrs = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
+  self->attrs = RAVE_OBJECT_NEW(&RaveAttributeTable_TYPE);
   self->datetime = RAVE_OBJECT_NEW(&RaveDateTime_TYPE);
   self->startdatetime = RAVE_OBJECT_NEW(&RaveDateTime_TYPE);
   self->enddatetime = RAVE_OBJECT_NEW(&RaveDateTime_TYPE);
@@ -422,6 +424,12 @@ double VerticalProfile_getMaxheight(VerticalProfile_t* self)
 
 int VerticalProfile_addAttribute(VerticalProfile_t* self, RaveAttribute_t* attribute)
 {
+  RAVE_ASSERT((self != NULL), "self == NULL");
+  return VerticalProfile_addAttributeVersion(self, attribute, RAVEIO_API_ODIM_VERSION);
+}
+
+int VerticalProfile_addAttributeVersion(VerticalProfile_t* self, RaveAttribute_t* attribute, RaveIO_ODIM_Version version)
+{
   const char* name = NULL;
   char* aname = NULL;
   char* gname = NULL;
@@ -437,7 +445,7 @@ int VerticalProfile_addAttribute(VerticalProfile_t* self, RaveAttribute_t* attri
       goto done;
     }
     if (strcasecmp("how", gname)==0 && RaveAttributeHelp_validateHowGroupAttributeName(gname, aname)) {
-      result = RaveObjectHashTable_put(self->attrs, name, (RaveCoreObject*)attribute);
+      result = RaveAttributeTable_addAttributeVersion(self->attrs, attribute, version, NULL);
     } else {
       RAVE_DEBUG1("Trying to add attribute: %s but only valid attributes are how/...", name);
     }
@@ -452,46 +460,47 @@ done:
 RaveAttribute_t* VerticalProfile_getAttribute(VerticalProfile_t* self, const char* name)
 {
   RAVE_ASSERT((self != NULL), "self == NULL");
+  return VerticalProfile_getAttributeVersion(self, name, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveAttribute_t* VerticalProfile_getAttributeVersion(VerticalProfile_t* self, const char* name, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((self != NULL), "self == NULL");
   if (name == NULL) {
     RAVE_ERROR0("Trying to get an attribute with NULL name");
     return NULL;
   }
-  return (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, name);
+  return RaveAttributeTable_getAttributeVersion(self->attrs, name, version);
 }
 
 int VerticalProfile_hasAttribute(VerticalProfile_t* self, const char* name)
 {
   RAVE_ASSERT((self != NULL), "scan == NULL");
-  return RaveObjectHashTable_exists(self->attrs, name);
+  return RaveAttributeTable_hasAttribute(self->attrs, name);
 }
 
 RaveList_t* VerticalProfile_getAttributeNames(VerticalProfile_t* self)
 {
   RAVE_ASSERT((self != NULL), "self == NULL");
-  return RaveObjectHashTable_keys(self->attrs);
+  return VerticalProfile_getAttributeNamesVersion(self, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveList_t* VerticalProfile_getAttributeNamesVersion(VerticalProfile_t* self, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((self != NULL), "self == NULL");
+  return RaveAttributeTable_getAttributeNamesVersion(self->attrs, version);
 }
 
 RaveObjectList_t* VerticalProfile_getAttributeValues(VerticalProfile_t* self)
 {
-  RaveObjectList_t* result = NULL;
-  RaveObjectList_t* tableattrs = NULL;
-
   RAVE_ASSERT((self != NULL), "self == NULL");
-  tableattrs = RaveObjectHashTable_values(self->attrs);
-  if (tableattrs == NULL) {
-    goto error;
-  }
-  result = RAVE_OBJECT_CLONE(tableattrs);
-  if (result == NULL) {
-    goto error;
-  }
+  return VerticalProfile_getAttributeValuesVersion(self, RAVEIO_API_ODIM_VERSION);
+}
 
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return result;
-error:
-  RAVE_OBJECT_RELEASE(result);
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return NULL;
+RaveObjectList_t* VerticalProfile_getAttributeValuesVersion(VerticalProfile_t* self, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((self != NULL), "self == NULL");
+  return RaveAttributeTable_getValuesVersion(self->attrs, version);
 }
 
 RaveField_t* VerticalProfile_getFF(VerticalProfile_t* self)

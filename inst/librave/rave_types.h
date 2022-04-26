@@ -25,6 +25,17 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef RAVE_TYPES_H
 #define RAVE_TYPES_H
 
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#ifndef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#endif
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+#endif
 
 /**
  * The /Conventions version in a ODIM HDF5 file.
@@ -37,6 +48,10 @@ typedef enum RaveIO_ODIM_Version {
   RaveIO_ODIM_Version_2_3 = 3,        /**< ODIM 2.3 */
   RaveIO_ODIM_Version_2_4 = 4,        /**< ODIM 2.4, The default version */
 } RaveIO_ODIM_Version;
+
+#ifndef RAVEIO_API_ODIM_VERSION
+#define RAVEIO_API_ODIM_VERSION RaveIO_ODIM_Version_2_3
+#endif
 
 /**
  * The /what/version in a ODIM HDF5 file

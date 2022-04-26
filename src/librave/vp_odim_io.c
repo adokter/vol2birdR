@@ -78,6 +78,92 @@ static void VpOdimIO_destructor(RaveCoreObject* obj)
 }
 
 /**
+ * Locates an attribute with specified name in the list of attributes.
+ * @param[in] attributes - list of attributes
+ * @param[in] name - name of attributes searched for
+ * @return attribute if found, otherwise NULL
+ */
+static RaveAttribute_t* VpOdimIOInternal_getAttribute(RaveObjectList_t* attributes, const char* name)
+{
+  int nlen = RaveObjectList_size(attributes);
+  int i = 0;
+  for (i = 0; i <nlen; i++) {
+    RaveAttribute_t* attr = (RaveAttribute_t*)RaveObjectList_get(attributes, i);
+    const char* attrname = RaveAttribute_getName(attr);
+    if (strcmp(attrname, name) == 0) {
+      return attr;
+    }
+    RAVE_OBJECT_RELEASE(attr);
+  }
+  return NULL;
+}
+
+/**
+ * Uppdates gain & offset for fields that are affected. Currently, HGHT and MESH.
+ * @param[in] self - self
+ * @param[in] attributes - list of attributes affected
+ * @param[in] fromInternal - If 0, then translation if to internal format. If 1, then from internal format.
+ */
+static int VpOdimIOInternal_updateGainOffset(VpOdimIO_t* self, RaveObjectList_t* attributes, int fromInternal)
+{
+  RaveAttribute_t* quantityAttr = NULL;
+  RaveAttribute_t* gainAttr = NULL;
+  RaveAttribute_t* offsetAttr = NULL;
+  int result = 0;
+
+  if (self->version < RaveIO_ODIM_Version_2_4) {
+    return 1;
+  }
+
+  quantityAttr = VpOdimIOInternal_getAttribute(attributes, "what/quantity");
+  if (quantityAttr != NULL && RaveAttribute_getFormat(quantityAttr) == RaveAttribute_Format_String) {
+    char* value = NULL;
+    double gain=1.0, offset=0.0;
+    RaveAttribute_getString(quantityAttr, &value);
+    if (value != NULL && (strcasecmp("HGHT", value)==0 || strcasecmp("MESH", value)==0)) {
+      gainAttr = VpOdimIOInternal_getAttribute(attributes, "what/gain");
+      offsetAttr = VpOdimIOInternal_getAttribute(attributes, "what/offset");
+      if (gainAttr == NULL) {
+        RaveAttribute_t* newattr = RaveAttributeHelp_createDouble("what/gain", 1.0);
+        if (newattr == NULL) {
+          goto done;
+        }
+        gainAttr = RAVE_OBJECT_COPY(newattr);
+        RaveObjectList_add(attributes, (RaveCoreObject*)newattr);
+        RAVE_OBJECT_RELEASE(newattr);
+      }
+      if (offsetAttr == NULL) {
+        RaveAttribute_t* newattr = RaveAttributeHelp_createDouble("what/gain", 0.0);
+        if (newattr == NULL) {
+          goto done;
+        }
+        offsetAttr = RAVE_OBJECT_COPY(newattr);
+        RaveObjectList_add(attributes, (RaveCoreObject*)newattr);
+        RAVE_OBJECT_RELEASE(newattr);
+      }
+      RaveAttribute_getDouble(gainAttr, &gain);
+      RaveAttribute_getDouble(offsetAttr, &offset);
+      if (fromInternal) {
+        OdimIoUtilities_convertGainOffsetFromInternalRave((const char*)value, self->version, &gain, &offset);
+      } else {
+        OdimIoUtilities_convertGainOffsetToInternalRave((const char*)value, self->version, &gain, &offset);
+      }
+      RaveAttribute_setDouble(gainAttr, gain);
+      RaveAttribute_setDouble(offsetAttr, offset);
+      RAVE_OBJECT_RELEASE(gainAttr);
+      RAVE_OBJECT_RELEASE(offsetAttr);
+    }
+  }
+
+  result = 1;
+done:
+  RAVE_OBJECT_RELEASE(quantityAttr);
+  RAVE_OBJECT_RELEASE(gainAttr);
+  RAVE_OBJECT_RELEASE(offsetAttr);
+  return result;
+}
+
+/**
  * Vp root attributes.
  * @param[in] object - the OdimIoUtilityArg pointing to a polar scan
  * @param[in] attribute - the attribute found
@@ -86,6 +172,7 @@ static void VpOdimIO_destructor(RaveCoreObject* obj)
 static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* attribute)
 {
   VerticalProfile_t* vp = (VerticalProfile_t*)((OdimIoUtilityArg*)object)->object;
+  RaveIO_ODIM_Version version = ((OdimIoUtilityArg*)object)->version;
   const char* name;
   int result = 0;
 
@@ -100,7 +187,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     result = VerticalProfile_setDate(vp, value);
-    
   } else if (strcasecmp("what/time", name)==0) {
     char* value = NULL;
     if (!RaveAttribute_getString(attribute, &value)) {
@@ -108,8 +194,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     result = VerticalProfile_setTime(vp, value);
-    
-    
   } else if (strcasecmp("what/source", name)==0) {
     char* value = NULL;
     if (!RaveAttribute_getString(attribute, &value)) {
@@ -117,8 +201,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     result = VerticalProfile_setSource(vp, value);
-    
-      
   } else if (strcasecmp("where/lon", name)==0) {
     double value = 0.0;
     if (!(result = RaveAttribute_getDouble(attribute, &value))) {
@@ -126,8 +208,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     VerticalProfile_setLongitude(vp, value * M_PI/180.0);
-    
-    
   } else if (strcasecmp("where/lat", name)==0) {
     double value = 0.0;
     if (!(result = RaveAttribute_getDouble(attribute, &value))) {
@@ -135,8 +215,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     VerticalProfile_setLatitude(vp, value * M_PI/180.0);
-    
-    
   } else if (strcasecmp("where/height", name)==0) {
     double value = 0.0;
     if (!(result = RaveAttribute_getDouble(attribute, &value))) {
@@ -144,8 +222,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     VerticalProfile_setHeight(vp, value);
-    
-    
   } else if (strcasecmp("where/levels", name)==0) {
     long value = 0;
     if (!(result = RaveAttribute_getLong(attribute, &value))) {
@@ -153,8 +229,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     VerticalProfile_setLevels(vp, value);
-    
-    
   } else if (strcasecmp("where/interval", name)==0) {
     double value = 0.0;
     if (!(result = RaveAttribute_getDouble(attribute, &value))) {
@@ -162,7 +236,6 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     VerticalProfile_setInterval(vp, value);
-    
   } else if (strcasecmp("where/minheight", name)==0) {
     double value = 0.0;
     if (!(result = RaveAttribute_getDouble(attribute, &value))) {
@@ -178,11 +251,10 @@ static int VpOdimIOInternal_loadRootAttribute(void* object, RaveAttribute_t* att
       goto done;
     }
     VerticalProfile_setMaxheight(vp, value);
-           
   } else if (strcasecmp("what/object", name) == 0) {
     result = 1;
   } else {
-    VerticalProfile_addAttribute(vp, attribute);
+    VerticalProfile_addAttributeVersion(vp, attribute, version);
     result = 1;
   }
 
@@ -202,16 +274,17 @@ static int VpOdimIOInternal_loadDsAttribute(void* object, RaveAttribute_t* attri
   VerticalProfile_t* vp = NULL;
   const char* name;
   int result = 0;
+  RaveIO_ODIM_Version version;
 
   RAVE_ASSERT((object != NULL), "object == NULL");
   RAVE_ASSERT((attribute != NULL), "attribute == NULL");
      
   vp = (VerticalProfile_t*)((OdimIoUtilityArg*)object)->object;
   name = RaveAttribute_getName(attribute);
+  version = ((OdimIoUtilityArg*)object)->version;
   
   /* The following functions added by Ulf to be able to access the new
      attributes starttime, endtime, startdate, enddate and product */
-  
   if (name != NULL) {
     if (strcasecmp("what/starttime", name)==0) {
       char* value = NULL;
@@ -260,7 +333,7 @@ static int VpOdimIOInternal_loadDsAttribute(void* object, RaveAttribute_t* attri
       }
       result = 1;
     } else {
-      VerticalProfile_addAttribute(vp, attribute);
+      VerticalProfile_addAttributeVersion(vp, attribute, version);
       result = 1;
     }
   }
@@ -278,7 +351,7 @@ done:
  * @param[in] ... - the varargs
  * @return 1 on success otherwise 0
  */
-static int VpOdimIOInternal_fillVpDataset(LazyNodeListReader_t* lazyReader, VerticalProfile_t* vp, const char* fmt, ...)
+static int VpOdimIOInternal_fillVpDataset(VpOdimIO_t* self, LazyNodeListReader_t* lazyReader, VerticalProfile_t* vp, const char* fmt, ...)
 {
   int result = 0;
   OdimIoUtilityArg arg;
@@ -303,7 +376,7 @@ static int VpOdimIOInternal_fillVpDataset(LazyNodeListReader_t* lazyReader, Vert
   arg.lazyReader = lazyReader;
   arg.nodelist = LazyNodeListReader_getHLNodeList(lazyReader);
   arg.object = (RaveCoreObject*)vp;
-
+  arg.version = self->version;
   if (!RaveHL_loadAttributesAndData(arg.nodelist,
                                     &arg,
                                     VpOdimIOInternal_loadDsAttribute,
@@ -317,9 +390,16 @@ static int VpOdimIOInternal_fillVpDataset(LazyNodeListReader_t* lazyReader, Vert
   result = 1;
   pindex = 1;
   while (result == 1 && RaveHL_hasNodeByName(arg.nodelist, "%s/data%d", name, pindex)) {
-    RaveField_t* field = OdimIoUtilities_loadField(lazyReader, "%s/data%d", name, pindex);
+    RaveField_t* field = OdimIoUtilities_loadField(lazyReader, self->version, "%s/data%d", name, pindex);
     if (field != NULL) {
-      result = VerticalProfile_addField(vp, field);
+      RaveObjectList_t* attributes = RaveField_getInternalAttributeValues(field);
+      if (attributes != NULL) {
+        result = VpOdimIOInternal_updateGainOffset(self, attributes, 0);
+      }
+      if (result) {
+        result = VerticalProfile_addField(vp, field);
+      }
+      RAVE_OBJECT_RELEASE(attributes);
     } else {
       result = 0;
     }
@@ -340,7 +420,7 @@ done:
  * @param[in] ... - the varargs
  * @return 1 on success otherwise 0
  */
-static int VpOdimIOInternal_addParameter(RaveField_t* field, HL_NodeList* nodelist, const char* fmt, ...)
+static int VpOdimIOInternal_addParameter(VpOdimIO_t* self, RaveField_t* field, HL_NodeList* nodelist, const char* fmt, ...)
 {
   int result = 0;
   RaveObjectList_t* attributes = NULL;
@@ -365,9 +445,11 @@ static int VpOdimIOInternal_addParameter(RaveField_t* field, HL_NodeList* nodeli
       goto done;
     }
   }
-  if ((attributes = RaveField_getAttributeValues(field)) == NULL) {
+  if ((attributes = RaveField_getAttributeValuesVersion(field, self->version)) == NULL) {
     goto done;
   }
+
+  VpOdimIOInternal_updateGainOffset(self, attributes, 1);
 
   if (!RaveHL_addAttributes(nodelist, attributes, name)) {
     goto done;
@@ -393,7 +475,7 @@ done:
  * @param[in] ... - the varargs
  * @return 1 on success otherwise 0
  */
-static int VpOdimIOInternal_addFields(VerticalProfile_t* vp, HL_NodeList* nodelist, const char* fmt, ...)
+static int VpOdimIOInternal_addFields(VpOdimIO_t* self, VerticalProfile_t* vp, HL_NodeList* nodelist, const char* fmt, ...)
 {
   int result = 0;
   RaveObjectList_t* fields = NULL;
@@ -425,7 +507,7 @@ static int VpOdimIOInternal_addFields(VerticalProfile_t* vp, HL_NodeList* nodeli
   for (pindex = 0; result == 1 && pindex < nparams; pindex++) {
     RaveField_t* field = (RaveField_t*)RaveObjectList_get(fields, pindex);
     if (field != NULL) {
-      result = VpOdimIOInternal_addParameter(field, nodelist, "%s/data%d", name, (pindex+1));
+      result = VpOdimIOInternal_addParameter(self, field, nodelist, "%s/data%d", name, (pindex+1));
     } else {
       result = 0;
     }
@@ -483,6 +565,7 @@ int VpOdimIO_read(VpOdimIO_t* self, LazyNodeListReader_t* lazyReader, VerticalPr
   arg.lazyReader = lazyReader;
   arg.nodelist = LazyNodeListReader_getHLNodeList(lazyReader);
   arg.object = (RaveCoreObject*)vp;
+  arg.version = self->version;
 
   if (!RaveHL_hasNodeByName(arg.nodelist, "/dataset1") ||
       !RaveHL_hasNodeByName(arg.nodelist, "/dataset1/data1")) {
@@ -498,7 +581,7 @@ int VpOdimIO_read(VpOdimIO_t* self, LazyNodeListReader_t* lazyReader, VerticalPr
     goto done;
   }
 
-  if (!VpOdimIOInternal_fillVpDataset(lazyReader, vp, "/dataset1")) {
+  if (!VpOdimIOInternal_fillVpDataset(self, lazyReader, vp, "/dataset1")) {
     RAVE_ERROR0("Failed to fill vertical profile");
     goto done;
   }
@@ -532,7 +615,7 @@ int VpOdimIO_fill(VpOdimIO_t* self, VerticalProfile_t* vp, HL_NodeList* nodelist
     }
   }
 
-  attributes = VerticalProfile_getAttributeValues(vp);
+  attributes = VerticalProfile_getAttributeValuesVersion(vp, self->version);
   if (attributes != NULL) {
     const char* objectType = RaveTypes_getStringFromObjectType(Rave_ObjectType_VP);
     if (!RaveUtilities_addStringAttributeToList(attributes, "what/object", objectType) ||
@@ -563,6 +646,7 @@ int VpOdimIO_fill(VpOdimIO_t* self, VerticalProfile_t* vp, HL_NodeList* nodelist
       !RaveUtilities_replaceDoubleAttributeInList(attributes, "where/lon", VerticalProfile_getLongitude(vp)*180.0/M_PI)) {
     goto done;
   }
+
   if (!VerticalProfile_hasAttribute(vp, "how/software")) {
     if (!RaveUtilities_addStringAttributeToList(attributes, "how/software", "BALTRAD")) {
       RAVE_ERROR0("Failed to add how/software to attributes");
@@ -638,7 +722,7 @@ int VpOdimIO_fill(VpOdimIO_t* self, VerticalProfile_t* vp, HL_NodeList* nodelist
     goto done;
   }
 
-  result = VpOdimIOInternal_addFields(vp, nodelist, "/dataset1");
+  result = VpOdimIOInternal_addFields(self, vp, nodelist, "/dataset1");
 
 done:
   RAVE_OBJECT_RELEASE(attributes);

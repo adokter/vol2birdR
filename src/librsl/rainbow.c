@@ -34,7 +34,7 @@ static int get_param_int(char *buf)
     int value;
     char *substr;
 
-    substr = index(buf, ':');
+    substr = strchr(buf, ':');
     sscanf(substr, ": %d", &value);
     return value;
 }
@@ -46,7 +46,7 @@ static float get_param_float(char *buf)
     float value;
     char *substr;
 
-    substr = index(buf, ':');
+    substr = strchr(buf, ':');
     sscanf(substr, ": %f", &value);
     return value;
 }
@@ -59,7 +59,7 @@ static char *get_param_string(char *buf)
     static char string[20];
     char *substr;
 
-    substr = index(buf, ':');
+    substr = strchr(buf, ':');
     sscanf(substr, ": %s", string);
     return string;
 }

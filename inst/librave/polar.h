@@ -7,6 +7,18 @@
 #ifndef POLAR_H
 #define POLAR_H
 
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#ifndef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#endif
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+#endif
+
 /**
  * Position object used for navigation.
  */

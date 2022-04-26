@@ -28,6 +28,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "rave_alloc.h"
 #include "raveobject_hashtable.h"
 #include "rave_utilities.h"
+#include "rave_attribute_table.h"
 #include <string.h>
 /**
  * Represents the cartesian volume
@@ -36,7 +37,7 @@ struct _RaveField_t {
   RAVE_OBJECT_HEAD /** Always on top */
   RaveData2D_t* data; /**< the data */
   LazyDataset_t* lazyDataset; /**< the lazy dataset */
-  RaveObjectHashTable_t* attrs; /**< attributes */
+  RaveAttributeTable_t* attrs; /**< attributes */
 };
 
 /*@{ Private functions */
@@ -46,7 +47,7 @@ struct _RaveField_t {
 static int RaveField_constructor(RaveCoreObject* obj)
 {
   RaveField_t* this = (RaveField_t*)obj;
-  this->attrs = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
+  this->attrs = RAVE_OBJECT_NEW(&RaveAttributeTable_TYPE);
   this->data = RAVE_OBJECT_NEW(&RaveData2D_TYPE);
   this->lazyDataset = NULL;
   if (this->attrs == NULL || this->data == NULL) {
@@ -256,6 +257,12 @@ RaveDataType RaveField_getDataType(RaveField_t* field)
 
 int RaveField_addAttribute(RaveField_t* field,  RaveAttribute_t* attribute)
 {
+  RAVE_ASSERT((field != NULL), "field == NULL");
+  return RaveField_addAttributeVersion(field,  attribute, RAVEIO_API_ODIM_VERSION);
+}
+
+int RaveField_addAttributeVersion(RaveField_t* field,  RaveAttribute_t* attribute, RaveIO_ODIM_Version version)
+{
   char* aname = NULL;
   char* gname = NULL;
   const char* name = NULL;
@@ -271,7 +278,7 @@ int RaveField_addAttribute(RaveField_t* field,  RaveAttribute_t* attribute)
 
   if ((strcasecmp("how", gname)==0 && RaveAttributeHelp_validateHowGroupAttributeName(gname, aname)) ||
       ((strcasecmp("what", gname)==0 || strcasecmp("where", gname)==0) && strchr(aname, '/') == NULL)) {
-    result = RaveObjectHashTable_put(field->attrs, name, (RaveCoreObject*)attribute);
+    result = RaveAttributeTable_addAttributeVersion(field->attrs, attribute, version, NULL);
   }
 
 done:
@@ -287,49 +294,49 @@ RaveAttribute_t* RaveField_getAttribute(RaveField_t* field, const char* name)
     RAVE_ERROR0("Trying to get an attribute with NULL name");
     return NULL;
   }
-  return (RaveAttribute_t*)RaveObjectHashTable_get(field->attrs, name);
+  return RaveAttributeTable_getAttribute(field->attrs, name);
 }
 
 int RaveField_hasAttribute(RaveField_t* field, const char* name)
 {
   RAVE_ASSERT((field != NULL), "field == NULL");
-  return RaveObjectHashTable_exists(field->attrs, name);
+  return RaveAttributeTable_hasAttribute(field->attrs, name);
 }
 
 RaveList_t* RaveField_getAttributeNames(RaveField_t* field)
 {
   RAVE_ASSERT((field != NULL), "field == NULL");
-  return RaveObjectHashTable_keys(field->attrs);
+  return RaveField_getAttributeNamesVersion(field, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveList_t* RaveField_getAttributeNamesVersion(RaveField_t* field, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((field != NULL), "field == NULL");
+  return RaveAttributeTable_getAttributeNamesVersion(field->attrs, version);
 }
 
 RaveObjectList_t* RaveField_getAttributeValues(RaveField_t* field)
 {
-  RaveObjectList_t* result = NULL;
-  RaveObjectList_t* tableattrs = NULL;
-
   RAVE_ASSERT((field != NULL), "field == NULL");
+  return RaveField_getAttributeValuesVersion(field, RAVEIO_API_ODIM_VERSION);
+}
 
-  tableattrs = RaveObjectHashTable_values(field->attrs);
-  if (tableattrs == NULL) {
-    goto error;
-  }
-  result = RAVE_OBJECT_CLONE(tableattrs);
-  if (result == NULL) {
-    goto error;
-  }
+RaveObjectList_t* RaveField_getAttributeValuesVersion(RaveField_t* field, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((field != NULL), "field == NULL");
+  return RaveAttributeTable_getValuesVersion(field->attrs, version);
+}
 
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return result;
-error:
-  RAVE_OBJECT_RELEASE(result);
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return NULL;
+RaveObjectList_t* RaveField_getInternalAttributeValues(RaveField_t* field)
+{
+  RAVE_ASSERT((field != NULL), "field == NULL");
+  return RaveAttributeTable_getInternalValues(field->attrs);
 }
 
 void RaveField_removeAttributes(RaveField_t* field)
 {
   RAVE_ASSERT((field != NULL), "field == NULL");
-  RaveObjectHashTable_clear(field->attrs);
+  RaveAttributeTable_clear(field->attrs);
 }
 
 int RaveField_hasAttributeStringValue(RaveField_t* field, const char* name, const char* value)
@@ -339,7 +346,7 @@ int RaveField_hasAttributeStringValue(RaveField_t* field, const char* name, cons
 
   RAVE_ASSERT((field != NULL), "field == NULL");
   if (name != NULL && value != NULL) {
-    attr = (RaveAttribute_t*)RaveObjectHashTable_get(field->attrs, name);
+    attr = RaveAttributeTable_getAttribute(field->attrs, name);
     if (attr != NULL && RaveAttribute_getFormat(attr) == RaveAttribute_Format_String) {
       char* aval = NULL;
       RaveAttribute_getString(attr, &aval);

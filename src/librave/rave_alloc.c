@@ -70,7 +70,7 @@ static RaveHeapEntry_t* rave_alloc_createHeapEntry(const char* filename, int lin
     memset(&(((unsigned char*)ptr)[sz+4]), 0, 4);
     ((unsigned char*)ptr)[sz+4] = 0xCA;
     ((unsigned char*)ptr)[sz+5] = 0xFE;
-    result->b = ptr + 4;
+    result->b = (char*)ptr + 4;
   } else {
     memset(&(((unsigned char*)ptr)[0]), 0, 8);
     ((unsigned char*)ptr)[6] = 0xCA;
@@ -78,7 +78,7 @@ static RaveHeapEntry_t* rave_alloc_createHeapEntry(const char* filename, int lin
     memset(&(((unsigned char*)ptr)[sz+8]), 0, 8);
     ((unsigned char*)ptr)[sz+8] = 0xCA;
     ((unsigned char*)ptr)[sz+9] = 0xFE;
-    result->b = ptr + 8;
+    result->b = (char*)ptr + 8;
   }
   return result;
 }
@@ -101,12 +101,12 @@ static int rave_alloc_reallocateDataInEntry(RaveHeapEntry_t* entry, size_t sz)
     memset(&(((unsigned char*)entry->ptr)[sz+4]), 0, 4);
     ((unsigned char*)entry->ptr)[sz+4] = 0xCA;
     ((unsigned char*)entry->ptr)[sz+5] = 0xFE;
-    entry->b = entry->ptr + 4;
+    entry->b = (char*)(entry->ptr) + 4;
   } else {
     memset(&(((unsigned char*)entry->ptr)[sz+8]), 0, 8);
     ((unsigned char*)entry->ptr)[sz+8] = 0xCA;
     ((unsigned char*)entry->ptr)[sz+9] = 0xFE;
-    entry->b = entry->ptr + 8;
+    entry->b = (char*)(entry->ptr) + 8;
   }
   return 1;
 }

@@ -905,6 +905,16 @@ int PolarScan_isTransformable(PolarScan_t* scan);
 int PolarScan_addAttribute(PolarScan_t* scan, RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute to the scan and specifies the odim version as well.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scan - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - the attribute version
+ * @return 1 on success otherwise 0
+ */
+int PolarScan_addAttributeVersion(PolarScan_t* scan, RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Removes a rave attribute from the scan.
  * @param[in] scan - self
  * @param[in] attrname - the name of the attribute to remove
@@ -918,6 +928,16 @@ void PolarScan_removeAttribute(PolarScan_t* scan, const char* attrname);
  * @returns the attribute if found otherwise NULL
  */
 RaveAttribute_t* PolarScan_getAttribute(PolarScan_t* scan, const char* name);
+
+/**
+ * Returns the rave attribute that is named accordingly for specified version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scan - self
+ * @param[in] name - the name of the attribute
+ * @param[in] version - the attribute version
+ * @returns the attribute if found otherwise NULL
+ */
+RaveAttribute_t* PolarScan_getAttributeVersion(PolarScan_t* scan, const char* name, RaveIO_ODIM_Version version);
 
 /**
  * Returns if the specified attribute exists.
@@ -935,11 +955,30 @@ int PolarScan_hasAttribute(PolarScan_t* scan, const char* name);
 RaveList_t* PolarScan_getAttributeNames(PolarScan_t* scan);
 
 /**
+ * Returns a list of attribute names for specified version. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scan - self
+ * @param[in] version - the attribute version
+ * @returns a list of attribute names
+ */
+RaveList_t* PolarScan_getAttributeNamesVersion(PolarScan_t* scan, RaveIO_ODIM_Version version);
+
+/**
  * Returns a list of attribute values belonging to this scan.
  * @param[in] scan - self
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* PolarScan_getAttributeValues(PolarScan_t* scan);
+
+/**
+ * Returns a list of attribute values belonging to this scan for the specified version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scan - self
+ * @param[in] version - the attribute version
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* PolarScan_getAttributeValuesVersion(PolarScan_t* scan, RaveIO_ODIM_Version version);
+
 
 /**
  * Performs a circular shift of an array attribute. if nx < 0, then shift is performed counter clockwise, if nx > 0, shift is performed clock wise, if 0, no shift is performed.

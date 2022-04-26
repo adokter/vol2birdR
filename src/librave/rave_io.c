@@ -256,12 +256,13 @@ static PolarScan_t* RaveIOInternal_loadScan(LazyNodeListReader_t* lazyReader, Ra
  * @param[in] nodelist - the node list
  * @returns a polar volume on success otherwise NULL
  */
-static PolarVolume_t* RaveIOInternal_loadPolarVolume(LazyNodeListReader_t* reader)
+static PolarVolume_t* RaveIOInternal_loadPolarVolume(LazyNodeListReader_t* reader, RaveIO_ODIM_Version version)
 {
   PolarVolume_t* result = NULL;
   PolarOdimIO_t* odimio = RAVE_OBJECT_NEW(&PolarOdimIO_TYPE);
   if (odimio != NULL) {
     PolarVolume_t* volume = RAVE_OBJECT_NEW(&PolarVolume_TYPE);
+    PolarOdimIO_setVersion(odimio, version);
     if (volume != NULL) {
       if (PolarOdimIO_readVolume(odimio, reader, volume)) {
         result = RAVE_OBJECT_COPY(volume);
@@ -323,12 +324,13 @@ static int RaveIOInternal_addScanToNodeList(RaveIO_t* raveio, PolarScan_t* objec
  * @param[in] nodelist - the hlhdf nodelist
  * @returns a cartesian object or NULL on failure
  */
-static Cartesian_t* RaveIOInternal_loadCartesian(LazyNodeListReader_t* lazyReader)
+static Cartesian_t* RaveIOInternal_loadCartesian(LazyNodeListReader_t* lazyReader, RaveIO_ODIM_Version version)
 {
   Cartesian_t* result = NULL;
   CartesianOdimIO_t* odimio = RAVE_OBJECT_NEW(&CartesianOdimIO_TYPE);
   if (odimio != NULL) {
     Cartesian_t* cartesian = RAVE_OBJECT_NEW(&Cartesian_TYPE);
+    CartesianOdimIO_setVersion(odimio, version);
     if (cartesian != NULL) {
       if (CartesianOdimIO_readCartesian(odimio, lazyReader, cartesian)) {
         result = RAVE_OBJECT_COPY(cartesian);
@@ -340,12 +342,13 @@ static Cartesian_t* RaveIOInternal_loadCartesian(LazyNodeListReader_t* lazyReade
   return result;
 }
 
-static RaveCoreObject* RaveIOInternal_loadCartesianVolume(LazyNodeListReader_t* lazyReader)
+static RaveCoreObject* RaveIOInternal_loadCartesianVolume(LazyNodeListReader_t* lazyReader, RaveIO_ODIM_Version version)
 {
   CartesianVolume_t* result = NULL;
   CartesianOdimIO_t* odimio = RAVE_OBJECT_NEW(&CartesianOdimIO_TYPE);
   if (odimio != NULL) {
     CartesianVolume_t* volume = RAVE_OBJECT_NEW(&CartesianVolume_TYPE);
+    CartesianOdimIO_setVersion(odimio, version);
     if (volume != NULL) {
       if (CartesianOdimIO_readVolume(odimio, lazyReader, volume)) {
         result = RAVE_OBJECT_COPY(volume);
@@ -411,12 +414,13 @@ static int RaveIOInternal_addCartesianToNodeList(RaveIO_t* raveio, Cartesian_t* 
   return result;
 }
 
-static RaveCoreObject* RaveIOInternal_loadVP(LazyNodeListReader_t* lazyReader)
+static RaveCoreObject* RaveIOInternal_loadVP(LazyNodeListReader_t* lazyReader, RaveIO_ODIM_Version version)
 {
   VerticalProfile_t* result = NULL;
   VpOdimIO_t* odimio = RAVE_OBJECT_NEW(&VpOdimIO_TYPE);
   if (odimio != NULL) {
     VerticalProfile_t* vp = RAVE_OBJECT_NEW(&VerticalProfile_TYPE);
+    VpOdimIO_setVersion(odimio, version);
     if (vp != NULL) {
       if (VpOdimIO_read(odimio, lazyReader, vp)) {
         result = RAVE_OBJECT_COPY(vp);
@@ -491,15 +495,15 @@ static int RaveIOInternal_loadHDF5(RaveIO_t* raveio, int lazyLoading, const char
   objectType = RaveIOInternal_getObjectType(nodelist);
 
   if (objectType == Rave_ObjectType_CVOL || objectType == Rave_ObjectType_COMP) {
-    object = (RaveCoreObject*)RaveIOInternal_loadCartesianVolume(lazyReader);
+    object = (RaveCoreObject*)RaveIOInternal_loadCartesianVolume(lazyReader, version);
   } else if (objectType == Rave_ObjectType_IMAGE) {
-    object = (RaveCoreObject*)RaveIOInternal_loadCartesian(lazyReader);
+    object = (RaveCoreObject*)RaveIOInternal_loadCartesian(lazyReader, version);
   } else if (objectType == Rave_ObjectType_PVOL) {
-    object = (RaveCoreObject*)RaveIOInternal_loadPolarVolume(lazyReader);
+    object = (RaveCoreObject*)RaveIOInternal_loadPolarVolume(lazyReader, version);
   } else if (objectType == Rave_ObjectType_SCAN) {
     object = (RaveCoreObject*)RaveIOInternal_loadScan(lazyReader, version);
   } else if (objectType == Rave_ObjectType_VP) {
-    object = (RaveCoreObject*)RaveIOInternal_loadVP(lazyReader);
+    object = (RaveCoreObject*)RaveIOInternal_loadVP(lazyReader, version);
   } else {
     RAVE_ERROR1("Currently, RaveIO does not support the object type as defined by '%s'", raveio->filename);
     goto done;

@@ -28,6 +28,18 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #define POLARNAV_H
 #include "rave_object.h"
 
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+#ifndef _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_NONSTDC_NO_DEPRECATE
+#endif
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#endif
+#endif
+
 /**
  * Defines a polar navigator
  */

@@ -1,0 +1,24 @@
+$(info The name of the shared library to be created is: $(SHLIB))
+
+SOURCES = $(wildcard ./*.cpp )
+
+SOURCES_C = $(wildcard ./libvol2bird/*.c ./librave/*.c ./libhlhdf/*.c ./librsl/*.c)
+
+OBJECTS_C = $(SOURCES_C:.c=.o)
+
+OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
+
+# pkg-config.exe proj --libs
+PROJ_LIBS=@PROJ_LIBS@
+PKG_LIBS=-lpthread -lhdf5 -lbz2  -lz  -ldl -lm $(PROJ_LIBS)
+PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO
+
+PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -DNOCONFUSE -DNO_UNZIP_PIPE -DRSL=1
+
+PKG_CPPFLAGS+= $(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::CFlags()")
+
+PKG_LIBS+=$(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::LdFlags()")
+
+all: $(SHLIB)
+
+

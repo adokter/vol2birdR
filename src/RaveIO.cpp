@@ -726,12 +726,12 @@ public:
       int nRowsProfile = vol2birdGetNRowsProfile(config.alldata());
       int nColsProfile = vol2birdGetNColsProfile(config.alldata());
 
-      fprintf(stdout, "# vol2bird Vertical Profile of Birds (VPB)\n");
-      fprintf(stdout, "# source: %s\n", source);
-      fprintf(stdout, "# polar volume input: %s\n", fileIn[0]);
+      Rprintf("# vol2bird Vertical Profile of Birds (VPB)\n");
+      Rprintf("# source: %s\n", source);
+      Rprintf("# polar volume input: %s\n", fileIn[0]);
       if (config.alldata()->misc.vcp > 0)
-        fprintf(stdout, "# volume coverage pattern (VCP): %i\n", config.alldata()->misc.vcp);
-      printf("# date   time HGHT    u      v       w     ff    dd  sd_vvp gap dbz     eta   dens   DBZH   n   n_dbz n_all n_dbz_all\n");
+        Rprintf("# volume coverage pattern (VCP): %i\n", config.alldata()->misc.vcp);
+      Rprintf("# date   time HGHT    u      v       w     ff    dd  sd_vvp gap dbz     eta   dens   DBZH   n   n_dbz n_all n_dbz_all\n");
 
       float *profileBio;
       float *profileAll;
@@ -744,8 +744,8 @@ public:
 
       for (iRowProfile = 0; iRowProfile < nRowsProfile; iRowProfile++) {
         iCopied = iRowProfile * nColsProfile;
-        printf("%8s %.4s ", date, time);
-        printf("%4.f %6.2f %6.2f %7.2f %5.2f %5.1f %6.2f %1c %6.2f %6.1f %6.2f %6.2f %5.f %5.f %5.f %5.f\n", profileBio[0 + iCopied],
+        Rprintf("%8s %.4s ", date, time);
+        Rprintf("%4.f %6.2f %6.2f %7.2f %5.2f %5.1f %6.2f %1c %6.2f %6.1f %6.2f %6.2f %5.f %5.f %5.f %5.f\n", profileBio[0 + iCopied],
             nanify(profileBio[2 + iCopied]), nanify(profileBio[3 + iCopied]), nanify(profileBio[4 + iCopied]), nanify(profileBio[5 + iCopied]),
             nanify(profileBio[6 + iCopied]), nanify(profileAll[7 + iCopied]), profileBio[8 + iCopied] == TRUE ? 'T' : 'F', nanify(profileBio[9 + iCopied]),
             nanify(profileBio[11 + iCopied]), nanify(profileBio[12 + iCopied]), nanify(profileAll[9 + iCopied]), nanify(profileBio[10 + iCopied]),

@@ -537,6 +537,17 @@ int Cartesian_isTransformable(Cartesian_t* cartesian);
 int Cartesian_addAttribute(Cartesian_t* cartesian, RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute to the cartesian product for specified version. If attribute maps to the member attributes it will be used to set the specific member.
+ * NOTE! This method is usually only used internally.
+ * instead.
+ * @param[in] cartesian - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - the attribute version
+ * @return 1 on success otherwise 0
+ */
+int Cartesian_addAttributeVersion(Cartesian_t* cartesian, RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Returns the rave attribute that is named accordingly.
  * @param[in] cartesian - self
  * @param[in] name - the name of the attribute
@@ -545,11 +556,30 @@ int Cartesian_addAttribute(Cartesian_t* cartesian, RaveAttribute_t* attribute);
 RaveAttribute_t* Cartesian_getAttribute(Cartesian_t* cartesian, const char* name);
 
 /**
+ * Returns the rave attribute that is named accordingly for specified version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] cartesian - self
+ * @param[in] name - the name of the attribute
+ * @param[in] version - the attribute version
+ * @returns the attribute if found otherwise NULL
+ */
+RaveAttribute_t* Cartesian_getAttributeVersion(Cartesian_t* cartesian, const char* name, RaveIO_ODIM_Version version);
+
+/**
  * Returns a list of attribute names. Release with \@ref #RaveList_freeAndDestroy.
  * @param[in] cartesian - self
  * @returns a list of attribute names
  */
 RaveList_t* Cartesian_getAttributeNames(Cartesian_t* cartesian);
+
+/**
+ * Returns a list of attribute names actual for specified version. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] cartesian - self
+ * @param[in] version - the attribute version
+ * @returns a list of attribute names
+ */
+RaveList_t* Cartesian_getAttributeNamesVersion(Cartesian_t* cartesian, RaveIO_ODIM_Version version);
 
 /**
  * Returns a list of attribute values that should be stored for this cartesian product.
@@ -560,6 +590,16 @@ RaveList_t* Cartesian_getAttributeNames(Cartesian_t* cartesian);
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* Cartesian_getAttributeValues(Cartesian_t* cartesian);
+
+/**
+ * Returns a list of attribute values that has been set for this product.
+ * NOTE! This method is usually only used internally.
+ * @param[in] cartesian - self
+ * @param[in] version - the attribute version
+ * belonging to a cartesian volume
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* Cartesian_getAttributeValuesVersion(Cartesian_t* cartesian, RaveIO_ODIM_Version version);
 
 /**
  * Returns if the cartesian product has got the specified attribute.

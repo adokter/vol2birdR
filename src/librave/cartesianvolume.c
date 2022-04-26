@@ -30,6 +30,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "rave_data2d.h"
 #include "raveobject_hashtable.h"
 #include "rave_utilities.h"
+#include "rave_attribute_table.h"
 #include <string.h>
 
 /**
@@ -41,7 +42,7 @@ struct _CartesianVolume_t {
   RaveDateTime_t* datetime;  /**< the date and time */
   char* source;              /**< where does this data come from */
   RaveObjectList_t* images;  /**< the list of images */
-  RaveObjectHashTable_t* attrs; /**< attributes */
+  RaveAttributeTable_t* attrs; /**< attributes */
   Projection_t* projection;     /**< this volumes projection definition */
   double xscale;                /**< x scale */
   double yscale;                /**< y scale */
@@ -66,7 +67,7 @@ static int CartesianVolume_constructor(RaveCoreObject* obj)
   this->source = NULL;
   this->datetime = RAVE_OBJECT_NEW(&RaveDateTime_TYPE);
   this->images = RAVE_OBJECT_NEW(&RaveObjectList_TYPE);
-  this->attrs = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
+  this->attrs = RAVE_OBJECT_NEW(&RaveAttributeTable_TYPE);
   this->projection = NULL;
   this->xscale = 0.0;
   this->yscale = 0.0;
@@ -419,6 +420,13 @@ int CartesianVolume_getNumberOfImages(CartesianVolume_t* cvol)
 
 int CartesianVolume_addAttribute(CartesianVolume_t* cvol, RaveAttribute_t* attribute)
 {
+  RAVE_ASSERT((cvol != NULL), "cvol == NULL");
+  RAVE_ASSERT((attribute != NULL), "attribute == NULL");
+  return CartesianVolume_addAttributeVersion(cvol, attribute, RAVEIO_API_ODIM_VERSION);
+}
+
+int CartesianVolume_addAttributeVersion(CartesianVolume_t* cvol, RaveAttribute_t* attribute, RaveIO_ODIM_Version version)
+{
   const char* name = NULL;
   char* aname = NULL;
   char* gname = NULL;
@@ -433,9 +441,9 @@ int CartesianVolume_addAttribute(CartesianVolume_t* cvol, RaveAttribute_t* attri
       goto done;
     }
     if ((strcasecmp("how", gname)==0) &&RaveAttributeHelp_validateHowGroupAttributeName(gname, aname)) {
-      result = RaveObjectHashTable_put(cvol->attrs, name, (RaveCoreObject*)attribute);
+      result = RaveAttributeTable_addAttributeVersion(cvol->attrs, attribute, version, NULL);
     } else if (strcasecmp("what/prodpar", name)==0) {
-      result = RaveObjectHashTable_put(cvol->attrs, name, (RaveCoreObject*)attribute);
+      result = RaveAttributeTable_addAttributeVersion(cvol->attrs, attribute, version, NULL);
     } else {
       RAVE_WARNING1("You are not allowed to add dynamic attributes in other groups than 'how': '%s'", name);
       goto done;
@@ -451,40 +459,47 @@ done:
 RaveAttribute_t* CartesianVolume_getAttribute(CartesianVolume_t* cvol,  const char* name)
 {
   RAVE_ASSERT((cvol != NULL), "cvol == NULL");
+  return CartesianVolume_getAttributeVersion(cvol, name, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveAttribute_t* CartesianVolume_getAttributeVersion(CartesianVolume_t* cvol,  const char* name, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((cvol != NULL), "cvol == NULL");
   if (name == NULL) {
     RAVE_ERROR0("Trying to get an attribute with NULL name");
     return NULL;
   }
-  return (RaveAttribute_t*)RaveObjectHashTable_get(cvol->attrs, name);
+  return RaveAttributeTable_getAttributeVersion(cvol->attrs, name, version);
 }
 
 int CartesianVolume_hasAttribute(CartesianVolume_t* cvol,  const char* name)
 {
   RAVE_ASSERT((cvol != NULL), "cvol == NULL");
-  return RaveObjectHashTable_exists(cvol->attrs, name);
+  return RaveAttributeTable_hasAttribute(cvol->attrs, name);
 }
 
 RaveList_t* CartesianVolume_getAttributeNames(CartesianVolume_t* cvol)
 {
   RAVE_ASSERT((cvol != NULL), "cvol == NULL");
-  return RaveObjectHashTable_keys(cvol->attrs);
+  return CartesianVolume_getAttributeNamesVersion(cvol, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveList_t* CartesianVolume_getAttributeNamesVersion(CartesianVolume_t* cvol, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((cvol != NULL), "cvol == NULL");
+  return RaveAttributeTable_getAttributeNamesVersion(cvol->attrs, version);
 }
 
 RaveObjectList_t* CartesianVolume_getAttributeValues(CartesianVolume_t* cvol)
 {
-  RaveObjectList_t* result = NULL;
-  RaveObjectList_t* attrs = NULL;
-
   RAVE_ASSERT((cvol != NULL), "cvol == NULL");
+  return CartesianVolume_getAttributeValuesVersion(cvol, RAVEIO_API_ODIM_VERSION);
+}
 
-  attrs = RaveObjectHashTable_values(cvol->attrs);
-  if (attrs == NULL) {
-    goto error;
-  }
-  result = RAVE_OBJECT_CLONE(attrs);
-error:
-  RAVE_OBJECT_RELEASE(attrs);
-  return result;
+RaveObjectList_t* CartesianVolume_getAttributeValuesVersion(CartesianVolume_t* cvol, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((cvol != NULL), "cvol == NULL");
+  return RaveAttributeTable_getValuesVersion(cvol->attrs, version);
 }
 
 /*@} End of Interface functions */

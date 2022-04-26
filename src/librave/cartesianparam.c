@@ -32,6 +32,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "rave_utilities.h"
 #include "rave_types.h"
 #include <string.h>
+#include "rave_attribute_table.h"
 
 /**
  * Represents the cartesian field product.
@@ -51,7 +52,7 @@ struct _CartesianParam_t {
 
   LazyDataset_t* lazyDataset; /**< the lazy dataset */
 
-  RaveObjectHashTable_t* attrs; /**< attributes */
+  RaveAttributeTable_t* attrs; /**< attributes */
   RaveObjectList_t* qualityfields; /**< quality fields */
 };
 
@@ -69,7 +70,7 @@ static int CartesianParam_constructor(RaveCoreObject* obj)
   this->undetect = 0.0;
   this->lazyDataset = NULL;
   this->data = RAVE_OBJECT_NEW(&RaveData2D_TYPE);
-  this->attrs = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
+  this->attrs = RAVE_OBJECT_NEW(&RaveAttributeTable_TYPE);
   this->qualityfields = RAVE_OBJECT_NEW(&RaveObjectList_TYPE);
   if (this->data == NULL || this->attrs == NULL || this->qualityfields == NULL) {
     goto fail;
@@ -407,6 +408,12 @@ RaveValueType CartesianParam_getMean(CartesianParam_t* self, long x, long y, int
 
 int CartesianParam_addAttribute(CartesianParam_t* self, RaveAttribute_t* attribute)
 {
+  RAVE_ASSERT((self != NULL), "self == NULL");
+  return CartesianParam_addAttributeVersion(self, attribute, RAVEIO_API_ODIM_VERSION);
+}
+
+int CartesianParam_addAttributeVersion(CartesianParam_t* self, RaveAttribute_t* attribute, RaveIO_ODIM_Version version)
+{
   const char* name = NULL;
   char* aname = NULL;
   char* gname = NULL;
@@ -421,9 +428,9 @@ int CartesianParam_addAttribute(CartesianParam_t* self, RaveAttribute_t* attribu
       goto done;
     }
     if ((strcasecmp("how", gname)==0) &&RaveAttributeHelp_validateHowGroupAttributeName(gname, aname)) {
-      result = RaveObjectHashTable_put(self->attrs, name, (RaveCoreObject*)attribute);
+      result = RaveAttributeTable_addAttributeVersion(self->attrs, attribute, version, NULL);
     } else if (strcasecmp("what/prodpar", name)==0) {
-      result = RaveObjectHashTable_put(self->attrs, name, (RaveCoreObject*)attribute);
+      result = RaveAttributeTable_addAttributeVersion(self->attrs, attribute, version, NULL);
     } else {
       RAVE_WARNING1("You are not allowed to add dynamic attributes in other groups than 'how': '%s'", name);
       goto done;
@@ -439,40 +446,47 @@ done:
 RaveAttribute_t* CartesianParam_getAttribute(CartesianParam_t* self, const char* name)
 {
   RAVE_ASSERT((self != NULL), "self == NULL");
+  return CartesianParam_getAttributeVersion(self, name, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveAttribute_t* CartesianParam_getAttributeVersion(CartesianParam_t* self, const char* name, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((self != NULL), "self == NULL");
   if (name == NULL) {
     RAVE_ERROR0("Trying to get an attribute with NULL name");
     return NULL;
   }
-  return (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, name);
+  return RaveAttributeTable_getAttributeVersion(self->attrs, name, version);
 }
 
 RaveList_t* CartesianParam_getAttributeNames(CartesianParam_t* self)
 {
   RAVE_ASSERT((self != NULL), "self == NULL");
-  return RaveObjectHashTable_keys(self->attrs);
+  return CartesianParam_getAttributeNamesVersion(self, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveList_t* CartesianParam_getAttributeNamesVersion(CartesianParam_t* self, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((self != NULL), "self == NULL");
+  return RaveAttributeTable_getAttributeNamesVersion(self->attrs, version);
 }
 
 RaveObjectList_t* CartesianParam_getAttributeValues(CartesianParam_t* self)
 {
-  RaveObjectList_t* result = NULL;
-  RaveObjectList_t* attrs = NULL;
-
   RAVE_ASSERT((self != NULL), "self == NULL");
+  return CartesianParam_getAttributeValuesVersion(self, RAVEIO_API_ODIM_VERSION);
+}
 
-  attrs = RaveObjectHashTable_values(self->attrs);
-  if (attrs == NULL) {
-    goto error;
-  }
-  result = RAVE_OBJECT_CLONE(attrs);
-error:
-  RAVE_OBJECT_RELEASE(attrs);
-  return result;
+RaveObjectList_t* CartesianParam_getAttributeValuesVersion(CartesianParam_t* self, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((self != NULL), "self == NULL");
+  return RaveAttributeTable_getValuesVersion(self->attrs, version);
 }
 
 int CartesianParam_hasAttribute(CartesianParam_t* self, const char* name)
 {
   RAVE_ASSERT((self != NULL), "self == NULL");
-  return RaveObjectHashTable_exists(self->attrs, name);
+  return RaveAttributeTable_hasAttribute(self->attrs, name);
 }
 
 int CartesianParam_addQualityField(CartesianParam_t* self, RaveField_t* field)

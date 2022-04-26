@@ -25,7 +25,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef RAVE_PROJ_H
 #define RAVE_PROJ_H
 
-/*#include <math.h>*/
+#include <math.h>
 
 #ifdef USE_PROJ4_API
 #include <proj_api.h>

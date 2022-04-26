@@ -574,106 +574,110 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
      */
 
     bzero(&msghdr, sizeof(msghdr));
+
     n = fread(&msghdr, sizeof(Wsr88d_msg_hdr), 1, wf->fptr);
 
-    /* printf("msgtype = %d\n", msghdr.msg_type); */
     msg_hdr_size = sizeof(Wsr88d_msg_hdr) - sizeof(msghdr.rpg);
 
     radar = RSL_new_radar(MAX_RADAR_VOLUMES);
     memset(&wsr88d_ray, 0, sizeof(Wsr88d_ray_m31)); /* Initialize to be safe. */
 
-    while (! end_of_vos) {
-	if (msghdr.msg_type == 31) {
-	    if (little_endian()) wsr88d_swap_m31_hdr(&msghdr);
+  while (!end_of_vos) {
+    if (msghdr.msg_type == 31) {
+      if (little_endian())
+        wsr88d_swap_m31_hdr(&msghdr);
 
-	    /* Get size of the remainder of message.  The given size is in
-	     * halfwords; convert it to bytes.
-	     */
-	    msg_size = (int) msghdr.msg_size * 2 - msg_hdr_size;
+      /* Get size of the remainder of message.  The given size is in
+       * halfwords; convert it to bytes.
+       */
+      msg_size = (int) msghdr.msg_size * 2 - msg_hdr_size;
 
-	    n = read_wsr88d_ray_m31(wf, msg_size, &wsr88d_ray);
-	    if (n <= 0) return NULL;
-	    raynum = wsr88d_ray.ray_hdr.azm_num;
-	    if (raynum > MAXRAYS_M31) {
-		fprintf(stderr,"Error: raynum = %d, exceeds MAXRAYS_M31"
-			" (%d)\n", raynum, MAXRAYS_M31);
-		fprintf(stderr,"isweep = %d\n", isweep);
-		RSL_free_radar(radar);
-		return NULL;
-	    }
+      n = read_wsr88d_ray_m31(wf, msg_size, &wsr88d_ray);
+      if (n <= 0)
+        return NULL;
+      raynum = wsr88d_ray.ray_hdr.azm_num;
+      if (raynum > MAXRAYS_M31) {
+        fprintf(stderr, "Error: raynum = %d, exceeds MAXRAYS_M31"
+            " (%d)\n", raynum, MAXRAYS_M31);
+        RSL_free_radar(radar);
+        return NULL;
+      }
 
-	    /* Check for an unexpected start of new elevation, and issue a
-	     * warning if this has occurred.  This condition usually means
-	     * less rays then expected in the sweep that just ended.
-	     */
-	    if (wsr88d_ray.ray_hdr.radial_status == START_OF_ELEV &&
-		    wsr88d_ray.ray_hdr.elev_num-1 > isweep) {
-		fprintf(stderr,"Warning: Radial status is Start-of-Elevation, "
-			"but End-of-Elevation was not\n"
-			"issued for elevation number %d.  Number of rays = %d"
-			"\n", prev_elev_num, prev_raynum);
-		wsr88d_load_sweep_header(radar, isweep);
-		isweep++;
-		prev_elev_num = wsr88d_ray.ray_hdr.elev_num - 1;
-	    }
+      /* Check for an unexpected start of new elevation, and issue a
+       * warning if this has occurred.  This condition usually means
+       * less rays then expected in the sweep that just ended.
+       */
+      if (wsr88d_ray.ray_hdr.radial_status == START_OF_ELEV && wsr88d_ray.ray_hdr.elev_num - 1 > isweep) {
+        fprintf(stderr, "Warning: Radial status is Start-of-Elevation, "
+            "but End-of-Elevation was not\n"
+            "issued for elevation number %d.  Number of rays = %d"
+            "\n", prev_elev_num, prev_raynum);
+        wsr88d_load_sweep_header(radar, isweep);
+        isweep++;
+        prev_elev_num = wsr88d_ray.ray_hdr.elev_num - 1;
+      }
 
-            /* Check if this sweep number exceeds how many we allocated */
-            if (isweep > MAXSWEEPS) {
-		fprintf(stderr,"Error: isweep = %d, exceeds MAXSWEEPS (%d)\n", isweep, MAXSWEEPS);
-		RSL_free_radar(radar);
-		return NULL;                
-            }
+      /* Check if this sweep number exceeds how many we allocated */
+      if (isweep > MAXSWEEPS) {
+        fprintf(stderr, "Error: isweep = %d, exceeds MAXSWEEPS (%d)\n", isweep, MAXSWEEPS);
+        RSL_free_radar(radar);
+        return NULL;
+      }
 
-	    /* Load ray into radar structure. */
-	    wsr88d_load_ray_into_radar(&wsr88d_ray, isweep, radar);
-	    prev_raynum = raynum;
+      /* Load ray into radar structure. */
+      wsr88d_load_ray_into_radar(&wsr88d_ray, isweep, radar);
+      prev_raynum = raynum;
 
-	    /* Check for end of sweep */
-	    if (wsr88d_ray.ray_hdr.radial_status == END_OF_ELEV) {
-		wsr88d_load_sweep_header(radar, isweep);
-		isweep++;
-		prev_elev_num = wsr88d_ray.ray_hdr.elev_num;
-	    }
-	}
-	else { /* msg_type not 31 */
-	    n = fread(&non31_seg_remainder, sizeof(non31_seg_remainder), 1,
-		    wf->fptr);
-	    if (n < 1) {
-		fprintf(stderr,"Warning: load_wsr88d_m31_into_radar: ");
-		if (feof(wf->fptr) != 0)
-		    fprintf(stderr, "Unexpected end of file.\n");
-		else
-		    fprintf(stderr,"Read failed.\n");
-		fprintf(stderr,"Current sweep index: %d\n"
-			"Last ray read: %d\n", isweep, prev_raynum);
-		wsr88d_load_sweep_header(radar, isweep);
-		return radar;
-	    }
-	    if (msghdr.msg_type == 5) {
-		wsr88d_get_vcp_data(non31_seg_remainder);
-		radar->h.vcp = vcp_data.vcp;
-	    }
-	}
+      /* Check for end of sweep */
+      if (wsr88d_ray.ray_hdr.radial_status == END_OF_ELEV) {
+        wsr88d_load_sweep_header(radar, isweep);
+        isweep++;
+        prev_elev_num = wsr88d_ray.ray_hdr.elev_num;
+      }
+    } else { /* msg_type not 31 */
+      n = fread(&non31_seg_remainder, sizeof(non31_seg_remainder), 1, wf->fptr);
+      fprintf(stderr, "not_31 - ftell: %d\n", ftell(wf->fptr));
 
-	/* If not at end of volume scan, read next message header. */
-	if (wsr88d_ray.ray_hdr.radial_status != END_VOS) {
-	    n = fread(&msghdr, sizeof(Wsr88d_msg_hdr), 1, wf->fptr);
-	    if (n < 1) {
-		fprintf(stderr,"Warning: load_wsr88d_m31_into_radar: ");
-		if (feof(wf->fptr) != 0)
-		    fprintf(stderr,"Unexpected end of file.\n");
-		else fprintf(stderr,"Failed reading msghdr.\n");
-		fprintf(stderr,"Current sweep index: %d\n"
-			"Last ray read: %d\n", isweep, prev_raynum);
-		wsr88d_load_sweep_header(radar, isweep);
-		end_of_vos = 1;
-	    }
-	}
-	else {
-	    end_of_vos = 1;
-	    wsr88d_load_sweep_header(radar, isweep);
-	}
-    }  /* while not end of vos */
+      if (n < 1) {
+        if (feof(wf->fptr) != 0) {
+          fprintf(stderr, "Unexpected end of file.\n");
+        } else {
+          fprintf(stderr, "Read failed.\n");
+        }
+        fprintf(stderr, "Current sweep index: %d\n"
+            "Last ray read: %d\n", isweep, prev_raynum);
+        wsr88d_load_sweep_header(radar, isweep);
+
+        return radar;
+      }
+      if (msghdr.msg_type == 5) {
+        wsr88d_get_vcp_data(non31_seg_remainder);
+        radar->h.vcp = vcp_data.vcp;
+      }
+    }
+
+    /* If not at end of volume scan, read next message header. */
+    if (wsr88d_ray.ray_hdr.radial_status != END_VOS) {
+      n = fread(&msghdr, sizeof(Wsr88d_msg_hdr), 1, wf->fptr);
+
+      if (n < 1) {
+        fprintf(stderr, "Warning: load_wsr88d_m31_into_radar: ");
+        if (feof(wf->fptr) != 0) {
+          fprintf(stderr, "Unexpected end of file.\n");
+        } else {
+          fprintf(stderr, "Failed reading msghdr.\n");
+        }
+        fprintf(stderr, "Current sweep index: %d\n"
+            "Last ray read: %d\n", isweep, prev_raynum);
+        wsr88d_load_sweep_header(radar, isweep);
+
+        end_of_vos = 1;
+      }
+    } else {
+      end_of_vos = 1;
+      wsr88d_load_sweep_header(radar, isweep);
+    }
+  } /* while not end of vos */
 
     return radar;
 }

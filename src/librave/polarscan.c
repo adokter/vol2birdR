@@ -33,6 +33,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "rave_data2d.h"
 #include "raveobject_hashtable.h"
 #include "rave_utilities.h"
+#include "rave_attribute_table.h"
 
 /**
  * This is the default parameter value that should be used when working
@@ -81,7 +82,8 @@ struct _PolarScan_t {
   char* paramname;
   PolarScanParam_t* param;
 
-  RaveObjectHashTable_t* attrs; /**< attributes */
+  /*RaveObjectHashTable_t* attrs;*/ /**< attributes */
+  RaveAttributeTable_t* attrs;
 
   RaveObjectList_t* qualityfields; /**< quality fields */
 
@@ -131,7 +133,7 @@ static int PolarScan_constructor(RaveCoreObject* obj)
   scan->enddatetime = RAVE_OBJECT_NEW(&RaveDateTime_TYPE);
   scan->parameters = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
   scan->projection = RAVE_OBJECT_NEW(&Projection_TYPE);
-  scan->attrs = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
+  scan->attrs = RAVE_OBJECT_NEW(&RaveAttributeTable_TYPE);
   scan->qualityfields = RAVE_OBJECT_NEW(&RaveObjectList_TYPE);
   scan->maxdistance = -1.0;
 
@@ -277,8 +279,8 @@ void PolarScanInternal_createAzimuthNavigationInfo(PolarScan_t* self, const char
   double *tmpStartazArr = NULL, *tmpStopazArr = NULL, *mvAzArr = NULL;
   int tmpStartazLen = 0, tmpStopazLen = 0, i = 0;
   if (strcasecmp("startazA", aname) == 0 || strcasecmp("stopazA", aname) == 0) {
-    startAz = (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, "how/startazA");
-    stopAz = (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, "how/stopazA");
+    startAz = RaveAttributeTable_getAttribute(self->attrs, "how/startazA");
+    stopAz = RaveAttributeTable_getAttribute(self->attrs, "how/stopAz");
     if (startAz != NULL && !RaveAttribute_getDoubleArray(startAz, &tmpStartazArr, &tmpStartazLen)) {
       RAVE_ERROR0("Failed to extract startazA array");
       goto done;
@@ -323,7 +325,7 @@ void PolarScanInternal_createAzimuthNavigationInfo(PolarScan_t* self, const char
       mvAzArr = NULL;
     }
   } else if (strcasecmp("astart", aname) == 0) {
-    astart = (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, "how/astart");
+    astart = RaveAttributeTable_getAttribute(self->attrs, "how/astart");
     if (astart != NULL) {
       double tmpv = 0.0;
       self->astart=0.0;
@@ -401,19 +403,8 @@ static PolarNavigationInfo* PolarScan_getNavigationInfo(
 
 static int PolarScanInternal_shiftArrayIfExists(PolarScan_t* scan, const char* attrname, int nx)
 {
-  RaveAttribute_t* attr = NULL;
-  int result = 1;
-
-  attr = PolarScan_getAttribute(scan, attrname);
-  if (attr != NULL) {
-    if (RaveAttribute_getFormat(attr) == RaveAttribute_Format_LongArray ||
-        RaveAttribute_getFormat(attr) == RaveAttribute_Format_DoubleArray) {
-      result = RaveAttribute_shiftArray(attr, nx);
-    }
-  }
-  RAVE_OBJECT_RELEASE(attr);
-
-  return result;
+  RAVE_ASSERT((scan != NULL), "scan == NULL");
+  return RaveAttributeTable_shiftAttributeIfExists(scan->attrs, attrname, nx);
 }
 
 /*@} End of Private functions */
@@ -613,7 +604,7 @@ double PolarScan_getMaxDistance(PolarScan_t* scan)
 
   if (scan->maxdistance < 0.0) {
     scan->maxdistance = 0.0;
-    PolarNavigator_reToDh(scan->navigator, (scan->nbins+1) * scan->rscale, scan->elangle, &scan->maxdistance, &h);
+    PolarNavigator_reToDh(scan->navigator, (scan->nbins+1) * scan->rscale + scan->rstart*1000.0, scan->elangle, &scan->maxdistance, &h);
   }
 
   return scan->maxdistance;
@@ -774,12 +765,13 @@ int PolarScan_addParameter(PolarScan_t* scan, PolarScanParam_t* parameter)
     scan->nrays = PolarScanParam_getNrays(parameter);
     scan->nbins = PolarScanParam_getNbins(parameter);
     scan->maxdistance = -1.0;
-    if (RaveObjectHashTable_exists(scan->attrs, "how/startazA")) {
+    if (RaveAttributeTable_hasAttribute(scan->attrs, "how/startazA")) {
       PolarScanInternal_createAzimuthNavigationInfo(scan, "startazA");
     }
-    if (RaveObjectHashTable_exists(scan->attrs, "how/astart")) {
+    if (RaveAttributeTable_hasAttribute(scan->attrs, "how/astart")) {
       PolarScanInternal_createAzimuthNavigationInfo(scan, "astart");
     }
+
   } else {
     if (scan->nrays != PolarScanParam_getNrays(parameter) ||
         scan->nbins != PolarScanParam_getNbins(parameter)) {
@@ -1061,8 +1053,8 @@ int PolarScan_getNorthmostIndex(PolarScan_t* self)
 
   RAVE_ASSERT((self != NULL), "scan == NULL");
 
-  startAz = (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, "how/startazA");
-  stopAz = (RaveAttribute_t*)RaveObjectHashTable_get(self->attrs, "how/stopazA");
+  startAz = RaveAttributeTable_getAttribute(self->attrs, "how/startazA");
+  stopAz = RaveAttributeTable_getAttribute(self->attrs, "how/stopazA");
   if (startAz != NULL && !RaveAttribute_getDoubleArray(startAz, &startazArr, &startazLen)) {
     RAVE_ERROR0("Failed to extract startazA array");
     goto done;
@@ -1351,7 +1343,11 @@ int PolarScan_getAzimuthAndRangeFromIndex(PolarScan_t* scan, int bin, int ray, d
   RAVE_ASSERT((scan != NULL), "scan == NULL");
   RAVE_ASSERT((a != NULL), "a == NULL");
   RAVE_ASSERT((r != NULL), "r == NULL");
-  *r = bin * scan->rscale;
+
+  if (bin < 0 || bin >= scan->nbins || ray < 0 || ray >= scan->nrays) {
+    return 0;
+  }
+  *r = bin * scan->rscale + scan->rstart*1000.0;
   *a = (2*M_PI/scan->nrays)*ray;
   return 1;
 }
@@ -1673,6 +1669,11 @@ int PolarScan_isTransformable(PolarScan_t* scan)
 
 int PolarScan_addAttribute(PolarScan_t* scan, RaveAttribute_t* attribute)
 {
+  return PolarScan_addAttributeVersion(scan, attribute, RAVEIO_API_ODIM_VERSION);
+}
+
+int PolarScan_addAttributeVersion(PolarScan_t* scan, RaveAttribute_t* attribute, RaveIO_ODIM_Version version)
+{
   const char* name = NULL;
   char* aname = NULL;
   char* gname = NULL;
@@ -1688,7 +1689,7 @@ int PolarScan_addAttribute(PolarScan_t* scan, RaveAttribute_t* attribute)
     }
     if ((strcasecmp("how", gname)==0) &&
         RaveAttributeHelp_validateHowGroupAttributeName(gname, aname)) {
-      result = RaveObjectHashTable_put(scan->attrs, name, (RaveCoreObject*)attribute);
+      result = RaveAttributeTable_addAttributeVersion(scan->attrs, attribute, version, NULL);
       if (result) {
         if (strcasecmp("astart", aname) == 0 ||
             strcasecmp("startazA", aname) == 0 ||
@@ -1707,6 +1708,7 @@ done:
   return result;
 }
 
+
 void PolarScan_removeAttribute(PolarScan_t* scan, const char* attrname)
 {
   char* aname = NULL;
@@ -1722,7 +1724,7 @@ void PolarScan_removeAttribute(PolarScan_t* scan, const char* attrname)
         RAVE_ERROR1("Not possible to validate how/group attribute name %s", attrname);
         goto done;
       }
-      RaveCoreObject* attr = RaveObjectHashTable_remove(scan->attrs, attrname);
+      RaveAttribute_t* attr = RaveAttributeTable_removeAttribute(scan->attrs, attrname);
       RAVE_OBJECT_RELEASE(attr);
     }
   }
@@ -1736,63 +1738,52 @@ done:
 RaveAttribute_t* PolarScan_getAttribute(PolarScan_t* scan, const char* name)
 {
   RAVE_ASSERT((scan != NULL), "scan == NULL");
+  return PolarScan_getAttributeVersion(scan, name, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveAttribute_t* PolarScan_getAttributeVersion(PolarScan_t* scan, const char* name, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((scan != NULL), "scan == NULL");
   if (name == NULL) {
     RAVE_ERROR0("Trying to get an attribute with NULL name");
     return NULL;
   }
-  return (RaveAttribute_t*)RaveObjectHashTable_get(scan->attrs, name);
+  return RaveAttributeTable_getAttributeVersion(scan->attrs, name, version);
 }
 
 int PolarScan_hasAttribute(PolarScan_t* scan, const char* name)
 {
   RAVE_ASSERT((scan != NULL), "scan == NULL");
-  return RaveObjectHashTable_exists(scan->attrs, name);
+  return RaveAttributeTable_hasAttribute(scan->attrs, name);
 }
 
 RaveList_t* PolarScan_getAttributeNames(PolarScan_t* scan)
 {
   RAVE_ASSERT((scan != NULL), "scan == NULL");
-  return RaveObjectHashTable_keys(scan->attrs);
+  return PolarScan_getAttributeNamesVersion(scan, RAVEIO_API_ODIM_VERSION);
 }
+
+RaveList_t* PolarScan_getAttributeNamesVersion(PolarScan_t* scan, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((scan != NULL), "scan == NULL");
+  return RaveAttributeTable_getAttributeNamesVersion(scan->attrs, version);
+}
+
 
 RaveObjectList_t* PolarScan_getAttributeValues(PolarScan_t* scan)
 {
-  RaveObjectList_t* result = NULL;
-  RaveObjectList_t* tableattrs = NULL;
-
-  RAVE_ASSERT((scan != NULL), "scan == NULL");
-  tableattrs = RaveObjectHashTable_values(scan->attrs);
-  if (tableattrs == NULL) {
-    goto error;
-  }
-  result = RAVE_OBJECT_CLONE(tableattrs);
-  if (result == NULL) {
-    goto error;
-  }
-
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return result;
-error:
-  RAVE_OBJECT_RELEASE(result);
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return NULL;
+  return PolarScan_getAttributeValuesVersion(scan, RAVEIO_API_ODIM_VERSION);
 }
+
+RaveObjectList_t* PolarScan_getAttributeValuesVersion(PolarScan_t* scan, RaveIO_ODIM_Version version)
+{
+  return RaveAttributeTable_getValuesVersion(scan->attrs, version);
+}
+
 
 int PolarScan_shiftAttribute(PolarScan_t* scan, const char* name, int nx)
 {
-  RaveAttribute_t* attr = NULL;
-  int result = 0;
-
-  attr = PolarScan_getAttribute(scan, name);
-  if (attr != NULL) {
-    if (RaveAttribute_getFormat(attr) == RaveAttribute_Format_LongArray ||
-        RaveAttribute_getFormat(attr) == RaveAttribute_Format_DoubleArray) {
-      result = RaveAttribute_shiftArray(attr, nx);
-    }
-  }
-  RAVE_OBJECT_RELEASE(attr);
-
-  return result;
+  return RaveAttributeTable_shiftAttribute(scan->attrs, name, nx);
 }
 
 int PolarScan_isValid(PolarScan_t* scan, Rave_ObjectType otype)
@@ -1803,8 +1794,8 @@ int PolarScan_isValid(PolarScan_t* scan, Rave_ObjectType otype)
   if (otype == Rave_ObjectType_PVOL) {
     if (PolarScan_getTime(scan) == NULL ||
         PolarScan_getDate(scan) == NULL ||
-        !RaveObjectHashTable_exists(scan->attrs, "what/enddate") ||
-        !RaveObjectHashTable_exists(scan->attrs, "what/endtime")) {
+        !RaveAttributeTable_hasAttribute(scan->attrs, "what/enddate") ||
+        !RaveAttributeTable_hasAttribute(scan->attrs, "what/endtime")) {
       RAVE_INFO0("Missing start/end date/time information");
       goto done;
     }
@@ -1917,7 +1908,7 @@ static RaveField_t* PolarScanInternal_getHeightOrDistanceField(PolarScan_t* self
 
   for (i = 0; i < self->nbins; i++) {
     double d = 0.0, h = 0.0;
-    PolarNavigator_reToDh(self->navigator, i*self->rscale, self->elangle, &d, &h);
+    PolarNavigator_reToDh(self->navigator, i*self->rscale + self->rstart*1000.0, self->elangle, &d, &h);
     if (ftype == 0) {
       RaveField_setValue(f, i, 0, d);
     } else {
@@ -1990,7 +1981,6 @@ fail:
   RAVE_OBJECT_RELEASE(parameters);
   return result;
 }
-
 
 int PolarScan_shiftDataAndAttributes(PolarScan_t* self, int nrays)
 {

@@ -228,13 +228,32 @@ int PolarScanParam_addAttribute(PolarScanParam_t* scanparam,
   RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute to the parameter.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scanparam - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - the version of the attribute added
+ * @return 1 on success otherwise 0
+ */
+int PolarScanParam_addAttributeVersion(PolarScanParam_t* scanparam, RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Returns the rave attribute that is named accordingly.
  * @param[in] scanparam - self
  * @param[in] name - the name of the attribute
  * @returns the attribute if found otherwise NULL
  */
-RaveAttribute_t* PolarScanParam_getAttribute(PolarScanParam_t* scanparam,
-  const char* name);
+RaveAttribute_t* PolarScanParam_getAttribute(PolarScanParam_t* scanparam,  const char* name);
+
+/**
+ * Returns the rave attribute that is named accordingly and version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scanparam - self
+ * @param[in] name - the name of the attribute
+ * @param[in] version - the version of the attribute
+ * @returns the attribute if found otherwise NULL
+ */
+RaveAttribute_t* PolarScanParam_getAttributeVersion(PolarScanParam_t* scanparam,  const char* name, RaveIO_ODIM_Version version);
 
 /**
  * Returns if the specified attribute exists.
@@ -252,6 +271,15 @@ int PolarScanParam_hasAttribute(PolarScanParam_t* scanparam, const char* name);
 RaveList_t* PolarScanParam_getAttributeNames(PolarScanParam_t* scanparam);
 
 /**
+ * Returns a list of attribute names for specified version. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] scanparam - self
+ * @param[in] version - the version of the attribute
+ * @returns a list of attribute names
+ */
+RaveList_t* PolarScanParam_getAttributeNamesVersion(PolarScanParam_t* scanparam, RaveIO_ODIM_Version version);
+
+/**
  * Returns a list of attribute values that should be stored for this parameter. Corresponding
  * members will also be added as attribute values. E.g. gain will be stored
  * as a double with name what/gain.
@@ -259,6 +287,16 @@ RaveList_t* PolarScanParam_getAttributeNames(PolarScanParam_t* scanparam);
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* PolarScanParam_getAttributeValues(PolarScanParam_t* scanparam);
+
+/**
+ * Returns a list of attribute values in specified version that has been added to this parameter. Corresponding members will also be added as attribute values. E.g. gain will be stored
+ * NOTE! This method is usually only used internally.
+ * as a double with name what/gain.
+ * @param[in] scanparam - self
+ * @param[in] version - the version of the attribute
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* PolarScanParam_getAttributeValuesVersion(PolarScanParam_t* scanparam, RaveIO_ODIM_Version version);
 
 /**
  * Adds a quality field to this scan.

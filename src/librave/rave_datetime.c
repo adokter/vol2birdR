@@ -145,6 +145,16 @@ const char* RaveDateTime_getDate(RaveDateTime_t* dt)
   return (const char*)dt->date;
 }
 
+int RaveDateTime_strptime(char* yyyymmddHHMMSS, struct tm* ts)
+{
+  if (sscanf(yyyymmddHHMMSS, "%4d%2d%2d%2d%2d%2d", &ts->tm_year, &ts->tm_mon, &ts->tm_mday, &ts->tm_hour, &ts->tm_min, &ts->tm_sec) != 6) {
+    return 0;
+  }
+  ts->tm_year += 1900;
+  ts->tm_mon -= 1;
+  return 1;
+}
+
 int RaveDateTime_compare(RaveDateTime_t* self, RaveDateTime_t* other)
 {
   RAVE_ASSERT((self != NULL), "self was NULL");
@@ -163,8 +173,7 @@ int RaveDateTime_compare(RaveDateTime_t* self, RaveDateTime_t* other)
     memset(&selft, 0, sizeof(struct tm));
     memset(&othert, 0, sizeof(struct tm));
 
-    if (strptime(selfdatestr, "%Y%m%d%H%M%S", &selft) == NULL ||
-        strptime(otherdatestr, "%Y%m%d%H%M%S", &othert) == NULL) {
+    if (!RaveDateTime_strptime(selfdatestr, &selft) || !RaveDateTime_strptime(otherdatestr, &othert)) {
       RAVE_WARNING2("Failed to convert either %s or %s into a time_t structure", selfdatestr, otherdatestr);
     } else {
       time_t ot = mktime(&othert);

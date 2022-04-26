@@ -288,12 +288,32 @@ double VerticalProfile_getMaxheight(VerticalProfile_t* self);
 int VerticalProfile_addAttribute(VerticalProfile_t* self, RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute of specified version to the vertical profile.
+ * NOTE! This method is usually only used internally.
+ * @param[in] self - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - the attribute version
+ * @return 1 on success otherwise 0
+ */
+int VerticalProfile_addAttributeVersion(VerticalProfile_t* self, RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Returns the rave attribute that is named accordingly.
  * @param[in] self - self
  * @param[in] name - the name of the attribute
  * @returns the attribute if found otherwise NULL
  */
 RaveAttribute_t* VerticalProfile_getAttribute(VerticalProfile_t* self, const char* name);
+
+/**
+ * Returns the rave attribute that is named accordingly of specified version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] self - self
+ * @param[in] name - the name of the attribute
+ * @param[in] version - the attribute version
+ * @returns the attribute if found otherwise NULL
+ */
+RaveAttribute_t* VerticalProfile_getAttributeVersion(VerticalProfile_t* self, const char* name, RaveIO_ODIM_Version version);
 
 /**
  * Returns if the specified attribute exists or not
@@ -311,11 +331,29 @@ int VerticalProfile_hasAttribute(VerticalProfile_t* self, const char* name);
 RaveList_t* VerticalProfile_getAttributeNames(VerticalProfile_t* self);
 
 /**
+ * Returns a list of attribute names for specified version. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] self - self
+ * @param[in] version - the attribute version
+ * @returns a list of attribute names
+ */
+RaveList_t* VerticalProfile_getAttributeNamesVersion(VerticalProfile_t* self, RaveIO_ODIM_Version version);
+
+/**
  * Returns a list of attribute values belonging to this vertical profile.
  * @param[in] self - self
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* VerticalProfile_getAttributeValues(VerticalProfile_t* self);
+
+/**
+ * Returns a list of attribute values for the specified version belonging to this vertical profile.
+ * NOTE! This method is usually only used internally.
+ * @param[in] self - self
+ * @param[in] version - the attribute version
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* VerticalProfile_getAttributeValuesVersion(VerticalProfile_t* self, RaveIO_ODIM_Version version);
 
 /**
  * Returns the Mean horizontal wind velocity (m/s).

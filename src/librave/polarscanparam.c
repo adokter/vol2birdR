@@ -32,6 +32,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "rave_data2d.h"
 #include "raveobject_hashtable.h"
 #include "rave_utilities.h"
+#include "rave_attribute_table.h"
 #include <float.h>
 
 /**
@@ -46,7 +47,7 @@ struct _PolarScanParam_t {
   double offset;     /**< offset when scaling */
   double nodata;     /**< nodata */
   double undetect;   /**< undetect */
-  RaveObjectHashTable_t* attrs; /**< attributes */
+  RaveAttributeTable_t* attrs; /**< attributes */
   RaveObjectList_t* qualityfields; /**< quality fields */
 };
 
@@ -59,7 +60,7 @@ static int PolarScanParam_constructor(RaveCoreObject* obj)
 {
   PolarScanParam_t* this = (PolarScanParam_t*)obj;
   this->data = RAVE_OBJECT_NEW(&RaveData2D_TYPE);
-  this->attrs = RAVE_OBJECT_NEW(&RaveObjectHashTable_TYPE);
+  this->attrs = RAVE_OBJECT_NEW(&RaveAttributeTable_TYPE);
   this->qualityfields = RAVE_OBJECT_NEW(&RaveObjectList_TYPE);
   this->quantity = NULL;
   this->gain = 0.0L;
@@ -359,9 +360,13 @@ int PolarScanParam_setValue(PolarScanParam_t* scanparam, int bin, int ray, doubl
   RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
   return RaveData2D_setValue(PolarScanParamInternal_ensureData2D(scanparam), bin, ray, v);
 }
+int PolarScanParam_addAttribute(PolarScanParam_t* scanparam,  RaveAttribute_t* attribute)
+{
+  RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
+  return PolarScanParam_addAttributeVersion(scanparam, attribute, RAVEIO_API_ODIM_VERSION);
+}
 
-int PolarScanParam_addAttribute(PolarScanParam_t* scanparam,
-  RaveAttribute_t* attribute)
+int PolarScanParam_addAttributeVersion(PolarScanParam_t* scanparam, RaveAttribute_t* attribute, RaveIO_ODIM_Version version)
 {
   const char* name = NULL;
   char* aname = NULL;
@@ -378,7 +383,8 @@ int PolarScanParam_addAttribute(PolarScanParam_t* scanparam,
     }
     if ((strcasecmp("how", gname)==0 && RaveAttributeHelp_validateHowGroupAttributeName(gname, aname)) ||
         ((strcasecmp("what", gname)==0 || strcasecmp("where", gname)==0) && strchr(aname, '/') == NULL)) {
-      result = RaveObjectHashTable_put(scanparam->attrs, name, (RaveCoreObject*)attribute);
+
+      result = RaveAttributeTable_addAttributeVersion(scanparam->attrs, attribute, version, NULL);
     }
   }
 
@@ -392,46 +398,48 @@ RaveAttribute_t* PolarScanParam_getAttribute(PolarScanParam_t* scanparam,
   const char* name)
 {
   RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
+  return PolarScanParam_getAttributeVersion(scanparam, name, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveAttribute_t* PolarScanParam_getAttributeVersion(PolarScanParam_t* scanparam,  const char* name, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
   if (name == NULL) {
     RAVE_ERROR0("Trying to get an attribute with NULL name");
     return NULL;
   }
-  return (RaveAttribute_t*)RaveObjectHashTable_get(scanparam->attrs, name);
+  return RaveAttributeTable_getAttributeVersion(scanparam->attrs, name, version);
 }
+
 
 int PolarScanParam_hasAttribute(PolarScanParam_t* scanparam, const char* name)
 {
   RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
-  return RaveObjectHashTable_exists(scanparam->attrs, name);
+  return RaveAttributeTable_hasAttribute(scanparam->attrs, name);
 }
 
 RaveList_t* PolarScanParam_getAttributeNames(PolarScanParam_t* scanparam)
 {
   RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
-  return RaveObjectHashTable_keys(scanparam->attrs);
+  return PolarScanParam_getAttributeNamesVersion(scanparam, RAVEIO_API_ODIM_VERSION);
+}
+
+RaveList_t* PolarScanParam_getAttributeNamesVersion(PolarScanParam_t* scanparam, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
+  return RaveAttributeTable_getAttributeNamesVersion(scanparam->attrs, version);
 }
 
 RaveObjectList_t* PolarScanParam_getAttributeValues(PolarScanParam_t* scanparam)
 {
-  RaveObjectList_t* result = NULL;
-  RaveObjectList_t* tableattrs = NULL;
-
   RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
-  tableattrs = RaveObjectHashTable_values(scanparam->attrs);
-  if (tableattrs == NULL) {
-    goto error;
-  }
-  result = RAVE_OBJECT_CLONE(tableattrs);
-  if (result == NULL) {
-    goto error;
-  }
+  return PolarScanParam_getAttributeValuesVersion(scanparam, RAVEIO_API_ODIM_VERSION);
+}
 
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return result;
-error:
-  RAVE_OBJECT_RELEASE(result);
-  RAVE_OBJECT_RELEASE(tableattrs);
-  return NULL;
+RaveObjectList_t* PolarScanParam_getAttributeValuesVersion(PolarScanParam_t* scanparam, RaveIO_ODIM_Version version)
+{
+  RAVE_ASSERT((scanparam != NULL), "scanparam == NULL");
+  return RaveAttributeTable_getValuesVersion(scanparam->attrs, version);
 }
 
 int PolarScanParam_addQualityField(PolarScanParam_t* param, RaveField_t* field)
@@ -515,7 +523,7 @@ RaveField_t* PolarScanParam_toField(PolarScanParam_t* param)
     goto done;
   }
 
-  attrlist = RaveObjectHashTable_values(param->attrs);
+  attrlist = RaveAttributeTable_getValues(param->attrs);
   if (attrlist == NULL) {
     RAVE_ERROR0("Could not get attribute values");
     goto done;

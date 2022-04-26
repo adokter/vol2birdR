@@ -26,8 +26,6 @@
 #include <string.h>
 #define _USE_BSD
 #include <sys/types.h>
-#include <sys/resource.h>
-#include <sys/wait.h>
 #include <signal.h>
 #include <zlib.h>
 
@@ -38,15 +36,16 @@ int no_command (char *cmd);
 FILE *uncompress_pipe (FILE *fp);
 FILE *compress_pipe (FILE *fp);
 
-
 /* Avoids the 'Broken pipe' message by reading the rest of the stream. */
 void rsl_readflush(FILE *fp)
 {
+#ifndef _WIN32
   if (fork() == 0) { /* Child */
 	char buf[1024];
 	while(fread(buf, sizeof(char), sizeof(buf), fp)) continue;
 	exit(0);
   }
+#endif
 }
 	
 int rsl_pclose(FILE *fp)
@@ -76,13 +75,14 @@ FILE *uncompress_pipe (FILE *fp)
 {
   FILE *retfp = NULL, *result = NULL;
   char buffer[CHUNK];
-
   gzFile gzfp = gzdopen(dup(fileno(fp)), "r");
 
   if (gzfp == Z_NULL) {
     return NULL;
   }
+
   retfp = tmpfile(); /* This might cause problems in windows.. Might have to use different tmpfile approach there.*/
+
   if (retfp == NULL) {
     goto done;
   }
@@ -93,9 +93,11 @@ FILE *uncompress_pipe (FILE *fp)
       break;
     fwrite(buffer, 1, len, retfp);
   }
+
   fseek(retfp, 0, SEEK_SET);
   result = retfp;
   retfp = NULL;
+
 done:
   if (retfp != NULL) {
     fclose(retfp);

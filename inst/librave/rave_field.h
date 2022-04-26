@@ -153,6 +153,16 @@ RaveDataType RaveField_getDataType(RaveField_t* field);
 int RaveField_addAttribute(RaveField_t* field,  RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute to the parameter.
+ * NOTE! This method is usually only used internally.
+ * @param[in] field - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - the version of the attribute added
+ * @return 1 on success otherwise 0
+ */
+int RaveField_addAttributeVersion(RaveField_t* field,  RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Returns the rave attribute that is named accordingly.
  * @param[in] field - self
  * @param[in] name - the name of the attribute
@@ -176,11 +186,37 @@ int RaveField_hasAttribute(RaveField_t* field, const char* name);
 RaveList_t* RaveField_getAttributeNames(RaveField_t* field);
 
 /**
- * Returns a list of attribute values that should be stored for this parameter.
+ * Returns a list of attribute names. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] field - self
+ * @param[in] version - version requested
+ * @returns a list of attribute names
+ */
+RaveList_t* RaveField_getAttributeNamesVersion(RaveField_t* field, RaveIO_ODIM_Version version);
+
+/**
+ * Returns a list of attribute values that has been set for this field
  * @param[in] field - self
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* RaveField_getAttributeValues(RaveField_t* field);
+
+/**
+ * Returns a list of attribute values that has been set for this field and version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] field - self
+ * @param[in] version - version requested
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* RaveField_getAttributeValuesVersion(RaveField_t* field, RaveIO_ODIM_Version version);
+
+/**
+ * Returns a reference to the internally stored attributes.
+ * NOTE! This method is usually only used internally.
+ * @param[in] field - self
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* RaveField_getInternalAttributeValues(RaveField_t* field);
 
 /**
  * Removes all attributes from the field.

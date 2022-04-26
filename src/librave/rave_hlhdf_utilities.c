@@ -132,6 +132,10 @@ const char* QUANTITIES_20_to_22[][2] = {
 /*@} End of Constants */
 
 /*@{ Defines */
+#ifdef _MSC_VER
+#define strcasecmp(x, y) _stricmp(x,y)
+#define strncasecmp(x, y, n) _strnicmp(x,y,n)
+#endif
 
 /**
  * Quick access function for reading one atomic value from a

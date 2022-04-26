@@ -29,6 +29,12 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "raveobject_list.h"
 #include "raveobject_hashtable.h"
 
+#ifdef _MSC_VER
+#ifndef strncasecmp
+#define strcasecmp(x, y) _stricmp(x,y)
+#endif
+#endif
+
 /**
  * Adds a long attribute to an object list.
  * @param[in] l - the list

@@ -38,7 +38,7 @@ typedef enum RaveAttribute_Format {
 } RaveAttribute_Format;
 
 /**
- * Defines a Geographical Area
+ * Defines a rave attribute
  */
 typedef struct _RaveAttribute_t RaveAttribute_t;
 

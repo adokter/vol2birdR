@@ -260,12 +260,39 @@ int CartesianVolume_getNumberOfImages(CartesianVolume_t* cvol);
 int CartesianVolume_addAttribute(CartesianVolume_t* cvol, RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute to the volume of specified version.
+ * what/date, what/time, what/source, where/lon, where/lat and where/height
+ * are handled specially and will be added to respective member instead
+ * of stored as attributes.
+ * what/date, what/time and what/source must be string.
+ * where/lon and where/lat must be double in degrees.
+ * where/height must be double in meters.
+ * NOTE! This method is usually only used internally.
+ *
+ * @param[in] cvol - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - the attribute version
+ * @return 1 on success otherwise 0
+ */
+int CartesianVolume_addAttributeVersion(CartesianVolume_t* cvol, RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Returns the rave attribute that is named accordingly.
  * @param[in] pvol - self
  * @param[in] name - the name of the attribute
  * @returns the attribute if found otherwise NULL
  */
 RaveAttribute_t* CartesianVolume_getAttribute(CartesianVolume_t* cvol,  const char* name);
+
+/**
+ * Returns the rave attribute that is named accordingly. In specified version
+ * NOTE! This method is usually only used internally.
+ * @param[in] pvol - self
+ * @param[in] name - the name of the attribute
+ * @param[in] version - the attribute version
+ * @returns the attribute if found otherwise NULL
+ */
+RaveAttribute_t* CartesianVolume_getAttributeVersion(CartesianVolume_t* cvol,  const char* name, RaveIO_ODIM_Version version);
 
 /**
  * Returns if the specified attribute exists in the how-attributes or not.
@@ -283,10 +310,28 @@ int CartesianVolume_hasAttribute(CartesianVolume_t* cvol,  const char* name);
 RaveList_t* CartesianVolume_getAttributeNames(CartesianVolume_t* cvol);
 
 /**
+ * Returns a list of attribute names for specified version. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] pvol - self
+ * @param[in] version - the attribute version
+ * @returns a list of attribute names
+ */
+RaveList_t* CartesianVolume_getAttributeNamesVersion(CartesianVolume_t* cvol, RaveIO_ODIM_Version version);
+
+/**
  * Returns a list of attribute values that should be stored for this volume.
  * @param[in] pvol - self
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* CartesianVolume_getAttributeValues(CartesianVolume_t* cvol);
+
+/**
+ * Returns a list of attribute values in specified version for this volume.
+ * NOTE! This method is usually only used internally.
+ * @param[in] cvol - self
+ * @param[in] version - the attribute version
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* CartesianVolume_getAttributeValuesVersion(CartesianVolume_t* cvol, RaveIO_ODIM_Version version);
 
 #endif /* CARTESIANVOLUME_H */

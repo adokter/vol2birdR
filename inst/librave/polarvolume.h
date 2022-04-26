@@ -468,6 +468,17 @@ int PolarVolume_addAttribute(PolarVolume_t* pvol,
   RaveAttribute_t* attribute);
 
 /**
+ * Adds a rave attribute to the volume using version as well.
+ * NOTE! This method is usually only used internally.
+ * @param[in] pvol - self
+ * @param[in] attribute - the attribute
+ * @param[in] version - version of attribute requested
+ * @return 1 on success otherwise 0
+ */
+int PolarVolume_addAttributeVersion(PolarVolume_t* pvol,
+  RaveAttribute_t* attribute, RaveIO_ODIM_Version version);
+
+/**
  * Returns the rave attribute that is named accordingly.
  * @param[in] pvol - self
  * @param[in] name - the name of the attribute
@@ -475,6 +486,17 @@ int PolarVolume_addAttribute(PolarVolume_t* pvol,
  */
 RaveAttribute_t* PolarVolume_getAttribute(PolarVolume_t* pvol,
   const char* name);
+
+/**
+ * Returns the rave attribute that is named accordingly for specified version.
+ * NOTE! This method is usually only used internally.
+ * @param[in] pvol - self
+ * @param[in] name - the name of the attribute
+ * @param[in] version - version of attribute requested
+ * @returns the attribute if found otherwise NULL
+ */
+RaveAttribute_t* PolarVolume_getAttributeVersion(PolarVolume_t* pvol,
+  const char* name, RaveIO_ODIM_Version version);
 
 /**
  * Removes a rave attribute from the volume.
@@ -491,11 +513,29 @@ void PolarVolume_removeAttribute(PolarVolume_t* pvol, const char* attrname);
 RaveList_t* PolarVolume_getAttributeNames(PolarVolume_t* pvol);
 
 /**
+ * Returns a list of attribute names for specified version. Release with \@ref #RaveList_freeAndDestroy.
+ * NOTE! This method is usually only used internally.
+ * @param[in] pvol - self
+ * @param[in] version - version of attribute requested
+ * @returns a list of attribute names
+ */
+RaveList_t* PolarVolume_getAttributeNamesVersion(PolarVolume_t* pvol, RaveIO_ODIM_Version version);
+
+/**
  * Returns a list of attribute values that should be stored for this volume.
  * @param[in] pvol - self
  * @returns a list of RaveAttributes.
  */
 RaveObjectList_t* PolarVolume_getAttributeValues(PolarVolume_t* pvol);
+
+/**
+ * Returns a list of attribute values in specified version for attributes that has been set in this volume.
+ * NOTE! This method is usually only used internally.
+ * @param[in] pvol - self
+ * @param[in] version - version of attribute requested
+ * @returns a list of RaveAttributes.
+ */
+RaveObjectList_t* PolarVolume_getAttributeValuesVersion(PolarVolume_t* pvol, RaveIO_ODIM_Version version);
 
 /**
  * Returns if the volume has the specified attribute or not

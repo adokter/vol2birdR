@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# PATH=/c/Program\ Files/R/R-4.0.4/bin:$PATH
+
+R_HOME=`R RHOME`
+
+pkg-config.exe --help 2>&1 >> /dev/null
+if [ $? -ne 0 ]; then
+  echo "Failed to locate pkg-config. Can't identify required flags. Using pre-sets."
+  PROJ_LIBS="-LC:/rtools40/mingw64/lib -LC:/msys64/mingw64/lib -lproj -lsqlite3 -lz -ltiff -ljpeg -lz -lcurl -lnormaliz -lssh2 -lcrypt32 -lgdi32 -lws2_32 -lcrypt32 -lgdi32 -lws2_32 -lssl -lcrypto -lws2_32 -lgdi32 -lcrypt32 -lz -lssl -lcrypto -lssl -lcrypto -lws2_32 -lgdi32 -lcrypt32 -lgdi32 -lcrypt32 -lwldap32 -lz -lws2_32 -lstdc++"
+else
+  PROJ_LIBS=`pkg-config.exe proj --libs`
+fi
+
+sed -e "s#@PROJ_LIBS@#${PROJ_LIBS}#g" src/Makevars.win.in > src/Makevars.win
+
