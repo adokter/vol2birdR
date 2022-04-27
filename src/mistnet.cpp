@@ -57,6 +57,7 @@ void cpp_vol2bird_initialize() {
   // called upon package load to remember the thread ID of the main thread
   HL_init();
   vol2bird_set_printf(Vol2Bird_Rprintf);
+  vol2bird_set_err_printf(Vol2Bird_Rprintf);
 }
 
 void call_r_gc() {
