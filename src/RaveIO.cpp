@@ -655,11 +655,20 @@ public:
 //' @export Vol2Bird
 class Vol2Bird {
 private:
+  bool _verbose = true;
 public:
-  Vol2Bird() {
+  Vol2Bird() : _verbose(true) {
   }
 
   virtual ~Vol2Bird() {
+  }
+
+  bool isVerbose() {
+    return _verbose;
+  }
+
+  void setVerbose(bool verbose) {
+    _verbose = verbose;
   }
 
   void process(StringVector &files, Vol2BirdConfig &config, std::string vpOutName, std::string volOutName) {
@@ -721,7 +730,7 @@ public:
     time = PolarVolume_getTime(volume);
     source = PolarVolume_getSource(volume);
 
-    {  // getter example scope begin
+    if (_verbose) {  // getter example scope begin
 
       int nRowsProfile = vol2birdGetNRowsProfile(config.alldata());
       int nColsProfile = vol2birdGetNColsProfile(config.alldata());
@@ -866,8 +875,9 @@ RCPP_MODULE(Vol2BirdConfig) {
 RCPP_EXPOSED_CLASS_NODECL(Vol2Bird)
 RCPP_MODULE(Vol2Bird) {
   class_<Vol2Bird>("Vol2Bird").constructor()
-  //.method("run", &Vol2Bird::run)
-  .method("process", &Vol2Bird::process);
+  .method("process", &Vol2Bird::process)
+  .property("verbose", &Vol2Bird::isVerbose, &Vol2Bird::setVerbose)
+  ;
 }
 //RCPP_EXPOSED_AS(Vol2Bird)
 
