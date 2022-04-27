@@ -154,7 +154,65 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles);
 
 int check_mistnet_loaded_c(void);
 
+static vol2bird_printfun vol2bird_internal_printf_fun = vol2bird_default_print;
+
+static vol2bird_printfun vol2bird_internal_err_printf_fun = vol2bird_default_err_print;
+
 // non-public function declarations (local to this file/translation unit)
+
+void vol2bird_printf(const char* fmt, ...)
+{
+  va_list ap;
+  int n;
+  char msg[65536];
+  va_start(ap, fmt);
+  n = vsnprintf(msg, 1024, fmt, ap);
+  va_end(ap);
+  if (n >= 0 && n <= 65536) {
+    vol2bird_internal_printf_fun(msg);
+  } else {
+    vol2bird_internal_printf_fun("vol2bird_printf failed when printing message");
+  }
+}
+
+void vol2bird_err_printf(const char* fmt, ...)
+{
+  va_list ap;
+  int n;
+  char msg[65536];
+  va_start(ap, fmt);
+  n = vsnprintf(msg, 1024, fmt, ap);
+  va_end(ap);
+  if (n >= 0 && n <= 65536) {
+    vol2bird_internal_err_printf_fun(msg);
+  } else {
+    vol2bird_internal_err_printf_fun("vol2bird_err_printf failed when printing message");
+  }
+}
+
+void vol2bird_default_print(const char* msg)
+{
+  fprintf(stdout, "%s", msg);
+}
+
+void vol2bird_default_err_print(const char* msg)
+{
+  fprintf(stderr, "%s", msg);
+}
+
+void vol2bird_set_printf(vol2bird_printfun fun)
+{
+  if (fun != NULL) {
+    vol2bird_internal_printf_fun = fun;
+  }
+}
+
+void vol2bird_set_err_printf(vol2bird_printfun fun)
+{
+  if (fun != NULL) {
+    vol2bird_internal_err_printf_fun = fun;
+  }
+}
 
 static int analyzeCells(PolarScan_t *scan, vol2birdScanUse_t scanUse, const int nCells, int dualpol, vol2bird_t *alldata) {
 
@@ -175,7 +233,7 @@ static int analyzeCells(PolarScan_t *scan, vol2birdScanUse_t scanUse, const int 
     nCellsValid = 0;
     
     if(!PolarScan_hasParameter(scan, scanUse.cellName)){
-        fprintf(stderr,"no CELL quantity in polar scan, aborting analyzeCells()\n");
+        vol2bird_err_printf("no CELL quantity in polar scan, aborting analyzeCells()\n");
         return 0;
     }
     
@@ -316,7 +374,7 @@ static void calcTexture(PolarScan_t *scan, vol2birdScanUse_t scanUse, vol2bird_t
                          alldata->constants.nRangNeighborhood,iNeighborhood,&iAzimLocal,&iRangLocal);
 
                 #ifdef FPRINTFON
-                fprintf(stderr, "iLocal = %d; ",iLocal);
+                vol2bird_err_printf("iLocal = %d; ",iLocal);
                 #endif
 
                 if (iLocal < 0) {
@@ -362,13 +420,13 @@ static void calcTexture(PolarScan_t *scan, vol2birdScanUse_t scanUse, vol2bird_t
                     PolarScanParam_setValue(texImage,iRang,iAzim,(double) tmpTex);
                 }
                 else {
-                    fprintf(stderr, "Error casting texture value of %f to float type at texImage[%d]. Aborting.\n",tmpTex,iGlobal);
+                    vol2bird_err_printf("Error casting texture value of %f to float type at texImage[%d]. Aborting.\n",tmpTex,iGlobal);
                     return;
                 }
                 
 
                 #ifdef FPRINTFON
-                fprintf(stderr,
+                vol2bird_err_printf(
                         "\n(C) count = %d; nCountMin = %d; vmoment1 = %f; vmoment2 = %f; tex = %f; texBody[%d] = %f\n",
                         count, alldata->constants.nCountMin, vmoment1, vmoment2, tex,
                         iGlobal, tmpTex);
@@ -527,12 +585,12 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                 }
                 
                 if (nCells<0){
-                    fprintf(stderr,"Error: findWeatherCells exited with errors\n");
+                    vol2bird_err_printf("Error: findWeatherCells exited with errors\n");
                     return;
                 }
                 
                 if (alldata->options.printCellProp == TRUE) {
-                    fprintf(stderr,"(%d/%d): found %d cells.\n",iScan+1, nScans, nCells);
+                    vol2bird_err_printf("(%d/%d): found %d cells.\n",iScan+1, nScans, nCells);
                 }
                 
                 // ------------------------------------------------------------- //
@@ -553,32 +611,32 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                 // ------------------------------------------------------------- //
     
                 if (alldata->options.printDbz == TRUE) {
-                    fprintf(stderr,"product = dbz\n");
+                    vol2bird_err_printf("product = dbz\n");
                     printMeta(scan,scanUse[iScan].dbzName);
                     printImage(scan,scanUse[iScan].dbzName);
                 }
                 if (alldata->options.printVrad == TRUE) {
-                    fprintf(stderr,"product = vrad\n");
+                    vol2bird_err_printf("product = vrad\n");
                     printMeta(scan,scanUse[iScan].vradName);
                     printImage(scan,scanUse[iScan].vradName);
                 }
                 if (alldata->options.printRhohv == TRUE) {
-                    fprintf(stderr,"product = rhohv\n");
+                    vol2bird_err_printf("product = rhohv\n");
                     printMeta(scan,scanUse[iScan].rhohvName);
                     printImage(scan,scanUse[iScan].rhohvName);
                 }
                 if (alldata->options.printTex == TRUE) {
-                    fprintf(stderr,"product = tex\n");
+                    vol2bird_err_printf("product = tex\n");
                     printMeta(scan,scanUse[iScan].texName);
                     printImage(scan,scanUse[iScan].texName);
                 }
                 if (alldata->options.printCell == TRUE) {
-                    fprintf(stderr,"product = cell\n");
+                    vol2bird_err_printf("product = cell\n");
                     printMeta(scan,scanUse[iScan].cellName);
                     printImage(scan,scanUse[iScan].cellName);
                 }
                 if (alldata->options.printClut == TRUE) { 
-                    fprintf(stderr,"product = clut\n");
+                    vol2bird_err_printf("product = clut\n");
                     printMeta(scan,scanUse[iScan].clutName);
                     printImage(scan,scanUse[iScan].clutName);
                 }
@@ -601,7 +659,7 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                     alldata->points.nPointsWritten[iLayer] += n;
 
                     if (alldata->points.indexFrom[iLayer] + alldata->points.nPointsWritten[iLayer] > alldata->points.indexTo[iLayer]) {
-                        fprintf(stderr, "Problem occurred: writing over existing data\n");
+                        vol2bird_err_printf("Problem occurred: writing over existing data\n");
                         return;
                     }
     
@@ -654,7 +712,7 @@ static int detNumberOfGates(const int iLayer,
         }
 
         #ifdef FPRINTFON
-        fprintf(stderr, "iRang = %d; range = %f; beamHeight = %f\n",iRang,range,beamHeight);
+        vol2bird_err_printf("iRang = %d; range = %f; beamHeight = %f\n",iRang,range,beamHeight);
         #endif
 
         nGates += nAzim;
@@ -776,7 +834,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
             }
         }
         if (!dualPolPresent){
-            fprintf(stderr,"Warning: no dual-pol moments found, switching to SINGLE POL mode\n");
+            vol2bird_err_printf("Warning: no dual-pol moments found, switching to SINGLE POL mode\n");
             alldata->options.dualPol = FALSE;
         }
     }
@@ -807,7 +865,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
 			}
 		}
 		if (scanUse[iScan].useScan == FALSE){
-			fprintf(stderr,"Warning: radial velocity missing, dropping scan %i ...\n",iScan+1);
+		  vol2bird_err_printf("Warning: radial velocity missing, dropping scan %i ...\n",iScan+1);
 		}
 
         // check that reflectivity parameter is present
@@ -816,7 +874,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
                 strcpy(scanUse[iScan].dbzName,alldata->options.dbzType);	
             }
             else{
-                fprintf(stderr,"Warning: requested reflectivity factor '%s' missing, searching for alternatives ...\n",alldata->options.dbzType);
+                vol2bird_err_printf("Warning: requested reflectivity factor '%s' missing, searching for alternatives ...\n",alldata->options.dbzType);
                 if(PolarScan_hasParameter(scan, "DBZH")){
                     sprintf(scanUse[iScan].dbzName,"DBZH");	
                 }
@@ -830,7 +888,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
 	        }
             }
             if (scanUse[iScan].useScan == FALSE){
-                fprintf(stderr,"Warning: reflectivity factor missing, dropping scan %i ...\n",iScan+1);
+                vol2bird_err_printf("Warning: reflectivity factor missing, dropping scan %i ...\n",iScan+1);
             }
         }
         
@@ -841,7 +899,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
                 scanUse[iScan].useScan = TRUE;
             }
             else{
-                fprintf(stderr,"Warning: correlation coefficient missing, dropping scan %i ...\n",iScan+1);
+                vol2bird_err_printf("Warning: correlation coefficient missing, dropping scan %i ...\n",iScan+1);
                 scanUse[iScan].useScan = FALSE;
             }
         }
@@ -870,7 +928,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
             if (elev < alldata->options.elevMin || elev > alldata->options.elevMax)
             {
                 scanUse[iScan].useScan = FALSE;
-                    fprintf(stderr,"Warning: elevation (%.1f deg) outside valid elevation range (%.1f-%.1f deg), dropping scan %i ...\n",\
+                  vol2bird_err_printf("Warning: elevation (%.1f deg) outside valid elevation range (%.1f-%.1f deg), dropping scan %i ...\n",\
                     elev,alldata->options.elevMin,alldata->options.elevMax,iScan+1);
             }
         }
@@ -883,7 +941,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
             if (rscale < RSCALEMIN || rscale == 0)
             {
                 scanUse[iScan].useScan = FALSE;
-                    fprintf(stderr,"Warning: range bin size (%.2f metre) too small, dropping scan %i ...\n",\
+                  vol2bird_err_printf("Warning: range bin size (%.2f metre) too small, dropping scan %i ...\n",\
                     rscale,iScan+1);
             }
         }
@@ -921,7 +979,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
                     param = PolarScan_getParameter(scan, scanUse[iScan].vradName);
                     nyquist = fabs(PolarScanParam_getOffset(param));
                 }
-                fprintf(stderr,"Warning: Nyquist interval attribute not found for scan %i, using radial velocity offset (%.1f m/s) instead \n",iScan+1,nyquist);
+                vol2bird_err_printf("Warning: Nyquist interval attribute not found for scan %i, using radial velocity offset (%.1f m/s) instead \n",iScan+1,nyquist);
                 RAVE_OBJECT_RELEASE(param);
             }
             
@@ -929,14 +987,14 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
             // only check for nyquist interval when we are NOT dealiasing the velocities
             if (nyquist < alldata->options.minNyquist){
                 scanUse[iScan].useScan = 0;
-                fprintf(stderr,"Warning: Nyquist velocity (%.1f m/s) too low, dropping scan %i ...\n",nyquist,iScan+1);
+                vol2bird_err_printf("Warning: Nyquist velocity (%.1f m/s) too low, dropping scan %i ...\n",nyquist,iScan+1);
             }
             
             // if Nyquist interval (NI) attribute was missing at scan level, add it now
             if (noNyquist){
                 RaveAttribute_t* attr_NI = RaveAttributeHelp_createDouble("how/NI", (double) nyquist);
                 if (attr_NI == NULL && nyquist > 0){
-                    fprintf(stderr, "warning: no valid Nyquist attribute could be added to scan\n");
+                    vol2bird_err_printf("warning: no valid Nyquist attribute could be added to scan\n");
                 }
                 else{    
                     PolarScan_addAttribute(scan, attr_NI);
@@ -991,12 +1049,12 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
     // produces valid JSON according to http://jsonlint.com/
     
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
     
     if (alldata->profiles.iProfileTypeLast != 1) {
-        fprintf(stderr,"Export method expects profile 1, but found %d. Aborting.",alldata->profiles.iProfileTypeLast);
+        vol2bird_err_printf("Export method expects profile 1, but found %d. Aborting.",alldata->profiles.iProfileTypeLast);
         return; 
     }
     
@@ -1006,8 +1064,8 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
     FILE *f = fopen("vol2bird-profile1.json", "w");
     if (f == NULL)
     {
-        printf("Error opening file 'vol2bird-profile1.json'!\n");
-        exit(1);
+        vol2bird_printf("Error opening file 'vol2bird-profile1.json'!\n");
+        return;
     }
     
     fprintf(f,"[\n");
@@ -1177,6 +1235,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
     }
     fprintf(f,"]\n");
 
+    fclose(f);
 }
 
 
@@ -1246,7 +1305,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
     #endif
 
     if (scan==NULL) {
-        fprintf(stderr,"Input scan is NULL.\n");
+        vol2bird_err_printf("Input scan is NULL.\n");
         return -1;
     }
     
@@ -1254,7 +1313,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
     PolarScanParam_t *cellParam = PolarScan_getParameter(scan, CELLNAME);
 
     if (scanParam == NULL || cellParam == NULL) {
-        fprintf(stderr,"%s and/or CELL quantities not found in polar scan\n", quantity);
+        vol2bird_err_printf("%s and/or CELL quantities not found in polar scan\n", quantity);
         return -1;
     }
 
@@ -1300,7 +1359,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
 
     // If threshold value is equal to missing value, produce a warning
     if (quantityThres == quantityMissing) {
-        fprintf(stderr,"Warning: in function findWeatherCells, quantityThres equals quantityMissing\n");
+        vol2bird_err_printf("Warning: in function findWeatherCells, quantityThres equals quantityMissing\n");
     }
 
     // ----------------------------------------------------------------------- //
@@ -1323,7 +1382,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
             }
             else {
                 #ifdef FPRINTFON
-                fprintf(stderr, "iGlobal = %d\niRang + 1 = %d\n"
+                vol2bird_err_printf("iGlobal = %d\niRang + 1 = %d\n"
                 "quantityRangeScale = %f\n"
                 "rCellMax = %f\n"
                 "(iRang + 1) * quantityRangeScale = %f\n"
@@ -1337,7 +1396,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
             }
 
             #ifdef FPRINTFON
-            fprintf(stderr,"iGlobal = %d\n",iGlobal);
+            vol2bird_err_printf("iGlobal = %d\n",iGlobal);
             #endif
             
             PolarScanParam_getValue(scanParam, iRang, iAzim, &quantityValueGlobal);
@@ -1347,7 +1406,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
             if (quantityValueGlobal == quantityMissing || quantityValueGlobal == quantityUndetect) {
 
                 #ifdef FPRINTFON
-                fprintf(stderr,"quantityImage[%d] == quantityMissing\n",iGlobal);
+                vol2bird_err_printf("quantityImage[%d] == quantityMissing\n",iGlobal);
                 #endif
 
                 continue;
@@ -1384,7 +1443,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
             }
 
             #ifdef FPRINTFON
-            fprintf(stderr,"iGlobal = %d, count = %d\n",iGlobal,count);
+            vol2bird_err_printf("iGlobal = %d, count = %d\n",iGlobal,count);
             #endif
 
 
@@ -1428,7 +1487,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
             if ((int) cellValueGlobal == cellImageInitialValue) {
 
                 #ifdef FPRINTFON
-                fprintf(stderr, "new cell found...assigning number %d\n",iCellIdentifier);
+                vol2bird_err_printf("new cell found...assigning number %d\n",iCellIdentifier);
                 #endif
                 
                 PolarScanParam_setValue(cellParam, iRang, iAzim, iCellIdentifier);
@@ -1453,7 +1512,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
         PolarScanParam_getValue(cellParam, iRangLocal, iAzimLocal, &cellValueOther);
 
         #ifdef FPRINTFON
-        fprintf(stderr,"iGlobal = %d, iGlobalOther = %d\n",iGlobal,iGlobalOther);
+        vol2bird_err_printf("iGlobal = %d, iGlobalOther = %d\n",iGlobal,iGlobalOther);
         #endif
 
         cellIdentifierGlobal = cellValueGlobal;
@@ -1487,7 +1546,7 @@ static int findNearbyGateIndex(const int nAzimParent, const int nRangParent, con
     if (nRangChild%2 != 1) {
 
         #ifdef FPRINTFON
-        fprintf(stderr, "nRangChild must be an odd integer number.\n");
+        vol2bird_err_printf("nRangChild must be an odd integer number.\n");
         #endif
 
         return -1;
@@ -1496,7 +1555,7 @@ static int findNearbyGateIndex(const int nAzimParent, const int nRangParent, con
     if (nAzimChild%2 != 1) {
 
         #ifdef FPRINTFON
-        fprintf(stderr, "nAzimChild must be an odd integer number.\n");
+        vol2bird_err_printf("nAzimChild must be an odd integer number.\n");
         #endif
 
         return -2;
@@ -1505,7 +1564,7 @@ static int findNearbyGateIndex(const int nAzimParent, const int nRangParent, con
     if (iChild > nAzimChild * nRangChild - 1) {
 
         #ifdef FPRINTFON
-        fprintf(stderr, "iChild is outside the child window.\n");
+        vol2bird_err_printf("iChild is outside the child window.\n");
         #endif
 
         return -3;
@@ -1526,7 +1585,7 @@ static int findNearbyGateIndex(const int nAzimParent, const int nRangParent, con
     if (*iRangReturn > nRangParent - 1) {
 
         #ifdef FPRINTFON
-        fprintf(stderr, "iChild is outside the parent array on the right-hand side.\n");
+        vol2bird_err_printf("iChild is outside the parent array on the right-hand side.\n");
         #endif
 
         return -4;
@@ -1534,7 +1593,7 @@ static int findNearbyGateIndex(const int nAzimParent, const int nRangParent, con
     if (*iRangReturn < 0) {
 
         #ifdef FPRINTFON
-        fprintf(stderr, "iChild is outside the parent array on the left-hand side.\n");
+        vol2bird_err_printf("iChild is outside the parent array on the left-hand side.\n");
         #endif
 
         return -5;
@@ -1554,7 +1613,7 @@ static void fringeCells(PolarScan_t* scan, vol2bird_t* alldata) {
     // -------------------------------------------------------------------------- //
 
     if(!PolarScan_hasParameter(scan, CELLNAME)){
-        fprintf(stderr,"no CELL quantity in polar scan, aborting fringeCells()\n");
+        vol2bird_err_printf("no CELL quantity in polar scan, aborting fringeCells()\n");
         return;
     }
 
@@ -1621,11 +1680,11 @@ static void fringeCells(PolarScan_t* scan, vol2bird_t* alldata) {
 
 
             #ifdef FPRINTFON
-            fprintf(stderr, "actualRange = %f\n",actualRange);
-            fprintf(stderr, "circumferenceAtActualRange = %f\n",circumferenceAtActualRange);
-            fprintf(stderr, "fringeDist / circumferenceAtActualRange = %f\n",alldata->constants.fringeDist / circumferenceAtActualRange);
-            fprintf(stderr, "aBlock = %d\n", aBlock);
-            fprintf(stderr, "rBlock = %d\n", rBlock);
+            vol2bird_err_printf("actualRange = %f\n",actualRange);
+            vol2bird_err_printf("circumferenceAtActualRange = %f\n",circumferenceAtActualRange);
+            vol2bird_err_printf("fringeDist / circumferenceAtActualRange = %f\n",alldata->constants.fringeDist / circumferenceAtActualRange);
+            vol2bird_err_printf("aBlock = %d\n", aBlock);
+            vol2bird_err_printf("rBlock = %d\n", rBlock);
             #endif
 
             nAzimChild = 2 * aBlock + 1;
@@ -1693,7 +1752,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
     cellProp = (CELLPROP *)malloc(nCells*sizeof(CELLPROP));
     
     if (!cellProp) {
-        fprintf(stderr,"Requested memory could not be allocated in getCellProperties!\n");
+        vol2bird_err_printf("Requested memory could not be allocated in getCellProperties!\n");
         return cellProp;
     }
     
@@ -1733,8 +1792,8 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
             }
 
             #ifdef FPRINTFON
-            fprintf(stderr,"dbzValue = %f; vradValue = %f; clutterValue = %f; texValue = %f\n",dbzValue,vradValue,clutterValue,texValue);
-            fprintf(stderr,"iGlobal = %d, iCell = %d\n",iGlobal,iCell);
+            vol2bird_err_printf("dbzValue = %f; vradValue = %f; clutterValue = %f; texValue = %f\n",dbzValue,vradValue,clutterValue,texValue);
+            vol2bird_err_printf("iGlobal = %d, iCell = %d\n",iGlobal,iCell);
             #endif
 
             cellProp[iCell].nGates += 1;
@@ -1747,7 +1806,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
                 cellProp[iCell].nGatesClutter += 1;
 
                 #ifdef FPRINTFON
-                fprintf(stderr,"iGlobal = %d: vrad too low...treating as clutter\n",iGlobal);
+                vol2bird_err_printf("iGlobal = %d: vrad too low...treating as clutter\n",iGlobal);
                 #endif
 
                 continue;
@@ -1772,7 +1831,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
             if (isnan(cellProp[iCell].dbzMax) || (dbzValue > cellProp[iCell].dbzMax)) {
 
                 #ifdef FPRINTFON
-                fprintf(stderr,"%d: new dbzMax value of %f found for this cell (%d).\n",iGlobal,dbzValue,iCell);
+                vol2bird_err_printf("%d: new dbzMax value of %f found for this cell (%d).\n",iGlobal,dbzValue,iCell);
                 #endif
 
                 cellProp[iCell].dbzMax = dbzValue;
@@ -1957,14 +2016,14 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
     clutVol = vol2birdGetVolume(&file, 1, rangeMax,1);
             
     if(clutVol == NULL){
-        fprintf(stderr, "Error: function loadClutterMap: failed to load file '%s'\n",file); 
+        vol2bird_err_printf( "Error: function loadClutterMap: failed to load file '%s'\n",file);
         return -1;
     }
     
     int nClutScans = PolarVolume_getNumberOfScans(clutVol);
 
     if(nClutScans < 1){
-        fprintf(stderr, "Error: function loadClutterMap: no clutter map data found in file '%s'\n",file); 
+        vol2bird_err_printf( "Error: function loadClutterMap: no clutter map data found in file '%s'\n",file);
         RAVE_OBJECT_RELEASE(clutVol);
         return -1;
     }
@@ -2000,7 +2059,7 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
         param = PolarScan_getParameter(clutScan,CLUTNAME);
         
         if(param == NULL){
-            fprintf(stderr, "Error in loadClutterMap: no scan parameter %s found in file %s\n", CLUTNAME,file);
+            vol2bird_err_printf( "Error in loadClutterMap: no scan parameter %s found in file %s\n", CLUTNAME,file);
             RAVE_OBJECT_RELEASE(clutVol);
             return -1;
         }
@@ -2013,7 +2072,7 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
         result = PolarScan_addParameter(scan, param_proj);
 
         if(result == 0){
-            fprintf(stderr, "Warning in loadClutterMap: failed to add cluttermap for scan %i\n",iScan+1); 
+            vol2bird_err_printf( "Warning in loadClutterMap: failed to add cluttermap for scan %i\n",iScan+1);
         }
         
         RAVE_OBJECT_RELEASE(param_proj);
@@ -2028,12 +2087,12 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
 // adds a scan parameter to the scan
 PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, RaveDataType type){
     if (scan == NULL){
-        fprintf(stderr, "error in PolarScan_newParam(): cannat create a new polar scan parameter for scan NULL pointer\n");
+        vol2bird_err_printf( "error in PolarScan_newParam(): cannat create a new polar scan parameter for scan NULL pointer\n");
         return NULL;        
     }
     
     if (PolarScan_hasParameter(scan, quantity)){
-        fprintf(stderr, "Parameter %s already exists in polar scan\n", quantity);
+        vol2bird_err_printf( "Parameter %s already exists in polar scan\n", quantity);
         return NULL;
     }
 
@@ -2041,7 +2100,7 @@ PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, Ra
     scanParam = RAVE_OBJECT_NEW(&PolarScanParam_TYPE);
 
     if (scanParam == NULL){
-        fprintf(stderr, "failed to allocate memory for new polar scan parameter\n");
+        vol2bird_err_printf( "failed to allocate memory for new polar scan parameter\n");
         return NULL;
     }
     
@@ -2088,7 +2147,7 @@ long datetime2long(char* date, char* time){
     // check for conversion errors
     if (ldatetime == 0){
         #ifdef FPRINTFON
-            fprintf(stderr,"Conversion error occurred\n");
+            vol2bird_err_printf("Conversion error occurred\n");
         #endif
         result = (long) NULL;
     }
@@ -2253,7 +2312,7 @@ double PolarVolume_getWavelength(PolarVolume_t* pvol)
             attr = PolarScan_getAttribute(scan, "how/wavelength");
             if (attr != (RaveAttribute_t *) NULL){
                 RaveAttribute_getDouble(attr, &value);
-                fprintf(stderr, "Warning: using radar wavelength stored for scan 1 (%f cm) for all scans ...\n", value);
+                vol2bird_err_printf( "Warning: using radar wavelength stored for scan 1 (%f cm) for all scans ...\n", value);
             }
         }
     }
@@ -2279,7 +2338,7 @@ double PolarVolume_setWavelength(PolarVolume_t* pvol, double wavelength)
             attr = PolarScan_getAttribute(scan, "how/wavelength");
             if (attr != (RaveAttribute_t *) NULL){
                 RaveAttribute_getDouble(attr, &value);
-                fprintf(stderr, "Warning: using radar wavelength stored for scan 1 (%f cm) for all scans ...\n", value);
+                vol2bird_err_printf( "Warning: using radar wavelength stored for scan 1 (%f cm) for all scans ...\n", value);
             }
         }
     }
@@ -2348,17 +2407,17 @@ PolarScan_t* PolarScan_resample(PolarScan_t* scan, double rscale_proj, long nbin
     double elev = PolarScan_getElangle(scan)*180/PI;
     
     if (rscale > rscale_proj){
-        fprintf(stderr, "Warning: requested range gate size (rscale=%3.1f m) too small for %2.1f degree scan, using %4.1f m\n", rscale_proj, elev, rscale);
+        vol2bird_err_printf( "Warning: requested range gate size (rscale=%3.1f m) too small for %2.1f degree scan, using %4.1f m\n", rscale_proj, elev, rscale);
         rscale_proj = rscale;
     }
 
     if (nbins < nbins_proj){
-        fprintf(stderr, "Warning: requested number of range bins (Nbins=%li) too large for %3.1f degree scan, using %li bins\n", nbins_proj, elev, nbins);
+        vol2bird_err_printf( "Warning: requested number of range bins (Nbins=%li) too large for %3.1f degree scan, using %li bins\n", nbins_proj, elev, nbins);
         nbins_proj = nbins;
     }
 
     if (nrays < nrays_proj){
-        fprintf(stderr, "Warning: requested number of azimuth rays (Nrays=%li) too large for %3.1f degree scan, using %li rays\n", nrays_proj, elev, nrays);
+        vol2bird_err_printf( "Warning: requested number of azimuth rays (Nrays=%li) too large for %3.1f degree scan, using %li rays\n", nrays_proj, elev, nrays);
         nrays_proj = nrays;
     }
     
@@ -2488,7 +2547,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
     
@@ -2506,7 +2565,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
             case 3 : 
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
         
@@ -2525,7 +2584,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
             case 3 : 
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
     
@@ -2546,7 +2605,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
 
@@ -2568,7 +2627,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
     
@@ -2588,7 +2647,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
             case 3 : 
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
     
@@ -2608,7 +2667,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
     
@@ -2631,7 +2690,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
 
@@ -2656,7 +2715,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
 
@@ -2680,7 +2739,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
                 doInclude = FALSE;
                 break;
             default :
-                fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
 
@@ -2763,10 +2822,10 @@ static int readUserConfigOptions(cfg_t** cfg, const char * optsConfFilename) {
     int result = cfg_parse((*cfg), optsConfFilename);
 
     if (result == CFG_FILE_ERROR){
-       fprintf(stderr, "Warning: no user configuration file '%s' found. Using default settings ...\n", optsConfFilename);
+       vol2bird_err_printf( "Warning: no user configuration file '%s' found. Using default settings ...\n", optsConfFilename);
     }
     else{
-       fprintf(stderr, "Loaded user configuration file '%s' ...\n", optsConfFilename);
+       vol2bird_err_printf( "Loaded user configuration file '%s' ...\n", optsConfFilename);
     }
 
     if (result == CFG_PARSE_ERROR) {
@@ -2939,7 +2998,7 @@ static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_
     
     RaveField_t* field = RAVE_OBJECT_NEW(&RaveField_TYPE);
     if (RaveField_createData(field, 1, alldata->options.nLayers, raveType) == 0){
-        fprintf(stderr,"Error pre-allocating field '%s'.\n", quantity); 
+        vol2bird_err_printf("Error pre-allocating field '%s'.\n", quantity);
         return -1;
     }
     
@@ -2954,7 +3013,7 @@ static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_
             profile=alldata->profiles.profile3;
             break;
         default:
-            fprintf(stderr, "Something is wrong this should not happen.\n");
+            vol2bird_err_printf( "Something is wrong this should not happen.\n");
             goto done;
     }
     
@@ -3040,17 +3099,17 @@ static void printCellProp(CELLPROP* cellProp, float elev, int nCells, int nCells
     // this function prints the cell properties struct to stderr  //
     // ---------------------------------------------------------- //
     
-    fprintf(stderr,"#Cell analysis for elevation %f:\n",elev*RAD2DEG);
-    fprintf(stderr,"#Minimum cell area in km^2     : %f\n",alldata->constants.areaCellMin);
-    fprintf(stderr,"#Threshold for mean dBZ cell   : %g dBZ\n",alldata->misc.cellDbzMin);
-    fprintf(stderr,"#Threshold for mean stdev cell : %g m/s\n",alldata->options.cellStdDevMax);
-    fprintf(stderr,"#Valid cells                   : %i/%i\n#\n",nCellsValid,nCells);
-    fprintf(stderr,"cellProp: .index .nGates .nGatesClutter   .Area .dbzAvg .texAvg .cv   .dbzMax .iRangOfMax .iAzimOfMax .drop\n");
+    vol2bird_err_printf("#Cell analysis for elevation %f:\n",elev*RAD2DEG);
+    vol2bird_err_printf("#Minimum cell area in km^2     : %f\n",alldata->constants.areaCellMin);
+    vol2bird_err_printf("#Threshold for mean dBZ cell   : %g dBZ\n",alldata->misc.cellDbzMin);
+    vol2bird_err_printf("#Threshold for mean stdev cell : %g m/s\n",alldata->options.cellStdDevMax);
+    vol2bird_err_printf("#Valid cells                   : %i/%i\n#\n",nCellsValid,nCells);
+    vol2bird_err_printf("cellProp: .index .nGates .nGatesClutter   .Area .dbzAvg .texAvg .cv   .dbzMax .iRangOfMax .iAzimOfMax .drop\n");
     for (int iCell = 0; iCell < nCells; iCell++) {
         if (cellProp[iCell].drop == TRUE) {
             continue;
         }
-        fprintf(stderr,"cellProp: %6d %7d %14d %7.2f %7.2f %7.2f %5.2f %7.2f %11d %11d %5c\n",
+        vol2bird_err_printf("cellProp: %6d %7d %14d %7.2f %7.2f %7.2f %5.2f %7.2f %11d %11d %5c\n",
             cellProp[iCell].index,
             cellProp[iCell].nGates,
             cellProp[iCell].nGatesClutter,
@@ -3088,7 +3147,7 @@ static void printGateCode(char* flags, const unsigned int gateCode) {
     
     nFlagsMax = 9;
     if (nFlagsNeeded > nFlagsMax) {
-        fprintf(stderr,"There's only space for %d flags\n. Aborting",nFlagsMax);
+        vol2bird_err_printf("There's only space for %d flags\n. Aborting",nFlagsMax);
         return;
     }
     
@@ -3125,7 +3184,7 @@ void printImage(PolarScan_t* scan, const char* quantity) {
     PolarScanParam_t* scanParam = PolarScan_getParameter(scan, quantity);
     
     if(scanParam == (PolarScanParam_t *) NULL){
-        fprintf(stderr,"warning::printImage: quantity %s not found in scan\n",quantity);
+        vol2bird_err_printf("warning::printImage: quantity %s not found in scan\n",quantity);
         return;
     }
 
@@ -3234,14 +3293,14 @@ void printImage(PolarScan_t* scan, const char* quantity) {
             type = PolarScanParam_getValue(scanParam,iRang,iAzim,&thisValue);
             
             if (type == RaveValueType_DATA){
-                fprintf(stderr,formatStr,thisValue);
+                vol2bird_err_printf(formatStr,thisValue);
             }
             else{
-                fprintf(stderr,naStr,thisValue);
+                vol2bird_err_printf(naStr,thisValue);
 
             }
         }
-        fprintf(stderr,"\n");
+        vol2bird_err_printf("\n");
     }
         
 } // printImageInt
@@ -3250,20 +3309,20 @@ void printImage(PolarScan_t* scan, const char* quantity) {
 
 static int printMeta(PolarScan_t* scan, const char* quantity) {
     
-    fprintf(stderr,"scan->heig = %f\n",PolarScan_getHeight(scan));
-    fprintf(stderr,"scan->elev = %f\n",PolarScan_getElangle(scan));
-    fprintf(stderr,"scan->nRang = %ld\n",PolarScan_getNbins(scan));
-    fprintf(stderr,"scan->nAzim = %ld\n",PolarScan_getNrays(scan));
-    fprintf(stderr,"scan->rangeScale = %f\n",PolarScan_getRscale(scan));
-    fprintf(stderr,"scan->azimScale = %f\n",360.0f/PolarScan_getNrays(scan));
+    vol2bird_err_printf("scan->heig = %f\n",PolarScan_getHeight(scan));
+    vol2bird_err_printf("scan->elev = %f\n",PolarScan_getElangle(scan));
+    vol2bird_err_printf("scan->nRang = %ld\n",PolarScan_getNbins(scan));
+    vol2bird_err_printf("scan->nAzim = %ld\n",PolarScan_getNrays(scan));
+    vol2bird_err_printf("scan->rangeScale = %f\n",PolarScan_getRscale(scan));
+    vol2bird_err_printf("scan->azimScale = %f\n",360.0f/PolarScan_getNrays(scan));
     
     PolarScanParam_t* scanParam = PolarScan_getParameter(scan,quantity);
     
     if(scanParam != (PolarScanParam_t*) NULL){
-        fprintf(stderr,"scan->%s->valueOffset = %f\n",quantity,PolarScanParam_getOffset(scanParam));
-        fprintf(stderr,"scan->%s->valueScale = %f\n",quantity,PolarScanParam_getGain(scanParam));
-        fprintf(stderr,"scan->%s->nodata = %f\n",quantity,PolarScanParam_getNodata(scanParam));
-        fprintf(stderr,"scan->%s->undetect = %f\n",quantity,PolarScanParam_getUndetect(scanParam));
+        vol2bird_err_printf("scan->%s->valueOffset = %f\n",quantity,PolarScanParam_getOffset(scanParam));
+        vol2bird_err_printf("scan->%s->valueScale = %f\n",quantity,PolarScanParam_getGain(scanParam));
+        vol2bird_err_printf("scan->%s->nodata = %f\n",quantity,PolarScanParam_getNodata(scanParam));
+        vol2bird_err_printf("scan->%s->undetect = %f\n",quantity,PolarScanParam_getUndetect(scanParam));
     }
     
     return 0;
@@ -3439,16 +3498,16 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
 
     #ifdef FPRINTFON
     for (iCell = 0; iCell < nCells; iCell++) {
-        fprintf(stderr,"(%d/%d): index = %d, nGates = %d\n",iCell,nCells,cellProp[iCell].index,cellProp[iCell].nGates);
+        vol2bird_err_printf("(%d/%d): index = %d, nGates = %d\n",iCell,nCells,cellProp[iCell].index,cellProp[iCell].nGates);
     }
-    fprintf(stderr,"end of list\n");
+    vol2bird_err_printf("end of list\n");
     #endif
 
 
     
     cellPropCopy = (CELLPROP*) malloc(sizeof(CELLPROP) * nCells);
     if (!cellPropCopy) {
-        fprintf(stderr,"Requested memory could not be allocated in removeDroppedCells!\n");
+        vol2bird_err_printf("Requested memory could not be allocated in removeDroppedCells!\n");
         return -1;
     }    
 
@@ -3477,7 +3536,7 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
 
     #ifdef FPRINTFON
     for (iCell = 0; iCell < nCells; iCell++) {
-        fprintf(stderr,"(%d/%d): copied = %c, index = %d, nGates = %d\n",iCell,nCells,iCell < nCopied ? 'T':'F',cellProp[iCell].index,cellProp[iCell].nGates);
+        vol2bird_err_printf("(%d/%d): copied = %c, index = %d, nGates = %d\n",iCell,nCells,iCell < nCopied ? 'T':'F',cellProp[iCell].index,cellProp[iCell].nGates);
     }
     #endif 
     
@@ -3551,8 +3610,8 @@ static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vo
             maxValue = cellImage[iGlobal];
         }
     }
-    fprintf(stderr,"minimum value in cellImage array = %d.\n", minValue);
-    fprintf(stderr,"maximum value in cellImage array = %d.\n", maxValue);
+    vol2bird_err_printf("minimum value in cellImage array = %d.\n", minValue);
+    vol2bird_err_printf("maximum value in cellImage array = %d.\n", maxValue);
     #endif
 
     nCellsValid = nCells;
@@ -3566,7 +3625,7 @@ static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vo
         cellImageValue = cellImage[iGlobal];
 
         if (cellImageValue > nCells - 1) {
-            fprintf(stderr, "You just asked for the properties of cell %d, which does not exist.\n", cellImageValue);
+            vol2bird_err_printf( "You just asked for the properties of cell %d, which does not exist.\n", cellImageValue);
             continue;
         }
 
@@ -3590,8 +3649,8 @@ static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vo
 
 
     #ifdef FPRINTFON
-    fprintf(stderr,"nCellsValid = %d\n",nCellsValid);
-    fprintf(stderr,"\n");
+    vol2bird_err_printf("nCellsValid = %d\n",nCellsValid);
+    vol2bird_err_printf("\n");
     #endif
 
     // replace the values in cellImage with newly calculated index values:
@@ -3605,11 +3664,11 @@ static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vo
         }
 
         #ifdef FPRINTFON
-        fprintf(stderr,"before: cellProp[%d].index = %d.\n",iCell,cellProp[iCell].index);
-        fprintf(stderr,"before: cellProp[%d].nGates = %d.\n",iCell,cellProp[iCell].nGates);
-        fprintf(stderr,"before: iCell = %d.\n",iCell);
-        fprintf(stderr,"before: iCellNew = %d.\n",iCellNew);
-        fprintf(stderr,"\n");
+        vol2bird_err_printf("before: cellProp[%d].index = %d.\n",iCell,cellProp[iCell].index);
+        vol2bird_err_printf("before: cellProp[%d].nGates = %d.\n",iCell,cellProp[iCell].nGates);
+        vol2bird_err_printf("before: iCell = %d.\n",iCell);
+        vol2bird_err_printf("before: iCellNew = %d.\n",iCellNew);
+        vol2bird_err_printf("\n");
         #endif
 
         for (iGlobal = 0; iGlobal < nGlobal; iGlobal++) {
@@ -3644,9 +3703,9 @@ static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vo
         }
 
         #ifdef FPRINTFON
-        fprintf(stderr,"after: cellProp[%d].index = %d.\n",iCell,cellProp[iCell].index);
-        fprintf(stderr,"after: cellProp[%d].nGates = %d.\n",iCell,cellProp[iCell].nGates);
-        fprintf(stderr,"\n");
+        vol2bird_err_printf("after: cellProp[%d].index = %d.\n",iCell,cellProp[iCell].index);
+        vol2bird_err_printf("after: cellProp[%d].nGates = %d.\n",iCell,cellProp[iCell].nGates);
+        vol2bird_err_printf("\n");
         #endif
     }
 
@@ -3664,7 +3723,7 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
   int iProfileType;
 
   if (alldata->misc.initializationSuccessful == FALSE) {
-    fprintf(stderr, "You need to initialize vol2bird before you can use it. Aborting.\n");
+    vol2bird_err_printf( "You need to initialize vol2bird before you can use it. Aborting.\n");
     return;
   }
 
@@ -3889,7 +3948,7 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
             // have a higher Nyquist velocity than maxNyquistDealias, dealiasing is suppressed
             if (alldata->options.dealiasVrad && iPass == 0 && !recycleDealias) {
 #ifdef FPRINTFON
-              fprintf(stderr,"dealiasing %i points for profile %i, layer %i ...\n",nPointsIncluded,iProfileType,iLayer+1);
+              vol2bird_err_printf("dealiasing %i points for profile %i, layer %i ...\n",nPointsIncluded,iProfileType,iLayer+1);
 #endif
               int result = dealias_points(&pointsSelection[0], alldata->misc.nDims, &yNyquist[0], alldata->misc.nyquistMin, &yObs[0], &yDealias[0],
                   nPointsIncluded);
@@ -3899,7 +3958,7 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
               }
 
               if (result == 0) {
-                fprintf(stderr, "Warning, failed to dealias radial velocities");
+                vol2bird_err_printf( "Warning, failed to dealias radial velocities");
               }
             }
 
@@ -4040,7 +4099,7 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
           alldata->profiles.profile3[iCopied] = alldata->profiles.profile[iCopied];
           break;
         default:
-          fprintf(stderr, "Something is wrong this should not happen.\n");
+          vol2bird_err_printf( "Something is wrong this should not happen.\n");
         }
         iCopied += 1;
       }
@@ -4056,7 +4115,7 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
 int vol2birdGetNColsProfile(vol2bird_t *alldata) {
 
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return -1;
     }
     return alldata->profiles.nColsProfile;
@@ -4066,7 +4125,7 @@ int vol2birdGetNColsProfile(vol2bird_t *alldata) {
 int vol2birdGetNRowsProfile(vol2bird_t *alldata) {   
 
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return -1;
     }
     return alldata->profiles.nRowsProfile;
@@ -4075,7 +4134,7 @@ int vol2birdGetNRowsProfile(vol2bird_t *alldata) {
 
 float* vol2birdGetProfile(int iProfileType, vol2bird_t *alldata) {
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return (float *) NULL;
     }
 
@@ -4087,7 +4146,7 @@ float* vol2birdGetProfile(int iProfileType, vol2bird_t *alldata) {
         case 3 : 
             return &(alldata->profiles.profile3[0]);
         default :
-            fprintf(stderr, "Something went wrong; behavior not implemented for given iProfileType.\n");
+            vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
     }
 
     return (float *) NULL;
@@ -4097,15 +4156,15 @@ float* vol2birdGetProfile(int iProfileType, vol2bird_t *alldata) {
 void vol2birdPrintIndexArrays(vol2bird_t* alldata) {
     
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
     
     int iLayer;
 
-    fprintf(stderr, "iLayer  iFrom   iTo     iTo-iFrom nWritten\n");
+    vol2bird_err_printf( "iLayer  iFrom   iTo     iTo-iFrom nWritten\n");
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
-        fprintf(stderr, "%7d %7d %7d %10d %8d\n",
+        vol2bird_err_printf( "%7d %7d %7d %10d %8d\n",
             iLayer, 
             alldata->points.indexFrom[iLayer], 
             alldata->points.indexTo[iLayer], 
@@ -4123,49 +4182,49 @@ void vol2birdPrintOptions(vol2bird_t* alldata) {
     // ------------------------------------------------------- //
     
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 
-    fprintf(stderr,"\n\nvol2bird configuration:\n\n");
+    vol2bird_err_printf("\n\nvol2bird configuration:\n\n");
 
-    fprintf(stderr,"%-25s = %f\n","absVDifMax",alldata->constants.absVDifMax);
-    fprintf(stderr,"%-25s = %f\n","azimMax",alldata->options.azimMax);
-    fprintf(stderr,"%-25s = %f\n","azimMin",alldata->options.azimMin);
-    fprintf(stderr,"%-25s = %f\n","birdRadarCrossSection",alldata->options.birdRadarCrossSection);
-    fprintf(stderr,"%-25s = %f\n","cellClutterFractionMax",alldata->constants.cellClutterFractionMax);
-    fprintf(stderr,"%-25s = %f\n","cellEtaMin",alldata->options.cellEtaMin);
-    fprintf(stderr,"%-25s = %f\n","cellStdDevMax",alldata->options.cellStdDevMax);
-    fprintf(stderr,"%-25s = %f\n","chisqMin",alldata->constants.chisqMin);
-    fprintf(stderr,"%-25s = %f\n","clutterValueMin",alldata->options.clutterValueMin);
-    fprintf(stderr,"%-25s = %f\n","etaMax",alldata->options.etaMax);
-    fprintf(stderr,"%-25s = %f\n","dbzThresMin",alldata->options.dbzThresMin);
-    fprintf(stderr,"%-25s = %s\n","dbzType",alldata->options.dbzType);
-    fprintf(stderr,"%-25s = %f\n","elevMax",alldata->options.elevMax);
-    fprintf(stderr,"%-25s = %f\n","elevMin",alldata->options.elevMin);
-    fprintf(stderr,"%-25s = %d\n","fitVrad",alldata->options.fitVrad);
-    fprintf(stderr,"%-25s = %f\n","fringeDist",alldata->constants.fringeDist);
-    fprintf(stderr,"%-25s = %f\n","layerThickness",alldata->options.layerThickness);
-    fprintf(stderr,"%-25s = %f\n","minNyquist",alldata->options.minNyquist);
-    fprintf(stderr,"%-25s = %f\n","areaCellMin",alldata->constants.areaCellMin);
-    fprintf(stderr,"%-25s = %d\n","nAzimNeighborhood",alldata->constants.nAzimNeighborhood);
-    fprintf(stderr,"%-25s = %d\n","nBinsGap",alldata->constants.nBinsGap);
-    fprintf(stderr,"%-25s = %d\n","nCountMin",alldata->constants.nCountMin);
-    fprintf(stderr,"%-25s = %d\n","nLayers",alldata->options.nLayers);
-    fprintf(stderr,"%-25s = %d\n","nObsGapMin",alldata->constants.nObsGapMin);
-    fprintf(stderr,"%-25s = %d\n","nPointsIncludedMin",alldata->constants.nPointsIncludedMin);
-    fprintf(stderr,"%-25s = %d\n","nRangNeighborhood",alldata->constants.nRangNeighborhood);
-    fprintf(stderr,"%-25s = %f\n","radarWavelength",alldata->options.radarWavelength);
-    fprintf(stderr,"%-25s = %f\n","rangeMax",alldata->options.rangeMax);
-    fprintf(stderr,"%-25s = %f\n","rangeMin",alldata->options.rangeMin);
-    fprintf(stderr,"%-25s = %f\n","rCellMax",alldata->misc.rCellMax);
-    fprintf(stderr,"%-25s = %f\n","refracIndex",alldata->constants.refracIndex);
-    fprintf(stderr,"%-25s = %d\n","requireVrad",alldata->options.requireVrad);
-    fprintf(stderr,"%-25s = %f\n","stdDevMinBird",alldata->options.stdDevMinBird);
-    fprintf(stderr,"%-25s = %c\n","useClutterMap",alldata->options.useClutterMap == TRUE ? 'T' : 'F');
-    fprintf(stderr,"%-25s = %f\n","vradMin",alldata->constants.vradMin);
+    vol2bird_err_printf("%-25s = %f\n","absVDifMax",alldata->constants.absVDifMax);
+    vol2bird_err_printf("%-25s = %f\n","azimMax",alldata->options.azimMax);
+    vol2bird_err_printf("%-25s = %f\n","azimMin",alldata->options.azimMin);
+    vol2bird_err_printf("%-25s = %f\n","birdRadarCrossSection",alldata->options.birdRadarCrossSection);
+    vol2bird_err_printf("%-25s = %f\n","cellClutterFractionMax",alldata->constants.cellClutterFractionMax);
+    vol2bird_err_printf("%-25s = %f\n","cellEtaMin",alldata->options.cellEtaMin);
+    vol2bird_err_printf("%-25s = %f\n","cellStdDevMax",alldata->options.cellStdDevMax);
+    vol2bird_err_printf("%-25s = %f\n","chisqMin",alldata->constants.chisqMin);
+    vol2bird_err_printf("%-25s = %f\n","clutterValueMin",alldata->options.clutterValueMin);
+    vol2bird_err_printf("%-25s = %f\n","etaMax",alldata->options.etaMax);
+    vol2bird_err_printf("%-25s = %f\n","dbzThresMin",alldata->options.dbzThresMin);
+    vol2bird_err_printf("%-25s = %s\n","dbzType",alldata->options.dbzType);
+    vol2bird_err_printf("%-25s = %f\n","elevMax",alldata->options.elevMax);
+    vol2bird_err_printf("%-25s = %f\n","elevMin",alldata->options.elevMin);
+    vol2bird_err_printf("%-25s = %d\n","fitVrad",alldata->options.fitVrad);
+    vol2bird_err_printf("%-25s = %f\n","fringeDist",alldata->constants.fringeDist);
+    vol2bird_err_printf("%-25s = %f\n","layerThickness",alldata->options.layerThickness);
+    vol2bird_err_printf("%-25s = %f\n","minNyquist",alldata->options.minNyquist);
+    vol2bird_err_printf("%-25s = %f\n","areaCellMin",alldata->constants.areaCellMin);
+    vol2bird_err_printf("%-25s = %d\n","nAzimNeighborhood",alldata->constants.nAzimNeighborhood);
+    vol2bird_err_printf("%-25s = %d\n","nBinsGap",alldata->constants.nBinsGap);
+    vol2bird_err_printf("%-25s = %d\n","nCountMin",alldata->constants.nCountMin);
+    vol2bird_err_printf("%-25s = %d\n","nLayers",alldata->options.nLayers);
+    vol2bird_err_printf("%-25s = %d\n","nObsGapMin",alldata->constants.nObsGapMin);
+    vol2bird_err_printf("%-25s = %d\n","nPointsIncludedMin",alldata->constants.nPointsIncludedMin);
+    vol2bird_err_printf("%-25s = %d\n","nRangNeighborhood",alldata->constants.nRangNeighborhood);
+    vol2bird_err_printf("%-25s = %f\n","radarWavelength",alldata->options.radarWavelength);
+    vol2bird_err_printf("%-25s = %f\n","rangeMax",alldata->options.rangeMax);
+    vol2bird_err_printf("%-25s = %f\n","rangeMin",alldata->options.rangeMin);
+    vol2bird_err_printf("%-25s = %f\n","rCellMax",alldata->misc.rCellMax);
+    vol2bird_err_printf("%-25s = %f\n","refracIndex",alldata->constants.refracIndex);
+    vol2bird_err_printf("%-25s = %d\n","requireVrad",alldata->options.requireVrad);
+    vol2bird_err_printf("%-25s = %f\n","stdDevMinBird",alldata->options.stdDevMinBird);
+    vol2bird_err_printf("%-25s = %c\n","useClutterMap",alldata->options.useClutterMap == TRUE ? 'T' : 'F');
+    vol2bird_err_printf("%-25s = %f\n","vradMin",alldata->constants.vradMin);
     
-    fprintf(stderr,"\n\n");
+    vol2bird_err_printf("\n\n");
 
 }  // vol2birdPrintOptions
 
@@ -4180,13 +4239,13 @@ void vol2birdPrintPointsArray(vol2bird_t* alldata) {
     // ------------------------------------------------- //
     
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 
     int iPoint;
     
-    fprintf(stderr, "iPoint    range     azim    elev         dbz        vrad    cell    gateCode   flags           nyquist     vradd        clut\n");
+    vol2bird_err_printf( "iPoint    range     azim    elev         dbz        vrad    cell    gateCode   flags           nyquist     vradd        clut\n");
     
     for (iPoint = 0; iPoint < alldata->points.nRowsPoints * alldata->points.nColsPoints; iPoint+=alldata->points.nColsPoints) {
         
@@ -4194,19 +4253,19 @@ void vol2birdPrintPointsArray(vol2bird_t* alldata) {
             
             printGateCode(&gateCodeStr[0], (int) alldata->points.points[iPoint + alldata->points.gateCodeCol]);
         
-            fprintf(stderr, "  %6d",    iPoint/alldata->points.nColsPoints);
-            fprintf(stderr, "  %6.1f",  alldata->points.points[iPoint + alldata->points.rangeCol]);
-            fprintf(stderr, "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
-            fprintf(stderr, "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.dbzValueCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.vradValueCol]);
-            fprintf(stderr, "  %6.0f",  alldata->points.points[iPoint + alldata->points.cellValueCol]);
-            fprintf(stderr, "  %8.0f",  alldata->points.points[iPoint + alldata->points.gateCodeCol]);
-            fprintf(stderr, "  %12s",   gateCodeStr);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.clutValueCol]);
-            fprintf(stderr, "\n");
+            vol2bird_err_printf( "  %6d",    iPoint/alldata->points.nColsPoints);
+            vol2bird_err_printf( "  %6.1f",  alldata->points.points[iPoint + alldata->points.rangeCol]);
+            vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
+            vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.dbzValueCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vradValueCol]);
+            vol2bird_err_printf( "  %6.0f",  alldata->points.points[iPoint + alldata->points.cellValueCol]);
+            vol2bird_err_printf( "  %8.0f",  alldata->points.points[iPoint + alldata->points.gateCodeCol]);
+            vol2bird_err_printf( "  %12s",   gateCodeStr);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.clutValueCol]);
+            vol2bird_err_printf( "\n");
     }    
 } // vol2birdPrintPointsArray
 
@@ -4221,20 +4280,20 @@ void vol2birdPrintPointsArraySimple(vol2bird_t* alldata) {
     
     int iPoint;
     
-    fprintf(stderr, "iPoint  azim    elev    dbz         vrad        cell     flags     nyquist vradd\n");
+    vol2bird_err_printf( "iPoint  azim    elev    dbz         vrad        cell     flags     nyquist vradd\n");
     
     for (iPoint = 0; iPoint < alldata->points.nRowsPoints * alldata->points.nColsPoints; iPoint+=alldata->points.nColsPoints) {
                 
-            fprintf(stderr, "  %6d",    iPoint/alldata->points.nColsPoints);
-            fprintf(stderr, "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
-            fprintf(stderr, "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.dbzValueCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.vradValueCol]);
-            fprintf(stderr, "  %6.0f",  alldata->points.points[iPoint + alldata->points.cellValueCol]);
-            fprintf(stderr, "  %8.0f",  alldata->points.points[iPoint + alldata->points.gateCodeCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
-            fprintf(stderr, "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
-            fprintf(stderr, "\n");
+            vol2bird_err_printf( "  %6d",    iPoint/alldata->points.nColsPoints);
+            vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
+            vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.dbzValueCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vradValueCol]);
+            vol2bird_err_printf( "  %6.0f",  alldata->points.points[iPoint + alldata->points.cellValueCol]);
+            vol2bird_err_printf( "  %8.0f",  alldata->points.points[iPoint + alldata->points.gateCodeCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
+            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
+            vol2bird_err_printf( "\n");
     }    
 } // vol2birdPrintPointsArray
 
@@ -4246,13 +4305,13 @@ void vol2birdPrintPointsArraySimple(vol2bird_t* alldata) {
 void printProfile(vol2bird_t* alldata) {
     
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 
-    fprintf(stderr,"\n\nProfile type: %d\n",alldata->profiles.iProfileTypeLast);
+    vol2bird_err_printf("\n\nProfile type: %d\n",alldata->profiles.iProfileTypeLast);
 
-    fprintf(stderr,"altmin-altmax: [u         ,v         ,w         ]; "
+    vol2bird_err_printf("altmin-altmax: [u         ,v         ,w         ]; "
                    "hSpeed  , hDir    , chi     , hasGap  , dbzAvg  ,"
                    " nPoints, eta         , rhobird nPointsZ \n");
 
@@ -4260,7 +4319,7 @@ void printProfile(vol2bird_t* alldata) {
     
     for (iLayer = alldata->options.nLayers - 1; iLayer >= 0; iLayer--) {
         
-        fprintf(stderr,"%6.0f-%-6.0f: [%10.2f,%10.2f,%10.2f]; %8.2f, "
+        vol2bird_err_printf("%6.0f-%-6.0f: [%10.2f,%10.2f,%10.2f]; %8.2f, "
         "%8.1f, %8.1f, %8c, %8.2f, %7.0f, %12.2f, %8.2f %5.f\n",
         alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  0],
         alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  1],
@@ -4299,7 +4358,7 @@ PolarVolume_t* vol2birdGetVolume(char* filenames[], int nInputFiles, float range
     #ifdef RSL
     if(RSL_filetype(filenames[0]) != UNKNOWN){
         if (nInputFiles > 1){
-            fprintf(stderr,"Multiple input files detected in RSL format. Only single polar volume file import supported, using file %s only.\n", filenames[0]);
+            vol2bird_err_printf("Multiple input files detected in RSL format. Only single polar volume file import supported, using file %s only.\n", filenames[0]);
         }
         volume = vol2birdGetRSLVolume(filenames[0], rangeMax, small);
         goto done;
@@ -4337,14 +4396,14 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
         file_element_p = readIRIS(filenames[i]);
 
         if(file_element_p == NULL){
-            fprintf(stderr, "Warning: failed to read file %s in IRIS format, ignoring.\n", filenames[i]);
+            vol2bird_err_printf( "Warning: failed to read file %s in IRIS format, ignoring.\n", filenames[i]);
             continue;
         }
 
         rot = objectTypeFromIRIS(file_element_p);
         
         if (rot == Rave_ObjectType_UNDEFINED){
-            fprintf(stderr, "Warning: unknown object type while reading file %s in IRIS format, ignoring.\n", filenames[i]);
+            vol2bird_err_printf( "Warning: unknown object type while reading file %s in IRIS format, ignoring.\n", filenames[i]);
             free_IRIS(&file_element_p);
             continue;
         }
@@ -4369,7 +4428,7 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
             ret = populateObject((RaveCoreObject*) volume, file_element_p);
 
             if( ret != 0) {
-                fprintf(stderr, "Error: could not populate IRIS data into a polar volume object\n");
+                vol2bird_err_printf( "Error: could not populate IRIS data into a polar volume object\n");
                 goto done;
             }
             
@@ -4401,7 +4460,7 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
             ret = populateObject((RaveCoreObject*) scan, file_element_p);
 
             if( ret != 0) {
-                fprintf(stderr, "Error: could not populate IRIS data into a polar scan object\n");
+                vol2bird_err_printf( "Error: could not populate IRIS data into a polar scan object\n");
                 goto done;
             }
             
@@ -4453,14 +4512,14 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
         RaveIO_t* raveio = RaveIO_open(filenames[i], 0, NULL);
 
         if(raveio == NULL){
-            fprintf(stderr, "Warning: failed to read file %s in ODIM format, ignoring.\n", filenames[i]);
+            vol2bird_err_printf( "Warning: failed to read file %s in ODIM format, ignoring.\n", filenames[i]);
             continue;
         }
         
         rot = RaveIO_getObjectType(raveio);
 
         if (!(rot == Rave_ObjectType_PVOL || rot == Rave_ObjectType_SCAN)) {
-            fprintf(stderr, "Warning: no scan or volume found when reading file %s in ODIM format, ignoring.\n", filenames[i]);
+            vol2bird_err_printf( "Warning: no scan or volume found when reading file %s in ODIM format, ignoring.\n", filenames[i]);
             RAVE_OBJECT_RELEASE(raveio);
             continue;
         }
@@ -4592,11 +4651,11 @@ int vol2birdLoadConfig(vol2bird_t* alldata) {
         optsConfFilename = OPTIONS_FILE;
     }
     else{
-        fprintf(stderr, "Searching user configuration file '%s' specified in environmental variable '%s'\n",optsConfFilename,OPTIONS_CONF);
+        vol2bird_err_printf( "Searching user configuration file '%s' specified in environmental variable '%s'\n",optsConfFilename,OPTIONS_CONF);
     }
 
     if (readUserConfigOptions(&(alldata->cfg), optsConfFilename) != 0) {
-        fprintf(stderr, "An error occurred while reading the user configuration file '%s'.\n", optsConfFilename);
+        vol2bird_err_printf( "An error occurred while reading the user configuration file '%s'.\n", optsConfFilename);
         return -1; 
     }
    
@@ -4706,8 +4765,10 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     
     alldata->misc.vol2birdSuccessful = TRUE;
 
+    vol2bird_printf("Running vol2birdSetUp\n");
+
     if (alldata->misc.loadConfigSuccessful == FALSE){
-        fprintf(stderr,"Vol2bird configuration not loaded. Run vol2birdLoadConfig prior to vol2birdSetup\n");
+        vol2bird_err_printf("Vol2bird configuration not loaded. Run vol2birdLoadConfig prior to vol2birdSetup\n");
         return -1;
     }
  
@@ -4718,7 +4779,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->options.radarWavelength = wavelength;
     }
     else{
-        fprintf(stderr,"Warning: radar wavelength not stored in polar volume. Using user-defined value of %f cm ...\n", alldata->options.radarWavelength);
+        vol2bird_err_printf("Warning: radar wavelength not stored in polar volume. Using user-defined value of %f cm ...\n", alldata->options.radarWavelength);
     }
     
     // Now that we have the wavelength, calculate its derived quantities:
@@ -4759,14 +4820,14 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     vol2birdScanUse_t* scanUse;
     scanUse = determineScanUse(volume, alldata);
     if (!alldata->options.dealiasVrad && alldata->misc.nyquistMinUsed < alldata->options.maxNyquistDealias){   
-       fprintf(stderr,"Warning: Nyquist velocity below maxNyquistDealias threshold was found (%f<%f), consider dealiasing.\n",alldata->misc.nyquistMinUsed,alldata->options.maxNyquistDealias);       
+       vol2bird_err_printf("Warning: Nyquist velocity below maxNyquistDealias threshold was found (%f<%f), consider dealiasing.\n",alldata->misc.nyquistMinUsed,alldata->options.maxNyquistDealias);
     }    
     if (alldata->options.dealiasVrad && alldata->misc.nyquistMinUsed > alldata->options.maxNyquistDealias){
        alldata->options.dealiasVrad=FALSE;
        //Maybe you want to give a warning here, but that generates a lot of warnings as this situation is common ...
     }
     if (alldata->options.dealiasVrad){
-        fprintf(stderr,"Warning: radial velocities will be dealiased...\n");
+        vol2bird_err_printf("Warning: radial velocities will be dealiased...\n");
     }
 
     // ------------------------------------------------------------- //
@@ -4849,49 +4910,49 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     );
    
     if (scanUse == (vol2birdScanUse_t*) NULL){
-        fprintf(stderr, "Error: no valid scans found in polar volume, aborting ...\n");
+        vol2bird_err_printf( "Error: no valid scans found in polar volume, aborting ...\n");
         return -1;
     }
 
     // Print warning missing rain specification
     if(!alldata->options.singlePol && !alldata->options.dualPol){
-        fprintf(stderr,"Warning: neither single- nor dual-polarization precipitation filter selected by user, continuing in SINGLE polarization mode\n");
+        vol2bird_err_printf("Warning: neither single- nor dual-polarization precipitation filter selected by user, continuing in SINGLE polarization mode\n");
 		alldata->options.singlePol = TRUE;
     }
 
     // Disable single pol rain filtering for S-band data when dual-pol moments are available
     if(alldata->options.radarWavelength > 7.5 && alldata->options.singlePol && alldata->options.dualPol){
-        fprintf(stderr,"Warning: disabling single-polarization precipitation filter for S-band data, continuing in DUAL polarization mode\n");
+        vol2bird_err_printf("Warning: disabling single-polarization precipitation filter for S-band data, continuing in DUAL polarization mode\n");
 		alldata->options.singlePol = FALSE;
     }
 
     // Print warning for S-band in single pol mode
     if(alldata->options.radarWavelength > 7.5 && !alldata->options.dualPol){
-        fprintf(stderr,"Warning: using experimental SINGLE polarization mode on S-band data, results may be unreliable!\n");
+        vol2bird_err_printf("Warning: using experimental SINGLE polarization mode on S-band data, results may be unreliable!\n");
     }
 
     // Print warning for MistNet mode
     if(alldata->options.useMistNet && (alldata->options.dualPol || alldata->options.singlePol)){
-        fprintf(stderr,"Warning: using MistNet, disabling other segmentation methods\n");
+        vol2bird_err_printf("Warning: using MistNet, disabling other segmentation methods\n");
         alldata->options.singlePol = FALSE;
         alldata->options.dualPol = FALSE;
     }
 
     // check that we are requesting the right number of elevation scans for MistNet segmentation model
     if(alldata->options.mistNetNElevs != MISTNET_N_ELEV){
-        fprintf(stderr, "Error: MistNet segmentation model expects %i elevations, but %i are specified.\n", MISTNET_N_ELEV, alldata->options.mistNetNElevs);
+        vol2bird_err_printf( "Error: MistNet segmentation model expects %i elevations, but %i are specified.\n", MISTNET_N_ELEV, alldata->options.mistNetNElevs);
         return -1;
     }
     
     // check that MistNet segmentation model can be found on disk
     if(alldata->options.useMistNet && !isRegularFile(alldata->options.mistNetPath)){
-        fprintf(stderr, "Error: MistNet segmentation model '%s' not found.\n", alldata->options.mistNetPath);
+        vol2bird_err_printf( "Error: MistNet segmentation model '%s' not found.\n", alldata->options.mistNetPath);
         return -1;
     }
 
     // Print warning for mistnet mode
     if(alldata->options.useMistNet && alldata->options.radarWavelength < 7.5){
-        fprintf(stderr,"Warning: MistNet segmentation model has been trained on S-band data, results at other radar wavelengths may be unreliable!\n");
+        vol2bird_err_printf("Warning: MistNet segmentation model has been trained on S-band data, results at other radar wavelengths may be unreliable!\n");
     }
 	
     // ------------------------------------------------------------- //
@@ -4905,7 +4966,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // altitude bin in the profile
     alldata->points.indexFrom = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->points.indexFrom == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'indexFrom'\n");
+        vol2bird_err_printf("Error pre-allocating array 'indexFrom'\n");
         return -1;
     }
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
@@ -4916,7 +4977,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // altitude bin in the profile
     alldata->points.indexTo = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->points.indexTo == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'indexTo'\n");
+        vol2bird_err_printf("Error pre-allocating array 'indexTo'\n");
         return -1;
     }
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
@@ -4928,7 +4989,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // calculating iProfileType == 1
     alldata->misc.scatterersAreNotBirds = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->misc.scatterersAreNotBirds == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'scatterersAreNotBirds'\n");
+        vol2bird_err_printf("Error pre-allocating array 'scatterersAreNotBirds'\n");
         return -1;
     }
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
@@ -4941,7 +5002,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // 'nPointsWritten' array
     alldata->points.nPointsWritten = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->points.nPointsWritten == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'nPointsWritten'\n");
+        vol2bird_err_printf("Error pre-allocating array 'nPointsWritten'\n");
         return -1;
     }
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
@@ -4971,7 +5032,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // pseudo-columns)
     alldata->points.points = (float*) malloc(sizeof(float) * alldata->points.nRowsPoints * alldata->points.nColsPoints);
     if (alldata->points.points == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'points'.\n"); 
+        vol2bird_err_printf("Error pre-allocating array 'points'.\n");
         return -1;
     }
 
@@ -5025,24 +5086,24 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // 'nColsProfile' pseudocolumns):
     alldata->profiles.profile = (float*) malloc(sizeof(float) * alldata->profiles.nRowsProfile * alldata->profiles.nColsProfile);
     if (alldata->profiles.profile == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'profile'.\n"); 
+        vol2bird_err_printf("Error pre-allocating array 'profile'.\n");
         return -1;
     }
 
     // these next three variables are a quick fix
     alldata->profiles.profile1 = (float*) malloc(sizeof(float) * alldata->profiles.nRowsProfile * alldata->profiles.nColsProfile);
     if (alldata->profiles.profile1 == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'profile1'.\n"); 
+        vol2bird_err_printf("Error pre-allocating array 'profile1'.\n");
         return -1;
     }
     alldata->profiles.profile2 = (float*) malloc(sizeof(float) * alldata->profiles.nRowsProfile * alldata->profiles.nColsProfile);
     if (alldata->profiles.profile2 == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'profile2'.\n"); 
+        vol2bird_err_printf("Error pre-allocating array 'profile2'.\n");
         return -1;
     }
     alldata->profiles.profile3 = (float*) malloc(sizeof(float) * alldata->profiles.nRowsProfile * alldata->profiles.nColsProfile);
     if (alldata->profiles.profile3 == NULL) {
-        fprintf(stderr,"Error pre-allocating array 'profile3'.\n"); 
+        vol2bird_err_printf("Error pre-allocating array 'profile3'.\n");
         return -1;
     }
 
@@ -5095,7 +5156,7 @@ void vol2birdTearDown(vol2bird_t* alldata) {
     // ---------------------------------------------------------- //
 
     if (alldata->misc.initializationSuccessful==FALSE) {
-        fprintf(stderr,"You need to initialize vol2bird before you can use it. Aborting.\n");
+        vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 

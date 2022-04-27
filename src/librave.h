@@ -9,6 +9,7 @@ extern "C" {
 #include "rave_io.h"
 #include "polarvolume.h"
 #include "hlhdf.h"
+#include "libvol2bird/libvol2bird.h"
 }
 namespace vol2birdR {
 namespace librave {

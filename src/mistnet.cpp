@@ -48,10 +48,15 @@ void cpp_vol2bird_namespace__store_main_thread_id() {
   main_thread_id();
 }
 
+void Vol2Bird_Rprintf(const char* msg) {
+  Rprintf("%s", msg);
+}
+
 // [[Rcpp::export]]
 void cpp_vol2bird_initialize() {
   // called upon package load to remember the thread ID of the main thread
   HL_init();
+  vol2bird_set_printf(Vol2Bird_Rprintf);
 }
 
 void call_r_gc() {

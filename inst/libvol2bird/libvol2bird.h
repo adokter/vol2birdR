@@ -396,6 +396,20 @@ struct vol2bird {
 };
 typedef struct vol2bird vol2bird_t;
 
+typedef void(*vol2bird_printfun)(const char* msg);
+
+void vol2bird_set_printf(vol2bird_printfun fun);
+
+void vol2bird_set_err_printf(vol2bird_printfun fun);
+
+void vol2bird_default_print(const char* msg);
+
+void vol2bird_default_err_print(const char* msg);
+
+void vol2bird_printf(const char* fmt, ...);
+
+void vol2bird_err_printf(const char* fmt, ...);
+
 typedef enum radarDataFormat {
   radarDataFormat_UNKNOWN = 0,
   radarDataFormat_ODIM = 1,   /** Opera Data Information Model (ODIM) */
