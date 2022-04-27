@@ -1,11 +1,14 @@
 #include <torch/script.h> 
 #include <iostream>
 
-#define MISTNET_BUILD  // mostly to trigger export of function when running on windows
-#include "libmistnet/mistnet.h"
+#ifdef _WIN32
+#define MISTNET_API __declspec(dllexport)
+#else
+#define MISTNET_API 
+#endif
 
 extern "C" {
-int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
+MISTNET_API int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
 {
         // ***************************************************************************
         // *************************                           ***********************
@@ -41,4 +44,5 @@ int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model
 }
 
 }
+
 

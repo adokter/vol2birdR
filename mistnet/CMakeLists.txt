@@ -79,7 +79,7 @@ add_library(mistnet SHARED ${MISTNET_SRC})
 add_library(mistnet::library ALIAS mistnet)
 
 target_include_directories(mistnet PUBLIC
-    ${PROJECT_SOURCE_DIR}/../inst
+    ${PROJECT_SOURCE_DIR}/include
 )
 
 target_link_libraries(mistnet ${TORCH_LIBRARIES})
