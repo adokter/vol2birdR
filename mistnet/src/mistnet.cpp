@@ -1,6 +1,9 @@
 #include <torch/script.h> 
 #include <iostream>
 
+#define MISTNET_BUILD  // mostly to trigger export of function when running on windows
+#include "libmistnet/mistnet.h"
+
 extern "C" {
 int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
 {

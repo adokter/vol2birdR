@@ -13,14 +13,17 @@
 #endif
 
 #ifdef MISTNET_BUILD
+
 #define MISTNET_PTR
 #define MISTNET_HEADERS_ONLY
-
 #ifdef _WIN32
 #define MISTNET_API extern "C" __declspec(dllexport)
 #endif
-#else
+
+#else // MISTNET_BUILD
+
 #define MISTNET_PTR *
+
 #endif
 
 #ifndef MISTNET_API
@@ -226,7 +229,6 @@ bool mistnetInit(const std::string &libPath, std::string *pError)
   if (!mistnetLoadLibrary(libPath, pError))
     return false;
   mistnet_loaded = true;
-
   LOAD_SYMBOL(_mistnet_run_mistnet);
 
   return true;
