@@ -275,10 +275,10 @@ Cartesian_t* polarVolumeToCartesian(PolarVolume_t* pvol, long dim, long res, dou
             
             RaveValueType a;
             // loop over the grid, and fill it
-            for(long x = 0,xx; x<dim; x++){
-                for(long y = 0,yy; y<dim; y++){
-                    xx=res*(x-dim/2);
-                    yy=res*(y-dim/2);
+            for(long x = 0; x<dim; x++){
+                for(long y = 0; y<dim; y++){
+                    double xx=((double)res)*((double)(x-dim/2));
+                    double yy=((double)res)*((double)(y-dim/2));
                     azim=atan2(yy,xx);
                     distance=sqrt(SQUARE(xx)+SQUARE(yy));
                     range=distance2range(distance,elev);
