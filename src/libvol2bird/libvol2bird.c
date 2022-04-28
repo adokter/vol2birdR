@@ -5061,6 +5061,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     //#ifdef MISTNET
     if (check_mistnet_loaded_c()) {
       if(alldata->options.useMistNet){
+        vol2bird_err_printf("Running segmentScansUsingMistnet.\n");
         int result = segmentScansUsingMistnet(volume, scanUse, alldata);
         if (result < 0) return -1;
       }
