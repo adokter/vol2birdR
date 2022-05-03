@@ -38,7 +38,6 @@
  * Control Document for the RDA/RPG", Build 10.0 Draft, WSR-88D Radar
  * Operations Center.
  */
-
 typedef struct {
     short rpg[6]; /* 12 bytes inserted by RPG Communications Mgr. Ignored. */
     unsigned short msg_size;  /* Message size for this segment, in halfwords */
@@ -286,7 +285,7 @@ int read_wsr88d_ray_m31(Wsr88d_file *wf, int msg_size,
 
     n = fread(wsr88d_ray->data, msg_size, 1, wf->fptr);
     if (n < 1) {
-	fprintf(stderr,"read_wsr88d_ray_m31: Read failed.\n");
+	RSL_printf("read_wsr88d_ray_m31: Read failed.\n");
 	return 0;
     }
 
@@ -420,7 +419,7 @@ void wsr88d_load_ray_into_radar(Wsr88d_ray_m31 *wsr88d_ray, int isweep,
 
 	vol_index = wsr88d_get_vol_index(data_hdr.dataname);
 	if (vol_index < 0) {
-	    fprintf(stderr,"wsr88d_load_ray_into_radar: Unknown dataname %s.  "
+	    RSL_printf("wsr88d_load_ray_into_radar: Unknown dataname %s.  "
 		    "isweep = %d, iray = %d.\n", data_hdr.dataname, isweep,
 		    iray);
 	    return;
@@ -597,7 +596,7 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
         return NULL;
       raynum = wsr88d_ray.ray_hdr.azm_num;
       if (raynum > MAXRAYS_M31) {
-        fprintf(stderr, "Error: raynum = %d, exceeds MAXRAYS_M31"
+        RSL_printf( "Error: raynum = %d, exceeds MAXRAYS_M31"
             " (%d)\n", raynum, MAXRAYS_M31);
         RSL_free_radar(radar);
         return NULL;
@@ -608,7 +607,7 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
        * less rays then expected in the sweep that just ended.
        */
       if (wsr88d_ray.ray_hdr.radial_status == START_OF_ELEV && wsr88d_ray.ray_hdr.elev_num - 1 > isweep) {
-        fprintf(stderr, "Warning: Radial status is Start-of-Elevation, "
+        RSL_printf( "Warning: Radial status is Start-of-Elevation, "
             "but End-of-Elevation was not\n"
             "issued for elevation number %d.  Number of rays = %d"
             "\n", prev_elev_num, prev_raynum);
@@ -619,7 +618,7 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
 
       /* Check if this sweep number exceeds how many we allocated */
       if (isweep > MAXSWEEPS) {
-        fprintf(stderr, "Error: isweep = %d, exceeds MAXSWEEPS (%d)\n", isweep, MAXSWEEPS);
+        RSL_printf( "Error: isweep = %d, exceeds MAXSWEEPS (%d)\n", isweep, MAXSWEEPS);
         RSL_free_radar(radar);
         return NULL;
       }
@@ -636,15 +635,14 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
       }
     } else { /* msg_type not 31 */
       n = fread(&non31_seg_remainder, sizeof(non31_seg_remainder), 1, wf->fptr);
-      fprintf(stderr, "not_31 - ftell: %d\n", ftell(wf->fptr));
 
       if (n < 1) {
         if (feof(wf->fptr) != 0) {
-          fprintf(stderr, "Unexpected end of file.\n");
+          RSL_printf( "Unexpected end of file.\n");
         } else {
-          fprintf(stderr, "Read failed.\n");
+          RSL_printf( "Read failed.\n");
         }
-        fprintf(stderr, "Current sweep index: %d\n"
+        RSL_printf( "Current sweep index: %d\n"
             "Last ray read: %d\n", isweep, prev_raynum);
         wsr88d_load_sweep_header(radar, isweep);
 
@@ -661,13 +659,13 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
       n = fread(&msghdr, sizeof(Wsr88d_msg_hdr), 1, wf->fptr);
 
       if (n < 1) {
-        fprintf(stderr, "Warning: load_wsr88d_m31_into_radar: ");
+        RSL_printf( "Warning: load_wsr88d_m31_into_radar: ");
         if (feof(wf->fptr) != 0) {
-          fprintf(stderr, "Unexpected end of file.\n");
+          RSL_printf( "Unexpected end of file.\n");
         } else {
-          fprintf(stderr, "Failed reading msghdr.\n");
+          RSL_printf( "Failed reading msghdr.\n");
         }
-        fprintf(stderr, "Current sweep index: %d\n"
+        RSL_printf( "Current sweep index: %d\n"
             "Last ray read: %d\n", isweep, prev_raynum);
         wsr88d_load_sweep_header(radar, isweep);
 

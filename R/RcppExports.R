@@ -21,6 +21,14 @@ cpp_vol2bird_initialize <- function() {
     invisible(.Call(`_vol2birdR_cpp_vol2bird_initialize`))
 }
 
+cpp_vol2bird_set_wsr88d_site_location <- function(loc) {
+    invisible(.Call(`_vol2birdR_cpp_vol2bird_set_wsr88d_site_location`, loc))
+}
+
+cpp_vol2bird_get_wsr88d_site_location <- function() {
+    .Call(`_vol2birdR_cpp_vol2bird_get_wsr88d_site_location`)
+}
+
 cpp_mistnet_init <- function(path) {
     invisible(.Call(`_vol2birdR_cpp_mistnet_init`, path))
 }

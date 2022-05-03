@@ -52,13 +52,40 @@ void Vol2Bird_Rprintf(const char* msg) {
   Rprintf("%s", msg);
 }
 
+void RSL_Rprintf(const char* msg) {
+  Rprintf("%s", msg);
+}
+
+extern "C" {
+void RSL_set_printfun(void(*printfun)(const char*));
+}
+
 // [[Rcpp::export]]
 void cpp_vol2bird_initialize() {
   // called upon package load to remember the thread ID of the main thread
   HL_init();
   vol2bird_set_printf(Vol2Bird_Rprintf);
   vol2bird_set_err_printf(Vol2Bird_Rprintf);
+  RSL_set_printfun(RSL_Rprintf);
 }
+
+extern "C" {
+void wsr88d_set_site_info_file(const char* pth);
+const char* wsr88d_get_site_info_file(void);
+}
+
+// [[Rcpp::export]]
+void cpp_vol2bird_set_wsr88d_site_location(std::string loc)
+{
+  wsr88d_set_site_info_file(loc.c_str());
+}
+
+// [[Rcpp::export]]
+std::string cpp_vol2bird_get_wsr88d_site_location()
+{
+  return std::string(wsr88d_get_site_info_file());
+}
+
 
 void call_r_gc() {
   Rcpp::Function r_gc("gc");

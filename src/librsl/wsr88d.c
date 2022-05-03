@@ -72,6 +72,8 @@
 
 #include "wsr88d.h"
 
+void RSL_printf(const char* fmt, ...);
+
 static int little_endian(void)
 {
   union {
@@ -166,21 +168,21 @@ float Cvt_time(long int time_in)
 void print_head(Wsr88d_file_header h)
 {
   int i;
-  fprintf(stderr,"Filename : ");
-  for (i=0;i<9;i++) fprintf(stderr,"%c", h.title.filename[i]);   printf("\n");
+  RSL_printf("Filename : ");
+  for (i=0;i<9;i++) RSL_printf("%c", h.title.filename[i]);   printf("\n");
 
-  fprintf(stderr,"Extension: ");
-  for (i=0;i<3;i++) fprintf(stderr,"%c", h.title.ext[i]);   printf("\n");
+  RSL_printf("Extension: ");
+  for (i=0;i<3;i++) RSL_printf("%c", h.title.ext[i]);   printf("\n");
 
-  fprintf(stderr,"Julian date: %d\n", Cvt_date(h.title.file_date));
-  fprintf(stderr,"       time: %f\n", Cvt_time(h.title.file_time));
+  RSL_printf("Julian date: %d\n", Cvt_date(h.title.file_date));
+  RSL_printf("       time: %f\n", Cvt_time(h.title.file_time));
 
   
 }
 
 void print_packet_info(Wsr88d_packet *p)
 {
-  fprintf(stderr,"%5hd %5hd %5hd %5hd %5hd %5hd %5hd %10.3f %6d\n",
+  RSL_printf("%5hd %5hd %5hd %5hd %5hd %5hd %5hd %10.3f %6d\n",
          p->msg_type, p->id_seq, p->azm, p->ray_num, p->ray_status, p->elev, p->elev_num,
          Cvt_time((int)p->ray_time), Cvt_date((int)p->ray_date));
 }
@@ -219,8 +221,8 @@ void wsr88d_print_sweep_info(Wsr88d_sweep *s)
 {
   int i;
 
-  fprintf(stderr,"Mtype    ID  azim  ray# rstat  elev elev#       time   date\n");
-  fprintf(stderr,"----- ----- ----- ----- ----- ----- ----- ---------- ------\n");
+  RSL_printf("Mtype    ID  azim  ray# rstat  elev elev#       time   date\n");
+  RSL_printf("----- ----- ----- ----- ----- ----- ----- ---------- ------\n");
 
   for (i=0; i<MAX_RAYS_IN_SWEEP; i++) {
     if (s->ray[i] != NULL) 
@@ -255,7 +257,7 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
       memcpy(block, clength, 4);
       i = read(fdin, block + 4, 20);
       if (i != 20) {
-        fprintf( stderr, "Missing header\n");
+        RSL_printf("Missing header\n");
         goto done;
         //exit(1);
       }
@@ -265,7 +267,7 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
       lseek(fdout, 0, SEEK_SET);
       if (write(fdout, block, 24) != 24) {
         // Failure to write...
-        fprintf(stderr, "Failed to write block\n");
+        RSL_printf( "Failed to write block\n");
         goto done;
       }
       continue;
@@ -287,9 +289,8 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
     if (length > isize) {
       isize = length;
       if ((block = (char*) realloc(block, isize)) == NULL) {
-        fprintf( stderr, "Cannot re-allocate input buffer\n");
+        RSL_printf("Cannot re-allocate input buffer\n");
         goto done;
-//        exit(1);
       }
     }
 
@@ -299,8 +300,7 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
 
     i = read(fdin, block, length);
     if (i != length) {
-      fprintf( stderr, "Short block read!\n");
-//      exit(1);
+      RSL_printf("Short block read!\n");
       goto done;
     }
     if (length > 10) {
@@ -317,18 +317,16 @@ tryagain:
         if (error == BZ_OUTBUFF_FULL) {
           osize += 262144;
           if ((oblock = (char*) realloc(oblock, osize)) == NULL) {
-            fprintf(stderr, "Cannot allocate output buffer\n");
+            RSL_printf( "Cannot allocate output buffer\n");
             goto done;
-//            exit(1);
           }
           goto tryagain;
         }
-        fprintf(stderr, "decompress error - %d\n", error);
-//        exit(1);
+        RSL_printf( "decompress error - %d\n", error);
         goto done;
       }
       if (write(fdout, oblock, olength) != olength) {
-        fprintf(stderr, "Failed to write outblock\n");
+        RSL_printf( "Failed to write outblock\n");
         goto done;
       }
     }
@@ -351,7 +349,7 @@ FILE *uncompress_pipe_ar2v(FILE *fp)
 {
   FILE *retfp = NULL, *result = NULL;
 
-  retfp = tmpfile(); /* This might cause problems in windows.. Might have to use different tmpfile approach there.*/
+  retfp = create_temporary_file();
   if (retfp == NULL) {
     goto done;
   }
@@ -359,7 +357,6 @@ FILE *uncompress_pipe_ar2v(FILE *fp)
     goto done;
   }
   fseek(retfp, 0, SEEK_SET);
-  fseek(fp, 0, SEEK_SET);
   result = retfp;
   retfp = NULL;
 done:
@@ -378,7 +375,7 @@ FILE *uncompress_pipe_ar2v (FILE *fp)
   int save_fd;
 
   if (no_command("wsr88d_decode_ar2v > /dev/null")){
-    fprintf(stderr, "wsr88d_decode_ar2v not found, aborting ...\n");
+    RSL_printf( "wsr88d_decode_ar2v not found, aborting ...\n");
     return fp;
   }
   save_fd = dup(0);
@@ -408,9 +405,9 @@ Wsr88d_file *wsr88d_open(char *filename)
 
   if ( strcmp(filename, "stdin") == 0 ) {
     save_fd = dup(0);
-    wf->fptr = fdopen(save_fd,"r");
+    wf->fptr = fdopen(save_fd,"rb");
   } else {
-    wf->fptr = fopen(filename, "r");
+    wf->fptr = fopen(filename, "rb");
   }
 
   if (wf->fptr == NULL) return NULL;
@@ -422,11 +419,11 @@ Wsr88d_file *wsr88d_open(char *filename)
   fpos_t pos;
   fgetpos(wf->fptr, &pos);
   if (fread(hdrplus4, sizeof(hdrplus4), 1, wf->fptr) != 1) {
-     fprintf(stderr,"failed to read first 28 bytes of Wsr88d file");
+      RSL_printf("failed to read first 28 bytes of Wsr88d file");
      return NULL;
   }
   if (fread(bzmagic, sizeof(bzmagic), 1, wf->fptr) != 1) {
-     fprintf(stderr,"failed to read bzip magic bytes from Wsr88d file");
+    RSL_printf("failed to read bzip magic bytes from Wsr88d file");
      return NULL;
   }
   // test for bzip2 magic.
@@ -437,11 +434,11 @@ Wsr88d_file *wsr88d_open(char *filename)
   // reopen the file
   if ( strcmp(filename, "stdin") == 0 ) {
      save_fd = dup(0);
-     wf->fptr = fdopen(save_fd,"r");
+     wf->fptr = fdopen(save_fd,"rb");
   } else {
-     wf->fptr = fopen(filename, "r");
+     wf->fptr = fopen(filename, "rb");
   }
- 
+
   // decompress
   if(ar2v6bzip){
      wf->fptr = uncompress_pipe_ar2v(wf->fptr);
@@ -469,7 +466,7 @@ int wsr88d_perror(char *message)
  */
 
   /* This is a simple model now. */
-  fprintf(stderr, "wsr88d_error: ");
+  RSL_printf( "wsr88d_error: ");
   perror(message);
   return 0;
 }
@@ -527,14 +524,14 @@ int wsr88d_read_tape_header(char *first_file,
   int n;
   char c;
 
-  if ((fp = fopen(first_file, "r")) == NULL) {
+  if ((fp = fopen(first_file, "rb")) == NULL) {
     perror(first_file);
     return 0;
   }
   
   n = fread(wsr88d_tape_header, sizeof(Wsr88d_tape_header), 1, fp);
   if (n == 0) {
-    fprintf(stderr, "WARNING: %s is smaller than 31616 bytes.  It is not a tape header file.\n", first_file);
+    RSL_printf("WARNING: %s is smaller than 31616 bytes.  It is not a tape header file.\n", first_file);
   } else {
     /* Try to read one more character.  If we can, then this is not a 
      * tape header file.  I suppose that we could look for '.' as the
@@ -542,12 +539,12 @@ int wsr88d_read_tape_header(char *first_file,
      * header file.
      */
     if (fread(&c, sizeof(char), 1, fp) > 0) {
-      fprintf(stderr, "WARNING: %s is larger than 31616 bytes.  It is not a tape header file.\n", first_file);
+      RSL_printf("WARNING: %s is larger than 31616 bytes.  It is not a tape header file.\n", first_file);
       memset(wsr88d_tape_header, 0, sizeof(Wsr88d_tape_header));
       n = 0;
     } else { /* Ok so far. Now check the first 8 bytes for "ARCHIVE2" */
       if (strncmp(wsr88d_tape_header->archive2, "ARCHIVE2", 8) != 0) {
-        fprintf(stderr, "WARNING: %s is 31616 bytes.  However, the first 8 bytes are not 'ARCHIVE2'.\n", first_file);
+        RSL_printf("WARNING: %s is 31616 bytes.  However, the first 8 bytes are not 'ARCHIVE2'.\n", first_file);
         memset(wsr88d_tape_header, 0, sizeof(Wsr88d_tape_header));
         n = 0;
       }
@@ -567,7 +564,7 @@ int wsr88d_read_tape_header(char *first_file,
 /**********************************************************************/
 int wsr88d_read_header(Wsr88d_file *wf, Wsr88d_header *wsr88d_header)
 {
-  fprintf(stderr,"Routine: wsr88d_read_header\n");
+  RSL_printf("Routine: wsr88d_read_header\n");
   return 0;
 }
 
@@ -610,7 +607,7 @@ int wsr88d_read_sweep(Wsr88d_file *wf, Wsr88d_sweep *wsr88d_sweep)
 /* Step 1. */
   while ((wsr88d_ray.msg_type & 15) != 1 && n > 0) {
     /*
-    fprintf(stderr,"SKIPPING packet: type %d, radial status %d\n",
+    RSL_printf("SKIPPING packet: type %d, radial status %d\n",
            wsr88d_ray.msg_type, wsr88d_ray.ray_status);
     */
     n = wsr88d_read_ray(wf, &wsr88d_ray);
@@ -622,7 +619,7 @@ int wsr88d_read_sweep(Wsr88d_file *wf, Wsr88d_sweep *wsr88d_sweep)
   while ( ! end_of_volume ) {
     if ((wsr88d_ray.msg_type & 15) != 1) {
       /*
-      fprintf(stderr,"SKIPPING (amid a sweep) packet: type %d, "
+      RSL_printf("SKIPPING (amid a sweep) packet: type %d, "
             "radial status %d\n",
              wsr88d_ray.msg_type, wsr88d_ray.ray_status);
        */
@@ -637,7 +634,7 @@ int wsr88d_read_sweep(Wsr88d_file *wf, Wsr88d_sweep *wsr88d_sweep)
        */
       /*
       if (nrec+1 != ray_num) {
-        fprintf(stderr, "Data says %d is ray_num, but, I've seen %d "
+        RSL_printf( "Data says %d is ray_num, but, I've seen %d "
                 "records.\n", ray_num, nrec+1);
       }
       */
@@ -671,7 +668,7 @@ int wsr88d_read_sweep(Wsr88d_file *wf, Wsr88d_sweep *wsr88d_sweep)
   free_and_clear_sweep(wsr88d_sweep, ray_num+1, MAX_RAYS_IN_SWEEP);
   
 /*
-  fprintf(stderr,"Processed %d records for elevation number %d\n",
+  RSL_printf("Processed %d records for elevation number %d\n",
          nrec+1, wsr88d_ray.elev_num);
   wsr88d_print_sweep_info(wsr88d_sweep);
 */
@@ -731,7 +728,7 @@ int wsr88d_read_ray(Wsr88d_file *wf, Wsr88d_ray *wsr88d_ray)
 int wsr88d_read_ray_header(Wsr88d_file *wf,
                            Wsr88d_ray_header *wsr88d_ray_header)
 {
-  fprintf(stderr,"Stub routine: wsr88d_read_ray_header.\n");
+  RSL_printf("Stub routine: wsr88d_read_ray_header.\n");
   return 0;
 }
 
@@ -786,16 +783,16 @@ int wsr88d_ray_to_float(Wsr88d_ray *ray,
 
 
 /*
-  fprintf(stderr,"refl_ptr = %d  #g = %d, ", refl_ptr, num_ref_gates);
-  fprintf(stderr," vel_ptr = %d  #g = %d, ", vel_ptr, num_vel_gates);
-  fprintf(stderr,"spec_ptr = %d  #g = %d, ", spec_ptr, num_spec_gates);
-  fprintf(stderr,"res_flag = %d\n", res_flag);
+  RSL_printf("refl_ptr = %d  #g = %d, ", refl_ptr, num_ref_gates);
+  RSL_printf(" vel_ptr = %d  #g = %d, ", vel_ptr, num_vel_gates);
+  RSL_printf("spec_ptr = %d  #g = %d, ", spec_ptr, num_spec_gates);
+  RSL_printf("res_flag = %d\n", res_flag);
 */
 
   if (THE_DATA_WANTED == WSR88D_DZ) {
     /* do the reflectivity data  (dbZ)*/
     if (refl_ptr+num_ref_gates > 2300) 
-      fprintf(stderr, "WARNING: # refl index (%d) exceeds maximum (2300)\n",
+      RSL_printf("WARNING: # refl index (%d) exceeds maximum (2300)\n",
               refl_ptr+num_ref_gates);
     else {
     for(i=0; i<num_ref_gates; i++) {
@@ -813,7 +810,7 @@ int wsr88d_ray_to_float(Wsr88d_ray *ray,
   } else if (THE_DATA_WANTED == WSR88D_VR) {
     /* do the velocity data  (M/S) */
     if (vel_ptr+num_vel_gates > 2300) 
-      fprintf(stderr, "WARNING: # vel index (%d) exceeds maximum (2300)\n",
+      RSL_printf("WARNING: # vel index (%d) exceeds maximum (2300)\n",
               vel_ptr+num_vel_gates);
     else {
     for(i=0; i<num_vel_gates;i++)   {
@@ -834,7 +831,7 @@ int wsr88d_ray_to_float(Wsr88d_ray *ray,
   } else if (THE_DATA_WANTED == WSR88D_SW) {
     /* now do the spectrum width data (M/S)*/
     if (spec_ptr+num_spec_gates > 2300) 
-      fprintf(stderr, "WARNING: # spec index (%d) exceeds maximum (2300)\n",
+      RSL_printf("WARNING: # spec index (%d) exceeds maximum (2300)\n",
               spec_ptr+num_spec_gates);
     else {
     for(i=0;i<num_spec_gates;i++) {

@@ -1688,3 +1688,45 @@ void RSL_add_dbz_offset_to_volume(Volume *v, float dbz_offset)
   for (isweep=0; isweep<v->h.nsweeps; isweep++)
     RSL_add_dbz_offset_to_sweep(v->sweep[isweep], dbz_offset);
 }
+
+
+/*********************************************************************/
+/*                                                                   */
+/*                 RSL_add_dbz_offset_to_volume                      */
+/*                                                                   */
+/*********************************************************************/
+static RSL_printfun RSL_internal_printf_fun = RSL_default_printfun;
+void RSL_set_printfun(RSL_printfun fun)
+{
+  RSL_internal_printf_fun = fun;
+}
+
+/*********************************************************************/
+/*                                                                   */
+/*                 RSL_add_dbz_offset_to_volume                      */
+/*                                                                   */
+/*********************************************************************/
+void RSL_default_printfun(const char* msg)
+{
+  fprintf(stderr, "%s", msg);
+}
+
+/*********************************************************************/
+/*                                                                   */
+/*                 RSL_printf                                        */
+/*                                                                   */
+/*********************************************************************/
+void RSL_printf(const char* fmt, ...)
+{
+  va_list ap;
+  int n;
+  char msg[65536];
+  va_start(ap, fmt);
+  n = vsnprintf(msg, 1024, fmt, ap);
+  va_end(ap);
+  if (n >= 0 && n <= 65536) {
+    RSL_internal_printf_fun(msg);
+  } else {
+    RSL_internal_printf_fun("RSL_printf failed when printing message");
+  }
+}

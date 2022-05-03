@@ -39,6 +39,7 @@ int rslCopy2Rave(Sweep *rslSweep,PolarScanParam_t* scanparam);
 #define ABS(x) (((x) < 0) ? (-(x)) : (x))
 #endif
 
+void vol2bird_err_printf(const char* fmt, ...);
 
 // non-public function declarations (local to this file/translation unit)
 
@@ -508,10 +509,12 @@ PolarVolume_t* vol2birdGetRSLVolume(char* filename, float rangeMax, int small) {
     
     // according to documentation of RSL it is not required to parse a callid
     // but in practice it is for WSR88D.
+
     char* base = basename(filename);
     char callid[5];
     strncpy(callid, base,4);
     callid[4] = 0; //null terminate destination
+    vol2bird_err_printf("Filename = %s, callid = %s\n", filename, callid);
     
     radar = RSL_anyformat_to_radar(filename,callid);
 

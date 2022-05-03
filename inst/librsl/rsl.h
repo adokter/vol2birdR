@@ -755,6 +755,7 @@ Histogram *RSL_get_histogram_from_volume(Volume *volume, Histogram *histogram,
 Histogram *RSL_read_histogram(char *infile);
 
 int no_command (char *cmd);
+FILE* create_temporary_file(void);
 FILE *uncompress_pipe (FILE *fp);
 FILE *compress_pipe (FILE *fp);
 int rsl_pclose(FILE *fp);
@@ -906,7 +907,15 @@ void RSL_wsr88d_keep_sails();
 /* Debugging prototypes. */
 void poke_around_volume(Volume *v);
 
+/* To be able to forward print to other functions than fprintf(stderr... */
+typedef void(*RSL_printfun)(const char* msg);
+void RSL_set_printfun(RSL_printfun fun);
+void RSL_default_printfun(const char* msg);
+void RSL_printf(const char* fmt, ...);
+
 /* SYSTEM: left out prototypes? */
+#ifndef _WIN32
 extern int pclose (FILE *f); /* From stdio.h */
+#endif
 
 #endif

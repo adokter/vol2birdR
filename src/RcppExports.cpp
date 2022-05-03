@@ -30,6 +30,26 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// cpp_vol2bird_set_wsr88d_site_location
+void cpp_vol2bird_set_wsr88d_site_location(std::string loc);
+RcppExport SEXP _vol2birdR_cpp_vol2bird_set_wsr88d_site_location(SEXP locSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type loc(locSEXP);
+    cpp_vol2bird_set_wsr88d_site_location(loc);
+    return R_NilValue;
+END_RCPP
+}
+// cpp_vol2bird_get_wsr88d_site_location
+std::string cpp_vol2bird_get_wsr88d_site_location();
+RcppExport SEXP _vol2birdR_cpp_vol2bird_get_wsr88d_site_location() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(cpp_vol2bird_get_wsr88d_site_location());
+    return rcpp_result_gen;
+END_RCPP
+}
 // cpp_mistnet_init
 void cpp_mistnet_init(std::string path);
 RcppExport SEXP _vol2birdR_cpp_mistnet_init(SEXP pathSEXP) {
@@ -49,6 +69,8 @@ RcppExport SEXP _rcpp_module_boot_Vol2Bird();
 static const R_CallMethodDef CallEntries[] = {
     {"_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id", (DL_FUNC) &_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id, 0},
     {"_vol2birdR_cpp_vol2bird_initialize", (DL_FUNC) &_vol2birdR_cpp_vol2bird_initialize, 0},
+    {"_vol2birdR_cpp_vol2bird_set_wsr88d_site_location", (DL_FUNC) &_vol2birdR_cpp_vol2bird_set_wsr88d_site_location, 1},
+    {"_vol2birdR_cpp_vol2bird_get_wsr88d_site_location", (DL_FUNC) &_vol2birdR_cpp_vol2bird_get_wsr88d_site_location, 0},
     {"_vol2birdR_cpp_mistnet_init", (DL_FUNC) &_vol2birdR_cpp_mistnet_init, 1},
     {"_rcpp_module_boot_PolarVolume", (DL_FUNC) &_rcpp_module_boot_PolarVolume, 0},
     {"_rcpp_module_boot_RaveIO", (DL_FUNC) &_rcpp_module_boot_RaveIO, 0},

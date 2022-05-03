@@ -35,6 +35,24 @@ int strcasecmp(const char *s1, const char *s2);
 #include <stdlib.h>
 #include "wsr88d.h"
 
+static char wsr88d_site_info_file[512];
+static int wsr88_site_info_file_initialized = 0;
+
+const char* wsr88d_get_site_info_file(void)
+{
+  if (!wsr88_site_info_file_initialized) {
+    strcpy(wsr88d_site_info_file, WSR88D_SITE_INFO_FILE);
+    wsr88_site_info_file_initialized = 1;
+  }
+  return (const char*)wsr88d_site_info_file;
+}
+
+void wsr88d_set_site_info_file(const char* filename)
+{
+  strcpy(wsr88d_site_info_file, filename);
+  wsr88_site_info_file_initialized = 1;
+}
+
 Wsr88d_site_info *wsr88d_get_site(char *in_sitenm)
 {
 	/* variable declarations	 */
@@ -46,7 +64,7 @@ Wsr88d_site_info *wsr88d_get_site(char *in_sitenm)
 	struct radar_site *currsite=NULL;
 	FILE *in_file;
 
-	if((in_file=fopen(WSR88D_SITE_INFO_FILE, "r")) !=NULL)
+	if((in_file=fopen(wsr88d_get_site_info_file(), "r")) !=NULL)
 	{
     	/* read each line */
 		while (fgets(line,sizeof(line),in_file) != NULL)

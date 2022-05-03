@@ -86,9 +86,9 @@ Radar *RSL_rainbow_to_radar(char *infile)
     if (infile == NULL) {
   	int save_fd;
   	save_fd = dup(0);
-  	fp = fdopen(save_fd, "r");
+  	fp = fdopen(save_fd, "rb");
     }
-    else if ((fp = fopen(infile, "r")) == NULL) {
+    else if ((fp = fopen(infile, "rb")) == NULL) {
   	perror(infile);
   	return NULL;
     }

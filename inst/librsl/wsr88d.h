@@ -9,6 +9,10 @@
 #ifndef WSR88D_SITE_INFO_FILE
 #define WSR88D_SITE_INFO_FILE "/opt/vol2bird/rsl/lib/wsr88d_locations.dat"
 #endif
+
+const char* wsr88d_get_site_info_file(void);
+void wsr88d_set_site_info_file(const char* filename);
+
 /*===============================================================*/
 typedef struct {
   char archive2[8];    /* Always ARCHIVE2 */
@@ -214,6 +218,7 @@ float wsr88d_get_frequency(Wsr88d_ray *ray);
 int no_command (char *cmd);
 FILE *uncompress_pipe (FILE *fp);
 FILE *compress_pipe (FILE *fp);
+FILE* create_temporary_file(void);
 int rsl_pclose(FILE *fp);
 
 #endif

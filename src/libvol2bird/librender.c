@@ -410,10 +410,6 @@ Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double 
         // loop over the grid, and fill it
         for(long x = 0; x<dim; x++){
             for(long y = 0; y<dim; y++){
-              int debug = 0;
-              if (strcmp(PolarScanParam_getQuantity(polarScanParam), "DBZH") == 0 && x == 0 && y < 10) {
-                debug = 1;
-              }
                 double xx=((double)res)*((double)(x-dim/2));
                 double yy=((double)res)*((double)(y-dim/2));
                 azim=atan2(yy,xx);

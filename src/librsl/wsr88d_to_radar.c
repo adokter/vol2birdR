@@ -270,12 +270,12 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
  *    3. If no valid site info, abort.
  */
   if (call_or_first_tape_file == NULL) {
-    fprintf(stderr, "wsr88d_to_radar: No valid site ID info provided.\n");
+    RSL_printf("wsr88d_to_radar: No valid site ID info provided.\n");
     return(NULL);
   } else if (strlen(call_or_first_tape_file) == 4)
     sitep =  wsr88d_get_site(call_or_first_tape_file);
   else if (strlen(call_or_first_tape_file) == 0) {
-    fprintf(stderr, "wsr88d_to_radar: No valid site ID info provided.\n");
+    RSL_printf( "wsr88d_to_radar: No valid site ID info provided.\n");
     return(NULL);
   }  
 
@@ -285,11 +285,11 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
       sitep  = wsr88d_get_site(site_id_str);
     }
   if (sitep == NULL) {
-      fprintf(stderr,"wsr88d_to_radar: No valid site ID info found.\n");
+      RSL_printf("wsr88d_to_radar: No valid site ID info found.\n");
         return(NULL);
   }
     if (radar_verbose_flag)
-      fprintf(stderr,"SITE: %c%c%c%c\n", sitep->name[0], sitep->name[1],
+      RSL_printf("SITE: %c%c%c%c\n", sitep->name[0], sitep->name[1],
              sitep->name[2], sitep->name[3]);
 
   
@@ -329,11 +329,11 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
   }
 
   if (n <= 0 || expected_msgtype == 0) {
-      fprintf(stderr,"RSL_wsr88d_to_radar: ");
+      RSL_printf("RSL_wsr88d_to_radar: ");
       if (n <= 0)
-      fprintf(stderr,"wsr88d_read_file_header failed\n");
+      RSL_printf("wsr88d_read_file_header failed\n");
       else
-      fprintf(stderr,"Archive II header contains unknown version "
+      RSL_printf("Archive II header contains unknown version "
           ": '%s'\n", version);
       wsr88d_close(wf);
       return NULL;
@@ -375,7 +375,7 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
           if (rsl_qsweep[nsweep] == 0) continue;
         }
         if (radar_verbose_flag)  
-        fprintf(stderr,"Processing for SWEEP # %d\n", nsweep);
+        RSL_printf("Processing for SWEEP # %d\n", nsweep);
 
           /*  wsr88d_print_sweep_info(&wsr88d_sweep); */
         
@@ -387,7 +387,7 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
              */
             if (nsweep >= radar->v[iv]->h.nsweeps) {
               if (radar_verbose_flag)
-                fprintf(stderr,"Exceeded sweep allocation of %d. "
+                RSL_printf("Exceeded sweep allocation of %d. "
                     "Adding 20 more.\n", nsweep);
               new_volume = RSL_new_volume(radar->v[iv]->h.nsweeps+20);
               new_volume = copy_sweeps_into_volume(new_volume, radar->v[iv]);

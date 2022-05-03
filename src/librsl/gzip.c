@@ -24,10 +24,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #define _USE_BSD
 #include <sys/types.h>
 #include <signal.h>
 #include <zlib.h>
+#ifdef _WIN32
+#include <fileapi.h>
+#endif
 
 #define CHUNK 16384
 
@@ -35,6 +39,47 @@
 int no_command (char *cmd);
 FILE *uncompress_pipe (FILE *fp);
 FILE *compress_pipe (FILE *fp);
+
+/**
+ * We need to have a portable way between windows and linux to keep track of
+ * tmpfiles. Unfortunatelly this means that we need to also ensure that temp
+ * file is removed somehow. Preferrably when closing file. On windows we use
+ * +TD as file modifiers. On windows we just run unlink immediately after
+ * opening file.
+ */
+FILE* create_temporary_file(void)
+{
+  char buff[L_tmpnam];
+  char* nam = NULL;
+  char tFilename[1024];
+
+  FILE* result = NULL;
+
+  memset(buff, 0, sizeof(char)*L_tmpnam);
+  nam = tmpnam(buff);
+
+#ifdef _WIN32
+  /* tmpfile on windows creates temporary file under C:\ but since that folder might have write permissions it might
+   * not be possible to create them. Instead we need to use a different path for windows and combine temp path with
+   * tmpname. If tmpname begins with \, we can concatenate it.  */
+  DWORD nBufferLength = 1024;
+  LPSTR pathBuffer[1024];
+  DWORD len = GetTempPathA(nBufferLength, pathBuffer);
+  pathBuffer[len] = '\0';
+  if (nam != NULL && nam[0] == '\\' ) {
+    if ((strlen(pathBuffer) + strlen(nam) + 1) < 1024) {
+      strcat(pathBuffer, nam);
+      strncpy(tFilename, pathBuffer, 1024);
+    }
+  }
+  result = fopen(tFilename, "wb+TD");
+#else
+  strcpy(tFilename, nam);
+  result = fopen(tFilename, "wb+");
+  unlink(tFilename);
+#endif
+  return result;
+}
 
 /* Avoids the 'Broken pipe' message by reading the rest of the stream. */
 void rsl_readflush(FILE *fp)
@@ -75,13 +120,14 @@ FILE *uncompress_pipe (FILE *fp)
 {
   FILE *retfp = NULL, *result = NULL;
   char buffer[CHUNK];
+  int totallen = 0;
   gzFile gzfp = gzdopen(dup(fileno(fp)), "r");
 
   if (gzfp == Z_NULL) {
     return NULL;
   }
 
-  retfp = tmpfile(); /* This might cause problems in windows.. Might have to use different tmpfile approach there.*/
+  retfp = create_temporary_file();
 
   if (retfp == NULL) {
     goto done;
@@ -91,6 +137,7 @@ FILE *uncompress_pipe (FILE *fp)
     int len = gzread(gzfp, buffer, sizeof(buffer));
     if (len <= 0)
       break;
+    totallen += len;
     fwrite(buffer, 1, len, retfp);
   }
 

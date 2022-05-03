@@ -59,9 +59,9 @@ enum File_type RSL_filetype(char *infile)
   FILE *fp;
   char magic[11];
 
-  if ((fp = fopen(infile, "r")) == NULL) {
-	perror(infile);
-	return UNKNOWN;
+  if ((fp = fopen(infile, "rb")) == NULL) {
+    perror(infile);
+    return UNKNOWN;
   }
 
   /* Read the magic bytes. */
