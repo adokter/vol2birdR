@@ -14,7 +14,7 @@ Imports:
     withr
 Depends: Rcpp (>= 1.0.4)
 LinkingTo: Rcpp, RcppGSL
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 SystemRequirements: GNU make
 Collate:
@@ -24,3 +24,6 @@ Collate:
     'RcppExports.R'
     'vol2birdR.R'
 RcppModules: RaveIO, PolarVolume, Vol2Bird, Vol2BirdConfig
+Suggests: 
+    knitr,
+    rmarkdown

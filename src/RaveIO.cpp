@@ -77,6 +77,14 @@ public:
   }
 };
 
+//' @name Vol2BirdConfig$new
+//' @title Constructs a new Vol2BirdConfig object
+//' @examples
+//'   a<-Vol2BirdConfig$new()
+
+//' @name Vol2BirdConfig
+//' @title Vol2Bird configuration
+//' @description The configuration used during processing
 //' @export Vol2BirdConfig
 class Vol2BirdConfig {
 private:
@@ -803,9 +811,9 @@ RCPP_MODULE(RaveIO) {
 RCPP_EXPOSED_CLASS_NODECL(Vol2BirdConfig)
 RCPP_MODULE(Vol2BirdConfig) {
   class_<Vol2BirdConfig>("Vol2BirdConfig")
-      .constructor()
-      .property("elevMin", &Vol2BirdConfig::get_elevMin, &Vol2BirdConfig::set_elevMin)
-      .property("elevMax", &Vol2BirdConfig::get_elevMax, &Vol2BirdConfig::set_elevMax)
+      .constructor("Creates a Vol2BirdConfig instance")
+      .property("elevMin", &Vol2BirdConfig::get_elevMin, &Vol2BirdConfig::set_elevMin, "Min elevation angle")
+      .property("elevMax", &Vol2BirdConfig::get_elevMax, &Vol2BirdConfig::set_elevMax, "Max elevation angle")
       .property("dbzType", &Vol2BirdConfig::get_dbzType, &Vol2BirdConfig::set_dbzType)
       .property("azimMax", &Vol2BirdConfig::get_azimMax, &Vol2BirdConfig::set_azimMax)
       .property("azimMin", &Vol2BirdConfig::get_azimMin, &Vol2BirdConfig::set_azimMin)

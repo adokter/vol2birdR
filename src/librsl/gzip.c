@@ -162,11 +162,11 @@ FILE *uncompress_pipe (FILE *fp)
   if (no_command("gzip --version > /dev/null 2>&1")) return fp;
   save_fd = dup(0);
   close(0); /* Redirect stdin for gzip. */
-  dup(fileno(fp));
+  (void)dup(fileno(fp));
   fpipe = popen("gzip -q -d -f --stdout", "r");
   if (fpipe == NULL) perror("uncompress_pipe");
   close(0);
-  dup(save_fd);
+  (void)dup(save_fd);
   close(save_fd);
   return fpipe;
 }
@@ -183,12 +183,12 @@ FILE *compress_pipe (FILE *fp)
   fflush(NULL); /* Flush all buffered output before opening this pipe. */
   save_fd = dup(1);
   close(1); /* Redirect stdout for gzip. */
-  dup(fileno(fp));
+  (void)dup(fileno(fp));
 
   fpipe = popen("gzip -q -1 -c", "w");
   if (fpipe == NULL) perror("compress_pipe");
   close(1);
-  dup(save_fd);
+  (void)dup(save_fd);
   return fpipe;
 }
 

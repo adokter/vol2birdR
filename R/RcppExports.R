@@ -7,6 +7,15 @@ NULL
 #' @export RaveIO
 NULL
 
+#' @name Vol2BirdConfig$new
+#' @title Constructs a new Vol2BirdConfig object
+#' @examples
+#'   a<-Vol2BirdConfig$new()
+NULL
+
+#' @name Vol2BirdConfig
+#' @title Vol2Bird configuration
+#' @description The configuration used during processing
 #' @export Vol2BirdConfig
 NULL
 
