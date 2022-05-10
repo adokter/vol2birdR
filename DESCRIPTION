@@ -26,4 +26,6 @@ Collate:
 RcppModules: RaveIO, PolarVolume, Vol2Bird, Vol2BirdConfig
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
