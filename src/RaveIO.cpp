@@ -475,25 +475,25 @@ public:
     _alldata.options.resample = v == true ? TRUE : FALSE;
   }
 
-  bool get_resampleRscale() {
-    return _alldata.options.resampleRscale == TRUE ? true : false;
+  float get_resampleRscale() {
+    return _alldata.options.resampleRscale;
   }
-  void set_resampleRscale(bool v) {
-    _alldata.options.resampleRscale = v == true ? TRUE : FALSE;
-  }
-
-  bool get_resampleNbins() {
-    return _alldata.options.resampleNbins == TRUE ? true : false;
-  }
-  void set_resampleNbins(bool v) {
-    _alldata.options.resampleNbins = v == true ? TRUE : FALSE;
+  void set_resampleRscale(float v) {
+    _alldata.options.resampleRscale = v;
   }
 
-  bool get_resampleNrays() {
-    return _alldata.options.resampleNrays == TRUE ? true : false;
+  int get_resampleNbins() {
+    return _alldata.options.resampleNbins;
   }
-  void set_resampleNrays(bool v) {
-    _alldata.options.resampleNrays = v == true ? TRUE : FALSE;
+  void set_resampleNbins(int v) {
+    _alldata.options.resampleNbins = v;
+  }
+
+  int get_resampleNrays() {
+    return _alldata.options.resampleNrays;
+  }
+  void set_resampleNrays(int v) {
+    _alldata.options.resampleNrays = v;
   }
 
   int get_mistNetNElevs() {
