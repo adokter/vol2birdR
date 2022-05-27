@@ -7,12 +7,12 @@ Author: Anders Henja
 Maintainer: Adriaan Dokter <your@email.com>
 Description: One paragraph description of what the package does as one
         or more full sentences.
-License: LGPL (>= 3)
+License: LGPL (>= 3) + file LICENSE
 Imports: 
-    Rcpp (>= 1.0.4), 
+    Rcpp (>= 1.0.4),
+    rlang, 
     methods,
     withr
-Depends: Rcpp (>= 1.0.4)
 LinkingTo: Rcpp, RcppGSL
 RoxygenNote: 7.1.2
 VignetteBuilder: knitr
@@ -29,3 +29,4 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Encoding: UTF-8
