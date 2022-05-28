@@ -6,8 +6,7 @@
 \alias{vol2birdR-package}
 \title{vol2birdR: R-variant of vol2bird}
 \description{
-One paragraph description of what the package does as one
-        or more full sentences.
+One paragraph description of what the package does as one or more full sentences.
 }
 \details{
 To get started, see:

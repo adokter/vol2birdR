@@ -10,6 +10,9 @@ extern "C" {
 using namespace Rcpp;
 #include "vol2birdR_types.h"
 
+//' @name PolarVolume
+//' @title PolarVolume
+//' @description The polar volume object as defined by RAVE.
 //' @export PolarVolume
 class PolarVolume {
 private:
@@ -39,6 +42,9 @@ public:
 };
 //RCPP_EXPOSED_CLASS(PolarVolume)
 
+//' @name RaveIO
+//' @title RaveIO routines
+//' @description Provides I/O routines using the rave framework
 //' @export RaveIO
 class RaveIO {
 private:
@@ -77,14 +83,9 @@ public:
   }
 };
 
-//' @name Vol2BirdConfig$new
-//' @title Constructs a new Vol2BirdConfig object
-//' @examples
-//'   a<-Vol2BirdConfig$new()
-
 //' @name Vol2BirdConfig
 //' @title Vol2Bird configuration
-//' @description The configuration used during processing
+//' @description The vol2bird configuration used during processing
 //' @export Vol2BirdConfig
 class Vol2BirdConfig {
 private:
@@ -754,6 +755,12 @@ public:
   }
 };
 
+//' @name Vol2Bird
+//' @title Vol2Bird
+//' @description The vol2bird processing class.
+//' Provides methods for processing polar volumes/scans. Typical usage can be
+//' processor<-Vol2Bird$new()
+//' processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
 //' @export Vol2Bird
 class Vol2Bird {
 private:

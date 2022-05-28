@@ -351,7 +351,6 @@ Rave_getDebugFunction()(__FILE__,__LINE__,RAVE_CRITICAL,msg,arg1,arg2,arg3,arg4)
 #define RAVE_ASSERT(expr, msg) \
 if(!expr) { \
 Rave_getDebugFunction()(__FILE__, __LINE__, RAVE_CRITICAL, msg); \
-abort(); \
 }
 
 #endif
