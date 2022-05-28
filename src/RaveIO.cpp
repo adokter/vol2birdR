@@ -183,8 +183,102 @@ public:
     initialize_config(&_alldata);
   }
 
+  Vol2BirdConfig(const Vol2BirdConfig& other) {
+    initialize_config(&_alldata);
+    strcpy(_alldata.misc.filename_pvol, other._alldata.misc.filename_pvol);
+    _alldata.options.elevMin = other._alldata.options.elevMin;
+    _alldata.options.elevMax = other._alldata.options.elevMax;
+    strcpy(_alldata.options.dbzType, other._alldata.options.dbzType);
+    _alldata.options.azimMin = other._alldata.options.azimMin;
+    _alldata.options.azimMax = other._alldata.options.azimMax;
+    _alldata.options.layerThickness = other._alldata.options.layerThickness;
+    _alldata.options.nLayers = other._alldata.options.nLayers;
+    _alldata.options.rangeMax = other._alldata.options.rangeMax;
+    _alldata.options.rangeMin = other._alldata.options.rangeMin;
+    _alldata.options.radarWavelength = other._alldata.options.radarWavelength;
+    _alldata.options.useClutterMap = other._alldata.options.useClutterMap;
+    _alldata.options.clutterValueMin = other._alldata.options.clutterValueMin;
+    strcpy(_alldata.options.clutterMap, other._alldata.options.clutterMap);
+    _alldata.options.printDbz = other._alldata.options.printDbz;
+    _alldata.options.printDealias = other._alldata.options.printDealias;
+    _alldata.options.printVrad = other._alldata.options.printVrad;
+    _alldata.options.printRhohv = other._alldata.options.printRhohv;
+    _alldata.options.printTex = other._alldata.options.printTex;
+    _alldata.options.printCell = other._alldata.options.printCell;
+    _alldata.options.printCellProp = other._alldata.options.printCellProp;
+    _alldata.options.printClut = other._alldata.options.printClut;
+    _alldata.options.printOptions = other._alldata.options.printOptions;
+    _alldata.options.printProfileVar = other._alldata.options.printProfileVar;
+    _alldata.options.printPointsArray = other._alldata.options.printPointsArray;
+    _alldata.options.fitVrad = other._alldata.options.fitVrad;
+    _alldata.options.exportBirdProfileAsJSONVar = other._alldata.options.exportBirdProfileAsJSONVar;
+    _alldata.options.minNyquist = other._alldata.options.minNyquist;
+    _alldata.options.maxNyquistDealias = other._alldata.options.maxNyquistDealias;
+    _alldata.options.birdRadarCrossSection = other._alldata.options.birdRadarCrossSection;
+    _alldata.options.cellStdDevMax = other._alldata.options.cellStdDevMax;
+    _alldata.options.stdDevMinBird = other._alldata.options.stdDevMinBird;
+    _alldata.options.etaMax = other._alldata.options.etaMax;
+    _alldata.options.cellEtaMin = other._alldata.options.cellEtaMin;
+    _alldata.options.requireVrad = other._alldata.options.requireVrad;
+    _alldata.options.dealiasVrad = other._alldata.options.dealiasVrad;
+    _alldata.options.dealiasRecycle = other._alldata.options.dealiasRecycle;
+    _alldata.options.dualPol = other._alldata.options.dualPol;
+    _alldata.options.singlePol = other._alldata.options.singlePol;
+    _alldata.options.dbzThresMin = other._alldata.options.dbzThresMin;
+    _alldata.options.rhohvThresMin = other._alldata.options.rhohvThresMin;
+    _alldata.options.resample = other._alldata.options.resample;
+    _alldata.options.resampleRscale = other._alldata.options.resampleRscale;
+    _alldata.options.resampleNbins = other._alldata.options.resampleNbins;
+    _alldata.options.resampleNrays = other._alldata.options.resampleNrays;
+    _alldata.options.mistNetNElevs = other._alldata.options.mistNetNElevs;
+    _alldata.options.mistNetElevs[0] = other._alldata.options.mistNetElevs[0];
+    _alldata.options.mistNetElevs[1] = other._alldata.options.mistNetElevs[1];
+    _alldata.options.mistNetElevs[2] = other._alldata.options.mistNetElevs[2];
+    _alldata.options.mistNetElevs[3] = other._alldata.options.mistNetElevs[3];
+    _alldata.options.mistNetElevs[4] = other._alldata.options.mistNetElevs[4];
+    _alldata.options.mistNetElevsOnly = other._alldata.options.mistNetElevsOnly;
+    _alldata.options.useMistNet = other._alldata.options.useMistNet;
+    strcpy(_alldata.options.mistNetPath, other._alldata.options.mistNetPath);
+
+    // ------------------------------------------------------------- //
+    //              vol2bird options from constants.h                //
+    // ------------------------------------------------------------- //
+    _alldata.constants.areaCellMin = other._alldata.constants.areaCellMin;
+    _alldata.constants.cellClutterFractionMax = other._alldata.constants.cellClutterFractionMax;
+    _alldata.constants.chisqMin = other._alldata.constants.chisqMin;
+    _alldata.constants.fringeDist = other._alldata.constants.fringeDist;
+    _alldata.constants.nBinsGap = other._alldata.constants.nBinsGap;
+    _alldata.constants.nPointsIncludedMin = other._alldata.constants.nPointsIncludedMin;
+    _alldata.constants.nNeighborsMin = other._alldata.constants.nNeighborsMin;
+    _alldata.constants.nObsGapMin = other._alldata.constants.nObsGapMin;
+    _alldata.constants.nAzimNeighborhood = other._alldata.constants.nAzimNeighborhood;
+    _alldata.constants.nRangNeighborhood = other._alldata.constants.nRangNeighborhood;
+    _alldata.constants.nCountMin = other._alldata.constants.nCountMin;
+    _alldata.constants.refracIndex = other._alldata.constants.refracIndex;
+    _alldata.constants.absVDifMax = other._alldata.constants.absVDifMax;
+    _alldata.constants.vradMin = other._alldata.constants.vradMin;
+
+    // ------------------------------------------------------------- //
+    //       some other variables, derived from user options         //
+    // ------------------------------------------------------------- //
+    _alldata.misc.rCellMax = other._alldata.misc.rCellMax;
+    _alldata.misc.nDims = other._alldata.misc.nDims;
+    _alldata.misc.nParsFitted = other._alldata.misc.nParsFitted;
+
+    // the following settings depend on wavelength, will be set in Vol2birdSetup
+    _alldata.misc.dbzFactor = other._alldata.misc.dbzFactor;
+    _alldata.misc.dbzMax = other._alldata.misc.dbzMax;
+    _alldata.misc.cellDbzMin = other._alldata.misc.cellDbzMin;
+
+    _alldata.misc.loadConfigSuccessful = other._alldata.misc.loadConfigSuccessful;
+  }
+
   vol2bird_t* alldata() {
     return (&_alldata);
+  }
+
+  Vol2BirdConfig* clone() {
+    return new Vol2BirdConfig(*this);
   }
 
   double get_elevMin() {
@@ -663,9 +757,9 @@ public:
 //' @export Vol2Bird
 class Vol2Bird {
 private:
-  bool _verbose = true;
+  bool _verbose = false;
 public:
-  Vol2Bird() : _verbose(true) {
+  Vol2Bird() : _verbose(false) {
   }
 
   virtual ~Vol2Bird() {
@@ -794,6 +888,41 @@ public:
     RAVE_OBJECT_RELEASE(volume);
   }
 
+  void rsl2odim(StringVector &files, Vol2BirdConfig &config, std::string volOutName)
+  {
+    PolarVolume_t *volume = NULL;
+    char *fileIn[INPUTFILESMAX];
+    int initSuccessful = 0;
+
+    if (files.size() == 0) {
+      throw std::invalid_argument("Must specify at least one input filename");
+    }
+    for (int i = 0; i < files.size(); i++) {
+      fileIn[i] = (char*) files(i);
+    }
+
+    volume = vol2birdGetVolume(fileIn, files.size(), 1000000, 1);
+    if (volume == NULL) {
+      throw std::runtime_error("Could not read file(s)");
+    }
+
+    config.alldata()->misc.loadConfigSuccessful = TRUE; // Config is already loaded when we come here.
+
+    if(config.alldata()->options.useMistNet) {
+      // initialize volbird library to run MistNet
+      int initSuccessful = vol2birdSetUp(volume, config.alldata()) == 0;
+      if (initSuccessful == FALSE) {
+        RAVE_OBJECT_RELEASE(volume);
+        throw std::runtime_error("Failed to initialize for processing");
+      }
+    }
+
+    saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
+    if(config.alldata()->options.useMistNet) {
+      vol2birdTearDown(config.alldata());
+    }
+    RAVE_OBJECT_RELEASE(volume);
+  }
 };
 
 RCPP_EXPOSED_CLASS_NODECL(PolarVolume)
@@ -812,6 +941,7 @@ RCPP_EXPOSED_CLASS_NODECL(Vol2BirdConfig)
 RCPP_MODULE(Vol2BirdConfig) {
   class_<Vol2BirdConfig>("Vol2BirdConfig")
       .constructor("Creates a Vol2BirdConfig instance")
+      .constructor<const Vol2BirdConfig&>("Copy constructor")
       .property("elevMin", &Vol2BirdConfig::get_elevMin, &Vol2BirdConfig::set_elevMin, "Min elevation angle")
       .property("elevMax", &Vol2BirdConfig::get_elevMax, &Vol2BirdConfig::set_elevMax, "Max elevation angle")
       .property("dbzType", &Vol2BirdConfig::get_dbzType, &Vol2BirdConfig::set_dbzType)
@@ -876,14 +1006,17 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("constant_vradMin", &Vol2BirdConfig::get_constant_vradMin, &Vol2BirdConfig::set_constant_vradMin)
       .property("misc_dbzFactor", &Vol2BirdConfig::get_misc_dbzFactor, &Vol2BirdConfig::set_misc_dbzFactor)
       .property("misc_dbzMax", &Vol2BirdConfig::get_misc_dbzMax, &Vol2BirdConfig::set_misc_dbzMax)
-      .property("misc_cellDbzMin", &Vol2BirdConfig::get_misc_cellDbzMin, &Vol2BirdConfig::set_misc_cellDbzMin);
+      .property("misc_cellDbzMin", &Vol2BirdConfig::get_misc_cellDbzMin, &Vol2BirdConfig::set_misc_cellDbzMin)
+      .method("clone", &Vol2BirdConfig::clone);
 }
 //RCPP_EXPOSED_AS(Vol2BirdConfig)
 
 RCPP_EXPOSED_CLASS_NODECL(Vol2Bird)
 RCPP_MODULE(Vol2Bird) {
-  class_<Vol2Bird>("Vol2Bird").constructor()
-  .method("process", &Vol2Bird::process)
+  class_<Vol2Bird>("Vol2Bird")
+  .constructor("Constructor")
+  .method("process", &Vol2Bird::process, "Processes the volume/scans")
+  .method("rsl2odim", &Vol2Bird::rsl2odim, "Converts the file into odim format")
   .property("verbose", &Vol2Bird::isVerbose, &Vol2Bird::setVerbose)
   ;
 }

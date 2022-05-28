@@ -37,10 +37,10 @@ Then the actual processor is initiated and then the processing is performed.
 
 ```R
 library(vol2birdR)
-config<-new(Vol2BirdConfig)
+config<-Vol2BirdConfig$new()
 config$verbose<-TRUE
 config$useMistNet<-TRUE
-processor<-new(Vol2Bird)
+processor<-Vol2Bird$new()
 processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
 ```
 
@@ -52,13 +52,27 @@ First the vol2birdR library is loaded by using
 The next step is where we setup the configuration required. This can be modified heavily and the best way to learn about this is to read the documentation about the config-class.
 In this example, the configuration is set to printout verbose output and that the torch library (mistnet) should be used using the mistnet model downloaded earlier. 
 ```R
-config<-new(Vol2BirdConfig)
+config<-Vol2BirdConfig$new()
 config$verbose<-TRUE
 config$useMistNet<-TRUE
 config$mistNetPath<-"/home/docuser/etc/mistnet_nexrad.pt"
 ```
 
-
 In the final step the processing is performed where the input is a ODIM H5 volume, above defined configuration and output is a vertical profile and a polar volume.
+
+## Vol2BirdConfig
+As mentioned earlier, all processing involves a config instance where all options are set. These options involves everything from printing certain information
+to what type of processing that should be performed.
+In some cases it might be necessary to copy configuration instances for whatever reason. In these cases you can't just assign the instances like
+```R
+config<-Vol2BirdConfig$new()
+extraconfig<-config
+```
+When doing like this, the config and extraconfig instances will both refer to the same object. To avoid this, use either clone or the copy constructor like
+```R
+config<-Vol2BirdConfig$new()
+extraconfig<-config$clone()             # Clone method
+otherconfig<-Vol2BirdConfig$new(config) # Copy constructor
+```
 
 Copyright 2010-2021 Adriaan M. Dokter (Cornell lab of Ornithology, University of Amsterdam) & Netherlands eScience Centre

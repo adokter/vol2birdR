@@ -1,6 +1,6 @@
 # Tests the Vol2BirdConfig class and all the various options that are available.
 #
-library(vol2birdR)
+#library(vol2birdR)
 
 #library(testthat)
 

@@ -329,22 +329,22 @@ void hlhdf_alloc_print_statistics(void)
   }
 
   fprintf(stderr, "HLHDF HEAP STATISTICS:\n");
-  fprintf(stderr, "Number of allocations  : %ld\n",number_of_allocations);
-  fprintf(stderr, "Number of reallocations: %ld\n", number_of_reallocations);
-  fprintf(stderr, "Number of strdup       : %ld\n", number_of_strdup);
-  fprintf(stderr, "Number of frees:       : %ld\n", number_of_frees);
-  fprintf(stderr, "Total nbr allocs/frees : %ld / %ld\n", totalNumberOfAllocations, number_of_frees);
-  fprintf(stderr, "Total heap allocation  : %ld bytes\n", total_heap_usage);
-  fprintf(stderr, "Total heap deallocation: %ld bytes\n", total_freed_heap_usage);
-  fprintf(stderr, "Lost heap              : %ld bytes\n", (total_heap_usage - total_freed_heap_usage));
+  fprintf(stderr, "Number of allocations  : %zu\n",number_of_allocations);
+  fprintf(stderr, "Number of reallocations: %zu\n", number_of_reallocations);
+  fprintf(stderr, "Number of strdup       : %zu\n", number_of_strdup);
+  fprintf(stderr, "Number of frees:       : %zu\n", number_of_frees);
+  fprintf(stderr, "Total nbr allocs/frees : %zu / %zu\n", totalNumberOfAllocations, number_of_frees);
+  fprintf(stderr, "Total heap allocation  : %zu bytes\n", total_heap_usage);
+  fprintf(stderr, "Total heap deallocation: %zu bytes\n", total_freed_heap_usage);
+  fprintf(stderr, "Lost heap              : %zu bytes\n", (total_heap_usage - total_freed_heap_usage));
   fprintf(stderr, "Max number of allocs   : %d\n", maxNbrOfAllocs);
 
   if (number_of_failed_allocations > 0)
-    fprintf(stderr, "Number of failed allocations     : %ld\n", number_of_failed_allocations);
+    fprintf(stderr, "Number of failed allocations     : %zu\n", number_of_failed_allocations);
   if (number_of_failed_reallocations  > 0)
-    fprintf(stderr, "Number of failed reallocations   : %ld\n", number_of_failed_reallocations);
+    fprintf(stderr, "Number of failed reallocations   : %zu\n", number_of_failed_reallocations);
   if (number_of_failed_frees > 0)
-    fprintf(stderr, "Number of failed frees           : %ld\n", number_of_failed_frees);
+    fprintf(stderr, "Number of failed frees           : %zu\n", number_of_failed_frees);
   if (number_of_failed_strdup > 0)
-    fprintf(stderr, "Number of failed strdup          : %ld\n", number_of_failed_strdup);
+    fprintf(stderr, "Number of failed strdup          : %zu\n", number_of_failed_strdup);
 }

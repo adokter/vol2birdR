@@ -63,7 +63,7 @@ FILE* create_temporary_file(void)
    * not be possible to create them. Instead we need to use a different path for windows and combine temp path with
    * tmpname. If tmpname begins with \, we can concatenate it.  */
   DWORD nBufferLength = 1024;
-  LPSTR pathBuffer[1024];
+  char pathBuffer[1024];
   DWORD len = GetTempPathA(nBufferLength, pathBuffer);
   pathBuffer[len] = '\0';
   if (nam != NULL && nam[0] == '\\' ) {
