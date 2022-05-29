@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "rave_alloc.h"
+#include "rave_debug.h"
 
 /**
  * Radius at the equator
@@ -104,9 +105,9 @@ void daToLl(Position* src, Position* tgt)
   double evalDist;
 
   if (cos(src->lat0) == 0.0) {
-    printf("When trying to translate length and azimuth\n");
-    printf("to longitude and latitude\n");
-    printf("cos(original latitude) would result in division by zero.\n");
+    Rave_printf("When trying to translate length and azimuth\n");
+    Rave_printf("to longitude and latitude\n");
+    Rave_printf("cos(original latitude) would result in division by zero.\n");
     return;
   }
 
@@ -218,7 +219,7 @@ void ehToRd(Position* src, Position* tgt)
   if (tmpValue < 1.0e-9 * (src->dndh)) {
     /*Straight lines*/
     if (sin(src->elevation) == 0.0) {
-      printf("Trying to divide by zero");
+      Rave_printf("Trying to divide by zero");
       return;
     }
     tgt->range = (src->alt - src->alt0) / sin(src->elevation);

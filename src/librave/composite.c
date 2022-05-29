@@ -2875,7 +2875,6 @@ Cartesian_t* Composite_generate(Composite_t* composite, Area_t* area, RaveList_t
             double dist = 0.0;
             double maxdist = 0.0;
             double rdist = 0.0;
-            //fprintf(stderr, "%g, %g => %f, %f\n", herex, herey, olon*180.0/M_PI, olat*180.0/M_PI);
             if (RAVE_OBJECT_CHECK_TYPE(obj, &PolarVolume_TYPE)) {
               dist = PolarVolume_getDistance((PolarVolume_t*)obj, olon, olat);
               maxdist = PolarVolume_getMaxDistance((PolarVolume_t*)obj);

@@ -4,7 +4,7 @@ author: Adriaan M. Dokter & Anders Henja
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to vol2birdR}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::knitr}
   %\VignetteEncoding{UTF-8}
 ---
 

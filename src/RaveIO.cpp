@@ -934,7 +934,9 @@ public:
 
 RCPP_EXPOSED_CLASS_NODECL(PolarVolume)
 RCPP_MODULE(PolarVolume) {
-  class_<PolarVolume>("PolarVolume").constructor().method("getNumberOfScans", &PolarVolume::getNumberOfScans);
+  class_<PolarVolume>("PolarVolume")
+      .constructor()
+      .method("getNumberOfScans", &PolarVolume::getNumberOfScans);
 }
 //RCPP_EXPOSED_AS(PolarVolume)
 

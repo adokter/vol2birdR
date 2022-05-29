@@ -1178,22 +1178,22 @@ void RaveData2D_disp(RaveData2D_t* field)
   long x, y;
   RAVE_ASSERT((field != NULL), "field == NULL");
 
-  fprintf(stdout, "RaveData2D=[ (%ld, %ld)\n", field->xsize, field->ysize);
+  Rave_printf("RaveData2D=[ (%ld, %ld)\n", field->xsize, field->ysize);
   for (y = 0; y < field->ysize; y++) {
-    fprintf(stdout, "  [");
+    Rave_printf("  [");
     for (x = 0; x < field->xsize; x++) {
       double v = 0.0;
       RaveData2D_getValueUnchecked(field,  x,  y,  &v);
       if (x > 0) {
-        fprintf(stdout, ", ");
+        Rave_printf(", ");
       }
-      fprintf(stdout, "%0.3f", v);
+      Rave_printf("%0.3f", v);
     }
-    fprintf(stdout, "]");
+    Rave_printf("]");
     if (y==field->ysize-1) {
-      fprintf(stdout, "];\n");
+      Rave_printf("];\n");
     } else {
-      fprintf(stdout, ",\n");
+      Rave_printf(",\n");
     }
   }
 }

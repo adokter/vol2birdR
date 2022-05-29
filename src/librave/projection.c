@@ -313,13 +313,6 @@ static Projection_t* ProjectionInternal_createCrsPipeline(Projection_t* projecti
     goto done;
   }
 
-  /*
-  PJ_PROJ_INFO info = proj_pj_info(pj);
-  fprintf(stderr, "Id: %s\n", info.id);
-  fprintf(stderr, "Description: %s\n", info.description);
-  fprintf(stderr, "Definition: %s\n", info.definition);
-  */
-
   proj->context = context;
   proj->pj = pj;
   proj->initialized = 1;

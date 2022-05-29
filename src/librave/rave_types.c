@@ -277,7 +277,7 @@ PolarObservation* RaveTypes_FilterPolarObservationDataValues(PolarObservation* o
     for (i = 0; i < nobservations; i++) {
       if (observations[i].vt == RaveValueType_DATA) {
         if (observations[i].v == 0.0 || observations[i].v == 255.0) {
-          fprintf(stderr, "Value counted as data even though value was either 0 or 255\n");
+          Rave_printf("Value counted as data even though value was either 0 or 255\n");
         }
         result[index++] = observations[i];
       }

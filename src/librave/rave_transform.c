@@ -9,6 +9,7 @@
 #include "limits.h"
 #include "float.h"
 #include "rave_alloc.h"
+#include "rave_debug.h"
 #include <math.h>
 #include <stdio.h>
 #include "projection.h"
@@ -114,7 +115,7 @@ double get_array_item_2d(
   }
   default:
     /* Ignored for now => 0.0 */
-    printf("get_array_item_2d: Unsupported type: '%d'\n", type);
+    Rave_printf("get_array_item_2d: Unsupported type: '%d'\n", type);
   }
   return ret;
 }
@@ -221,7 +222,7 @@ void set_array_item_2d(
   }
   default:
     /* Ignored for now => 0.0 */
-    printf("set_array_item_2d: Unsupported type: '%d'\n", type);
+    Rave_printf("set_array_item_2d: Unsupported type: '%d'\n", type);
   }
 }
 
@@ -294,13 +295,13 @@ static int internal_transform_proj(PJ* p1, PJ* p2, double* x, double* y)
 
   context = proj_context_create();
   if (context == NULL) {
-    fprintf(stderr, "Failed to create context");
+    Rave_printf("Failed to create context");
     return 0;
   }
   proj_log_level(context, Projection_getDebugLevel());
   pj = proj_create_crs_to_crs(context, proj_pj_info(p1).definition, proj_pj_info(p2).definition, NULL);
   if (pj == NULL) {
-    fprintf(stderr, "Failed to create crs pj");
+    Rave_printf("Failed to create crs pj");
     proj_context_destroy(context);
     return 0;
   }
@@ -593,7 +594,7 @@ TransformWeight* get_weights_2d(int x, int y, UV here_s, RaveTransform2D* tw)
   } else if (tw->method == NEAREST) {
     return get_nearest_weights_2d(x, y, here_s, tw);
   } else {
-    printf("UNSUPPORTED INTERPOLATION METHOD %d\n", tw->method);
+    Rave_printf("UNSUPPORTED INTERPOLATION METHOD %d\n", tw->method);
     return NULL;
   }
 }
@@ -603,7 +604,7 @@ double compute_weights_2d(TransformWeight *tw)
   double v = 0.0;
   int i;
   if (tw->scale_weights && tw->total_wsum == 0.0) {
-    printf("total weight sum was zero, handle this outside\n");
+    Rave_printf("total weight sum was zero, handle this outside\n");
     return 0.0;
   }
 
