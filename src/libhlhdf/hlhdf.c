@@ -144,7 +144,7 @@ void HL_init()
     HL_disableErrorReporting();
 #ifdef HLHDF_MEMORY_DEBUG
     if (atexit(hlhdf_dump_memory_information) != 0) {
-      fprintf(stderr, "Could not set atexit function");
+      HL_printf("Could not set atexit function");
     }
 #endif
   }

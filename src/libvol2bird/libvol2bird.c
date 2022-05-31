@@ -2149,7 +2149,7 @@ long datetime2long(char* date, char* time){
         #ifdef FPRINTFON
             vol2bird_err_printf("Conversion error occurred\n");
         #endif
-        result = (long) NULL;
+        result = 0;
     }
     else{
         result = ldatetime;
@@ -2232,7 +2232,7 @@ int PolarVolume_getStartDateTime(PolarVolume_t* pvol, char** StartDate, char** S
             long datetime = datetime2long(date, time);
             
             //continue if no valid datetime can be constructed
-            if (datetime == (long) NULL){
+            if (datetime == 0){
                 continue;
             }
             
@@ -2277,7 +2277,7 @@ int PolarVolume_getEndDateTime(PolarVolume_t* pvol, char** EndDate, char** EndTi
             long datetime = datetime2long(date, time);
             
             //continue if no valid datetime can be constructed
-            if ((date == NULL || time == NULL || datetime == (long) NULL)){
+            if ((date == NULL || time == NULL || datetime == 0)){
                 continue;
             }
             

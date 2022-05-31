@@ -90,21 +90,22 @@ static void HL_DefaultDebugFunction(char* filename, int lineno, HL_Debug lvl,
   }
   sprintf(infobuff, "%20s : %11s", strtime, dbgtype);
   vsprintf(msgbuff, fmt, alist);
-
+#ifndef NO_HLHDF_PRINTF
   fprintf(stderr, "%s : %s (%s:%d)\n", infobuff, msgbuff, filename, lineno);
+#endif
 }
 
 static void HL_DefaultHdf5ErrorFunction(unsigned n, const H5E_error_t* rowmsg)
 {
   if (hlhdfDbg.hdf5showerror) {
     char* minorError = NULL;
-    fprintf(stderr, "  HDF5-ERROR: #%03d: %s line %d in %s: %s\n", n,
+    HL_printf("  HDF5-ERROR: #%03d: %s line %d in %s: %s\n", n,
             rowmsg->file_name, rowmsg->line, rowmsg->func_name, rowmsg->desc);
-    fprintf(stderr, "    major(%ld): %s\n", rowmsg->maj_num,
+    HL_printf("    major(%ld): %s\n", rowmsg->maj_num,
             H5Eget_major(rowmsg->maj_num));
     minorError = H5Eget_minor(rowmsg->min_num);
     if (minorError != NULL) {
-      fprintf(stderr, "    minor(%ld): %s\n", rowmsg->min_num,
+      HL_printf("    minor(%ld): %s\n", rowmsg->min_num,
               minorError);
       free(minorError);
     }
@@ -113,6 +114,21 @@ static void HL_DefaultHdf5ErrorFunction(unsigned n, const H5E_error_t* rowmsg)
 /*@} End of Private functions */
 
 /*@{ Interface functions */
+void HL_printf(const char* fmt, ...)
+{
+  va_list alist;
+  va_start(alist,fmt);
+  char msgbuff[4096];
+  int n = vsnprintf(msgbuff, 4096, fmt, alist);
+  va_end(alist);
+  if (n < 0 || n >= 1024) {
+    return;
+  }
+#ifndef NO_HLHDF_PRINTF
+  fprintf(stderr, "%s", msgbuff);
+#endif
+}
+
 void HL_InitializeDebugger()
 {
   if (initialized == 0) {

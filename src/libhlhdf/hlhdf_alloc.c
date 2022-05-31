@@ -65,7 +65,7 @@ static HlhdfHeapEntry_t* hlhdf_alloc_createHeapEntry(const char* filename, int l
   HlhdfHeapEntry_t* result = malloc(sizeof(HlhdfHeapEntry_t));
   void* ptr = NULL;
   if (result == NULL) {
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate memory for heap entry\n");
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate memory for heap entry\n");
     return NULL;
   }
   result->filename = strdup(filename);
@@ -73,7 +73,7 @@ static HlhdfHeapEntry_t* hlhdf_alloc_createHeapEntry(const char* filename, int l
   result->sz = sz;
   ptr = malloc(sz + 4);
   if (result->filename == NULL || ptr == NULL) {
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate memory for filename and/or databuffer\n");
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate memory for filename and/or databuffer\n");
     if (result->filename != NULL) free(result->filename);
     if (ptr != NULL) free(ptr);
     free(result);
@@ -91,12 +91,12 @@ static HlhdfHeapEntry_t* hlhdf_alloc_createHeapEntry(const char* filename, int l
 static int hlhdf_alloc_reallocateDataInEntry(HlhdfHeapEntry_t* entry, size_t sz)
 {
   if (entry == NULL) {
-    fprintf(stderr, "BAD CALL TO REALLOCATION FUNCTION, PROGRAMMING ERROR!!\n");
-    abort();
+    HL_printf("BAD CALL TO REALLOCATION FUNCTION, PROGRAMMING ERROR!!\n");
+    HL_ABORT();
   }
   entry->ptr = realloc(entry->ptr, sz + 4);
   if (entry->ptr == NULL) {
-    fprintf(stderr, "Failed to reallocate memory...\n");
+    HL_printf("Failed to reallocate memory...\n");
     return 0;
   }
   entry->sz = sz;
@@ -112,7 +112,7 @@ static HlhdfHeapEntry_t* hlhdf_alloc_addHeapEntry(const char* filename, int line
   if (hlhdf_heap == NULL) {
     hlhdf_heap = malloc(sizeof(HlhdfHeap_t));
     if (hlhdf_heap == NULL) {
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate root heap entry\n");
+      HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate root heap entry\n");
       return NULL;
     }
     hlhdf_heap->entry = NULL;
@@ -127,7 +127,7 @@ static HlhdfHeapEntry_t* hlhdf_alloc_addHeapEntry(const char* filename, int line
   } else {
     heap->next = malloc(sizeof(HlhdfHeap_t));
     if (heap->next == NULL) {
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate heap node\n");
+      HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate heap node\n");
       return NULL;
     }
     heap->next->next = NULL;
@@ -138,7 +138,7 @@ static HlhdfHeapEntry_t* hlhdf_alloc_addHeapEntry(const char* filename, int line
   }
 
   if (heap->entry == NULL) {
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate heap entry\n");
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate heap entry\n");
   }
   return heap->entry;
 }
@@ -170,10 +170,10 @@ static void hlhdf_alloc_releaseMemory(const char* filename, int lineno, HlhdfHea
       status = 1;
     }
     if (status == 0) {
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: ---------MEMORY CORRUPTION HAS OCCURED-----------------\n");
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: Memory allocated from: %s:%d\n", entry->filename, entry->lineno);
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: Was corrupted when releasing at: %s:%d\n", filename, lineno);
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: Memory markers are: %x%x ... %x%x\n",
+      HL_printf("HLHDF_MEMORY_CHECK: ---------MEMORY CORRUPTION HAS OCCURED-----------------\n");
+      HL_printf("HLHDF_MEMORY_CHECK: Memory allocated from: %s:%d\n", entry->filename, entry->lineno);
+      HL_printf("HLHDF_MEMORY_CHECK: Was corrupted when releasing at: %s:%d\n", filename, lineno);
+      HL_printf("HLHDF_MEMORY_CHECK: Memory markers are: %x%x ... %x%x\n",
         (int)ptr[0], (int)ptr[1], (int)ptr[entry->sz+2], (int)ptr[entry->sz+3]);
     }
     free(entry->ptr);
@@ -192,7 +192,7 @@ void* hlhdf_alloc_malloc(const char* filename, int lineno, size_t sz)
     return entry->b;
   } else {
     number_of_failed_allocations++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate memory at %s:%d\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate memory at %s:%d\n",filename,lineno);
     return NULL;
   }
 }
@@ -207,12 +207,12 @@ void* hlhdf_alloc_calloc(const char* filename, int lineno, size_t npts, size_t s
       memset(entry->b, 0, npts*sz);
     } else {
       number_of_failed_allocations++;
-      fprintf(stderr, "Failed to allocate data buffer at %s:%d\n",filename,lineno);
+      HL_printf("Failed to allocate data buffer at %s:%d\n",filename,lineno);
     }
     return entry->b;
   } else {
     number_of_failed_allocations++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate memory at %s:%d\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate memory at %s:%d\n",filename,lineno);
     return NULL;
   }
 }
@@ -227,13 +227,13 @@ void* hlhdf_alloc_realloc(const char* filename, int lineno, void* ptr, size_t sz
   entry = hlhdf_alloc_findPointer(ptr);
   if (entry == NULL) {
     number_of_failed_reallocations++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Calling realloc without a valid pointer at %s:%d\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: Calling realloc without a valid pointer at %s:%d\n",filename,lineno);
     return NULL;
   }
   oldsz = entry->sz;
   if(!hlhdf_alloc_reallocateDataInEntry(entry, sz)) {
     number_of_failed_reallocations++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to reallocate memory at %s:%d\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to reallocate memory at %s:%d\n",filename,lineno);
   } else {
     number_of_reallocations++;
     if (sz > oldsz) {
@@ -251,7 +251,7 @@ char* hlhdf_alloc_strdup(const char* filename, int lineno, const char* str)
   HlhdfHeapEntry_t* entry = NULL;
   if (str == NULL) {
     number_of_failed_strdup++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK:Atempting to strdup NULL string %s:%d\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK:Atempting to strdup NULL string %s:%d\n",filename,lineno);
     return NULL;
   }
   len = strlen(str) + 1;
@@ -267,7 +267,7 @@ char* hlhdf_alloc_strdup(const char* filename, int lineno, const char* str)
     return entry->b;
   } else {
     number_of_failed_strdup++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: Failed to allocate memory at %s:%d\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: Failed to allocate memory at %s:%d\n",filename,lineno);
     return NULL;
   }
 }
@@ -277,12 +277,12 @@ void hlhdf_alloc_free(const char* filename, int lineno, void* ptr)
   HlhdfHeap_t* heapptr = hlhdf_heap;
   if (heapptr == NULL) {
     number_of_failed_frees++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: FREE CALLED ON DATA NOT ALLOCATED BY HLHDF: %s:%d.\n",filename,lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: FREE CALLED ON DATA NOT ALLOCATED BY HLHDF: %s:%d.\n",filename,lineno);
     return;
   }
   if (ptr == NULL) {
     number_of_failed_frees++;
-    fprintf(stderr, "HLHDF_MEMORY_CHECK: ATEMPTING TO FREE NULL-value at %s:%d", filename, lineno);
+    HL_printf("HLHDF_MEMORY_CHECK: ATEMPTING TO FREE NULL-value at %s:%d", filename, lineno);
     return;
   }
   while (heapptr != NULL) {
@@ -295,7 +295,7 @@ void hlhdf_alloc_free(const char* filename, int lineno, void* ptr)
     heapptr = heapptr->next;
   }
   number_of_failed_frees++;
-  fprintf(stderr, "HLHDF_MEMORY_CHECK: Atempting to free something that not has been allocated: %s:%d\n", filename, lineno);
+  HL_printf("HLHDF_MEMORY_CHECK: Atempting to free something that not has been allocated: %s:%d\n", filename, lineno);
 }
 
 void hlhdf_alloc_dump_heap(void)
@@ -308,10 +308,10 @@ void hlhdf_alloc_dump_heap(void)
   while (heapptr != NULL) {
     if (heapptr->entry != NULL) {
       if (!msgPrinted) {
-        fprintf(stderr, "HLHDF_MEMORY_CHECK: Application terminating...\n");
+        HL_printf("HLHDF_MEMORY_CHECK: Application terminating...\n");
         msgPrinted = 1;
       }
-      fprintf(stderr, "HLHDF_MEMORY_CHECK: %d bytes allocated %s:%d\n", (int)heapptr->entry->sz, heapptr->entry->filename, heapptr->entry->lineno);
+      HL_printf("HLHDF_MEMORY_CHECK: %d bytes allocated %s:%d\n", (int)heapptr->entry->sz, heapptr->entry->filename, heapptr->entry->lineno);
     }
     heapptr = heapptr->next;
   }
@@ -328,23 +328,23 @@ void hlhdf_alloc_print_statistics(void)
     heapptr = heapptr->next;
   }
 
-  fprintf(stderr, "HLHDF HEAP STATISTICS:\n");
-  fprintf(stderr, "Number of allocations  : %ld\n",number_of_allocations);
-  fprintf(stderr, "Number of reallocations: %ld\n", number_of_reallocations);
-  fprintf(stderr, "Number of strdup       : %ld\n", number_of_strdup);
-  fprintf(stderr, "Number of frees:       : %ld\n", number_of_frees);
-  fprintf(stderr, "Total nbr allocs/frees : %ld / %ld\n", totalNumberOfAllocations, number_of_frees);
-  fprintf(stderr, "Total heap allocation  : %ld bytes\n", total_heap_usage);
-  fprintf(stderr, "Total heap deallocation: %ld bytes\n", total_freed_heap_usage);
-  fprintf(stderr, "Lost heap              : %ld bytes\n", (total_heap_usage - total_freed_heap_usage));
-  fprintf(stderr, "Max number of allocs   : %d\n", maxNbrOfAllocs);
+  HL_printf("HLHDF HEAP STATISTICS:\n");
+  HL_printf("Number of allocations  : %ld\n",number_of_allocations);
+  HL_printf("Number of reallocations: %ld\n", number_of_reallocations);
+  HL_printf("Number of strdup       : %ld\n", number_of_strdup);
+  HL_printf("Number of frees:       : %ld\n", number_of_frees);
+  HL_printf("Total nbr allocs/frees : %ld / %ld\n", totalNumberOfAllocations, number_of_frees);
+  HL_printf("Total heap allocation  : %ld bytes\n", total_heap_usage);
+  HL_printf("Total heap deallocation: %ld bytes\n", total_freed_heap_usage);
+  HL_printf("Lost heap              : %ld bytes\n", (total_heap_usage - total_freed_heap_usage));
+  HL_printf("Max number of allocs   : %d\n", maxNbrOfAllocs);
 
   if (number_of_failed_allocations > 0)
-    fprintf(stderr, "Number of failed allocations     : %ld\n", number_of_failed_allocations);
+    HL_printf("Number of failed allocations     : %ld\n", number_of_failed_allocations);
   if (number_of_failed_reallocations  > 0)
-    fprintf(stderr, "Number of failed reallocations   : %ld\n", number_of_failed_reallocations);
+    HL_printf("Number of failed reallocations   : %ld\n", number_of_failed_reallocations);
   if (number_of_failed_frees > 0)
-    fprintf(stderr, "Number of failed frees           : %ld\n", number_of_failed_frees);
+    HL_printf("Number of failed frees           : %ld\n", number_of_failed_frees);
   if (number_of_failed_strdup > 0)
-    fprintf(stderr, "Number of failed strdup          : %ld\n", number_of_failed_strdup);
+    HL_printf("Number of failed strdup          : %ld\n", number_of_failed_strdup);
 }

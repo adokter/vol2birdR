@@ -42,6 +42,8 @@ std::thread::id main_thread_id() noexcept {
   return tid;
 }
 
+//' Sets the main thread id
+//'
 // [[Rcpp::export]]
 void cpp_vol2bird_namespace__store_main_thread_id() {
   // called upon package load to remember the thread ID of the main thread
@@ -60,6 +62,8 @@ extern "C" {
 void RSL_set_printfun(void(*printfun)(const char*));
 }
 
+//' Initializes the vol2birdR library
+//'
 // [[Rcpp::export]]
 void cpp_vol2bird_initialize() {
   // called upon package load to remember the thread ID of the main thread
@@ -74,12 +78,18 @@ void wsr88d_set_site_info_file(const char* pth);
 const char* wsr88d_get_site_info_file(void);
 }
 
+//' Sets the wsr88d site location file
+//'
+//' @param loc location of file
 // [[Rcpp::export]]
 void cpp_vol2bird_set_wsr88d_site_location(std::string loc)
 {
   wsr88d_set_site_info_file(loc.c_str());
 }
 
+//' Returns the wsr88d site location file
+//'
+//' @return location of site location file
 // [[Rcpp::export]]
 std::string cpp_vol2bird_get_wsr88d_site_location()
 {
@@ -93,6 +103,9 @@ void call_r_gc() {
   R_RunPendingFinalizers();
 }
 
+//' Initializes the mistnet shared library pointed to by the path
+//'
+//' @param path The shared library
 // [[Rcpp::export]]
 void cpp_mistnet_init(std::string path) {
   std::string error;

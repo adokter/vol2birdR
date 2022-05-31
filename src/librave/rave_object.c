@@ -149,8 +149,8 @@ void RaveCoreObject_release(RaveCoreObject* obj, const char* filename, int linen
       RAVE_FREE(obj);
       objectsDestroyed++;
     } else if (obj->roh_refCnt < 0) {
-      fprintf(stderr, "Got negative reference count, aborting");
-      abort();
+      Rave_printf("Got negative reference count, aborting");
+      RAVE_ABORT();
     }
   }
 }
@@ -232,19 +232,19 @@ int RaveCoreObject_isCloneable(RaveCoreObject* src)
 
 void RaveCoreObject_printCurrentObjectStatus(void)
 {
-  fprintf(stderr, "Created: %ld, Deleted: %ld, Pending: %ld\n", objectsCreated, objectsDestroyed, objectsCreated-objectsDestroyed);
+  Rave_printf("Created: %ld, Deleted: %ld, Pending: %ld\n", objectsCreated, objectsDestroyed, objectsCreated-objectsDestroyed);
 }
 
 void RaveCoreObject_printStatistics(void)
 {
-  fprintf(stderr, "Objects created: %ld\n", objectsCreated);
-  fprintf(stderr, "Objects deleted: %ld\n", objectsDestroyed);
-  fprintf(stderr, "Objects pending: %ld\n", objectsCreated - objectsDestroyed);
+  Rave_printf("Objects created: %ld\n", objectsCreated);
+  Rave_printf("Objects deleted: %ld\n", objectsDestroyed);
+  Rave_printf("Objects pending: %ld\n", objectsCreated - objectsDestroyed);
 
   if (OBJECT_HEAP != NULL) {
     heapobject* ho = OBJECT_HEAP;
     while (ho != NULL) {
-      fprintf(stderr, "%s at %s:%d has not been released (refcnt = %d)\n",
+      Rave_printf("%s at %s:%d has not been released (refcnt = %d)\n",
               ho->obj->roh_type->name, ho->filename, ho->lineno, ho->obj->roh_refCnt);
       ho = ho->next;
     }

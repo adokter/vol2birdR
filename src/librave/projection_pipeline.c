@@ -181,7 +181,6 @@ ProjectionPipeline_t* ProjectionPipeline_createDefaultLonLatPipelineFromDef(cons
 int ProjectionPipeline_init(ProjectionPipeline_t *pipeline, Projection_t *first,
     Projection_t *second)
 {
-  int result = 0;
   RAVE_ASSERT((pipeline != NULL), "pipeline was NULL");
   RAVE_ASSERT((pipeline->initialized == 0), "pipeline was already initalized");
 
@@ -191,43 +190,6 @@ int ProjectionPipeline_init(ProjectionPipeline_t *pipeline, Projection_t *first,
   }
 
   return ProjectionPipeline_initFromDef(pipeline, Projection_getDefinition(first), Projection_getDefinition(second));
-
-#ifdef KALLE
-
-  /* If we are using proj4 api, then original projections will be used. If on other hand
-   * we are using new proj api. We need to create the actual pipeline.
-   */
-#ifndef USE_PROJ4_API
-  {
-    PJ *p = NULL;
-    PJ_CONTEXT* context = proj_context_create();
-    if (context == NULL) {
-      RAVE_ERROR0("Failed to create context for projection");
-      goto done;
-    }
-    proj_log_level(context, Projection_getDebugLevel());
-    p = proj_create_crs_to_crs(context, Projection_getDefinition(first), Projection_getDefinition(second), NULL);
-    if (p == NULL) {
-      RAVE_ERROR2("Failed to create crs_to_crs_projection: %d, %s", proj_errno(0), proj_errno_string(proj_errno(0)));
-      proj_context_destroy(context);
-      goto done;
-    }
-    pipeline->pj = p;
-    pipeline->context = context;
-  }
-#endif
-  pipeline->first = RAVE_OBJECT_COPY(first);
-  pipeline->second = RAVE_OBJECT_COPY(second);
-  pipeline->firstIsLatlong = Projection_isLatLong(pipeline->first);
-  pipeline->secondIsLatlong = Projection_isLatLong(pipeline->second);
-  pipeline->initialized = 1;
-  result = 1;
-
-#ifndef USE_PROJ4_API
-done:
-#endif
-  return result;
-#endif
 }
 
 int ProjectionPipeline_initFromDef(ProjectionPipeline_t *pipeline, const char* first,

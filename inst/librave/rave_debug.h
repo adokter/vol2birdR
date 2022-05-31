@@ -53,6 +53,13 @@ typedef enum Rave_Debug {
 typedef void(*rave_dbgfun)(const char* filename, int lineno, Rave_Debug lvl, const char* fmt, ...);
 
 /**
+ * The printer function.
+ * @param[in] fmt - the varargs formatter string
+ * @param[in] ... - the varargs list
+ */
+void Rave_printf(const char* fmt, ...);
+
+/**
  * Initializes the debugger structure, must have been called before executing the code.
  * @ingroup rave_c_apis
  */
@@ -210,6 +217,7 @@ Rave_getDebugFunction()(__FILE__, __LINE__, RAVE_CRITICAL, msg); \
 abort(); \
 }
 
+#define RAVE_ABORT() abort()
 
 #else
 /** Spewdebug macro taking one text string.*/
@@ -344,15 +352,21 @@ Rave_getDebugFunction()(__FILE__,__LINE__,RAVE_CRITICAL,msg,arg1,arg2,arg3)
 #define RAVE_CRITICAL4(msg,arg1,arg2,arg3,arg4) \
 Rave_getDebugFunction()(__FILE__,__LINE__,RAVE_CRITICAL,msg,arg1,arg2,arg3,arg4)
 
-/**
- * Precondition macro, if the expression does not evaluate to true, then an
- * CRITICAL error message will be produced and then the program will abort().
- */
+#ifdef NO_RAVE_ABORT
+
+#define RAVE_ASSERT(expr, msg)
+#define RAVE_ABORT()
+
+#else
+
 #define RAVE_ASSERT(expr, msg) \
 if(!expr) { \
 Rave_getDebugFunction()(__FILE__, __LINE__, RAVE_CRITICAL, msg); \
 abort(); \
 }
+#define RAVE_ABORT() abort()
+
+#endif
 
 #endif
 /*@}*/

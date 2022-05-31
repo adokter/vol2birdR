@@ -61,6 +61,13 @@ typedef struct {
 extern hlhdf_debug_struct hlhdfDbg;
 
 /**
+ * The printer function.
+ * @param[in] fmt - the varargs formatter string
+ * @param[in] ... - the varargs list
+ */
+void HL_printf(const char* fmt, ...);
+
+/**
  * Initializes the debugger structure, must have been called before executing the code.
  * @ingroup hlhdf_c_apis
  */
@@ -356,6 +363,12 @@ hlhdfDbg.dbgfun(__FILE__,__LINE__,HLHDF_CRITICAL,msg,arg1,arg2,arg3)
 #define HL_CRITICAL4(msg,arg1,arg2,arg3,arg4) \
 hlhdfDbg.dbgfun(__FILE__,__LINE__,HLHDF_CRITICAL,msg,arg1,arg2,arg3,arg4)
 
+#ifdef NO_HLHDF_ABORT
+
+#define HL_ASSERT(expr, msg)
+#define HL_ABORT()
+
+#else
 /**
  * Precondition macro, if the expression does not evaluate to true, then an
  * CRITICAL error message will be produced and then the program will abort().
@@ -365,6 +378,10 @@ if(!expr) { \
 hlhdfDbg.dbgfun(__FILE__, __LINE__, HLHDF_CRITICAL, msg); \
 abort(); \
 }
+
+#define HL_ABORT() abort()
+
+#endif
 
 #endif
 /*@}*/

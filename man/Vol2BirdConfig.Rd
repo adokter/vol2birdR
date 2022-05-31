@@ -4,6 +4,6 @@
 \alias{Vol2BirdConfig}
 \title{Vol2Bird configuration}
 \description{
-The configuration used during processing
+The vol2bird configuration used during processing
 }
 \keyword{internal}

@@ -39,6 +39,21 @@ static void setLogTime(char* strtime, int len)
   strftime(strtime, len, "%Y/%m/%d %H:%M:%S", tu_time);
 }
 
+void Rave_printf(const char* fmt, ...)
+{
+  va_list alist;
+  va_start(alist,fmt);
+  char msgbuff[4096];
+  int n = vsnprintf(msgbuff, 4096, fmt, alist);
+  va_end(alist);
+  if (n < 0 || n >= 1024) {
+    return;
+  }
+#ifndef NO_RAVE_PRINTF
+  fprintf(stderr, "%s", msgbuff);
+#endif
+}
+
 static void Rave_defaultDebugFunction(const char* filename, int lineno, Rave_Debug lvl,
   const char* fmt, ...)
 {
@@ -92,7 +107,7 @@ static void Rave_defaultDebugFunction(const char* filename, int lineno, Rave_Deb
   sprintf(infobuff, "%20s : %11s", strtime, dbgtype);
   vsprintf(msgbuff, fmt, alist);
 
-  fprintf(stderr, "%s : %s (%s:%d)\n", infobuff, msgbuff, filename, lineno);
+  Rave_printf("%s : %s (%s:%d)\n", infobuff, msgbuff, filename, lineno);
 }
 /*@} End of Private functions */
 

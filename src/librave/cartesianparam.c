@@ -95,7 +95,6 @@ static RaveData2D_t* CartesianParamInternal_ensureData2D(CartesianParam_t* self)
   if (self->lazyDataset != NULL) {
     RaveData2D_t* loaded = LazyDataset_get(self->lazyDataset);
     if (loaded != NULL) {
-      /*fprintf(stderr, "CartesianParamInternal_ensureData2D: LazyDataset fetched\n");*/
       RAVE_OBJECT_RELEASE(self->data);
       self->data = RAVE_OBJECT_COPY(loaded);
       RAVE_OBJECT_RELEASE(self->lazyDataset);

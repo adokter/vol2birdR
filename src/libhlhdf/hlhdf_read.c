@@ -933,7 +933,7 @@ static herr_t hlhdf_node_visitor(hid_t g_id, const char *name, const H5O_info_t 
     break;
   }
   default: {
-    fprintf(stderr, "(%ld) UNKNOWN: %s\n", g_id, name);
+    HL_printf("(%ld) UNKNOWN: %s\n", g_id, name);
     break;
   }
   }

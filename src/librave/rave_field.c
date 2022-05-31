@@ -71,7 +71,6 @@ static RaveData2D_t* RaveFieldInternal_ensureData2D(RaveField_t* field)
   if (field->lazyDataset != NULL) {
     RaveData2D_t* loaded = LazyDataset_get(field->lazyDataset);
     if (loaded != NULL) {
-      /*fprintf(stderr, "RaveFieldInternal_ensureData2D: LazyDataset fetched\n");*/
       RAVE_OBJECT_RELEASE(field->data);
       field->data = RAVE_OBJECT_COPY(loaded);
       RAVE_OBJECT_RELEASE(field->lazyDataset);
