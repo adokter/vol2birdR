@@ -9,20 +9,17 @@ Description: One paragraph description of what the package does as one
         or more full sentences.
 License: LGPL (>= 3) + file LICENSE
 Imports: 
+    assertthat,
+    methods,
     Rcpp (>= 1.0.4),
     rlang, 
-    methods,
+    utils,
     withr
 LinkingTo: Rcpp, RcppGSL
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
+Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 SystemRequirements: GNU make
-Collate:
-    'package.R'
-    'install.R'
-    'mistnet_load.R'
-    'RcppExports.R'
-    'vol2birdR.R'
 RcppModules: RaveIO, PolarVolume, Vol2Bird, Vol2BirdConfig
 Suggests: 
     knitr,

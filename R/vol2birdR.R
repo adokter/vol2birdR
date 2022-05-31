@@ -10,6 +10,8 @@
 #'
 #' @keywords internal
 #'
+#' @import assertthat
+#' @importFrom utils str
 #' @importFrom rlang abort
 "_PACKAGE"
 

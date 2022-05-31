@@ -6,3 +6,4 @@
 \description{
 The configuration used during processing
 }
+\keyword{internal}

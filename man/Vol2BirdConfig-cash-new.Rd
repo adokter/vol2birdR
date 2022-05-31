@@ -9,3 +9,4 @@ Constructs a new Vol2BirdConfig object
 \examples{
   a<-Vol2BirdConfig$new()
 }
+\keyword{internal}

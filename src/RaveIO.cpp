@@ -79,12 +79,14 @@ public:
 
 //' @name Vol2BirdConfig$new
 //' @title Constructs a new Vol2BirdConfig object
+//' @keywords internal
 //' @examples
 //'   a<-Vol2BirdConfig$new()
 
 //' @name Vol2BirdConfig
 //' @title Vol2Bird configuration
 //' @description The configuration used during processing
+//' @keywords internal
 //' @export Vol2BirdConfig
 class Vol2BirdConfig {
 private:
