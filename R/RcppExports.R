@@ -4,13 +4,13 @@
 #' @name PolarVolume
 #' @title PolarVolume
 #' @description The polar volume object as defined by RAVE.
-#' @export PolarVolume
+#' @keywords internal
 NULL
 
 #' @name RaveIO
 #' @title RaveIO routines
 #' @description Provides I/O routines using the rave framework
-#' @export RaveIO
+#' @keywords internal
 NULL
 
 #' @name Vol2BirdConfig$new
@@ -24,7 +24,6 @@ NULL
 #' @title Vol2Bird configuration
 #' @description The vol2bird configuration used during processing
 #' @keywords internal
-#' @export Vol2BirdConfig
 NULL
 
 #' @name Vol2Bird
@@ -33,17 +32,19 @@ NULL
 #' Provides methods for processing polar volumes/scans. Typical usage can be
 #' processor<-Vol2Bird$new()
 #' processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
-#' @export Vol2Bird
+#' @keywords internal
 NULL
 
 #' Sets the main thread id
 #'
+#' @keywords internal
 cpp_vol2bird_namespace__store_main_thread_id <- function() {
     invisible(.Call(`_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id`))
 }
 
 #' Initializes the vol2birdR library
 #'
+#' @keywords internal
 cpp_vol2bird_initialize <- function() {
     invisible(.Call(`_vol2birdR_cpp_vol2bird_initialize`))
 }
@@ -64,6 +65,7 @@ cpp_vol2bird_get_wsr88d_site_location <- function() {
 
 #' Initializes the mistnet shared library pointed to by the path
 #'
+#' @keywords internal
 #' @param path The shared library
 cpp_mistnet_init <- function(path) {
     invisible(.Call(`_vol2birdR_cpp_mistnet_init`, path))

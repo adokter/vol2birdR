@@ -9,3 +9,4 @@ install_os()
 \description{
 Returns the system name
 }
+\keyword{internal}

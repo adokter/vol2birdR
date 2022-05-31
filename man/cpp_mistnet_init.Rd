@@ -12,3 +12,4 @@ cpp_mistnet_init(path)
 \description{
 Initializes the mistnet shared library pointed to by the path
 }
+\keyword{internal}

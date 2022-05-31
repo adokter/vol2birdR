@@ -18,3 +18,4 @@ mistnet_install_libs(version, type, install_path, install_config)
 \description{
 Installs the mistnet libraries
 }
+\keyword{internal}

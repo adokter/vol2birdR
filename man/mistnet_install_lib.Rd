@@ -35,3 +35,4 @@ if anything could be located or not
 \description{
 Installs the library
 }
+\keyword{internal}

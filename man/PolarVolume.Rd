@@ -6,3 +6,4 @@
 \description{
 The polar volume object as defined by RAVE.
 }
+\keyword{internal}

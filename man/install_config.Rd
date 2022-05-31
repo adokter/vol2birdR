@@ -13,4 +13,4 @@ install_config
 \description{
 Contains a list of mistnet libraries for the various OS:s
 }
-\keyword{datasets}
+\keyword{internal}

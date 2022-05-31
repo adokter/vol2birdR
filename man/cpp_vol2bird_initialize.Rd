@@ -9,3 +9,4 @@ cpp_vol2bird_initialize()
 \description{
 Initializes the vol2birdR library
 }
+\keyword{internal}

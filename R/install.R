@@ -1,8 +1,9 @@
 #' The default branch
+#' @keywords internal
 branch <- "main"
 
 #' Contains a list of mistnet libraries for the various OS:s
-#
+#' @keywords internal
 install_config <- list(
   "1.10.2" = list(
     "cpu" = list(
@@ -48,6 +49,7 @@ install_config <- list(
 #' Returns the path of the mistnet libraries for specified version
 #' @param version The Mistnet version checked for
 #' @return the path to the libraries
+#' @keywords internal
 install_path <- function(version = "1.0") {
   path <- Sys.getenv("MISTNET_HOME")
   if (nzchar(path)) {
@@ -57,7 +59,6 @@ install_path <- function(version = "1.0") {
   }
 }
 
-#' A simple exported version of install_path
 #' Returns the torch installation path.
 #' @export
 torch_install_path <- function() {
@@ -66,6 +67,7 @@ torch_install_path <- function() {
 
 #' Checks if the torch and mistnet library has been installed or not.
 #' Returns TRUE if both torch and mistnet libraries can be found, otherwise FALSE
+#' @export
 install_exists <- function() {
   if (!dir.exists(install_path())) {
     return(FALSE)
@@ -93,6 +95,7 @@ torch_is_installed <- function() {
 #' @param library_name The name of the library searched for, either libmistnet or libtorch
 #' @param install_path The location where to look for the libraries
 #' @return if anything could be located or not
+#' @keywords internal
 lib_installed <- function(library_name, install_path) {
   x <- list.files(file.path(install_path, "lib"))
 
@@ -111,6 +114,7 @@ lib_installed <- function(library_name, install_path) {
 #' @param filter Not used
 #' @param md5hash MD5 check
 #' @param inst_path inst path
+#' @keywords internal
 #' @return if anything could be located or not
 mistnet_install_lib <- function(library_name, library_url,
                                 install_path, source_path, filter, md5hash,
@@ -150,7 +154,7 @@ mistnet_install_lib <- function(library_name, library_url,
 }
 
 #' Returns the system name
-#'
+#' @keywords internal
 install_os <- function() {
   tolower(Sys.info()[["sysname"]])
 }
@@ -160,6 +164,7 @@ install_os <- function() {
 #' @param type what type of libraries to be installed
 #' @param install_path Where libraries should be installed
 #' @param install_config the library config
+#' @keywords internal
 mistnet_install_libs <- function(version, type, install_path, install_config) {
   current_os <- install_os()
 

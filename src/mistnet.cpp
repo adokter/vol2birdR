@@ -44,6 +44,7 @@ std::thread::id main_thread_id() noexcept {
 
 //' Sets the main thread id
 //'
+//' @keywords internal
 // [[Rcpp::export]]
 void cpp_vol2bird_namespace__store_main_thread_id() {
   // called upon package load to remember the thread ID of the main thread
@@ -64,6 +65,7 @@ void RSL_set_printfun(void(*printfun)(const char*));
 
 //' Initializes the vol2birdR library
 //'
+//' @keywords internal
 // [[Rcpp::export]]
 void cpp_vol2bird_initialize() {
   // called upon package load to remember the thread ID of the main thread
@@ -105,6 +107,7 @@ void call_r_gc() {
 
 //' Initializes the mistnet shared library pointed to by the path
 //'
+//' @keywords internal
 //' @param path The shared library
 // [[Rcpp::export]]
 void cpp_mistnet_init(std::string path) {

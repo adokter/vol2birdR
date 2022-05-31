@@ -2,7 +2,7 @@
 % Please edit documentation in R/mistnet_load.R
 \name{mistnet_start}
 \alias{mistnet_start}
-\title{Initialized the mistnet system if enabled.}
+\title{Initialize the mistnet system if enabled.}
 \usage{
 mistnet_start(version = mistnet_default(), reload = FALSE)
 }
@@ -12,5 +12,5 @@ mistnet_start(version = mistnet_default(), reload = FALSE)
 \item{reload}{if mistnet library should be reloaded or not, default FALSE.}
 }
 \description{
-Initialized the mistnet system if enabled.
+Initialize the mistnet system if enabled.
 }

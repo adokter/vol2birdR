@@ -7,7 +7,7 @@ mistnet_default <- function() {
   "1.0.0"
 }
 
-#' Initialized the mistnet system if enabled.
+#' Initialize the mistnet system if enabled.
 #' @param version version of mistnet library
 #' @param reload if mistnet library should be reloaded or not, default FALSE.
 mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
