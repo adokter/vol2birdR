@@ -12,8 +12,8 @@ get_install_libs_url(
 \arguments{
 \item{version}{The Torch version to install.}
 
-\item{type}{The installation type for Torch. Valid values are \code{"cpu"} or the 'CUDA' version.}
+\item{type}{The installation type for Torch. Valid values is currently \code{"cpu"}.}
 }
 \description{
-List the Torch and mistnet files to download as local files in order to proceed with install_torch_from_file().
+List the Torch and mistnet files to download as local files in order to proceed with install_mistnet_from_file(). See install_mistnet_from_file for example usage.
 }
