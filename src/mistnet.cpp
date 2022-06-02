@@ -83,6 +83,7 @@ const char* wsr88d_get_site_info_file(void);
 //' Sets the wsr88d site location file
 //'
 //' @param loc location of file
+//' @keywords internal
 // [[Rcpp::export]]
 void cpp_vol2bird_set_wsr88d_site_location(std::string loc)
 {
@@ -92,6 +93,7 @@ void cpp_vol2bird_set_wsr88d_site_location(std::string loc)
 //' Returns the wsr88d site location file
 //'
 //' @return location of site location file
+//' @keywords internal
 // [[Rcpp::export]]
 std::string cpp_vol2bird_get_wsr88d_site_location()
 {

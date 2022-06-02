@@ -12,3 +12,4 @@ location of site location file
 \description{
 Returns the wsr88d site location file
 }
+\keyword{internal}

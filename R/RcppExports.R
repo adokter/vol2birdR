@@ -52,6 +52,7 @@ cpp_vol2bird_initialize <- function() {
 #' Sets the wsr88d site location file
 #'
 #' @param loc location of file
+#' @keywords internal
 cpp_vol2bird_set_wsr88d_site_location <- function(loc) {
     invisible(.Call(`_vol2birdR_cpp_vol2bird_set_wsr88d_site_location`, loc))
 }
@@ -59,6 +60,7 @@ cpp_vol2bird_set_wsr88d_site_location <- function(loc) {
 #' Returns the wsr88d site location file
 #'
 #' @return location of site location file
+#' @keywords internal
 cpp_vol2bird_get_wsr88d_site_location <- function() {
     .Call(`_vol2birdR_cpp_vol2bird_get_wsr88d_site_location`)
 }
