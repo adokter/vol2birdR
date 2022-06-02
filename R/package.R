@@ -17,7 +17,7 @@ globalVariables(c("..", "self", "private", "N"))
   
   install_success <- TRUE
    
-  if (install_exists() && install_success) {
+  if (mistnet_exists() && install_success) {
     # in case init fails we will just have disabled mistnet and run without it..
     tryCatch(
       {

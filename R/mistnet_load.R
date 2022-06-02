@@ -11,7 +11,7 @@ mistnet_default <- function() {
 #' @param version version of mistnet library
 #' @param reload if mistnet library should be reloaded or not, default FALSE.
 mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
-  if (!install_exists()) {
+  if (!mistnet_exists()) {
     stop("Mistnet is disabled.")
   }
 
