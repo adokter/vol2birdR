@@ -84,13 +84,6 @@ mistnet_exists <- function() {
   TRUE
 }
 
-#' Verifies if torch is installed
-#'
-#' @export
-torch_is_installed <- function() {
-  install_exists()
-}
-
 #' Returns the path of the mistnet libraries for specified version
 #' @param library_name The name of the library searched for, either libmistnet or libtorch
 #' @param install_path The location where to look for the libraries

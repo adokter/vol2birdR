@@ -36,7 +36,6 @@ globalVariables(c("..", "self", "private", "N"))
 #' Bullets
 release_bullets <- function() {
   c(
-    "Create the cran/ branch and update the branch variable",
-    "Uncomment the indicated line in the .RBuildignore file"
+    "FIXME Needs to be written"
   )
 }
