@@ -3,6 +3,7 @@
 
 #' The default mistnet version
 #' @return the default mistnet version
+#' @keywords internal
 mistnet_default <- function() {
   "1.0.0"
 }
@@ -10,6 +11,7 @@ mistnet_default <- function() {
 #' Initialize the mistnet system if enabled.
 #' @param version version of mistnet library
 #' @param reload if mistnet library should be reloaded or not, default FALSE.
+#' @keywords internal
 mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
   if (!mistnet_exists()) {
     stop("Mistnet is disabled.")
