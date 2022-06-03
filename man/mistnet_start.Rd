@@ -14,3 +14,4 @@ mistnet_start(version = mistnet_default(), reload = FALSE)
 \description{
 Initialize the mistnet system if enabled.
 }
+\keyword{internal}

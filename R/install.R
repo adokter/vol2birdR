@@ -290,7 +290,7 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' @details
 #'
 #' When \code{"install_mistnet()"} initiated download is not possible, but installation archive files are
-#' present on local filesystem, \code{"install_torch_from_file()"} can be used as a workaround to installation issue.
+#' present on local filesystem, \code{"install_mistnet_from_file()"} can be used as a workaround to installation issue.
 #' \code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
 #' that is used for the R package. Both are highly dependent, and should be checked through \code{"get_install_libs_url()"}
 #'
