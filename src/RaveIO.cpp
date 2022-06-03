@@ -952,6 +952,7 @@ RCPP_MODULE(RaveIO) {
 }
 //RCPP_EXPOSED_AS(RaveIO)
 
+//' @keywords internal
 RCPP_EXPOSED_CLASS_NODECL(Vol2BirdConfig)
 RCPP_MODULE(Vol2BirdConfig) {
   class_<Vol2BirdConfig>("Vol2BirdConfig")

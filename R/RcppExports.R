@@ -35,6 +35,9 @@ NULL
 #' @keywords internal
 NULL
 
+#' @keywords internal
+NULL
+
 #' Sets the main thread id
 #'
 #' @keywords internal

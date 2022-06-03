@@ -1,4 +1,4 @@
-#' @useDynLib torchpkg
+#' @useDynLib mistnet
 #' @importFrom Rcpp sourceCpp
 NULL
 

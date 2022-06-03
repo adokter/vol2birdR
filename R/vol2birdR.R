@@ -13,6 +13,11 @@
 #' @import assertthat
 #' @importFrom utils str
 #' @importFrom rlang abort
+#' @import Rcpp
+#' @export RaveIO
+#' @export PolarVolume
+#' @export Vol2BirdConfig
+#' @export Vol2Bird
 "_PACKAGE"
 
 loadModule("RaveIO",TRUE)

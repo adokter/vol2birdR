@@ -23,14 +23,13 @@ When \code{"install_mistnet()"} initiated download is not possible, but installa
 present on local filesystem, \code{"install_torch_from_file()"} can be used as a workaround to installation issue.
 \code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
 that is used for the R package. Both are highly dependent, and should be checked through \code{"get_install_libs_url()"}
-}
-\examples{
-> get_install_libs_url()
+
+\> get_install_libs_url()
 $libtorch
-[1] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2\%2Bcpu.zip"
+\[1\] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2\%2Bcpu.zip"
 
 $libmistnet
-[1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
+\[1\] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
 
 In a terminal, download above zip-files.
 \%> mkdir /tmp/myfiles
@@ -39,5 +38,6 @@ In a terminal, download above zip-files.
 \%> wget https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip
 
 Then in R, type:
-> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", libmistnet="file:///tmp/myfiles/Linux-cpu.zip")
+\> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
+libmistnet="file:///tmp/myfiles/Linux-cpu.zip")
 }

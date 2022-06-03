@@ -211,6 +211,7 @@ mistnet_install_libs <- function(version, type, install_path, install_config) {
   invisible(install_path)
 }
 
+#' Returns the install type
 #' @keywords internal
 install_type <- function(version) {
   return("cpu")
@@ -293,13 +294,13 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' \code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
 #' that is used for the R package. Both are highly dependent, and should be checked through \code{"get_install_libs_url()"}
 #'
-#' @examples
-#' > get_install_libs_url()
+#' 
+#' \> get_install_libs_url()
 #' $libtorch
-#' [1] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip"
+#' \\[1\\] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip"
 #'
 #' $libmistnet
-#' [1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
+#' \\[1\\] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
 #'
 #' In a terminal, download above zip-files.
 #' %> mkdir /tmp/myfiles
@@ -308,7 +309,8 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' %> wget https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip
 #'
 #' Then in R, type:
-#' > install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", libmistnet="file:///tmp/myfiles/Linux-cpu.zip")
+#' \> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", 
+#'      libmistnet="file:///tmp/myfiles/Linux-cpu.zip")
 #' @export
 install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, ...) {
   stopifnot(inherits(url(libtorch), "file"))
