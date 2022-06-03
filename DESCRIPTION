@@ -1,12 +1,11 @@
 Package: vol2birdR
 Type: Package
-Title: R-variant of vol2bird
+Title: R-Variant of Vol2Bird
 Version: 0.1
 Date: 2022-03-21
 Author: Anders Henja
 Maintainer: Adriaan Dokter <your@email.com>
-Description: One paragraph description of what the package does as one
-        or more full sentences.
+Description: R-variant of the vol2bird software.
 License: LGPL (>= 3) + file LICENSE
 Imports: 
     assertthat,

@@ -4,10 +4,9 @@
 \name{vol2birdR-package}
 \alias{vol2birdR}
 \alias{vol2birdR-package}
-\title{vol2birdR: R-variant of vol2bird}
+\title{vol2birdR: R-Variant of Vol2Bird}
 \description{
-One paragraph description of what the package does as one
-        or more full sentences.
+R-variant of the vol2bird software.
 }
 \details{
 To get started, see:

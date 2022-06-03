@@ -938,21 +938,36 @@ public:
   }
 };
 
+//' @name Rcpp_PolarVolume-class
+//' @title Rcpp_PolarVolume-class
+//' @description The PolarVolume class
+//' A polar volume
 RCPP_EXPOSED_CLASS_NODECL(PolarVolume)
 RCPP_MODULE(PolarVolume) {
   class_<PolarVolume>("PolarVolume")
-      .constructor()
-      .method("getNumberOfScans", &PolarVolume::getNumberOfScans);
+      .constructor("Default constructor")
+      .method("getNumberOfScans", &PolarVolume::getNumberOfScans, "Returns number of scans");
 }
 //RCPP_EXPOSED_AS(PolarVolume)
 
+//' @name Rcpp_RaveIO-class
+//' @title Rcpp_RaveIO-class
+//' @description The RaveIO class
+//' Used when loading and saving objects
 RCPP_EXPOSED_CLASS_NODECL(RaveIO)
 RCPP_MODULE(RaveIO) {
-  class_<RaveIO>("RaveIO").constructor().constructor<std::string>().method("object", &RaveIO::object).method("filename", &RaveIO::filename);
+  class_<RaveIO>("RaveIO")
+      .constructor("Default constructor")
+      .constructor<std::string>("Constructor")
+      .method("object", &RaveIO::object, "Object")
+      .method("filename", &RaveIO::filename, "Filename");
 }
 //RCPP_EXPOSED_AS(RaveIO)
 
-//' @keywords internal
+//' @name Rcpp_Vol2BirdConfig-class
+//' @title Rcpp_Vol2BirdConfig-class
+//' @description The vol2bird configuration class.
+//' Configuration instance used when processing data.
 RCPP_EXPOSED_CLASS_NODECL(Vol2BirdConfig)
 RCPP_MODULE(Vol2BirdConfig) {
   class_<Vol2BirdConfig>("Vol2BirdConfig")
@@ -1027,13 +1042,18 @@ RCPP_MODULE(Vol2BirdConfig) {
 }
 //RCPP_EXPOSED_AS(Vol2BirdConfig)
 
+//' @name Rcpp_Vol2Bird-class
+//' @title Rcpp_Vol2Bird-class
+//' @description The vol2bird processing class.
+//' Provides methods for processing polar volumes/scans. Typical usage can be
+//'
 RCPP_EXPOSED_CLASS_NODECL(Vol2Bird)
 RCPP_MODULE(Vol2Bird) {
   class_<Vol2Bird>("Vol2Bird")
   .constructor("Constructor")
   .method("process", &Vol2Bird::process, "Processes the volume/scans")
   .method("rsl2odim", &Vol2Bird::rsl2odim, "Converts the file into odim format")
-  .property("verbose", &Vol2Bird::isVerbose, &Vol2Bird::setVerbose)
+  .property("verbose", &Vol2Bird::isVerbose, &Vol2Bird::setVerbose, "If processing should be verbose or not")
   ;
 }
 //RCPP_EXPOSED_AS(Vol2Bird)

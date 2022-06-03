@@ -9,6 +9,8 @@
 #' @seealso
 #' * [vol2bird()]
 #' 
+#' @importFrom utils capture.output
+#'
 #' @examples
 #' # create a configuration object
 #' config <- vol2bird_config()
@@ -16,6 +18,8 @@
 #' config
 #' # change the maximum range included in the profile generation to 40 km:
 #' config$rangeMax <- 40000
+#
+
 vol2bird_config <- function(){
   output=Vol2BirdConfig$new()
   output

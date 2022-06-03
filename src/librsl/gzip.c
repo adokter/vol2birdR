@@ -183,12 +183,12 @@ FILE *compress_pipe (FILE *fp)
   fflush(NULL); /* Flush all buffered output before opening this pipe. */
   save_fd = dup(1);
   close(1); /* Redirect stdout for gzip. */
-  (void)dup(fileno(fp));
+  (void)!dup(fileno(fp));
 
   fpipe = popen("gzip -q -1 -c", "w");
   if (fpipe == NULL) perror("compress_pipe");
   close(1);
-  (void)dup(save_fd);
+  (void)!dup(save_fd);
   return fpipe;
 }
 

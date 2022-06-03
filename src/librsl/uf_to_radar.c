@@ -584,18 +584,18 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
         return NULL;
     }
     memcpy(uf, &magic.buf[4], 2);
-    (void)fread(&uf[1], sizeof(char), nbytes-2, fp);
+    (void)!fread(&uf[1], sizeof(char), nbytes-2, fp);
     if (little_endian()) swap_uf_buffer(uf);
-    (void)fread(&nbytes, sizeof(int), 1, fp);
+    (void)!fread(&nbytes, sizeof(int), 1, fp);
     if (uf_into_radar(uf, &radar) == UF_DONE) break;
     /* Now the rest of the file. */
     while(fread(&nbytes, sizeof(int), 1, fp) > 0) {
       if (little_endian()) swap_4_bytes(&nbytes);
       
-      (void)fread(uf, sizeof(char), nbytes, fp);
+      (void)!fread(uf, sizeof(char), nbytes, fp);
       if (little_endian()) swap_uf_buffer(uf);
       
-      (void)fread(&nbytes, sizeof(int), 1, fp);
+      (void)!fread(&nbytes, sizeof(int), 1, fp);
       
       if (uf_into_radar(uf, &radar) == UF_DONE) break;
     }
@@ -613,18 +613,18 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
         return NULL;
     }
     memcpy(uf, &magic.buf[2], 4);
-    (void)fread(&uf[2], sizeof(char), sbytes-4, fp);
+    (void)!fread(&uf[2], sizeof(char), sbytes-4, fp);
     if (little_endian()) swap_uf_buffer(uf);
-    (void)fread(&sbytes, sizeof(short), 1, fp);
+    (void)!fread(&sbytes, sizeof(short), 1, fp);
     uf_into_radar(uf, &radar);
     /* Now the rest of the file. */
     while(fread(&sbytes, sizeof(short), 1, fp) > 0) {
       if (little_endian()) swap_2_bytes(&sbytes);
       
-      (void)fread(uf, sizeof(char), sbytes, fp);
+      (void)!fread(uf, sizeof(char), sbytes, fp);
       if (little_endian()) swap_uf_buffer(uf);
       
-      (void)fread(&sbytes, sizeof(short), 1, fp);
+      (void)!fread(&sbytes, sizeof(short), 1, fp);
       
       if (uf_into_radar(uf, &radar) == UF_DONE) break;
     }
@@ -642,7 +642,7 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
         return NULL;
     }
     memcpy(uf, &magic.buf[0], 6);
-    (void)fread(&uf[3], sizeof(short), sbytes-3, fp);
+    (void)!fread(&uf[3], sizeof(short), sbytes-3, fp);
     if (little_endian()) swap_uf_buffer(uf);
     uf_into_radar(uf, &radar);
     /* Now the rest of the file. */
@@ -650,7 +650,7 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
       memcpy(&sbytes, &uf[1], 2);  /* Record length is in word #2. */
       if (little_endian()) swap_2_bytes(&sbytes);
       
-      (void)fread(&uf[2], sizeof(short), sbytes-2, fp);  /* Have words 1,2. */
+      (void)!fread(&uf[2], sizeof(short), sbytes-2, fp);  /* Have words 1,2. */
       if (little_endian()) swap_uf_buffer(uf);
       
       if (uf_into_radar(uf, &radar) == UF_DONE) break;

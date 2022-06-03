@@ -2,8 +2,6 @@
 .project
 .settings
 src/Makevars
-inst/doc
-/doc/
 /Meta/
 config.log
 config.status

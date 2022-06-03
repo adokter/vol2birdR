@@ -35,7 +35,29 @@ NULL
 #' @keywords internal
 NULL
 
-#' @keywords internal
+#' @name Rcpp_PolarVolume-class
+#' @title Rcpp_PolarVolume-class
+#' @description The PolarVolume class
+#' A polar volume
+NULL
+
+#' @name Rcpp_RaveIO-class
+#' @title Rcpp_RaveIO-class
+#' @description The RaveIO class
+#' Used when loading and saving objects
+NULL
+
+#' @name Rcpp_Vol2BirdConfig-class
+#' @title Rcpp_Vol2BirdConfig-class
+#' @description The vol2bird configuration class.
+#' Configuration instance used when processing data.
+NULL
+
+#' @name Rcpp_Vol2Bird-class
+#' @title Rcpp_Vol2Bird-class
+#' @description The vol2bird processing class.
+#' Provides methods for processing polar volumes/scans. Typical usage can be
+#'
 NULL
 
 #' Sets the main thread id
