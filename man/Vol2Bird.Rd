@@ -4,7 +4,7 @@
 \alias{vol2bird}
 \title{Calculate a vertical profile (\code{vp}) from a polar volume (\code{pvol}) file}
 \usage{
-vol2bird(file, vpfile = "", pvolfile_out = "", config, verbose = FALSE)
+vol2bird(file, vpfile = "", pvolfile_out = "", config, verbose = TRUE)
 }
 \arguments{
 \item{file}{Character (vector). Either a path to a single radar polar volume
@@ -25,6 +25,8 @@ RSL formats to ODIM, and for adding MistNet segmentation output.}
 
 \item{config}{optional configuration object of class \code{Rcpp_Vol2BirdConfig},
 typically output from \link{vol2bird_config}}
+
+\item{verbose}{logical. When TRUE print profile output to console.}
 }
 \description{
 Calculates a vertical profile of biological scatterers (\code{vp}) from a polar
