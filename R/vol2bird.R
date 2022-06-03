@@ -5,6 +5,8 @@
 #' [vol2bird](https://github.com/adokter/vol2bird/) (Dokter et al.
 #' 2011 \doi{10.1098/rsif.2010.0116}).
 #'
+#' @rdname Vol2Bird
+#'
 #' @param file Character (vector). Either a path to a single radar polar volume
 #'   (`pvol`) file containing multiple scans/sweeps, or multiple paths to scan
 #'   files containing a single scan/sweep. Or a single `pvol` object. The file data format should be either 1)

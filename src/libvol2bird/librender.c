@@ -11,6 +11,11 @@
 #include <string.h>
 #include <math.h>
 
+//#ifdef MISTNET
+//#include "../libmistnet/libmistnet.h"
+//#endif
+
+
 /**
  * FUNCTION PROTOTYPES
  **/
@@ -52,7 +57,9 @@ PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdS
 
 PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volume, double elev);
 
+#ifdef R_MISTNET
 int run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
+#endif
 
 #ifndef MIN
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
@@ -469,57 +476,73 @@ void free4DTensor(float ****tensor, int dim1, int dim2, int dim3){
 	free(tensor);
 }
 
-double*** init3DTensor(int dim1, int dim2, int dim3, double init){
-    
+double*** init3DTensor(int dim1, int dim2, int dim3, double init)
+{
     double ***tensor = (double ***)malloc(dim1*sizeof(double**));
     
     if(tensor == NULL){
         vol2bird_err_printf("failed to initialize 3D tensor (1)");
-        exit(0);
+        // exit(0)
+        return NULL;
     }
-    
-    for (int i = 0; i< dim1; i++) {
 
+    for (int i = 0; i < dim1; i++) {
+        tensor[i] = NULL;
+    }
+
+    for (int i = 0; i< dim1; i++) {
         tensor[i] = (double **) malloc(dim2*sizeof(double *));
         
         if(tensor[i] == NULL){
             vol2bird_err_printf("failed to initialize 3D tensor (2)");
-            exit(0);
+            free3DTensor(tensor, dim1, dim2);
+            //exit(0);
+            return NULL;
+        } else {
+            for (int j = 0; j < dim2; j++) {
+                tensor[i][j] = NULL;
+            }
         }
         
         for (int j = 0; j < dim2; j++) {
-            
             tensor[i][j] = (double *)malloc(dim3*sizeof(double));
-            
             if(tensor[i][j] == NULL){
                 vol2bird_err_printf("failed to initialize 3D tensor (3)");
-                exit(0);
+	              free3DTensor(tensor, dim1, dim2);
+                // exit(0);
+                return NULL;
             }
         } // j
     } // i
     
-    	// assign values to allocated memory
-	for (int i = 0; i < dim1; i++)
-		for (int j = 0; j < dim2; j++)
-			for (int k = 0; k < dim3; k++)
-				tensor[i][j][k] = init;
+    // assign values to allocated memory
+    for (int i = 0; i < dim1; i++) {
+        for (int j = 0; j < dim2; j++) {
+            for (int k = 0; k < dim3; k++) {
+                tensor[i][j][k] = init;
+            }
+        }
+    }
 
     return tensor;
 }
 
-void free3DTensor(double ***tensor, int dim1, int dim2){
-	// deallocate memory
-	for (int i = 0; i < dim1; i++) 
-	{
-		for (int j = 0; j < dim2; j++){
+void free3DTensor(double ***tensor, int dim1, int dim2)
+{
+  if (tensor != NULL) {
+    for (int i = 0; i < dim1; i++) {
+      if (tensor[i] != NULL) {
+        for (int j = 0; j < dim2; j++) {
+          if (tensor[i][j] != NULL) {
             free(tensor[i][j]);
+          }
         }
-		free(tensor[i]);
-	}
-	free(tensor);
+        free(tensor[i]);
+      }
+    }
+    free(tensor);
+  }
 }
-
-
 
 int fill3DTensor(double ***tensor, RaveObjectList_t* list, int dim1, int dim2, int dim3){
 
@@ -973,7 +996,7 @@ int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int di
 
 }
 
-
+//#if defined(MISTNET) or defined(R_MISTNET)
 // segments biology from precipitation using mistnet deep convolution net.
 int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata){    
     // volume with only the 5 selected elevations
@@ -1054,4 +1077,4 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
     
     return result;
 }   // segmentScansUsingMistnet
-
+//#endif

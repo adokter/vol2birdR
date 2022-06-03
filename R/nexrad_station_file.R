@@ -16,12 +16,12 @@
 #' }
 nexrad_station_file <- function(file){
   if(missing(file)){
-    return(vol2birdR:::cpp_vol2bird_get_wsr88d_site_location())  
+    return(cpp_vol2bird_get_wsr88d_site_location())  
   }
   assert_that(file.exists(file))
   data=tryCatch(utils::read.delim(file),error=function(e) NULL)
   assert_that(is.data.frame(data),msg=paste0("file '",file,"' is not a fixed-width data table"))
   assert_that(ncol(data)==11,msg=sprintf("expecting a file with 11 columns, found %i",ncol(data)))
-  vol2birdR:::cpp_vol2bird_set_wsr88d_site_location(file)
+  cpp_vol2bird_set_wsr88d_site_location(file)
   return(file)
 }

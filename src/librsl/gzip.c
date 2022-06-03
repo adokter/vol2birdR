@@ -88,7 +88,7 @@ void rsl_readflush(FILE *fp)
   if (fork() == 0) { /* Child */
 	char buf[1024];
 	while(fread(buf, sizeof(char), sizeof(buf), fp)) continue;
-	exit(0);
+	// exit(0);
   }
 #endif
 }
@@ -162,11 +162,11 @@ FILE *uncompress_pipe (FILE *fp)
   if (no_command("gzip --version > /dev/null 2>&1")) return fp;
   save_fd = dup(0);
   close(0); /* Redirect stdin for gzip. */
-  (void)dup(fileno(fp));
+  (void)!dup(fileno(fp));
   fpipe = popen("gzip -q -d -f --stdout", "r");
   if (fpipe == NULL) perror("uncompress_pipe");
   close(0);
-  (void)dup(save_fd);
+  (void)!dup(save_fd);
   close(save_fd);
   return fpipe;
 }

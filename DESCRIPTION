@@ -2,7 +2,7 @@ Package: vol2birdR
 Type: Package
 Title: R-Variant of Vol2Bird
 Version: 0.1
-Date: 2022-03-21
+Date: 2022-06-03
 Author: Anders Henja
 Maintainer: Adriaan Dokter <your@email.com>
 Description: R-variant of the vol2bird software.

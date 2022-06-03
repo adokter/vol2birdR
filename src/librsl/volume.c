@@ -1152,7 +1152,7 @@ float RSL_get_value_from_ray(Ray *ray, float r)
       {
       if(radar_verbose_flag)
          {
-         fprintf(stderr,"RSL_get_value_from_ray: ray->h.gate_size == 0\n");
+         RSL_printf("RSL_get_value_from_ray: ray->h.gate_size == 0\n");
          }
       return BADVAL;
       }
@@ -1454,10 +1454,10 @@ void RSL_select_fields(char *field_type, ...)
   c_field = field_type;
   va_start(ap, field_type);
 
-  if (radar_verbose_flag) fprintf(stderr,"Selected fields for ingest:");
+  if (radar_verbose_flag) RSL_printf("Selected fields for ingest:");
   while (c_field) {
     /* CHECK EACH FIELD. This is a fancier case statement than C provides. */
-    if (radar_verbose_flag) fprintf(stderr," %s", c_field);
+    if (radar_verbose_flag) RSL_printf(" %s", c_field);
     if (strcasecmp(c_field, "all") == 0) {
       for (i=0; i<MAX_RADAR_VOLUMES; i++) rsl_qfield[i] = 1;
     } else if (strcasecmp(c_field, "none") == 0) {
@@ -1472,13 +1472,13 @@ void RSL_select_fields(char *field_type, ...)
       
       if (i == MAX_RADAR_VOLUMES) {
         if (radar_verbose_flag)
-          fprintf(stderr, "\nRSL_select_fields: Invalid field name <<%s>> specified.\n", c_field);
+          RSL_printf("\nRSL_select_fields: Invalid field name <<%s>> specified.\n", c_field);
       }
     }
     c_field = va_arg(ap, char *);
   }
 
-  if (radar_verbose_flag) fprintf(stderr,"\n");
+  if (radar_verbose_flag) RSL_printf("\n");
   va_end(ap);
 
 }
@@ -1523,7 +1523,7 @@ int rsl_query_field(char *c_field)
   if (i == MAX_RADAR_VOLUMES) { /* We should never see this message for
                                  * properly written ingest code.
                                  */
-    fprintf(stderr, "rsl_query_field: Invalid field name <<%s>> specified.\n", c_field);
+    RSL_printf("rsl_query_field: Invalid field name <<%s>> specified.\n", c_field);
   }
   
   /* 'i' is the index. Is it set? */
@@ -1572,11 +1572,11 @@ void RSL_read_these_sweeps(char *csweep, ...)
       rsl_qsweep[i] = 0;
 
 
-  if (radar_verbose_flag) fprintf(stderr,"Selected sweeps for ingest:");
+  if (radar_verbose_flag) RSL_printf("Selected sweeps for ingest:");
   for (;c_sweep;    c_sweep = va_arg(ap, char *))
     {
     /* CHECK EACH FIELD. This is a fancier case statement than C provides. */
-    if (radar_verbose_flag) fprintf(stderr," %s", c_sweep);
+    if (radar_verbose_flag) RSL_printf(" %s", c_sweep);
     if (strcasecmp(c_sweep, "all") == 0) {
       for (i=0; i<RSL_MAX_QSWEEP; i++) rsl_qsweep[i] = 1;
       rsl_qsweep_max = RSL_MAX_QSWEEP;
@@ -1590,12 +1590,12 @@ void RSL_read_these_sweeps(char *csweep, ...)
     } else {
       i = sscanf(c_sweep,"%d", &isweep);
       if (i == 0) { /* No match, bad argument. */
-        if (radar_verbose_flag) fprintf(stderr,"\nRSL_read_these_sweeps: bad parameter %s.  Ignoring.\n", c_sweep);
+        if (radar_verbose_flag) RSL_printf("\nRSL_read_these_sweeps: bad parameter %s.  Ignoring.\n", c_sweep);
         continue;
       }
 
       if (isweep < 0 || isweep > RSL_MAX_QSWEEP) {
-        if (radar_verbose_flag) fprintf(stderr,"\nRSL_read_these_sweeps: parameter %s not in [0,%d).  Ignoring.\n", c_sweep, RSL_MAX_QSWEEP);
+        if (radar_verbose_flag) RSL_printf("\nRSL_read_these_sweeps: parameter %s not in [0,%d).  Ignoring.\n", c_sweep, RSL_MAX_QSWEEP);
         continue;
       }
 
@@ -1604,7 +1604,7 @@ void RSL_read_these_sweeps(char *csweep, ...)
     }
   }
 
-  if (radar_verbose_flag) fprintf(stderr,"\n");
+  if (radar_verbose_flag) RSL_printf("\n");
   va_end(ap);
 }
 
@@ -1708,7 +1708,9 @@ void RSL_set_printfun(RSL_printfun fun)
 /*********************************************************************/
 void RSL_default_printfun(const char* msg)
 {
+#ifdef RSL_NO_STDERR_PRINTF
   fprintf(stderr, "%s", msg);
+#endif
 }
 
 /*********************************************************************/

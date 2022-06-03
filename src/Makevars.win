@@ -15,7 +15,7 @@ H5_API_CFLAGS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_h5_api_
 PKG_LIBS=-lpthread $(HDF5_LIBS) -lbz2  -lz  -ldl -lm $(PROJ_LIBS)
 PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 
-PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -DNOCONFUSE -DNO_UNZIP_PIPE -DRSL=1
+PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -DNOCONFUSE -DR_MISTNET -DNO_UNZIP_PIPE -DNO_HLHDF_PRINTF -DNO_HLHDF_ABORT -DNO_RAVE_PRINTF -DNO_RAVE_ABORT -DRSL_NO_STDERR_PRINTF -DRSL=1
 
 PKG_CPPFLAGS+= $(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::CFlags()")
 

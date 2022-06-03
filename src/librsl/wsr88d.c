@@ -169,10 +169,10 @@ void print_head(Wsr88d_file_header h)
 {
   int i;
   RSL_printf("Filename : ");
-  for (i=0;i<9;i++) RSL_printf("%c", h.title.filename[i]);   printf("\n");
+  for (i=0;i<9;i++) RSL_printf("%c", h.title.filename[i]);   RSL_printf("\n");
 
   RSL_printf("Extension: ");
-  for (i=0;i<3;i++) RSL_printf("%c", h.title.ext[i]);   printf("\n");
+  for (i=0;i<3;i++) RSL_printf("%c", h.title.ext[i]);   RSL_printf("\n");
 
   RSL_printf("Julian date: %d\n", Cvt_date(h.title.file_date));
   RSL_printf("       time: %f\n", Cvt_time(h.title.file_time));

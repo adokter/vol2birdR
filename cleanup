@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 \rm -fr autom4te.cache
 \rm -f config.log config.status

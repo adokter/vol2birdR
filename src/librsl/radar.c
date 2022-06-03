@@ -60,7 +60,7 @@
 
 void RSL_print_version()
 {
-  printf("RSL version %s.\n", RSL_VERSION_STR);
+  RSL_printf("RSL version %s.\n", RSL_VERSION_STR);
 }
 
 /* Debug printing global variable: radar_verbose_flag */
@@ -79,7 +79,7 @@ void print_vect(float v[], int istart, int istop)
 {
   int i;
   for (i=istart; i<=istop; i++)
-	fprintf(stderr,"v[%d] = %f\n", i, v[i]);
+	RSL_printf("v[%d] = %f\n", i, v[i]);
 }
 
 
