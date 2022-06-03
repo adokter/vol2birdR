@@ -565,7 +565,7 @@ int INSERT_SWEEP(Sweep *s)
     new_list = (Sweep_list *) calloc(100*RSL_nextents, sizeof(Sweep_list));
     if (new_list == NULL) {
       perror("INSERT_SWEEP");
-      exit(2);
+      return -1;
     }
     /* Copy the old list to the new one. */
     for (i=0; i<RSL_max_sweeps; i++) new_list[i] = RSL_sweep_list[i];
@@ -605,7 +605,10 @@ Sweep *RSL_new_sweep(int max_rays)
   Sweep *s;
   s = (Sweep  *)calloc(1, sizeof(Sweep));
   if (s == NULL) perror("RSL_new_sweep");
-  INSERT_SWEEP(s);
+  if (s != NULL && INSERT_SWEEP(s) == -1) {
+    free(s);
+    return NULL;
+  }
   s->ray = (Ray **) calloc(max_rays, sizeof(Ray*));
   if (s->ray == NULL) perror("RSL_new_sweep, Ray*");
   s->h.nrays = max_rays; /* A default setting. */
@@ -1056,6 +1059,9 @@ Hash_table *hash_table_for_sweep(Sweep *s)
                 * result of pointer assignments.
                 */
     i = INSERT_SWEEP(s);
+    if (i < 0) {
+      return NULL;
+    }
   }
 
   if (RSL_sweep_list[i].hash == NULL) { /* First time.  Construct the table. */
