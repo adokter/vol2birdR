@@ -767,7 +767,6 @@ public:
 //' Provides methods for processing polar volumes/scans. Typical usage can be
 //' processor<-Vol2Bird$new()
 //' processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
-//' @keywords internal
 class Vol2Bird {
 private:
   bool _verbose = false;

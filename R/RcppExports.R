@@ -32,7 +32,6 @@ NULL
 #' Provides methods for processing polar volumes/scans. Typical usage can be
 #' processor<-Vol2Bird$new()
 #' processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
-#' @keywords internal
 NULL
 
 #' @name Rcpp_PolarVolume-class
