@@ -10,7 +10,7 @@ extern "C" {
 using namespace Rcpp;
 #include "vol2birdR_types.h"
 
-//' @name PolarVolume
+//' @name PolarVolume-class
 //' @title PolarVolume
 //' @description The polar volume object as defined by RAVE.
 //' @keywords internal
@@ -42,7 +42,7 @@ public:
 };
 //RCPP_EXPOSED_CLASS(PolarVolume)
 
-//' @name RaveIO
+//' @name RaveIO-class
 //' @title RaveIO routines
 //' @description Provides I/O routines using the rave framework
 //' @keywords internal
@@ -83,16 +83,18 @@ public:
   }
 };
 
-//' @name Vol2BirdConfig$new
-//' @title Constructs a new Vol2BirdConfig object
-//' @keywords internal
-//' @examples
-//'   a<-Vol2BirdConfig$new()
-
-//' @name Vol2BirdConfig
+//' @name Vol2BirdConfig-class
 //' @title Vol2Bird configuration
 //' @description The vol2bird configuration used during processing
+//' @examples
+//' # create a configuration object:
+//' config<-Vol2BirdConfig$new()
+//' # copy configuration object using clone method:
+//' extraconfig<-config$clone()
+//' # copy configuration object using copy constructor:
+//' otherconfig<-Vol2BirdConfig$new(config)
 //' @keywords internal
+//' @seealso [vol2bird_config()]
 class Vol2BirdConfig {
 private:
   vol2bird_t _alldata;
@@ -761,12 +763,16 @@ public:
   }
 };
 
-//' @name Vol2Bird
-//' @title Vol2Bird
+
+//' @name Vol2Bird-class
+//' @title Vol2Bird processor class
 //' @description The vol2bird processing class.
-//' Provides methods for processing polar volumes/scans. Typical usage can be
+//' Provides methods for processing polar volumes/scans.
+//' @examples
 //' processor<-Vol2Bird$new()
 //' processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
+//' @keywords internal
+//' @seealso [vol2bird()]
 class Vol2Bird {
 private:
   bool _verbose = false;
@@ -937,9 +943,10 @@ public:
   }
 };
 
+//' @rdname PolarVolume-class
 //' @name Rcpp_PolarVolume-class
 //' @title Rcpp_PolarVolume-class
-//' @description The PolarVolume class
+//' @description The Rcpp PolarVolume class
 //' A polar volume
 RCPP_EXPOSED_CLASS_NODECL(PolarVolume)
 RCPP_MODULE(PolarVolume) {
@@ -949,9 +956,10 @@ RCPP_MODULE(PolarVolume) {
 }
 //RCPP_EXPOSED_AS(PolarVolume)
 
+//' @rdname RaveIO-class
 //' @name Rcpp_RaveIO-class
 //' @title Rcpp_RaveIO-class
-//' @description The RaveIO class
+//' @description The Rcpp RaveIO class
 //' Used when loading and saving objects
 RCPP_EXPOSED_CLASS_NODECL(RaveIO)
 RCPP_MODULE(RaveIO) {
@@ -963,9 +971,10 @@ RCPP_MODULE(RaveIO) {
 }
 //RCPP_EXPOSED_AS(RaveIO)
 
+//' @rdname Vol2BirdConfig-class
 //' @name Rcpp_Vol2BirdConfig-class
 //' @title Rcpp_Vol2BirdConfig-class
-//' @description The vol2bird configuration class.
+//' @description The Rcpp vol2bird configuration class.
 //' Configuration instance used when processing data.
 RCPP_EXPOSED_CLASS_NODECL(Vol2BirdConfig)
 RCPP_MODULE(Vol2BirdConfig) {
@@ -1041,11 +1050,10 @@ RCPP_MODULE(Vol2BirdConfig) {
 }
 //RCPP_EXPOSED_AS(Vol2BirdConfig)
 
+//' @rdname Vol2Bird-class
 //' @name Rcpp_Vol2Bird-class
 //' @title Rcpp_Vol2Bird-class
-//' @description The vol2bird processing class.
-//' Provides methods for processing polar volumes/scans. Typical usage can be
-//'
+//' @description The Rcpp vol2bird processing class.
 RCPP_EXPOSED_CLASS_NODECL(Vol2Bird)
 RCPP_MODULE(Vol2Bird) {
   class_<Vol2Bird>("Vol2Bird")

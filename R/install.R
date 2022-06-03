@@ -2,7 +2,7 @@
 #' @keywords internal
 branch <- "main"
 
-#' Contains a list of mistnet libraries for the various OS:s
+#' Contains a list of mistnet libraries for the various OS's
 #' @keywords internal
 install_config <- list(
   "1.10.2" = list(
@@ -211,7 +211,7 @@ mistnet_install_libs <- function(version, type, install_path, install_config) {
   invisible(install_path)
 }
 
-#' Returns the install type
+#' Returns the Torch install type
 #' @keywords internal
 install_type <- function(version) {
   return("cpu")

@@ -4,7 +4,7 @@
 \alias{vol2bird}
 \title{Calculate a vertical profile (\code{vp}) from a polar volume (\code{pvol}) file}
 \usage{
-vol2bird(file, vpfile = "", pvolfile_out = "", config)
+vol2bird(file, vpfile = "", pvolfile_out = "", config, verbose = FALSE)
 }
 \arguments{
 \item{file}{Character (vector). Either a path to a single radar polar volume

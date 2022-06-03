@@ -14,6 +14,7 @@
 #' \dontrun{
 #' nexrad_station_file("/path/to/my/station_file")
 #' }
+#' @export
 nexrad_station_file <- function(file){
   if(missing(file)){
     return(cpp_vol2bird_get_wsr88d_site_location())  
