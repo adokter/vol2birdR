@@ -6,9 +6,10 @@
 ^docs$
 ^_pkgdown\.yml$
 ^pkgdown$
+^mistnet$
 pkgdown/
 .gitignore
-.github
+^.github.*
 ^codemeta\.json$
 cran-comments.md
 ^\.github$
