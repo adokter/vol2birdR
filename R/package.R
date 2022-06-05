@@ -1,7 +1,3 @@
-#' @useDynLib mistnet
-#' @importFrom Rcpp sourceCpp
-NULL
-
 globalVariables(c("..", "self", "private", "N"))
 
 .generator_null <- NULL
@@ -31,11 +27,4 @@ globalVariables(c("..", "self", "private", "N"))
 
 .onUnload <- function(libpath) {
 
-}
-
-#' Bullets
-release_bullets <- function() {
-  c(
-    "FIXME Needs to be written"
-  )
 }

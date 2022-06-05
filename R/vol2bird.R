@@ -23,10 +23,12 @@
 #'   RSL formats to ODIM, and for adding MistNet segmentation output.
 #' @param config optional configuration object of class `Rcpp_Vol2BirdConfig`,
 #' typically output from \link{vol2bird_config}
+#' @param verbose logical. When TRUE print profile output to console.
 #' 
 #' @seealso
 #' * [vol2bird_config()]
-vol2bird <- function(file, vpfile="", pvolfile_out="", config){
+#' @export
+vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
   for (filename in file) {
     assert_that(file.exists(filename))
   }
@@ -36,8 +38,20 @@ vol2bird <- function(file, vpfile="", pvolfile_out="", config){
   if(missing(config)){
     config <- Vol2BirdConfig$new()
   }
+  assert_that(is.flag(verbose))
+  
+  if(config$useMistNet){
+    assert_that(mistnet_exists(),msg="mistnet installation not found, install with `install_mistnet()`")
+  }
+  
   assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))
   
+  # make a copy of the configuration object
+  # necessary to accommodate parallel processes, since the processor might change the
+  # configuration object based on the input file characteristics
+  config_copy <- vol2bird_config(config)
+  
   processor<-Vol2Bird$new()
-  processor$process(path.expand(file), config, vpfile, pvolfile_out)
+  processor$verbose <- verbose
+  processor$process(path.expand(file), config_copy, vpfile, pvolfile_out)
 }

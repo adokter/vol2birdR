@@ -2,15 +2,36 @@
 % Please edit documentation in R/vol2bird_config.R
 \name{vol2bird_config}
 \alias{vol2bird_config}
-\title{Create a vol2bird configuration object}
+\title{Create a vol2bird configuration instance}
 \usage{
-vol2bird_config()
+vol2bird_config(config)
+}
+\arguments{
+\item{config}{a configuration object to be copied.}
 }
 \value{
-an object of class \code{Vol2BirdConfig}
+an object of class \code{Rcpp_Vol2BirdConfig}
 }
 \description{
-Creates a vol2bird configuration object of class \code{Vol2BirdConfig}
+Creates a vol2bird configuration instance of class \code{Rcpp_Vol2BirdConfig}
+}
+\details{
+All processing options for \code{\link[=vol2bird]{vol2bird()}} are set using a configuration instance of class \code{Rcpp_Vol2BirdConfig}
+In some cases it might be necessary to copy and modify configuration instance, for example
+when processing polar volume files with different settings.
+In these cases you can't copy the instance like:
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{config<-vol2bird_config()
+extra_config<-config
+}\if{html}{\out{</div>}}
+
+In the above example, the \code{config} and \code{extra_config} instances will both refer to the same object.
+(copy by reference). To avoid this (and make a copy by value), use:
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{config<-vol2bird_config()
+# create a copy identical to object config:
+extra_config<-vol2bird_config(config)
+}\if{html}{\out{</div>}}
 }
 \examples{
 # create a configuration object
@@ -19,6 +40,8 @@ config <- vol2bird_config()
 config
 # change the maximum range included in the profile generation to 40 km:
 config$rangeMax <- 40000
+# make a copy of the configuration object:
+config_copy <- vol2bird_config(config)
 }
 \seealso{
 \itemize{
