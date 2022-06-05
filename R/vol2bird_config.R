@@ -22,6 +22,7 @@
 
 vol2bird_config <- function(){
   output=Vol2BirdConfig$new()
+  output$mistNetPath <- file.path(find.package("vol2birdR"), "data", "mistnet_nexrad.pt")
   output
 }
 
