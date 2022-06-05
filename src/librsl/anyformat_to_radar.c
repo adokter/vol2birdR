@@ -69,7 +69,7 @@ enum File_type RSL_filetype(char *infile)
   if (fread(magic, sizeof(magic), 1, fp) != 1) {
 	char *magic_str = (char *)calloc(sizeof(magic)+1, sizeof(char));
 	memcpy(magic_str, magic, sizeof(magic));
-	fprintf(stderr,"Error fread: Magic is %s\n", magic_str);
+	RSL_printf("Error fread: Magic is %s\n", magic_str);
 	free (magic_str);
 	perror("RSL_filetype");
         /* Thanks to Thiago Biscaro for fixing defunct process problem. */
@@ -163,7 +163,7 @@ Radar *RSL_anyformat_to_radar(char *infile, ...)
   case  DORADE_FILE: radar = RSL_dorade_to_radar(infile); break;
 #endif
   default:
-	fprintf(stderr, "Unknown input file type.  File <%s> is not recognized by RSL.\n", infile);
+  RSL_printf("Unknown input file type.  File <%s> is not recognized by RSL.\n", infile);
 	return NULL;
   }
   

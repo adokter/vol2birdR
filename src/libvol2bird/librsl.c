@@ -113,21 +113,21 @@ PolarScanParam_t* PolarScanParam_RSL2Rave(Radar *radar, float elev, int RSL_INDE
     char *name;
 
     if(radar == NULL) {
-        fprintf(stderr, "Warning: RSL radar object is empty...\n");
+        vol2bird_err_printf("Warning: RSL radar object is empty...\n");
         return param;
     }
     
     rslVolume = radar->v[RSL_INDEX];
 
     if(rslVolume == NULL) {
-        fprintf(stderr, "Warning: RSL volume %i not found by PolarScanParam_RSL2Rave...\n",RSL_INDEX);
+        vol2bird_err_printf("Warning: RSL volume %i not found by PolarScanParam_RSL2Rave...\n",RSL_INDEX);
         return param;
     }
 
     rslSweep = RSL_get_sweep(rslVolume, elev);
 
     if(rslSweep == NULL) {
-        fprintf(stderr, "Warning: RSL sweep of volume %i not found by PolarScanParam_RSL2Rave...\n",RSL_INDEX);
+        vol2bird_err_printf("Warning: RSL sweep of volume %i not found by PolarScanParam_RSL2Rave...\n",RSL_INDEX);
         return param;
     }
 
@@ -135,12 +135,12 @@ PolarScanParam_t* PolarScanParam_RSL2Rave(Radar *radar, float elev, int RSL_INDE
     
 
     if(rslRay == NULL) {
-        fprintf(stderr, "Warning: RSL first ray of volume %i not found by PolarScanParam_RSL2Rave...\n",RSL_INDEX);
+        vol2bird_err_printf("Warning: RSL first ray of volume %i not found by PolarScanParam_RSL2Rave...\n",RSL_INDEX);
         return param;
     }
     
     if(ABS(rslSweep->h.elev-elev)>ELEVTOL){
-        fprintf(stderr,"Warning: elevation angle mistmatch in PolarScanParam_RSL2Rave (requested %f, found %f)...\n",elev,rslSweep->h.elev);
+        vol2bird_err_printf("Warning: elevation angle mistmatch in PolarScanParam_RSL2Rave (requested %f, found %f)...\n",elev,rslSweep->h.elev);
         return param;
     }
     
@@ -196,7 +196,7 @@ PolarScanParam_t* PolarScanParam_RSL2Rave(Radar *radar, float elev, int RSL_INDE
             gain = 1;
             break;
         default :
-            fprintf(stderr, "Something went wrong; RSL scan parameter not implemented in PolarScanParam_RSL2Rave\n");
+            vol2bird_err_printf("Something went wrong; RSL scan parameter not implemented in PolarScanParam_RSL2Rave\n");
             return param;
 
     }
@@ -215,7 +215,7 @@ PolarScanParam_t* PolarScanParam_RSL2Rave(Radar *radar, float elev, int RSL_INDE
     // i.e. either 1, 0.5, 0.25 degrees etc.
     nrays = MAX(360,360*ROUND((float) rslSweep->h.nrays/360.0));
     if (nrays != rslSweep->h.nrays){
-        fprintf(stderr, "Warning: resampling %s sweep at elevation %f (%i rays into %i azimuth-bins) ...\n",name,elev,rslSweep->h.nrays,nrays);
+        vol2bird_err_printf("Warning: resampling %s sweep at elevation %f (%i rays into %i azimuth-bins) ...\n",name,elev,rslSweep->h.nrays,nrays);
     }
 
     param = RAVE_OBJECT_NEW(&PolarScanParam_TYPE);
@@ -252,7 +252,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     double rscale;
     
     if(radar == NULL) {
-        fprintf(stderr, "Error: RSL radar object is empty...\n");
+        vol2bird_err_printf("Error: RSL radar object is empty...\n");
         return scan;
     }
     
@@ -266,12 +266,12 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     }
     
     if(rslVol == NULL) {
-        fprintf(stderr, "Error: RSL radar object is empty...\n");
+        vol2bird_err_printf("Error: RSL radar object is empty...\n");
         return scan;
     }
 
     if(iScan>rslVol->h.nsweeps-1) {
-        fprintf(stderr, "Error: iScan larger than # sweeps...\n");
+        vol2bird_err_printf("Error: iScan larger than # sweeps...\n");
         return scan;
     }
 
@@ -298,7 +298,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     
     RaveAttribute_t* attr_NI = RaveAttributeHelp_createDouble("how/NI", (double) nyq_vel);
     if (attr_NI == NULL || nyq_vel == 0){
-        fprintf(stderr, "warning: no valid Nyquist velocity found in RSL polar volume\n");
+        vol2bird_err_printf("warning: no valid Nyquist velocity found in RSL polar volume\n");
     }
     else{    
         PolarScan_addAttribute(scan, attr_NI);
@@ -318,7 +318,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
         
         param = PolarScanParam_RSL2Rave(radar, elev, iParam, rangeMax, &scale);
         if(param == NULL){
-            fprintf(stderr, "PolarScanParam_RSL2Rave returned empty object for parameter %i\n",iParam); 
+            vol2bird_err_printf("PolarScanParam_RSL2Rave returned empty object for parameter %i\n",iParam);
             goto done;
         }
         
@@ -327,7 +327,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
         result = PolarScan_addParameter(scan, param);
         
         if(result == 0){
-            fprintf(stderr, "Warning: dimensions of scan parameter %i at elev %f do not match scan dimensions, resampling ...\n",iParam, elev);
+            vol2bird_err_printf("Warning: dimensions of scan parameter %i at elev %f do not match scan dimensions, resampling ...\n",iParam, elev);
             
             PolarScanParam_t *param_proj;
             // project the scan parameter on the grid of the scan
@@ -336,7 +336,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
             result = PolarScan_addParameter(scan, param_proj);
             
             if(result == 0){
-                fprintf(stderr, "PolarScan_RSL2Rave failed to add parameter %i to RAVE polar scan\n",iParam); 
+                vol2bird_err_printf("PolarScan_RSL2Rave failed to add parameter %i to RAVE polar scan\n",iParam);
                 RAVE_OBJECT_RELEASE(param_proj);
             }
  
@@ -356,13 +356,13 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     PolarVolume_t* volume = NULL;
     
     if(radar == NULL) {
-        fprintf(stderr, "Error: RSL radar object is empty...\n");
+        vol2bird_err_printf("Error: RSL radar object is empty...\n");
         return volume;
     }
 
     // sort the scans (sweeps) and rays
     if(RSL_sort_radar(radar) == NULL) {
-        fprintf(stderr, "Error: failed to sort RSL radar object...\n");
+        vol2bird_err_printf("Error: failed to sort RSL radar object...\n");
         goto done;
     }
     
@@ -398,7 +398,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     // retrieve the first ray, for extracting some metadata
     rslRay = RSL_get_first_ray_of_volume(rslVol);
     if (rslRay == NULL){
-        fprintf(stderr, "Error: RSL radar object contains no rays...\n");
+        vol2bird_err_printf("Error: RSL radar object contains no rays...\n");
         goto done;
     }
         
@@ -419,7 +419,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     sprintf(pvtime, "%02i%02i%02i",radar->h.hour,radar->h.minute,ROUND(radar->h.sec));
     sprintf(pvdate, "%04i%02i%02i",radar->h.year,radar->h.month,radar->h.day);
     sprintf(pvsource, "RAD:%s,PLC:%s,state:%s,radar_name:%s",radar->h.name,radar->h.city,radar->h.state,radar->h.radar_name);
-    fprintf(stderr,"Reading RSL polar volume with nominal time %s-%s, source: %s\n",pvdate,pvtime,pvsource);    
+    vol2bird_err_printf("Reading RSL polar volume with nominal time %s-%s, source: %s\n",pvdate,pvtime,pvsource);
     PolarVolume_setTime(volume,pvtime);
     PolarVolume_setDate(volume,pvdate);
     PolarVolume_setSource(volume,pvsource);
@@ -431,7 +431,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     int vcp = radar->h.vcp;
     RaveAttribute_t* attr_vcp = RaveAttributeHelp_createLong("how/vcp", (long) vcp);
     if (attr_vcp == NULL){
-        fprintf(stderr, "warning: no valid VCP value found in RSL polar volume\n");
+        vol2bird_err_printf("warning: no valid VCP value found in RSL polar volume\n");
     }
     else{    
         PolarVolume_addAttribute(volume, attr_vcp);
@@ -441,7 +441,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     float wavelength = rslRay->h.wavelength*100;
     RaveAttribute_t* attr_wavelength = RaveAttributeHelp_createDouble("how/wavelength", (double) wavelength);
     if (attr_wavelength == NULL && wavelength > 0){
-        fprintf(stderr, "warning: no valid wavelength found in RSL polar volume\n");
+        vol2bird_err_printf("warning: no valid wavelength found in RSL polar volume\n");
     }
     else{    
         PolarVolume_addAttribute(volume, attr_wavelength);
@@ -454,7 +454,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
         // Add the scan to the volume
         result = PolarVolume_addScan(volume,scan);
         if(result == 0){
-           fprintf(stderr, "PolarVolume_RSL2Rave failed to add RSL scan %i to RAVE polar volume\n",iScan); 
+           vol2bird_err_printf("PolarVolume_RSL2Rave failed to add RSL scan %i to RAVE polar volume\n",iScan);
         }
     }
    
@@ -479,11 +479,11 @@ PolarVolume_t* PolarVolume_vol2bird_RSL2Rave(Radar* radar, float rangeMax){
     
     // several checks that the volumes contain data
     if (rslVolZ == NULL){
-        fprintf(stderr, "Error: RSL radar object contains no reflectivity volume...\n");
+        vol2bird_err_printf("Error: RSL radar object contains no reflectivity volume...\n");
         goto done;
     }
     else if (rslVolV == NULL){
-        fprintf(stderr, "Error: RSL radar object contains no radial velocity volume...\n");
+        vol2bird_err_printf("Error: RSL radar object contains no radial velocity volume...\n");
         goto done;
     }
     
@@ -519,7 +519,7 @@ PolarVolume_t* vol2birdGetRSLVolume(char* filename, float rangeMax, int small) {
     radar = RSL_anyformat_to_radar(filename,callid);
 
     if (radar == NULL) {
-        fprintf(stderr, "critical error, cannot open file %s\n", filename);
+        vol2bird_err_printf("critical error, cannot open file %s\n", filename);
         return NULL;
     }
     

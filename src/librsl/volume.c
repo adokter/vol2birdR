@@ -1714,7 +1714,7 @@ void RSL_set_printfun(RSL_printfun fun)
 /*********************************************************************/
 void RSL_default_printfun(const char* msg)
 {
-#ifdef RSL_NO_STDERR_PRINTF
+#ifndef RSL_NO_STDERR_PRINTF
   fprintf(stderr, "%s", msg);
 #endif
 }

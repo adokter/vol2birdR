@@ -198,10 +198,10 @@ Hash_table *construct_sweep_hash_table(Sweep *s)
   hash_table = (Hash_table *) calloc(1, sizeof(Hash_table));
   hash_table->nindexes = s->h.nrays;
   if (hash_table->nindexes < 0) {
-	fprintf(stderr, "Unable to construct sweep hash table because nrays = %d\n", s->h.nrays);
-	fprintf(stderr, "FATAL error... unable to continue.\n");
-	//exit(-1);
-	return NULL;
+    RSL_printf("Unable to construct sweep hash table because nrays = %d\n", s->h.nrays);
+    RSL_printf("FATAL error... unable to continue.\n");
+    //exit(-1);
+    return NULL;
   }
 
   res = 360.0 / hash_table->nindexes;
@@ -227,9 +227,9 @@ Hash_table *construct_sweep_hash_table(Sweep *s)
 	/*	fprintf(stderr,"ray# %d, azim %f, iazim %d\n", ray->h.ray_num, ray->h.azimuth, iazim); */
 	if (iazim > hash_table->nindexes || iazim < 0) {
 	  if (radar_verbose_flag){
-		fprintf(stderr,"ERROR: ");
-		fprintf(stderr,"ray# %d, azim %f, iazim %d, nrays %d, nindexes %d\n", ray->h.ray_num, ray->h.azimuth, iazim, s->h.nrays, hash_table->nindexes);
-   }
+	    RSL_printf("ERROR: ");
+	    RSL_printf("ray# %d, azim %f, iazim %d, nrays %d, nindexes %d\n", ray->h.ray_num, ray->h.azimuth, iazim, s->h.nrays, hash_table->nindexes);
+	  }
 	} else
       hash_table->indexes[iazim] = hash_add_node(hash_table->indexes[iazim], ray);
 

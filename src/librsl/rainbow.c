@@ -231,10 +231,10 @@ static int read_hdr_line(char *buf, int maxchars, FILE *fp)
     }
 
     if (badline) {
-	fprintf(stderr,"A header line exceeded buffer size %d.\n",maxchars);
-	fprintf(stderr,"Did not find end-of-line character 0x%02x.\n",CR);
-	buf[maxchars - 1] = '\0';  /* Make it a legal string anyway. */
-	return -1;
+      RSL_printf("A header line exceeded buffer size %d.\n",maxchars);
+      RSL_printf("Did not find end-of-line character 0x%02x.\n",CR);
+      buf[maxchars - 1] = '\0';  /* Make it a legal string anyway. */
+      return -1;
     }
 
     buf[i] = '\0';

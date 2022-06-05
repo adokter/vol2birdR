@@ -97,7 +97,7 @@ Radar *RSL_rainbow_to_radar(char *infile)
     /* Read first character and verify file format. */
 
     if ((c = fgetc(fp)) != SOH) {
-	fprintf(stderr,"%s is not a valid Rainbow format file.\n",infile);
+      RSL_printf("%s is not a valid Rainbow format file.\n",infile);
   	return NULL;
     }
 
@@ -106,27 +106,21 @@ Radar *RSL_rainbow_to_radar(char *infile)
     read_rainbow_header(&rainbow_hdr, fp);
 
     if (rainbow_hdr.filetype != SCAN_DATA ) {
-	fprintf(stderr,"ERROR: File is not a scan data file.\n");
-	fprintf(stderr,"File type number (header label H3) is %d\n",
-		rainbow_hdr.filetype);
-	fprintf(stderr,"See Rainbow File Format Document for details on "
-		"header labels.\n");
-	return NULL;
+      RSL_printf("ERROR: File is not a scan data file.\n");
+      RSL_printf("File type number (header label H3) is %d\n", rainbow_hdr.filetype);
+      RSL_printf("See Rainbow File Format Document for details on header labels.\n");
+      return NULL;
     }
     if (rainbow_hdr.product != VOLUME_SCAN) {
-	fprintf(stderr,"WARNING: Product is not volume scan as expected.\n");
-	fprintf(stderr,"Header label N is %d, expected %d\n",
-		rainbow_hdr.product, VOLUME_SCAN);
-	fprintf(stderr,"See Rainbow File Format Document for details on "
-		"header labels.\n");
+      RSL_printf("WARNING: Product is not volume scan as expected.\n");
+      RSL_printf("Header label N is %d, expected %d\n",	rainbow_hdr.product, VOLUME_SCAN);
+      RSL_printf("See Rainbow File Format Document for details on header labels.\n");
     }
     if (rainbow_hdr.compressed) {
-	fprintf(stderr,"RSL_rainbow_to_radar: Label F3 indicates data "
-		"compression.\n");
-	fprintf(stderr,"This routine can not handle compressed data.\n");
-	fprintf(stderr,"See Rainbow File Format Document for details on "
-		"header labels.\n");
-	return NULL;
+      RSL_printf("RSL_rainbow_to_radar: Label F3 indicates data compression.\n");
+      RSL_printf("This routine can not handle compressed data.\n");
+      RSL_printf("See Rainbow File Format Document for details on header labels.\n");
+      return NULL;
     }
 
     /* Make radar structure and assign header information.  */
@@ -215,12 +209,10 @@ int rainbow_data_to_radar(Radar *radar, Rainbow_hdr rainbow_hdr, FILE *fp)
      * types has been implemented.  Currently only handles reflectivity (DZ).
      */
     if (vol_index != DZ_INDEX) {
-	fprintf(stderr, "RSL_rainbow_to_radar: currently only handles "
-		"field type DZ\n");
-	fprintf(stderr,"Rainbow data type value (label F9) is %d\n",
-		rainbow_hdr.datatype);
-	fprintf(stderr,"Corresponding vol_INDEX number is %d\n", vol_index);
-	return 0;
+      RSL_printf("RSL_rainbow_to_radar: currently only handles field type DZ\n");
+      RSL_printf("Rainbow data type value (label F9) is %d\n", rainbow_hdr.datatype);
+      RSL_printf("Corresponding vol_INDEX number is %d\n", vol_index);
+      return 0;
     }
 
     nsweeps = rainbow_hdr.nsweeps;
@@ -228,11 +220,9 @@ int rainbow_data_to_radar(Radar *radar, Rainbow_hdr rainbow_hdr, FILE *fp)
 	rainbow_hdr.az_step + .5;
     nbins = rainbow_hdr.nbins;
     if (nrays != 360) {
-	fprintf(stderr,"WARNING: number of rays computed is not the number "
-		"expected.\n");
-	fprintf(stderr,"Computed = nrays: azstart = %d, az_stop = %d, "
-		"az_step = %f\n");
-	fprintf(stderr,"Expected 360\n");
+      RSL_printf("WARNING: number of rays computed is not the number expected.\n");
+      RSL_printf("Computed = nrays: azstart = %d, az_stop = %d, az_step = %f\n");
+      RSL_printf("Expected 360\n");
     }
     radar->v[vol_index] = RSL_new_volume(nsweeps);
     v = radar->v[vol_index];
@@ -256,11 +246,9 @@ int rainbow_data_to_radar(Radar *radar, Rainbow_hdr rainbow_hdr, FILE *fp)
 	for (iray = 0; iray < nrays; iray++) {
 	    nread = fread(rainbow_ray, 1, nbins, fp);
 	    if (nread != nbins) {
-		fprintf(stderr, "ERROR: Could not read enough bytes to fill "
-			"ray.\n");
-		fprintf(stderr, "Sweep = %d, ray = %d, number read = %d\n",
-			isweep, iray, nread);
-		return 0;
+	      RSL_printf("ERROR: Could not read enough bytes to fill ray.\n");
+	      RSL_printf("Sweep = %d, ray = %d, number read = %d\n", isweep, iray, nread);
+	      return 0;
 	    }
 	    ray = RSL_new_ray(nbins);
 

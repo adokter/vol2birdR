@@ -113,8 +113,8 @@ static void put_start_time_in_radar_header(Radar *radar)
   }
   /* This shouldn't happen. */
   if (i >= MAX_RADAR_VOLUMES) {
-      fprintf(stderr,"put_start_time_in_radar_header: No radar volumes contain "
-              "sweep at index 0.\n");
+    RSL_printf("put_start_time_in_radar_header: No radar volumes contain "
+        "sweep at index 0.\n");
       return;
   }
 
@@ -266,9 +266,9 @@ int uf_into_radar(UF_buffer uf, Radar **the_radar)
     if (uf_ma[34] == 1) radar->h.scan_mode = PPI;
     else if (uf_ma[34] == 3) radar->h.scan_mode = RHI;
     else {
-      fprintf(stderr,"Warning: UF sweep mode = %d\n", uf_ma[34]);
-      fprintf(stderr,"    Expected 1 or 3 (PPI or RHI)\n");
-      fprintf(stderr,"    Setting radar->h.scan_mode to PPI\n");
+      RSL_printf("Warning: UF sweep mode = %d\n", uf_ma[34]);
+      RSL_printf("    Expected 1 or 3 (PPI or RHI)\n");
+      RSL_printf("    Setting radar->h.scan_mode to PPI\n");
       radar->h.scan_mode = PPI;
     }
     need_scan_mode = 0;
@@ -292,7 +292,7 @@ int uf_into_radar(UF_buffer uf, Radar **the_radar)
       }
     }
     if (ifield < 0) { /* DON'T know how to handle this yet. */
-      fprintf(stderr, "Unknown field type %c%c\n", (char)field_type[0],
+      RSL_printf("Unknown field type %c%c\n", (char)field_type[0],
               (char)field_type[1]);
       continue;
     }
@@ -308,7 +308,7 @@ int uf_into_radar(UF_buffer uf, Radar **the_radar)
                                                   * Copy all previous sweeps.
                                                   */
       if (radar_verbose_flag)
-        fprintf(stderr,"Exceeded sweep allocation of %d. Adding 20 more.\n", isweep);
+        RSL_printf("Exceeded sweep allocation of %d. Adding 20 more.\n", isweep);
       new_volume = RSL_new_volume(radar->v[ifield]->h.nsweeps+20);
       new_volume = copy_sweeps_into_volume(new_volume, radar->v[ifield]);
       radar->v[ifield] = new_volume;
@@ -316,7 +316,7 @@ int uf_into_radar(UF_buffer uf, Radar **the_radar)
 
     if (radar->v[ifield]->sweep[isweep] == NULL) {
       if (radar_verbose_flag)
-        fprintf(stderr,"Allocating new sweep for field %d, isweep %d\n", ifield, isweep);
+        RSL_printf("Allocating new sweep for field %d, isweep %d\n", ifield, isweep);
       radar->v[ifield]->sweep[isweep] = RSL_new_sweep(1000);
       radar->v[ifield]->sweep[isweep]->h.nrays = 0; /* Increment this for each
                                                      * ray encountered.
@@ -573,15 +573,15 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
   
   switch (uf_type) {
   case FOUR_BYTE_UF:
-    if (radar_verbose_flag) fprintf(stderr,"UF file with 4 byte FORTRAN record delimeters.\n");
+    if (radar_verbose_flag) RSL_printf("UF file with 4 byte FORTRAN record delimeters.\n");
     /* Handle first record specially, since we needed magic information. */
     nbytes = magic.word;
     if (little_endian()) swap_4_bytes(&nbytes);
     if (nbytes > sizeof(UF_buffer)) {
-        fprintf(stderr,"\nRSL_uf_to_radar_fp: Record size (%d bytes) exceeds "
+      RSL_printf("\nRSL_uf_to_radar_fp: Record size (%d bytes) exceeds "
                 "UF_buffer (%d bytes).\n", nbytes,sizeof(UF_buffer));
-        fprintf(stderr,"Increase size of UF_buffer in uf_to_radar.c\n");
-        return NULL;
+      RSL_printf("Increase size of UF_buffer in uf_to_radar.c\n");
+      return NULL;
     }
     memcpy(uf, &magic.buf[4], 2);
     (void)!fread(&uf[1], sizeof(char), nbytes-2, fp);
@@ -602,15 +602,15 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
     break;
 
   case TWO_BYTE_UF:
-    if (radar_verbose_flag) fprintf(stderr,"UF file with 2 byte FORTRAN record delimeters.\n");
+    if (radar_verbose_flag) RSL_printf("UF file with 2 byte FORTRAN record delimeters.\n");
     /* Handle first record specially, since we needed magic information. */
     sbytes = magic.sword;
     if (little_endian()) swap_2_bytes(&sbytes);
     if (sbytes > sizeof(UF_buffer)) {
-        fprintf(stderr,"\nRSL_uf_to_radar_fp: Record size (%d bytes) exceeds "
+      RSL_printf("\nRSL_uf_to_radar_fp: Record size (%d bytes) exceeds "
                 "UF_buffer (%d bytes).\n", sbytes,sizeof(UF_buffer));
-        fprintf(stderr,"Increase size of UF_buffer in uf_to_radar.c\n");
-        return NULL;
+      RSL_printf("Increase size of UF_buffer in uf_to_radar.c\n");
+      return NULL;
     }
     memcpy(uf, &magic.buf[2], 4);
     (void)!fread(&uf[2], sizeof(char), sbytes-4, fp);
@@ -631,15 +631,15 @@ Radar *RSL_uf_to_radar_fp(FILE *fp)
     break;
 
   case TRUE_UF:
-    if (radar_verbose_flag) fprintf(stderr,"UF file with no FORTRAN record delimeters.  Good.\n");
+    if (radar_verbose_flag) RSL_printf("UF file with no FORTRAN record delimeters.  Good.\n");
     /* Handle first record specially, since we needed magic information. */
     memcpy(&sbytes, &magic.buf[2], 2); /* Record length is in word #2. */
     if (little_endian()) swap_2_bytes(&sbytes); /* # of 2 byte words. */
     if (sbytes > sizeof(UF_buffer)) {
-        fprintf(stderr,"\nRSL_uf_to_radar_fp: Record size (%d bytes) exceeds "
+      RSL_printf("\nRSL_uf_to_radar_fp: Record size (%d bytes) exceeds "
                 "UF_buffer (%d bytes).\n", sbytes,sizeof(UF_buffer));
-        fprintf(stderr,"Increase size of UF_buffer in uf_to_radar.c\n");
-        return NULL;
+      RSL_printf("Increase size of UF_buffer in uf_to_radar.c\n");
+      return NULL;
     }
     memcpy(uf, &magic.buf[0], 6);
     (void)!fread(&uf[3], sizeof(short), sbytes-3, fp);

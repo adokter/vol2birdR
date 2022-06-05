@@ -192,12 +192,16 @@ void vol2bird_err_printf(const char* fmt, ...)
 
 void vol2bird_default_print(const char* msg)
 {
+#ifndef NO_VOL2BIRD_PRINTF
   fprintf(stdout, "%s", msg);
+#endif
 }
 
 void vol2bird_default_err_print(const char* msg)
 {
+#ifndef NO_VOL2BIRD_PRINTF
   fprintf(stderr, "%s", msg);
+#endif
 }
 
 void vol2bird_set_printf(vol2bird_printfun fun)
