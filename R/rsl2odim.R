@@ -1,9 +1,4 @@
-#' Calculate a vertical profile (`vp`) from a polar volume (`pvol`) file
-#'
-#' Calculates a vertical profile of biological scatterers (`vp`) from a polar
-#' volume (`pvol`) file using the algorithm
-#' [vol2bird](https://github.com/adokter/vol2bird/) (Dokter et al.
-#' 2011 \doi{10.1098/rsif.2010.0116}).
+#' Convert a NEXRAD polar volume file to an ODIM polar volume file
 #'
 #' @param file Character (vector). Either a path to a single radar polar volume
 #'   (`pvol`) file containing multiple scans/sweeps, or multiple paths to scan
@@ -14,8 +9,6 @@
 #'   supported by the [RSL
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
 #'   IRIS (IRIS RAW) format.
-#' @param vpfile Character. File name. When provided, writes a vertical profile
-#'   file (`vpfile`) in the ODIM HDF5 format to disk.
 #' @param pvolfile_out Character. File name. When provided, writes a polar
 #'   volume (`pvol`) file in the ODIM HDF5 format to disk. Useful for converting
 #'   RSL formats to ODIM, and for adding MistNet segmentation output.
@@ -26,7 +19,7 @@
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
-vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
+rsl2odim <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
   for (filename in file) {
     assert_that(file.exists(filename))
   }
@@ -34,7 +27,7 @@ vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
     assert_that(is.writeable(dirname(vpfile)))
   }
   if(missing(config)){
-    config <- Vol2BirdConfig$new()
+    config <- vol2bird_config()
   }
   assert_that(is.flag(verbose))
   
@@ -51,5 +44,5 @@ vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
   
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
-  processor$process(path.expand(file), config_copy, vpfile, path.expand(pvolfile_out))
+  processor$rsl2odim(path.expand(file), config_copy, path.expand(pvolfile_out))
 }
