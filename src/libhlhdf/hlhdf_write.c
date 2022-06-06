@@ -206,7 +206,7 @@ static hid_t createSimpleDataset(hid_t loc_id, hid_t type_id, const char* name,
   }
 
   if (compress != NULL &&
-      (compress->type == CT_SZLIB || (compress->type = CT_ZLIB && (compress->level > 0 || compress->level <= 9)))) {
+      (compress->type == CT_SZLIB || (compress->type = CT_ZLIB && (compress->level > 0 && compress->level <= 9)))) {
     if ((props = H5Pcreate(H5P_DATASET_CREATE)) < 0) {
       HL_ERROR0("Failed to create the compression property");
       goto done;

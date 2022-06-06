@@ -115,7 +115,7 @@ PolarScanParam_t* create_dealiased_parameter(PolarScan_t* scan, const char* quan
   if (attr != NULL) {
     RaveAttribute_getDouble(attr, &NI);
   } else {
-    NI = abs(offset);
+    NI = fabs(offset);
   }
   // number of rows
   m = floor (VAF/NI*VMAX);
@@ -332,7 +332,7 @@ int dealias_scan_by_quantity(PolarScan_t* scan, const char* quantity, double ema
       if (attr != NULL) {
         RaveAttribute_getDouble(attr, &NI);
       } else {
-        NI = abs(offset);
+        NI = fabs(offset);
       }
       // number of rows
       m = floor (VAF/NI*VMAX);

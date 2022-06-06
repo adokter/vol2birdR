@@ -268,12 +268,12 @@ void PolarNavigator_dhToRe(PolarNavigator_t* polnav, double d, double h, double*
 
   R_earth = PolarNavigator_getEarthRadiusOrigin(polnav);
 
-  if (abs(polnav->dndh + 1.0 / R_earth) < 1.0e-9 * (polnav->dndh)) {
+  if (fabs(polnav->dndh + 1.0 / R_earth) < 1.0e-9 * (polnav->dndh)) {
     /* The rays and the earth-surface are modelled as being straight lines.*/
     height = h - polnav->alt0;
     *r = sqrt(height * height + d * d);
 
-    if (abs(d) < 1.0) {
+    if (fabs(d) < 1.0) {
       *e = atan(height / d);
     } else {
       *e = M_PI / 2.0;
@@ -310,7 +310,7 @@ void PolarNavigator_deToRh(PolarNavigator_t* polnav, double d, double e, double*
 
   R_earth = PolarNavigator_getEarthRadiusOrigin(polnav);
 
-  if (abs(1.0 / R_earth + polnav->dndh) < 1.0e-9 * (polnav->dndh)) {
+  if (fabs(1.0 / R_earth + polnav->dndh) < 1.0e-9 * (polnav->dndh)) {
     height = polnav->alt0;
     *r = sqrt(height * height + d * d);
     *h = polnav->alt0 + ((*r) * sin(e));
@@ -335,7 +335,7 @@ void PolarNavigator_reToDh(PolarNavigator_t* polnav, double r, double e, double*
 
   R_earth = PolarNavigator_getEarthRadiusOrigin(polnav);
 
-  if (abs(polnav->dndh + 1.0 / R_earth) < 1.0e-9 * (polnav->dndh)) {
+  if (fabs(polnav->dndh + 1.0 / R_earth) < 1.0e-9 * (polnav->dndh)) {
     /*Straight lines*/
     *h = polnav->alt0 + r * sin(e);
     *d = r * cos(e);
