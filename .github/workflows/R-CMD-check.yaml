@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          # - {os: macOS-latest,   r: 'release'}
+          - {os: macOS-latest,   r: 'release'}
           #- {os: windows-latest, r: 'release'}
           - {os: ubuntu-20.04,   r: 'devel'}
           #- {os: ubuntu-latest,   r: 'release'}
@@ -41,7 +41,7 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v1
 
       - name: Install system dependencies
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         run: |
           pak::local_system_requirements(execute = TRUE)
           pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
