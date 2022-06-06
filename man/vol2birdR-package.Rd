@@ -4,9 +4,11 @@
 \name{vol2birdR-package}
 \alias{vol2birdR}
 \alias{vol2birdR-package}
-\title{vol2birdR: R-Variant of Vol2Bird}
+\title{vol2birdR: Vertical Profiles of Biological Scatterers from Weather Radar Data}
 \description{
-R-variant of the vol2bird software.
+R implementation of the vol2bird software for generating vertical profiles
+    of birds and other biological scatterers from weather radar data. See \doi{10.1098/rsif.2010.0116}
+    for a paper describing the methodology
 }
 \details{
 To get started, see:
@@ -17,5 +19,23 @@ paper describing the profiling algorithmp.
 \item \href{https://adriaandokter.com/vol2bird}{vol2bird C code documentation}:
 an overview of the algorithm structure.
 }
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/adokter/vol2birdR/}
+  \item \url{https://adriaandokter.com/vol2bird/}
+  \item Report bugs at \url{https://github.com/adokter/vol2birdR/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Adriaan M. Dokter \email{amd427@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID})
+
+Authors:
+\itemize{
+  \item Anders Henja \email{anders.henja@gmail.com}
+}
+
 }
 \keyword{internal}
