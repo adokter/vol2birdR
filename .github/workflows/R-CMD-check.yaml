@@ -18,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          #- {os: macOS-latest,   r: 'release'}
+          - {os: macos-10.15,   r: 'release'}
           #- {os: windows-latest, r: 'release'}
           - {os: ubuntu-20.04,   r: 'devel'}
           #- {os: ubuntu-latest,   r: 'release'}
@@ -48,6 +48,11 @@ jobs:
           pak::pkg_system_requirements("proj4", execute = TRUE) # Using same proj for now...
           pak::pkg_system_requirements("hdf5r", execute = TRUE) # Using same hdf5 for now...
         shell: Rscript {0}
+
+      - name: Install macOS system dependencies
+        if: runner.os == 'macOS'
+        run: |
+          env HOMEBREW_NO_AUTO_UPDATE=1 brew install hdf5@1.10 proj
 
       - name: Install dependencies
         run: |
