@@ -4,7 +4,7 @@
 \alias{rsl2odim}
 \title{Convert a NEXRAD polar volume file to an ODIM polar volume file}
 \usage{
-rsl2odim(file, vpfile = "", pvolfile_out = "", config, verbose = TRUE)
+rsl2odim(file, pvolfile_out = "", config, verbose = TRUE)
 }
 \arguments{
 \item{file}{Character (vector). Either a path to a single radar polar volume

@@ -19,12 +19,12 @@
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
-rsl2odim <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
+rsl2odim <- function(file, pvolfile_out="", config, verbose=TRUE){
   for (filename in file) {
     assert_that(file.exists(filename))
   }
-  if (!are_equal(vpfile, "")) {
-    assert_that(is.writeable(dirname(vpfile)))
+  if (!are_equal(pvolfile_out, "")) {
+    assert_that(is.writeable(dirname(pvolfile_out)))
   }
   if(missing(config)){
     config <- vol2bird_config()
