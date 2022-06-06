@@ -53,5 +53,5 @@ vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
   
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
-  processor$process(path.expand(file), config_copy, vpfile, pvolfile_out)
+  processor$process(path.expand(file), config_copy, vpfile, path.expand(pvolfile_out))
 }
