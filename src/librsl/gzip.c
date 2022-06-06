@@ -49,16 +49,15 @@ FILE *compress_pipe (FILE *fp);
  */
 FILE* create_temporary_file(void)
 {
+  FILE* result = NULL;
+
+#ifdef _WIN32
   char buff[L_tmpnam];
   char* nam = NULL;
   char tFilename[1024];
 
-  FILE* result = NULL;
-
   memset(buff, 0, sizeof(char)*L_tmpnam);
   nam = tmpnam(buff);
-
-#ifdef _WIN32
   /* tmpfile on windows creates temporary file under C:\ but since that folder might have write permissions it might
    * not be possible to create them. Instead we need to use a different path for windows and combine temp path with
    * tmpname. If tmpname begins with \, we can concatenate it.  */
@@ -74,9 +73,10 @@ FILE* create_temporary_file(void)
   }
   result = fopen(tFilename, "wb+TD");
 #else
-  strcpy(tFilename, nam);
-  result = fopen(tFilename, "wb+");
-  unlink(tFilename);
+  //strcpy(tFilename, nam);
+  //result = fopen(tFilename, "wb+");
+  //unlink(tFilename);
+  result = tmpfile();
 #endif
   return result;
 }
