@@ -14,19 +14,22 @@
 #'   supported by the [RSL
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
 #'   IRIS (IRIS RAW) format.
+#' @param config optional configuration object of class `Rcpp_Vol2BirdConfig`,
+#' typically output from \link{vol2bird_config}
 #' @param vpfile Character. File name. When provided, writes a vertical profile
 #'   file (`vpfile`) in the ODIM HDF5 format to disk.
 #' @param pvolfile_out Character. File name. When provided, writes a polar
 #'   volume (`pvol`) file in the ODIM HDF5 format to disk. Useful for converting
 #'   RSL formats to ODIM, and for adding MistNet segmentation output.
-#' @param config optional configuration object of class `Rcpp_Vol2BirdConfig`,
-#' typically output from \link{vol2bird_config}
 #' @param verbose logical. When TRUE print profile output to console.
+#' @param return_config logical. When TRUE processing options that are determined based on
+#' input file characteristics are returned and updated in the object specified by the `config`
+#' argument. Do not set to `TRUE` when `vol2bird()` is used in loops like `lapply()` or in parallel processes.
 #' 
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
-vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
+vol2bird <- function(file, config, vpfile="", pvolfile_out="", verbose=TRUE, return_config=FALSE){
   for (filename in file) {
     assert_that(file.exists(filename))
   }
@@ -34,9 +37,10 @@ vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
     assert_that(is.writeable(dirname(vpfile)))
   }
   if(missing(config)){
-    config <- Vol2BirdConfig$new()
+    config <- vol2bird_config()
   }
   assert_that(is.flag(verbose))
+  assert_that(is.flag(return_config))
   
   if(config$useMistNet){
     assert_that(mistnet_exists(),msg="mistnet installation not found, install with `install_mistnet()`")
@@ -44,12 +48,17 @@ vol2bird <- function(file, vpfile="", pvolfile_out="", config, verbose=TRUE){
   
   assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))
   
-  # make a copy of the configuration object
-  # necessary to accommodate parallel processes, since the processor might change the
-  # configuration object based on the input file characteristics
-  config_copy <- vol2bird_config(config)
+  # make a copy of the configuration object for parallel processes.
+  # The processor might change the configuration object based on the
+  # input file characteristics
+  if(return_config){
+    config_instance <- config
+  }
+  else{
+    config_instance <- vol2bird_config(config)  
+  }
   
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
-  processor$process(path.expand(file), config_copy, vpfile, path.expand(pvolfile_out))
+  processor$process(path.expand(file), config_instance, path.expand(vpfile), path.expand(pvolfile_out))
 }

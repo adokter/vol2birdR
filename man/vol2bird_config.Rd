@@ -16,6 +16,80 @@ an object of class \code{Rcpp_Vol2BirdConfig}
 Creates a vol2bird configuration instance of class \code{Rcpp_Vol2BirdConfig}
 }
 \details{
+\subsection{configuration options}{
+
+The class \code{Rcpp_Vol2BirdConfig} class object accesses the following vol2bird processing options:
+\itemize{
+\item \code{azimMax}: the minimum azimuth \link{0-360 degrees} used for constructing the bird density profile
+\item \code{azimMin}: the maximum azimuth \link{0-360 degrees} used for constructing the bird density profile
+\item \code{birdRadarCrossSection}: DOCUMENTATION TO BE FINISHED! num 11
+\item \code{cellEtaMin}: num 11500
+\item \code{cellStdDevMax}: num 5
+\item \code{clutterMap}: chr ""
+\item \code{clutterValueMin}: num 0.1
+\item \code{constant_absVDifMax}: num 10
+\item \code{constant_areaCellMin}: num 0.5
+\item \code{constant_cellClutterFractionMax}: num 0.5
+\item \code{constant_chisqMin}: num 1e-05
+\item \code{constant_fringeDist}: num 5000
+\item \code{constant_nAzimNeighborhood}: int 3
+\item \code{constant_nBinsGap}: int 8
+\item \code{constant_nCountMin}: int 4
+\item \code{constant_nNeighborsMin}: int 5
+\item \code{constant_nObsGapMin}: int 5
+\item \code{constant_nPointsIncludedMin}: int 25
+\item \code{constant_nRangNeighborhood}: int 3
+\item \code{constant_refracIndex}: num 0.964
+\item \code{constant_vradMin}: num 1
+\item \code{dbzThresMin}: num 0
+\item \code{dbzType}: chr "DBZH"
+\item \code{dealiasRecycle}: logi TRUE
+\item \code{dealiasVrad}: logi TRUE
+\item \code{dualPol}: logi TRUE
+\item \code{elevMax}: num 90
+\item \code{elevMin}: num 0
+\item \code{etaMax}: num 36000
+\item \code{exportBirdProfileAsJSONVar}: logi FALSE
+\item \code{fitVrad}: logi TRUE
+\item \code{layerThickness}: num 200
+\item \code{maxNyquistDealias}: num 25
+\item \code{minNyquist}: num 5
+\item \code{misc_cellDbzMin}: num NaN
+\item \code{misc_dbzFactor}: num NaN
+\item \code{misc_dbzMax}: num NaN
+\item \code{mistNetElevs}: num \link{1`:5} 0.5 1.5 2.5 3.5 4.5
+\item \code{mistNetElevsOnly}: logi TRUE
+\item \code{mistNetPath}: chr "/Library/Frameworks/R.framework/Versions/4.1/Resources/library/vol2birdR/data/mistnet_nexrad.pt"
+\item \code{nLayers}: int 25
+\item \code{printCell}: logi FALSE
+\item \code{printCellProp}: logi FALSE
+\item \code{printClut}: logi FALSE
+\item \code{printDbz}: logi FALSE
+\item \code{printDealias}: logi FALSE
+\item \code{printOptions}: logi FALSE
+\item \code{printPointsArray}: logi FALSE
+\item \code{printProfileVar}: logi FALSE
+\item \code{printRhohv}: logi FALSE
+\item \code{printTex}: logi FALSE
+\item \code{printVrad}: logi FALSE
+\item \code{radarWavelength}: num 5.3
+\item \code{rangeMax}: num 35000
+\item \code{rangeMin}: num 5000
+\item \code{requireVrad}: logi FALSE
+\item \code{resample}: logi FALSE
+\item \code{resampleNbins}: int 100
+\item \code{resampleNrays}: int 360
+\item \code{resampleRscale}: num 500
+\item \code{rhohvThresMin}: num 0.95
+\item \code{singlePol}: logi TRUE
+\item \code{stdDevMinBird}: num 2
+\item \code{useClutterMap}: logi FALSE
+\item \code{useMistNet}: logi FALSE
+}
+}
+
+\subsection{copying configuration instances}{
+
 All processing options for \code{\link[=vol2bird]{vol2bird()}} are set using a configuration instance of class \code{Rcpp_Vol2BirdConfig}
 In some cases it might be necessary to copy and modify configuration instance, for example
 when processing polar volume files with different settings.
@@ -32,6 +106,7 @@ In the above example, the \code{config} and \code{extra_config} instances will b
 # create a copy identical to object config:
 extra_config<-vol2bird_config(config)
 }\if{html}{\out{</div>}}
+}
 }
 \examples{
 # create a configuration object
