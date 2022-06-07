@@ -9,10 +9,10 @@ rsl2odim(file, pvolfile_out = "", config, verbose = TRUE)
 \arguments{
 \item{file}{Character (vector). Either a path to a single radar polar volume
 (\code{pvol}) file containing multiple scans/sweeps, or multiple paths to scan
-files containing a single scan/sweep. Or a single \code{pvol} object. The file data format should be either 1)
+files containing a single scan/sweep. The file data format should be either 1)
 \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM}
 format, which is the implementation of the OPERA data information model in
-the \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, 2) a format
+the \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, 2) NEXRAD format
 supported by the \href{https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library} or 3) Vaisala
 IRIS (IRIS RAW) format.}
 

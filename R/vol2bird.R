@@ -7,10 +7,10 @@
 #'
 #' @param file Character (vector). Either a path to a single radar polar volume
 #'   (`pvol`) file containing multiple scans/sweeps, or multiple paths to scan
-#'   files containing a single scan/sweep. Or a single `pvol` object. The file data format should be either 1)
+#'   files containing a single scan/sweep. The file data format should be either 1)
 #'   [ODIM](https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf)
 #'    format, which is the implementation of the OPERA data information model in
-#'   the [HDF5](https://support.hdfgroup.org/HDF5/) format, 2) a format
+#'   the [HDF5](https://support.hdfgroup.org/HDF5/) format, 2) NEXRAD format
 #'   supported by the [RSL
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
 #'   IRIS (IRIS RAW) format.
