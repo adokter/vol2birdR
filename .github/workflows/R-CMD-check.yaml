@@ -40,8 +40,19 @@ jobs:
           
       - uses: r-lib/actions/setup-pandoc@v1
 
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MSYS
+          update: true
+
+      - name: Install windows dependencies
+        if: runner.os == 'Windows'
+        run: |
+          msys2 -c 'pacman --noconfirm -Syyuu'
+          msys2 -c 'pacman --noconfirm -Suu'
+
       - name: Install system dependencies
-        if: runner.os == 'Linux' || runner.os == 'Windows'
+        if: runner.os == 'Linux'
         run: |
           pak::local_system_requirements(execute = TRUE)
           pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
