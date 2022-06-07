@@ -733,27 +733,6 @@ public:
   void set_constant_vradMin(double v) {
     _alldata.constants.vradMin = v;
   }
-
-  double get_misc_dbzFactor() {
-    return _alldata.misc.dbzFactor;
-  }
-  void set_misc_dbzFactor(double v) {
-    _alldata.misc.dbzFactor = v;
-  }
-
-  double get_misc_dbzMax() {
-    return _alldata.misc.dbzMax;
-  }
-  void set_misc_dbzMax(double v) {
-    _alldata.misc.dbzMax = v;
-  }
-
-  double get_misc_cellDbzMin() {
-    return _alldata.misc.cellDbzMin;
-  }
-  void set_misc_cellDbzMin(double v) {
-    _alldata.misc.cellDbzMin = v;
-  }
 };
 
 
@@ -1033,9 +1012,6 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("constant_refracIndex", &Vol2BirdConfig::get_constant_refracIndex, &Vol2BirdConfig::set_constant_refracIndex)
       .property("constant_absVDifMax", &Vol2BirdConfig::get_constant_absVDifMax, &Vol2BirdConfig::set_constant_absVDifMax)
       .property("constant_vradMin", &Vol2BirdConfig::get_constant_vradMin, &Vol2BirdConfig::set_constant_vradMin)
-      .property("misc_dbzFactor", &Vol2BirdConfig::get_misc_dbzFactor, &Vol2BirdConfig::set_misc_dbzFactor)
-      .property("misc_dbzMax", &Vol2BirdConfig::get_misc_dbzMax, &Vol2BirdConfig::set_misc_dbzMax)
-      .property("misc_cellDbzMin", &Vol2BirdConfig::get_misc_cellDbzMin, &Vol2BirdConfig::set_misc_cellDbzMin)
       .method("clone", &Vol2BirdConfig::clone);
 }
 //RCPP_EXPOSED_AS(Vol2BirdConfig)

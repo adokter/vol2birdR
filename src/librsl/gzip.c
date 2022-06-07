@@ -35,6 +35,9 @@
 
 #define CHUNK 16384
 
+/* Instead of fprintf */
+void RSL_printf(const char* fmt, ...);
+
 /* Prototype definitions within this file. */
 int no_command (char *cmd);
 FILE *uncompress_pipe (FILE *fp);
