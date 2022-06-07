@@ -52,30 +52,39 @@ FILE* create_temporary_file(void)
   FILE* result = NULL;
 
 #ifdef _WIN32
-  char buff[L_tmpnam];
-  char* nam = NULL;
-  char tFilename[1024];
+  /* tmpfile on windows creates temporary file under C:\ so we need to use windows stuff to generate
+   * the temporary file  */
+  char pathBuffer[MAX_PATH];
+  char tempFileName[MAX_PATH];
 
-  memset(buff, 0, sizeof(char)*L_tmpnam);
-  nam = tmpnam(buff);
-  /* tmpfile on windows creates temporary file under C:\ but since that folder might have write permissions it might
-   * not be possible to create them. Instead we need to use a different path for windows and combine temp path with
-   * tmpname. If tmpname begins with \, we can concatenate it.  */
-  DWORD nBufferLength = 1024;
-  char pathBuffer[1024];
-  DWORD len = GetTempPathA(nBufferLength, pathBuffer);
-  pathBuffer[len] = '\0';
-  if (nam != NULL && nam[0] == '\\' ) {
-    if ((strlen(pathBuffer) + strlen(nam) + 1) < 1024) {
-      strcat(pathBuffer, nam);
-      strncpy(tFilename, pathBuffer, 1024);
-    }
+  DWORD tplen;
+  UINT tflen;
+
+  tplen = GetTempPath(MAX_PATH, pathBuffer);
+  pathBuffer[tplen] = '\0';
+
+  if (tplen > MAX_PATH || tplen == 0) {
+    RSL_printf("Failed to generate temporary path");
+    return NULL;
   }
-  result = fopen(tFilename, "wb+TD");
+
+  //  Generates a temporary file name.
+  tflen = GetTempFileName(pathBuffer,
+                        "rsl",
+                        1,
+                        tempFileName);
+  tempFileName[tflen] = '\0';
+
+  if (tflen == 0) {
+    RSL_printf("Failed to generate temporary filename");
+    return NULL;
+  }
+
+  result = fopen(tempFileName, "wb+TD");
+  if (result == NULL) {
+    RSL_printf("Could not create a temporary file %s\n", tempFileName);
+  }
 #else
-  //strcpy(tFilename, nam);
-  //result = fopen(tFilename, "wb+");
-  //unlink(tFilename);
   result = tmpfile();
 #endif
   return result;
@@ -130,6 +139,7 @@ FILE *uncompress_pipe (FILE *fp)
   retfp = create_temporary_file();
 
   if (retfp == NULL) {
+    RSL_printf("Early return, couldn't create temporary file\n");
     goto done;
   }
 
@@ -140,6 +150,8 @@ FILE *uncompress_pipe (FILE *fp)
     totallen += len;
     fwrite(buffer, 1, len, retfp);
   }
+
+  RSL_printf("Moved %d bytes\n", totallen);
 
   fseek(retfp, 0, SEEK_SET);
   result = retfp;
