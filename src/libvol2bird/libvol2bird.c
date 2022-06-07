@@ -510,9 +510,7 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
     }
 
     return;
-    
-    
-};
+}
 
 
 
@@ -2528,7 +2526,7 @@ static int hasAzimuthGap(const float* points_local, const int nPoints, vol2bird_
 
 const char* libvol2bird_version(void){
     return VERSION;
-};
+}
 
 
 static int includeGate(const int iProfileType, const int iQuantityType, const unsigned int gateCode, vol2bird_t* alldata) {

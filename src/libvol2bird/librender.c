@@ -308,7 +308,7 @@ Cartesian_t* polarVolumeToCartesian(PolarVolume_t* pvol, long dim, long res, dou
     } // iElev
     
     return cartesian;
-};
+}
 
 
 
@@ -438,7 +438,7 @@ Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double 
     } // iParam
     
     return cartesian;
-};
+}
 
 
 float**** create4DTensor(float *array, int dim1, int dim2, int dim3, int dim4) {

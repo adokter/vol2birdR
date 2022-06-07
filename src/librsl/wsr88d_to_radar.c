@@ -255,7 +255,7 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
   char site_id_str[5];
   char *the_file;
   int expected_msgtype = 0;
-  char version[8];
+  char version[9];
   int vnum;
 
   extern int rsl_qfield[]; /* See RSL_select_fields in volume.c */

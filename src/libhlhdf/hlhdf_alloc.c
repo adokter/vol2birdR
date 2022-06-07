@@ -84,7 +84,7 @@ static HlhdfHeapEntry_t* hlhdf_alloc_createHeapEntry(const char* filename, int l
   ((unsigned char*)ptr)[sz+2] = 0xCA;
   ((unsigned char*)ptr)[sz+3] = 0xFE;
   result->ptr = ptr;
-  result->b = ptr + 2;
+  result->b = (unsigned char*)ptr + 2;
   return result;
 }
 
@@ -102,7 +102,7 @@ static int hlhdf_alloc_reallocateDataInEntry(HlhdfHeapEntry_t* entry, size_t sz)
   entry->sz = sz;
   ((unsigned char*)entry->ptr)[sz+2] = 0xCA;
   ((unsigned char*)entry->ptr)[sz+3] = 0xFE;
-  entry->b = entry->ptr + 2;
+  entry->b = ((unsigned char*)entry->ptr) + 2;
   return 1;
 }
 

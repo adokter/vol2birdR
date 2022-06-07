@@ -572,8 +572,7 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
      * in message header to determine how many bytes to read.
      */
 
-    bzero(&msghdr, sizeof(msghdr));
-
+    memset(&msghdr, 0, sizeof(msghdr));
     n = fread(&msghdr, sizeof(Wsr88d_msg_hdr), 1, wf->fptr);
 
     msg_hdr_size = sizeof(Wsr88d_msg_hdr) - sizeof(msghdr.rpg);
