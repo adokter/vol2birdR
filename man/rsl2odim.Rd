@@ -4,7 +4,13 @@
 \alias{rsl2odim}
 \title{Convert a NEXRAD polar volume file to an ODIM polar volume file}
 \usage{
-rsl2odim(file, pvolfile_out = "", config, verbose = TRUE)
+rsl2odim(
+  file,
+  config,
+  pvolfile_out = "",
+  verbose = TRUE,
+  return_config = FALSE
+)
 }
 \arguments{
 \item{file}{Character (vector). Either a path to a single radar polar volume
@@ -16,14 +22,18 @@ the \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, 2) NEXRAD format
 supported by the \href{https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library} or 3) Vaisala
 IRIS (IRIS RAW) format.}
 
+\item{config}{optional configuration object of class \code{Rcpp_Vol2BirdConfig},
+typically output from \link{vol2bird_config}}
+
 \item{pvolfile_out}{Character. File name. When provided, writes a polar
 volume (\code{pvol}) file in the ODIM HDF5 format to disk. Useful for converting
 RSL formats to ODIM, and for adding MistNet segmentation output.}
 
-\item{config}{optional configuration object of class \code{Rcpp_Vol2BirdConfig},
-typically output from \link{vol2bird_config}}
-
 \item{verbose}{logical. When TRUE print profile output to console.}
+
+\item{return_config}{logical. When TRUE processing options that are determined based on
+input file characteristics are returned and updated in the object specified by the \code{config}
+argument. Do not set to \code{TRUE} when \code{vol2bird()} is used in loops like \code{lapply()} or in parallel processes.}
 }
 \description{
 Convert a NEXRAD polar volume file to an ODIM polar volume file

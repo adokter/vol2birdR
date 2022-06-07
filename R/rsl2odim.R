@@ -5,7 +5,7 @@
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
-rsl2odim <- function(file, pvolfile_out="", config, verbose=TRUE){
+rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, return_config=FALSE){
   for (filename in file) {
     assert_that(file.exists(filename))
   }
@@ -16,19 +16,25 @@ rsl2odim <- function(file, pvolfile_out="", config, verbose=TRUE){
     config <- vol2bird_config()
   }
   assert_that(is.flag(verbose))
+  assert_that(is.flag(return_config))
   
   if(config$useMistNet){
     assert_that(mistnet_exists(),msg="mistnet installation not found, install with `install_mistnet()`")
   }
   
   assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))
-  
-  # make a copy of the configuration object
-  # necessary to accommodate parallel processes, since the processor might change the
-  # configuration object based on the input file characteristics
-  config_copy <- vol2bird_config(config)
-  
+
+  # make a copy of the configuration object for parallel processes.
+  # The processor might change the configuration object based on the
+  # input file characteristics
+  if(return_config){
+    config_instance <- config
+  }
+  else{
+    config_instance <- vol2bird_config(config)  
+  }
+
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
-  processor$rsl2odim(path.expand(file), config_copy, path.expand(pvolfile_out))
+  processor$rsl2odim(path.expand(file), config_instance, path.expand(pvolfile_out))
 }
