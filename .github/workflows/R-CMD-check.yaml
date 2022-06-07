@@ -19,11 +19,9 @@ jobs:
       matrix:
         config:
           - {os: macos-10.15,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
+          #- {os: windows-latest, r: 'release'}
           - {os: ubuntu-20.04,   r: 'devel'}
           #- {os: ubuntu-latest,   r: 'release'}
-          #- {os: ubuntu-latest,   r: 'oldrel-1'}
-
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
@@ -39,19 +37,6 @@ jobs:
           extra-packages: any::rcmdcheck
           
       - uses: r-lib/actions/setup-pandoc@v1
-
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MSYS
-          update: true
-
-      - name: Install windows dependencies
-        if: runner.os == 'Windows'
-        run: |
-          msys2 -c 'pacman --noconfirm -Syyuu'
-          msys2 -c 'pacman --noconfirm -Suu'
-          msys2 -c 'pacman --noconfirm -S  mingw-w64-x86_64-hdf5'
-          msys2 -c 'pacman --noconfirm -S  mingw-w64-x86_64-proj'
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
