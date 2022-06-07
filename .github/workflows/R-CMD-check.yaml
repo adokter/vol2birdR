@@ -50,6 +50,8 @@ jobs:
         run: |
           msys2 -c 'pacman --noconfirm -Syyuu'
           msys2 -c 'pacman --noconfirm -Suu'
+          msys2 -c 'pacman --noconfirm -S  mingw-w64-x86_64-hdf5'
+          msys2 -c 'pacman --noconfirm -S  mingw-w64-x86_64-proj'
 
       - name: Install system dependencies
         if: runner.os == 'Linux'
