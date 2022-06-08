@@ -1,20 +1,17 @@
+## vol2birdR 0.1.0
+This version is the initial release of this package
+
+## Test environments
+* local OS X install, R 4.1.2
+* local Ubuntu 20.04 LTS, 18.04 LTS, 4.1.2
+* local Windows install, R 4.1.2
+* remote R-devel https://builder.r-hub.io.
+* remote R-devel Windows https://win-builder.r-project.org/
+
 ## R CMD check results
 There were no ERRORs or WARNINGs. 
 
-There was 3 NOTES:
+## r-hub builder
 
-* checking CRAN incoming feasibility ... NOTE
-  First release, maintainer & LICENSE
-
-* checking installed package size ... NOTE
-  installed size is 10.3Mb
-  sub-directories of 1Mb or more:
-    libs   9.3Mb
-
-  Only artifact included in libs is vol2birdR.so which is big due to linkage and dependencies.
-  
-* checking for GNU extensions in Makefiles ... NOTE
-  GNU make is a SystemRequirements.
-
-  Using Rcpp according to recommendations.
-
+## Downstream dependencies
+There are currently no downstream dependencies for this package
