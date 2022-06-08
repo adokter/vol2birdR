@@ -44,6 +44,23 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 # define TOLERENCE (0.000001) /* used in conjunction with the relative difference function reldif */
 
 /**
+ * Typedef for print function
+ */
+typedef void(*iris_printfun)(const char* msg);
+
+/**
+ * The default printf function routing prints to stderr unless -DIRIS_NO_EXIT_OR_STDERR has been specified.
+ */
+void Iris_default_printf(const char* msg);
+
+/**
+ * Sets the print function to where printouts should be done. Default behaviour is to use
+ * Iris_default_printf.
+ * @param[in] fun - the default printer
+ */
+void Iris_set_printf(iris_printfun fun);
+
+/**
  * Wraps exit into it's own function to be able to disable hard exit when used in app.
  * Will either return code or do a hard exit depending on if -DIRIS_NO_EXIT_OR_STDERR has
  * been defind or not.

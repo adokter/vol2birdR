@@ -43,6 +43,21 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #include "dlist.h"
 
 /**
+ * print function used by Iris_printf
+ */
+static iris_printfun iris_internal_printf_fun = Iris_default_printf;
+
+/**
+ * Default printf function.
+ */
+void Iris_default_printf(const char* msg)
+{
+#ifndef IRIS_NO_EXIT_OR_STDERR
+  fprintf(stderr, "%s", msg);
+#endif
+}
+
+/**
  * Wraps exit into it's own function to be able to disable hard exit when used in app.
  * Will either return code or do a hard exit depending on if -DIRIS_NO_EXIT_OR_STDERR has
  * been defind or not.
@@ -76,9 +91,19 @@ void Iris_printf(const char* fmt, ...)
   if (n < 0 || n >= 1024) {
     return;
   }
-#ifndef IRIS_NO_EXIT_OR_STDERR
-  fprintf(stderr, "%s", msgbuff);
-#endif
+  iris_internal_printf_fun(msgbuff);
+}
+
+/**
+ * Sets the print function to where printouts should be done. Default behaviour is to use
+ * Iris_default_printf.
+ * @param[in] fun - the default printer
+ */
+void Iris_set_printf(iris_printfun fun)
+{
+  if (fun != NULL) {
+    iris_internal_printf_fun = fun;
+  }
 }
 
 /**
@@ -1721,7 +1746,9 @@ int populateObject(RaveCoreObject* object, file_element_s* file_element_p) {
 file_element_s* readIRIS(const char* ifile) {
    int ret = -1;
    file_element_s* file_element_p = NULL;
-   if (!is_regular_file(ifile)) return NULL;
+   if (!is_regular_file(ifile)) {
+     return NULL;
+   }
    /*****************************************************************************
     *                                                                           *
     * allocate space for a file element structure, the file space pointed to by *
@@ -2165,7 +2192,9 @@ int is_regular_file(const char *path) {
  * Intent: determines if the given file is intended to be in IRIS format
  */
 int isIRIS(const char *path) {
-   FILE *file = fopen(path, "r" );
+
+   FILE *file = fopen(path, "rb" );
+
    /* fopen returns 0, the NULL pointer, on failure */
    if (file == 0) { /* if failed to open file, tell the client */
       Iris_printf("Could not open file %s. Will abort!\n",path );

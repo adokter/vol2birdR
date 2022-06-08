@@ -84,7 +84,7 @@ int iris2list(const char *ifile,
     * try to ascertain if the file is big_endian or little_endian               *
     *                                                                           *
     ****************************************************************************/
-   fpIn = fopen( ifile, "r" );
+   fpIn = fopen( ifile, "rb" );
    if( fpIn == NULL) {        /* if failed to open file, tell the user */
       Iris_printf("Failed to open IRIS file %s.\n",ifile);
       free_IRIS(file_element_pp);

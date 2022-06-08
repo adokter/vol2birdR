@@ -2,6 +2,7 @@
 #include <memory>
 #include <librave.h>
 #include <libmistnet/mistnet.h>
+
 #include <thread>
 
 using namespace Rcpp;
@@ -59,8 +60,13 @@ void RSL_Rprintf(const char* msg) {
   Rprintf("%s", msg);
 }
 
+void IRIS2ODIM_Rprintf(const char* msg) {
+  Rprintf("%s", msg);
+}
+
 extern "C" {
 void RSL_set_printfun(void(*printfun)(const char*));
+void Iris_set_printf(void(*printfun)(const char*));
 }
 
 //' Initializes the vol2birdR library
@@ -72,6 +78,7 @@ void cpp_vol2bird_initialize() {
   HL_init();
   vol2bird_set_printf(Vol2Bird_Rprintf);
   vol2bird_set_err_printf(Vol2Bird_Rprintf);
+  Iris_set_printf(IRIS2ODIM_Rprintf);
   RSL_set_printfun(RSL_Rprintf);
 }
 
