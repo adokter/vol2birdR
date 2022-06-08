@@ -16,6 +16,7 @@ BugReports: https://github.com/adokter/vol2birdR/issues
 Imports: 
     assertthat,
     methods,
+    pkgbuild,
     Rcpp (>= 1.0.4),
     rlang, 
     utils,
@@ -24,7 +25,8 @@ LinkingTo: Rcpp, RcppGSL
 RoxygenNote: 7.2.0
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-SystemRequirements: GNU make
+SystemRequirements: GNU make, HDF5, PROJ
+NeedsCompilation: yes
 RcppModules: RaveIO, PolarVolume, Vol2Bird, Vol2BirdConfig
 Suggests: 
     knitr,
