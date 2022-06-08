@@ -66,7 +66,7 @@ torch_install_path <- function() {
 }
 
 #' Checks if the torch and mistnet libraries have been installed or not.
-#' Returns TRUE if both torch and mistnet libraries can be found, otherwise FALSE
+#' @return TRUE if both torch and mistnet libraries can be found, otherwise FALSE
 #' @export
 mistnet_exists <- function() {
   if (!dir.exists(install_path())) {
