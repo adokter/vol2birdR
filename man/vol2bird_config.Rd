@@ -7,88 +7,16 @@
 vol2bird_config(config)
 }
 \arguments{
-\item{config}{a configuration object to be copied.}
+\item{config}{a configuration instance to be copied.}
 }
 \value{
 an object of class \code{Rcpp_Vol2BirdConfig}
 }
 \description{
-Creates a vol2bird configuration instance of class \code{Rcpp_Vol2BirdConfig}
+Creates or copies a vol2bird configuration instance of class \code{Rcpp_Vol2BirdConfig}
 }
 \details{
-\subsection{configuration options}{
-
-The class \code{Rcpp_Vol2BirdConfig} class object accesses the following vol2bird processing options:
-\itemize{
-\item \code{azimMax}: the minimum azimuth \link{0-360 degrees} used for constructing the bird density profile
-\item \code{azimMin}: the maximum azimuth \link{0-360 degrees} used for constructing the bird density profile
-\item \code{birdRadarCrossSection}: DOCUMENTATION TO BE FINISHED! num 11
-\item \code{cellEtaMin}: num 11500
-\item \code{cellStdDevMax}: num 5
-\item \code{clutterMap}: chr ""
-\item \code{clutterValueMin}: num 0.1
-\item \code{constant_absVDifMax}: num 10
-\item \code{constant_areaCellMin}: num 0.5
-\item \code{constant_cellClutterFractionMax}: num 0.5
-\item \code{constant_chisqMin}: num 1e-05
-\item \code{constant_fringeDist}: num 5000
-\item \code{constant_nAzimNeighborhood}: int 3
-\item \code{constant_nBinsGap}: int 8
-\item \code{constant_nCountMin}: int 4
-\item \code{constant_nNeighborsMin}: int 5
-\item \code{constant_nObsGapMin}: int 5
-\item \code{constant_nPointsIncludedMin}: int 25
-\item \code{constant_nRangNeighborhood}: int 3
-\item \code{constant_refracIndex}: num 0.964
-\item \code{constant_vradMin}: num 1
-\item \code{dbzThresMin}: num 0
-\item \code{dbzType}: chr "DBZH"
-\item \code{dealiasRecycle}: logi TRUE
-\item \code{dealiasVrad}: logi TRUE
-\item \code{dualPol}: logi TRUE
-\item \code{elevMax}: num 90
-\item \code{elevMin}: num 0
-\item \code{etaMax}: num 36000
-\item \code{exportBirdProfileAsJSONVar}: logi FALSE
-\item \code{fitVrad}: logi TRUE
-\item \code{layerThickness}: num 200
-\item \code{maxNyquistDealias}: num 25
-\item \code{minNyquist}: num 5
-\item \code{misc_cellDbzMin}: num NaN
-\item \code{misc_dbzFactor}: num NaN
-\item \code{misc_dbzMax}: num NaN
-\item \code{mistNetElevs}: num \link{1`:5} 0.5 1.5 2.5 3.5 4.5
-\item \code{mistNetElevsOnly}: logi TRUE
-\item \code{mistNetPath}: chr "/Library/Frameworks/R.framework/Versions/4.1/Resources/library/vol2birdR/data/mistnet_nexrad.pt"
-\item \code{nLayers}: int 25
-\item \code{printCell}: logi FALSE
-\item \code{printCellProp}: logi FALSE
-\item \code{printClut}: logi FALSE
-\item \code{printDbz}: logi FALSE
-\item \code{printDealias}: logi FALSE
-\item \code{printOptions}: logi FALSE
-\item \code{printPointsArray}: logi FALSE
-\item \code{printProfileVar}: logi FALSE
-\item \code{printRhohv}: logi FALSE
-\item \code{printTex}: logi FALSE
-\item \code{printVrad}: logi FALSE
-\item \code{radarWavelength}: num 5.3
-\item \code{rangeMax}: num 35000
-\item \code{rangeMin}: num 5000
-\item \code{requireVrad}: logi FALSE
-\item \code{resample}: logi FALSE
-\item \code{resampleNbins}: int 100
-\item \code{resampleNrays}: int 360
-\item \code{resampleRscale}: num 500
-\item \code{rhohvThresMin}: num 0.95
-\item \code{singlePol}: logi TRUE
-\item \code{stdDevMinBird}: num 2
-\item \code{useClutterMap}: logi FALSE
-\item \code{useMistNet}: logi FALSE
-}
-}
-
-\subsection{copying configuration instances}{
+\subsection{Copying configuration instances}{
 
 All processing options for \code{\link[=vol2bird]{vol2bird()}} are set using a configuration instance of class \code{Rcpp_Vol2BirdConfig}
 In some cases it might be necessary to copy and modify configuration instance, for example
@@ -107,15 +35,110 @@ In the above example, the \code{config} and \code{extra_config} instances will b
 extra_config<-vol2bird_config(config)
 }\if{html}{\out{</div>}}
 }
+
+\subsection{User configuration options}{
+
+The \code{Rcpp_Vol2BirdConfig} class object sets the following vol2bird processing options:
+\itemize{
+\item \code{azimMax}: Numeric. The minimum azimuth (0-360 degrees) used for constructing the bird density profile
+\item \code{azimMin}: Numeric. The maximum azimuth (0-360 degrees) used for constructing the bird density profile
+\item \code{birdRadarCrossSection}: Numeric. Radar cross section in cm^2
+\item \code{clutterMap}: Character. clutter map path and filename
+\item \code{clutterValueMin}: Numeric. sample volumes in the static cluttermap with a value above
+this threshold will be considered clutter-contaminated. Default 0.1
+\item \code{dbzType}: Character. Reflectivity factor quantity to use. Default \code{DBZH}
+\item \code{dualPol}: Logical. Whether to use dual-pol moments for filtering meteorological echoes. Default \code{TRUE}
+\item \code{elevMax}: Numeric. The minimum scan elevation in degrees used for constructing the bird density profile
+\item \code{elevMin}: Numeric. The maximum scan elevation in degrees used for constructing the bird density profile
+\item \code{layerThickness}: Numeric. The width/thickness of an altitude layer in m. Default 200
+\item \code{mistNetPath}: Character. Path of mistnet segmentation model in pytorch (.pt) format
+\item \code{nLayers}: Integer. The number of layers in an altitude profile. Default 25
+\item \code{radarWavelength}: Numeric. The radar wavelength in cm to assume when unavailable as an attribute in the input file. Default 5.3
+\item \code{rangeMax}: Numeric. The maximum range in m used for constructing the bird density profile. Default 35000
+\item \code{rangeMin}: Numeric. The minimum range in m used for constructing the bird density profile. Default 5000
+\item \code{rhohvThresMin}: Numeric. Correlation coefficients higher than this threshold will be classified as precipitation. Default 0.95
+\item \code{singlePol}: Logical. Whether to use single-pol moments for filtering meteorological echoes. Default \code{TRUE}
+\item \code{stdDevMinBird}: Numeric. VVP Radial velocity standard deviation threshold. Default 2 m/s.
+\item \code{useClutterMap}: Logical. Whether to use a static clutter map. Default \code{FALSE}
+\item \code{useMistNet}: Logical. Whether to use the MistNet segmentation model. Default \code{FALSE}.
+}
+}
+
+\subsection{Advanced configuration options}{
+
+Changing these settings is rarely needed.
+\itemize{
+\item \code{cellEtaMin}:  Numeric. Maximum mean reflectivity in cm^2/km^3 for cells containing birds
+\item \code{cellStdDevMax}: Numeric. When analyzing precipitation cells, only cells for which the stddev of
+vrad (aka the texture) is less than cellStdDevMax are considered in the rest of the analysis
+\item \code{dbzThresMin}: Numeric. Minimum reflectivity factor of a gate to be considered for inclusion in a weather cell. Default 0 dBZ
+\item \code{dealiasRecycle}: Logical. Whether we should dealias all data once (default \code{TRUE}), or dealias for each profile individually (\code{FALSE})
+\item \code{dealiasVrad}: Logical. Whether we should dealias the radial velocities. Default \code{TRUE}.
+\item \code{etaMax}: Numeric. Maximum reflectivity in cm^2/km^3 for single gates containing birds. Default 36000
+\item \code{exportBirdProfileAsJSONVar}: Logical. Deprecated, do not use. Default \code{FALSE}
+\item \code{fitVrad}: Logical. Whether or not to fit a model to the observed vrad. Default \code{TRUE}
+\item \code{maxNyquistDealias}: Numeric. When all scans have nyquist velocity higher than this value, dealiasing is suppressed. Default 25 m/s.
+\item \code{minNyquist}: Numeric. Scans with Nyquist velocity lower than this value are excluded. Default 5 m/s.
+\item \code{mistNetElevs}: Numeric vector of length 5. Elevations to use in Cartesian projection for Mistnet. Default \code{c(0.5, 1.5, 2.5, 3.5, 4.5)}
+\item \code{mistNetElevsOnly}: Logical. When \code{TRUE} (default), use only the specified elevation scans for mistnet to calculate profile, otherwise use all available elevation scans
+\item \code{requireVrad}: Logical. For a range gate to contribute it should have a valid radial velocity. Default \code{FALSE}
+\item \code{resample}: Logical. Whether to resample the input polar volume. Downsampling speeds up the calculation. Default \code{FALSE}
+\item \code{resampleNbins}: Numeric. Resampled number of range bins. Ignored when \code{resample} is \code{FALSE}. Default 100
+\item \code{resampleNrays}: Numeric. Resampled number of azimuth bins. Ignored when \code{resample} is \code{FALSE}. Default 360
+\item \code{resampleRscale}: Numeric. Resampled range gate length in m. Ignored when \code{resample} is \code{FALSE}. Default 500 m.
+}
+}
+
+\subsection{Algorithm constants}{
+
+Changing any of these constants is not recommended
+\itemize{
+\item \code{constant_absVDifMax}: Numeric. After fitting the radial velocity data, throw out any VRAD observations that
+are more than absVDifMax away from the fitted value as outliers. Default 10
+\item \code{constant_areaCellMin}: Numeric. When analyzing cells, areaCellMin determines the minimum size
+of a cell to be considered in the rest of the analysis. in km^2. Default 0.5
+\item \code{constant_cellClutterFractionMax}: Cells with clutter fractions above this value are likely not birds. Default 0.5
+\item \code{constant_chisqMin}: Minimum standard deviation of the VVP fit. Default 1e-05
+\item \code{constant_fringeDist}: Each identified weather cell is grown by a distance equal to 'fringeDist' using a region-growing approach. Default 5000
+\item \code{constant_nAzimNeighborhood}: vrad's texture is calculated based on the local neighborhood. The neighborhood size in the azimuth direction is equal to this value. Default 3
+\item \code{constant_nBinsGap}: When determining whether there are enough vrad observations in each direction, use nBinsGap sectors. Default 8
+\item \code{constant_nCountMin}: The minimum number of neighbors for the texture value to be considered valid, as used in calcTexture(). Default 4
+\item \code{constant_nNeighborsMin}: the minimum number of direct neighbors with dbz value above dbzThresMin as used in findWeatherCells(). Default 5
+\item \code{constant_nObsGapMin}: there should be at least this many vrad observations in each sector. Default 5
+\item \code{constant_nPointsIncludedMin}: when calculating the altitude-layer averaged dbz, there should be at least this many valid data points. Default 25
+\item \code{constant_nRangNeighborhood}: vrad's texture is calculated based on the local neighborhood. The neighborhood size in the range direction is equal to this value. Default 3
+\item \code{constant_refracIndex}: Refractive index of the scatterers. Default equal to water 0.964
+\item \code{constant_vradMin}: When analyzing cells, radial velocities lower than vradMin are treated as clutter. Default 1 m/s.
+}
+}
+
+\subsection{Debug printing options}{
+
+Enable these printing options only for debugging purposes
+in a terminal, since large amounts of data will be dumped into the console.
+\itemize{
+\item \code{printCell}: Logical. Print precipitation cell data to stderr. Default \code{FALSE}
+\item \code{printCellProp}: Logical. Print precipitaion cell properties to stderr. Default \code{FALSE}
+\item \code{printClut}: Logical. Print clutter data to stderr. Default \code{FALSE}
+\item \code{printDbz}: Logical. Print reflectivity factor data to stderr. Default \code{FALSE}
+\item \code{printDealias}: Logical. \code{FALSE}
+\item \code{printOptions}: Logical. Print options to stderr. Default \code{FALSE}
+\item \code{printPointsArray}: Logical. Print the 'points' array to stderr. Default \code{FALSE}
+\item \code{printProfileVar}: Logical. Print profile data to stderr. Default \code{FALSE}
+\item \code{printRhohv}: Logical. Print correlation coefficient data to stderr. Default \code{FALSE}
+\item \code{printTex}: Logical. Print radial velocity texture data to stderr. Default \code{FALSE}
+\item \code{printVrad}: Logical. Print radial velocity data to stderr. Default \code{FALSE}
+}
+}
 }
 \examples{
-# create a configuration object
+# create a configuration instance
 config <- vol2bird_config()
 # list the the configuration elements:
 config
 # change the maximum range included in the profile generation to 40 km:
 config$rangeMax <- 40000
-# make a copy of the configuration object:
+# make a copy of the configuration instance:
 config_copy <- vol2bird_config(config)
 }
 \seealso{
