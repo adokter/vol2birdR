@@ -84,9 +84,6 @@ FILE* create_temporary_file(void)
   }
 
   result = fopen(tempFileName, "wb+TD");
-  if (result == NULL) {
-    RSL_printf("Could not create a temporary file %s\n", tempFileName);
-  }
 #else
   result = tmpfile();
 #endif
@@ -142,8 +139,9 @@ FILE *uncompress_pipe (FILE *fp)
   retfp = create_temporary_file();
 
   if (retfp == NULL) {
-    RSL_printf("Early return, couldn't create temporary file\n");
-    goto done;
+    RSL_printf("Couldn't create temporary file\n");
+    gzclose(gzfp);
+    return fp;
   }
 
   for (;;) {
@@ -153,8 +151,6 @@ FILE *uncompress_pipe (FILE *fp)
     totallen += len;
     fwrite(buffer, 1, len, retfp);
   }
-
-  RSL_printf("Moved %d bytes\n", totallen);
 
   fseek(retfp, 0, SEEK_SET);
   result = retfp;

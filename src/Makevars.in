@@ -2,7 +2,7 @@ $(info The name of the shared library to be created is: $(SHLIB))
 
 SOURCES = $(wildcard ./*.cpp )
 
-SOURCES_C = $(wildcard ./libvol2bird/*.c ./librave/*.c ./libhlhdf/*.c ./librsl/*.c)
+SOURCES_C = $(wildcard ./libvol2bird/*.c ./librave/*.c ./libhlhdf/*.c ./librsl/*.c ./libiris2odim/*.c)
 
 OBJECTS_C = $(SOURCES_C:.c=.o)
 
@@ -10,9 +10,8 @@ OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
 
 PKG_LIBS=@VOL2BIRD_LIBS@
 PKG_CPPFLAGS= @VOL2BIRD_CPPFLAGS@ @HDF5_API_VERS_USE@
-#PKG_CFLAGS=@VOL2BIRD_CFLAGS@ @HDF5_API_VERS_USE@ 
 
-PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -DNOCONFUSE -DR_MISTNET -DNO_UNZIP_PIPE -DNO_HLHDF_PRINTF -DNO_HLHDF_ABORT -DNO_RAVE_PRINTF -DNO_RAVE_ABORT -DRSL_NO_STDERR_PRINTF -DNO_VOL2BIRD_PRINTF -DRSL=1
+PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -I../inst/libiris2odim -DNOCONFUSE -DR_MISTNET -DNO_UNZIP_PIPE -DNO_HLHDF_PRINTF -DNO_HLHDF_ABORT -DNO_RAVE_PRINTF -DNO_RAVE_ABORT -DRSL_NO_STDERR_PRINTF -DNO_VOL2BIRD_PRINTF -DRSL=1  -DIRIS_NO_EXIT_OR_STDERR -DIRIS=1
 
 PKG_CPPFLAGS+= $(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::CFlags()")
 

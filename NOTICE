@@ -14,5 +14,6 @@ Radar Software Library (RSL)  - src/librsl
 High Level HDF (HL-HDF)       - src/libhlhdf
 RAVE                          - src/librave
 VOL2BIRD                      - src/libvol2bird
+IRIS2ODIM                     - src/libiris2odim
 
 
