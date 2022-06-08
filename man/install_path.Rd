@@ -7,7 +7,7 @@
 install_path(version = "1.0")
 }
 \arguments{
-\item{version}{The Mistnet version checked for}
+\item{version}{The MistNet version checked for}
 }
 \value{
 the path to the libraries

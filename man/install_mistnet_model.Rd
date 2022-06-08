@@ -2,7 +2,7 @@
 % Please edit documentation in R/install.R
 \name{install_mistnet_model}
 \alias{install_mistnet_model}
-\title{Install Mistnet model file}
+\title{Install MistNet model file}
 \usage{
 install_mistnet_model(
   reinstall = FALSE,

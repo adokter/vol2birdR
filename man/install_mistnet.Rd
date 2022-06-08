@@ -2,7 +2,7 @@
 % Please edit documentation in R/install.R
 \name{install_mistnet}
 \alias{install_mistnet}
-\title{Install Mistnet}
+\title{Install MistNet libraries}
 \usage{
 install_mistnet(
   version = "1.10.2",
@@ -13,9 +13,9 @@ install_mistnet(
 )
 }
 \arguments{
-\item{version}{The Mistnet version to install.}
+\item{version}{The MistNet version to install.}
 
-\item{reinstall}{Re-install Mistnet even if its already installed?}
+\item{reinstall}{Re-install MistNet even if its already installed?}
 
 \item{path}{Optional path to install or check for an already existing installation.}
 
@@ -24,7 +24,7 @@ install_mistnet(
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
 }
 \description{
-Installs Mistnet and its dependencies.
+Installs MistNet libraries and dependencies.
 }
 \details{
 When using \code{path} to install in a specific location, make sure the \code{MISTNET_HOME} environment

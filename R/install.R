@@ -47,7 +47,7 @@ install_config <- list(
 )
 
 #' Returns the path of the mistnet libraries for specified version
-#' @param version The Mistnet version checked for
+#' @param version The MistNet version checked for
 #' @return the path to the libraries
 #' @keywords internal
 install_path <- function(version = "1.0") {
@@ -217,7 +217,7 @@ install_type <- function(version) {
   return("cpu")
 }
 
-#' Install Mistnet model file
+#' Install MistNet model file
 #'
 #' Installs the PyTorch mistnet model file
 #'
@@ -263,12 +263,12 @@ install_mistnet_model <- function(reinstall=FALSE, path = install_path(), timeou
   return(TRUE)
 }
 
-#' Install Mistnet
+#' Install MistNet libraries
 #'
-#' Installs Mistnet and its dependencies.
+#' Installs MistNet libraries and dependencies.
 #'
-#' @param version The Mistnet version to install.
-#' @param reinstall Re-install Mistnet even if its already installed?
+#' @param version The MistNet version to install.
+#' @param reinstall Re-install MistNet even if its already installed?
 #' @param path Optional path to install or check for an already existing installation.
 #' @param timeout Optional timeout in seconds for large file download.
 #' @param ... other optional arguments (like \code{`load`} for manual installation).
@@ -324,13 +324,13 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
   }
 }
 
-#' Install Mistnet from files
+#' Install MistNet libraries from files
 #'
-#' Installs Torch and its dependencies from files.
+#' Installs Torch and MistNet dependencies from files.
 #'
 #' @param version The Torch version to install.
 #' @param libtorch The installation archive file to use for Torch. Shall be a \code{"file://"} URL scheme.
-#' @param libmistnet The installation archive file to use for Mistnet. Shall be a \code{"file://"} URL scheme.
+#' @param libmistnet The installation archive file to use for MistNet. Shall be a \code{"file://"} URL scheme.
 #' @param mistnet_model The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!
 #' @param ... other parameters to be passed to \code{"install_torch()"}
 #'

@@ -14,7 +14,7 @@ mistnet_default <- function() {
 #' @keywords internal
 mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
   if (!mistnet_exists()) {
-    stop("Mistnet is disabled.")
+    stop("MistNet is disabled.")
   }
 
   if (.globals$mistnet_started && !reload) {

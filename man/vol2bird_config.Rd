@@ -79,7 +79,7 @@ vrad (aka the texture) is less than cellStdDevMax are considered in the rest of 
 \item \code{fitVrad}: Logical. Whether or not to fit a model to the observed vrad. Default \code{TRUE}
 \item \code{maxNyquistDealias}: Numeric. When all scans have nyquist velocity higher than this value, dealiasing is suppressed. Default 25 m/s.
 \item \code{minNyquist}: Numeric. Scans with Nyquist velocity lower than this value are excluded. Default 5 m/s.
-\item \code{mistNetElevs}: Numeric vector of length 5. Elevations to use in Cartesian projection for Mistnet. Default \code{c(0.5, 1.5, 2.5, 3.5, 4.5)}
+\item \code{mistNetElevs}: Numeric vector of length 5. Elevations to use in Cartesian projection for MistNet. Default \code{c(0.5, 1.5, 2.5, 3.5, 4.5)}
 \item \code{mistNetElevsOnly}: Logical. When \code{TRUE} (default), use only the specified elevation scans for mistnet to calculate profile, otherwise use all available elevation scans
 \item \code{requireVrad}: Logical. For a range gate to contribute it should have a valid radial velocity. Default \code{FALSE}
 \item \code{resample}: Logical. Whether to resample the input polar volume. Downsampling speeds up the calculation. Default \code{FALSE}

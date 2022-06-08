@@ -2,7 +2,7 @@
 % Please edit documentation in R/install.R
 \name{install_mistnet_from_file}
 \alias{install_mistnet_from_file}
-\title{Install Mistnet from files}
+\title{Install MistNet libraries from files}
 \usage{
 install_mistnet_from_file(
   version = "1.10.2",
@@ -17,14 +17,14 @@ install_mistnet_from_file(
 
 \item{libtorch}{The installation archive file to use for Torch. Shall be a \code{"file://"} URL scheme.}
 
-\item{libmistnet}{The installation archive file to use for Mistnet. Shall be a \code{"file://"} URL scheme.}
+\item{libmistnet}{The installation archive file to use for MistNet. Shall be a \code{"file://"} URL scheme.}
 
 \item{mistnet_model}{The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!}
 
 \item{...}{other parameters to be passed to \code{"install_torch()"}}
 }
 \description{
-Installs Torch and its dependencies from files.
+Installs Torch and MistNet dependencies from files.
 }
 \details{
 When \code{"install_mistnet()"} initiated download is not possible, but installation archive files are
