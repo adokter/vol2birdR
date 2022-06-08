@@ -4,10 +4,10 @@
 \name{vol2birdR-package}
 \alias{vol2birdR}
 \alias{vol2birdR-package}
-\title{vol2birdR: Vertical Profiles of Biological Scatterers from Weather Radar Data}
+\title{vol2birdR: Vertical Profiles of Biological Signals in Weather Radar Data}
 \description{
 R implementation of the vol2bird software for generating vertical profiles
-    of birds and other biological scatterers from weather radar data. See \doi{10.1098/rsif.2010.0116}
+    of birds and other biological signals in weather radar data. See \doi{10.1098/rsif.2010.0116}
     for a paper describing the methodology.
 }
 \details{

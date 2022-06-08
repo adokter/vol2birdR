@@ -1,6 +1,6 @@
 Package: vol2birdR
 Type: Package
-Title: Vertical Profiles of Biological Scatterers from Weather Radar Data
+Title: Vertical Profiles of Biological Signals in Weather Radar Data
 Version: 0.1.0
 Date: 2022-06-03
 Authors@R: c(
@@ -8,7 +8,7 @@ Authors@R: c(
     person("Adriaan M.", "Dokter", role = c("aut", "cre"), email = "amd427@cornell.edu", comment = c(ORCID = "0000-0001-6573-066X"))
     )
 Description: R implementation of the vol2bird software for generating vertical profiles
-    of birds and other biological scatterers from weather radar data. See <doi:10.1098/rsif.2010.0116>
+    of birds and other biological signals in weather radar data. See <doi:10.1098/rsif.2010.0116>
     for a paper describing the methodology.
 License: LGPL (>= 3) + file LICENSE
 URL: https://github.com/adokter/vol2birdR/, https://adriaandokter.com/vol2bird/
