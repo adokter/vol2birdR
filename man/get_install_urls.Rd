@@ -13,5 +13,8 @@ get_install_urls(version = "1.10.2", type = install_type(version = version))
 }
 \description{
 List the Torch and mistnet files to download as local files in order to proceed with install_mistnet_from_file().
-See install_mistnet_from_file for example usage.
+See \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}} for example usage.
+}
+\seealso{
+\code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}
 }

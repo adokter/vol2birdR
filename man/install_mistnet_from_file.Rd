@@ -21,35 +21,41 @@ install_mistnet_from_file(
 
 \item{mistnet_model}{The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!}
 
-\item{...}{other parameters to be passed to \code{"install_torch()"}}
+\item{...}{other parameters to be passed to \code{\link[=install_torch]{install_torch()}}}
 }
 \description{
 Installs Torch and MistNet dependencies from files.
 }
 \details{
-When \code{"install_mistnet()"} initiated download is not possible, but installation archive files are
-present on local filesystem, \code{"install_mistnet_from_file()"} can be used as a workaround to installation issue.
+When \code{\link[=install_mistnet]{install_mistnet()}} initiated download is not possible, but installation archive files are
+present on local filesystem, \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}} can be used as a workaround to installation issue.
 \code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
-that is used for the R package. Both are highly dependent, and should be checked through \code{"get_install_urls()"}
+that is used for the R package. Both are highly dependent, and should be checked through \code{\link[=get_install_urls]{get_install_urls()}}
 
-\> get_install_urls()
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{> get_install_urls()
 $libtorch
-\[1\] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2\%2Bcpu.zip"
+[1] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2\%2Bcpu.zip"
 
 $libmistnet
-\[1\] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
+[1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
 
 $mistnet_model
-\[1\] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
+[1] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
+}\if{html}{\out{</div>}}
 
 In a terminal, download above zip-files.
-\%> mkdir /tmp/myfiles
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{\%> mkdir /tmp/myfiles
 \%> cd /tmp/myfiles
 \%> wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2\%2Bcpu.zip
 \%> wget https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip
 \%> wget http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt
+}\if{html}{\out{</div>}}
+
 Then in R, type:
-\> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
-libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
-mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", 
+     libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
+     mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
+}\if{html}{\out{</div>}}
 }

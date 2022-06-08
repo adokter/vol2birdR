@@ -332,37 +332,41 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' @param libtorch The installation archive file to use for Torch. Shall be a \code{"file://"} URL scheme.
 #' @param libmistnet The installation archive file to use for MistNet. Shall be a \code{"file://"} URL scheme.
 #' @param mistnet_model The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!
-#' @param ... other parameters to be passed to \code{"install_torch()"}
+#' @param ... other parameters to be passed to [install_torch()]
 #'
 #' @details
 #'
-#' When \code{"install_mistnet()"} initiated download is not possible, but installation archive files are
-#' present on local filesystem, \code{"install_mistnet_from_file()"} can be used as a workaround to installation issue.
+#' When [install_mistnet()] initiated download is not possible, but installation archive files are
+#' present on local filesystem, [install_mistnet_from_file()] can be used as a workaround to installation issue.
 #' \code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
-#' that is used for the R package. Both are highly dependent, and should be checked through \code{"get_install_urls()"}
+#' that is used for the R package. Both are highly dependent, and should be checked through [get_install_urls()]
 #'
-#' 
-#' \> get_install_urls()
+#' ```R
+#' > get_install_urls()
 #' $libtorch
-#' \\[1\\] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip"
+#' [1] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip"
 #'
 #' $libmistnet
-#' \\[1\\] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
+#' [1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
 #'
 #' $mistnet_model
-#' \\[1\\] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
+#' [1] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
+#' ```
 #'
 #' In a terminal, download above zip-files.
+#' ```R
 #' %> mkdir /tmp/myfiles
 #' %> cd /tmp/myfiles
 #' %> wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip
 #' %> wget https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip
 #' %> wget http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt
+#' ```
 #' Then in R, type:
-#' \> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", 
+#' ```R
+#' > install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", 
 #'      libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
 #'      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
-#'
+#' ```
 #' @export
 install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, mistnet_model=NULL, ...) {
   stopifnot(inherits(url(libtorch), "file"))
@@ -381,12 +385,13 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
 #' List of files to download
 #'
 #' List the Torch and mistnet files to download as local files in order to proceed with install_mistnet_from_file(). 
-#' See install_mistnet_from_file for example usage.
+#' See [install_mistnet_from_file()] for example usage.
 #'
 #' @param version The Torch version to install.
 #' @param type The installation type for Torch. Valid values is currently \code{"cpu"}.
 #'
 #' @export
+#' @seealso [install_mistnet_from_file()]
 get_install_urls <- function(version = "1.10.2", type = install_type(version = version)) {
   libtorch <- install_config[[version]][[type]][[install_os()]][["libtorch"]][["url"]]
   libmistnet <- install_config[[version]][[type]][[install_os()]][["libmistnet"]]
