@@ -8,7 +8,7 @@
 \description{
 R implementation of the vol2bird software for generating vertical profiles
     of birds and other biological scatterers from weather radar data. See \doi{10.1098/rsif.2010.0116}
-    for a paper describing the methodology
+    for a paper describing the methodology.
 }
 \details{
 To get started, see:

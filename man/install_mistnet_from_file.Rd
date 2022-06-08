@@ -8,7 +8,7 @@ install_mistnet_from_file(
   version = "1.10.2",
   libtorch,
   libmistnet,
-  mistnet_nexrad = NULL,
+  mistnet_model = NULL,
   ...
 )
 }
@@ -19,7 +19,7 @@ install_mistnet_from_file(
 
 \item{libmistnet}{The installation archive file to use for Mistnet. Shall be a \code{"file://"} URL scheme.}
 
-\item{mistnet_nexrad}{The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!}
+\item{mistnet_model}{The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!}
 
 \item{...}{other parameters to be passed to \code{"install_torch()"}}
 }
@@ -39,7 +39,7 @@ $libtorch
 $libmistnet
 \[1\] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
 
-$mistnet_nexrad
+$mistnet_model
 \[1\] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
 
 In a terminal, download above zip-files.
@@ -51,5 +51,5 @@ In a terminal, download above zip-files.
 Then in R, type:
 \> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
 libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
-mistnet_nexrad="file:///tmp/myfiles/mistnet_nexrad.pt")
+mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 }

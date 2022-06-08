@@ -20,6 +20,7 @@ rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, return_config=
   
   if(config$useMistNet){
     assert_that(mistnet_exists(),msg="mistnet installation not found, install with `install_mistnet()`")
+    assert_that(file.exists(config$mistNetPath),msg="mistnet model file not found, point `mistNetPath` option to valid mistnet file or download the model with `install_mistnet_model()`")
   }
   
   assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))

@@ -80,7 +80,7 @@ mistnet_exists <- function() {
   if (!length(list.files(file.path(install_path(), "lib"), "mistnet")) > 0) {
     return(FALSE)
   }
-
+  
   TRUE
 }
 
@@ -217,9 +217,9 @@ install_type <- function(version) {
   return("cpu")
 }
 
-#' Install Mistnet Nexrad file
+#' Install Mistnet model file
 #'
-#' Installs the mistnet model file
+#' Installs the PyTorch mistnet model file
 #'
 #' @param reinstall Re-install the model even if its already installed
 #' @param path Optional path to install or check for an already existing installation.
@@ -231,7 +231,7 @@ install_type <- function(version) {
 #' Used to download and install the mistnet model file
 #'
 #' @export
-install_mistnet_nexrad <- function(reinstall=FALSE, path = install_path(), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", ...)
+install_mistnet_model <- function(reinstall=FALSE, path = install_path(), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", ...)
 {
   if (reinstall) {
     if (file.exists(file.path(path, "data/mistnet_nexrad.pt"))) {
@@ -331,7 +331,7 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' @param version The Torch version to install.
 #' @param libtorch The installation archive file to use for Torch. Shall be a \code{"file://"} URL scheme.
 #' @param libmistnet The installation archive file to use for Mistnet. Shall be a \code{"file://"} URL scheme.
-#' @param mistnet_nexrad The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!
+#' @param mistnet_model The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!
 #' @param ... other parameters to be passed to \code{"install_torch()"}
 #'
 #' @details
@@ -349,7 +349,7 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' $libmistnet
 #' \\[1\\] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
 #'
-#' $mistnet_nexrad
+#' $mistnet_model
 #' \\[1\\] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
 #'
 #' In a terminal, download above zip-files.
@@ -361,10 +361,10 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' Then in R, type:
 #' \> install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", 
 #'      libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
-#'      mistnet_nexrad="file:///tmp/myfiles/mistnet_nexrad.pt")
+#'      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 #'
 #' @export
-install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, mistnet_nexrad=NULL, ...) {
+install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, mistnet_model=NULL, ...) {
   stopifnot(inherits(url(libtorch), "file"))
   stopifnot(inherits(url(libmistnet), "file"))
 
@@ -373,8 +373,8 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
 
   install_mistnet(version = version, type = "cpu", install_config = install_config, ...)
   
-  if (!is.null(mistnet_nexrad)) {
-    install_mistnet_nexrad(from_url=mistnet_nexrad)
+  if (!is.null(mistnet_model)) {
+    install_mistnet_model(from_url=mistnet_model)
   } 
 }
 
@@ -390,6 +390,6 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
 get_install_urls <- function(version = "1.10.2", type = install_type(version = version)) {
   libtorch <- install_config[[version]][[type]][[install_os()]][["libtorch"]][["url"]]
   libmistnet <- install_config[[version]][[type]][[install_os()]][["libmistnet"]]
-  mistnet_nexrad <- "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
-  list(libtorch = libtorch, libmistnet = libmistnet, mistnet_nexrad = mistnet_nexrad)
+  mistnet_model <- "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
+  list(libtorch = libtorch, libmistnet = libmistnet, mistnet_model = mistnet_model)
 }
