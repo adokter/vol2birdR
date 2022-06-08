@@ -13,6 +13,7 @@
 #' @import methods
 #' @useDynLib vol2birdR, .registration = TRUE
 #' @import assertthat
+#' @import pkgbuild
 #' @importFrom utils str
 #' @importFrom rlang abort
 #' @importFrom utils capture.output
