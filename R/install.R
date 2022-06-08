@@ -332,7 +332,7 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' @param libtorch The installation archive file to use for Torch. Shall be a \code{"file://"} URL scheme.
 #' @param libmistnet The installation archive file to use for MistNet. Shall be a \code{"file://"} URL scheme.
 #' @param mistnet_model The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!
-#' @param ... other parameters to be passed to [install_torch()]
+#' @param ... other parameters to be passed to `install_torch()`
 #'
 #' @details
 #'

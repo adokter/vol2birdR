@@ -21,7 +21,7 @@ install_mistnet_from_file(
 
 \item{mistnet_model}{The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!}
 
-\item{...}{other parameters to be passed to \code{\link[=install_torch]{install_torch()}}}
+\item{...}{other parameters to be passed to \code{install_torch()}}
 }
 \description{
 Installs Torch and MistNet dependencies from files.
