@@ -24,7 +24,8 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
  * @date 2015-10-16
  */
 #define _POSIX_C_SOURCE 200809L
-#define _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE  // To get timegm on linux
+#define _DARWIN_C_SOURCE // To get timegm on mac
 #include <ctype.h>
 #include <stdio.h>
 #include <math.h>       // M_PI
@@ -1295,7 +1296,7 @@ int populateObject(RaveCoreObject* object, file_element_s* file_element_p) {
    char ntime[7];
    char ndate[9];
    int hourz, minutez, secondz, nominal_time_in_sfm;
-   int yearz, monthz, dayz;
+   int yearz=0, monthz=0, dayz=0;
    double time_in_seconds = 0.0;
    double time_in_minutes = 0.0;
    double nominal_time_in_minutes;
@@ -3157,7 +3158,7 @@ double calc_nyquist(file_element_s *file_element_p) {
          nyquist_velocity = 0.;
          if(PRF1_hz_int != 0  && PRF2_hz_int != 0) {
             nyquist_velocity = wavelength_meters /
-                (4. * abs(PRT1 - PRT2));
+                (4. * fabs(PRT1 - PRT2));
          }
       }
    }
