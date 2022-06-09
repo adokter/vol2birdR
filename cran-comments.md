@@ -14,12 +14,33 @@ There were no ERRORs or WARNINGs.
 We have the following NOTES:
 - GNU make is a SystemRequirements.
 
-## r-hub builder
+## check_rhub() results
 There were no ERRORs or WARNINGs. 
 
 We have the following NOTES:
-- installed size > 5Mb (however .tar.gz package size is < 1Mb)
-- GNU make is a SystemRequirements.
+
+❯ checking CRAN incoming feasibility ... NOTE
+  
+  New submission
+  
+  Found the following (possibly) invalid URLs:
+    URL: https://doi.org/10.1111/2041-210X.13280
+      From: man/vol2birdR-package.Rd
+      Status: 503
+      Message: Service Unavailable
+
+❯ checking installed package size ... NOTE
+    installed size is 10.9Mb
+    sub-directories of 1Mb or more:
+      libs   9.8Mb
+
+❯ checking for GNU extensions in Makefiles ... NOTE
+  GNU make is a SystemRequirements.
+
+- installed size > 5Mb due to system dependency libraries being installed.
+- The uploaded .tar.gz package size is < 1Mb
+
+## check_win_devel() results:
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package
