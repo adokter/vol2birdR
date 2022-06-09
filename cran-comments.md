@@ -17,7 +17,7 @@ We have the following NOTES:
 ## check_rhub() results
 There were no ERRORs or WARNINGs. 
 
-We have the following NOTES:
+We have the following 3 NOTES:
 
 ❯ checking CRAN incoming feasibility ... NOTE
   
@@ -39,8 +39,24 @@ We have the following NOTES:
 
 - installed size > 5Mb due to system dependency libraries being installed.
 - The uploaded .tar.gz package size is < 1Mb
+- We verified the https://doi.org/10.1111/2041-210X.13280 link is accessible
 
 ## check_win_devel() results:
+There were no ERRORs or WARNINGs.
+
+We have one NOTE:
+
+❯ checking CRAN incoming feasibility ... NOTE
+
+  New submission
+
+  Found the following (possibly) invalid URLs:
+    URL: https://doi.org/10.1111/2041-210X.13280
+      From: man/vol2birdR-package.Rd
+      Status: 503
+      Message: Service Unavailable
+
+We verified this link is accessible
 
 ## Downstream dependencies
 There are currently no downstream dependencies for this package
