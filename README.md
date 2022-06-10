@@ -8,7 +8,7 @@ Enables vol2bird for R.
 # Install
 
 **Vol2BirdR** is available for all major platforms, namely Linux, OS X
-and Windows. The package depends on both PROJ and HDF5.
+and Windows. The package depends on GSL, PROJ and HDF5.
 
 ## System Requirements
 
