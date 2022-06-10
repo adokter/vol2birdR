@@ -12,14 +12,16 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
-# Note
+
+# vol2birdR
+
 Enables vol2bird for R.
 
-# Install
+## Installation
 
-**Vol2BirdR** is available for all major platforms, namely Linux, OS X and Windows. The package depends on both PROJ and HDF5.
+**vol2BirdR** is available for all major platforms, namely Linux, OS X and Windows. The package depends on both PROJ and HDF5.
 
-## Requirements
+### Requirements
 
 For OS X and Linux both PROJ and HDF5 needs to be installed.
 
