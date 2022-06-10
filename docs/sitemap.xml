@@ -13,6 +13,9 @@
     <loc>/articles/package.html</loc>
   </url>
   <url>
+    <loc>/articles/vol2birdR.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -68,6 +71,9 @@
   </url>
   <url>
     <loc>/reference/install_mistnet_from_file.html</loc>
+  </url>
+  <url>
+    <loc>/reference/install_mistnet_model.html</loc>
   </url>
   <url>
     <loc>/reference/install_mistnet_nexrad.html</loc>
