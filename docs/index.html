@@ -70,36 +70,36 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="vol2birdr">vol2birdR<a class="anchor" aria-label="anchor" href="#vol2birdr"></a>
 </h1></div>
-<p>Enables vol2bird for R.</p>
+<p>Enables <a href="https://github.com/adokter/vol2bird" class="external-link">vol2bird</a> for R.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p><strong>vol2BirdR</strong> is available for all major platforms, namely Linux, OS X and Windows. The package depends on both PROJ and HDF5.</p>
+<p><strong>vol2BirdR</strong> is available for all major platforms, namely Linux, OS X and Windows. The package depends on GSL, PROJ and HDF5.</p>
 <div class="section level3">
-<h3 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a>
+<h3 id="system-requirements">System Requirements<a class="anchor" aria-label="anchor" href="#system-requirements"></a>
 </h3>
-<p>For OS X and Linux both PROJ and HDF5 needs to be installed.</p>
+<p>For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 need to be installed.</p>
 <table class="table">
 <colgroup>
-<col width="48%">
-<col width="51%">
+<col width="37%">
+<col width="62%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">System</th>
-<th align="left">Command</th>
+<th>System</th>
+<th>Command</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>OS X (using Homebrew)</strong></td>
-<td align="left"><code>brew install hdf5@1.10 proj</code></td>
+<td>OS X (using Homebrew)</td>
+<td><code>brew install hdf5@1.10 proj gsl</code></td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Debian-based systems (including Ubuntu)</strong></td>
-<td align="left"><code>sudo apt-get install libhdf5-dev libproj-dev</code></td>
+<td>Debian-based systems (including Ubuntu)</td>
+<td><code>sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Systems supporting yum and RPMs</strong></td>
-<td align="left"><code>sudo yum install hdf5-devel proj-devel</code></td>
+<td>Systems supporting yum and RPMs</td>
+<td><code>sudo yum install hdf5-devel proj-devel gsl gsl-devel</code></td>
 </tr>
 </tbody>
 </table>

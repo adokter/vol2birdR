@@ -15,11 +15,11 @@ knitr::opts_chunk$set(
 
 # vol2birdR
 
-Enables vol2bird for R.
+Enables [vol2bird](https://github.com/adokter/vol2bird) for R.
 
 ## Installation
 
-**Vol2BirdR** is available for all major platforms, namely Linux, OS X and Windows. The package depends on GSL, PROJ and HDF5.
+**vol2BirdR** is available for all major platforms, namely Linux, OS X and Windows. The package depends on GSL, PROJ and HDF5.
 
 ### System Requirements
 

@@ -3,11 +3,11 @@
 
 # vol2birdR
 
-Enables vol2bird for R.
+Enables [vol2bird](https://github.com/adokter/vol2bird) for R.
 
 ## Installation
 
-**Vol2BirdR** is available for all major platforms, namely Linux, OS X
+**vol2BirdR** is available for all major platforms, namely Linux, OS X
 and Windows. The package depends on GSL, PROJ and HDF5.
 
 ### System Requirements
@@ -15,8 +15,8 @@ and Windows. The package depends on GSL, PROJ and HDF5.
 For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 need
 to be installed.
 
-System | Command
---- | ---
-OS X (using Homebrew) | `brew install hdf5@1.10 proj gsl`
-Debian-based systems (including Ubuntu) | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev`
-Systems supporting yum and RPMs | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`
+| System                                  | Command                                                           |
+|-----------------------------------------|-------------------------------------------------------------------|
+| OS X (using Homebrew)                   | `brew install hdf5@1.10 proj gsl`                                 |
+| Debian-based systems (including Ubuntu) | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
+| Systems supporting yum and RPMs         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`            |
