@@ -1,6 +1,7 @@
 #' The default branch
 #' @keywords internal
 branch <- "main"
+supported_pytorch_versions=c("1.10.2")
 
 #' Contains a list of mistnet libraries for the various OS's
 #' @keywords internal
@@ -286,6 +287,11 @@ install_mistnet_model <- function(reinstall=FALSE, path = install_path(), timeou
 #' @export
 install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
                           path = install_path(), timeout = 360, ...) {
+  assert_that(version %in% supported_pytorch_versions, 
+              msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
+  assert_that(is.flag(reinstall))
+  assert_that(is.number(timeout))
+  
   if (reinstall) {
     unlink(path, recursive = TRUE)
   }
@@ -369,8 +375,11 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' ```
 #' @export
 install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, mistnet_model=NULL, ...) {
-  stopifnot(inherits(url(libtorch), "file"))
-  stopifnot(inherits(url(libmistnet), "file"))
+  assert_that(version %in% supported_pytorch_versions, 
+              msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
+
+  assert_that(inherits(url(libtorch), "file"))
+  assert_that(inherits(url(libmistnet), "file"))
 
   install_config[[version]][["cpu"]][[install_os()]][["libtorch"]][["url"]] <- libtorch
   install_config[[version]][["cpu"]][[install_os()]][["libmistnet"]] <- libmistnet
@@ -384,15 +393,16 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
 
 #' List of files to download
 #'
-#' List the Torch and mistnet files to download as local files in order to proceed with install_mistnet_from_file(). 
-#' See [install_mistnet_from_file()] for example usage.
+#' List the Torch and mistnet files to download as local files
+#' in order to proceed with [install_mistnet_from_file()].
 #'
 #' @param version The Torch version to install.
-#' @param type The installation type for Torch. Valid values is currently \code{"cpu"}.
+#' @param type The installation type for Torch. Valid value is currently \code{"cpu"}.
 #'
 #' @export
 #' @seealso [install_mistnet_from_file()]
 get_install_urls <- function(version = "1.10.2", type = install_type(version = version)) {
+  assert_that(version %in% supported_pytorch_versions)
   libtorch <- install_config[[version]][[type]][[install_os()]][["libtorch"]][["url"]]
   libmistnet <- install_config[[version]][[type]][[install_os()]][["libmistnet"]]
   mistnet_model <- "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
