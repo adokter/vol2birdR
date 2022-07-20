@@ -1,0 +1,13 @@
+url: ~
+
+template:
+  bootstrap: 5
+
+navbar:
+  bg: dark
+
+authors:
+  Adriaan M. Dokter:
+    href: http://adriaandokter.com
+  Anders Henja:
+    href: https://www.linkedin.com/in/anders-henja-03a1b05
