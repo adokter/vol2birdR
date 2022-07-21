@@ -12,6 +12,12 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/vol2birdR)](https://cran.r-project.org/package=vol2birdR)
+[![R-CMD-check](https://github.com/adokter/vol2birdR/workflows/R-CMD-check/badge.svg)](https://github.com/adokter/vol2birdR/actions)
+<!-- badges: end -->
+
 # vol2birdR
 **vol2birdR** is an R package for the vol2bird algorithm for calculating vertical profiles of birds and other biological scatterers from weather radar data. 
 

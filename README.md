@@ -1,5 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/vol2birdR)](https://cran.r-project.org/package=vol2birdR)
+[![R-CMD-check](https://github.com/adokter/vol2birdR/workflows/R-CMD-check/badge.svg)](https://github.com/adokter/vol2birdR/actions)
+<!-- badges: end -->
 
 # vol2birdR
 
