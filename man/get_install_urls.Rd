@@ -16,5 +16,7 @@ List the Torch and mistnet files to download as local files
 in order to proceed with \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}.
 }
 \seealso{
-\code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}
+\itemize{
+\item \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}
+}
 }

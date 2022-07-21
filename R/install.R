@@ -110,8 +110,6 @@ lib_installed <- function(library_name, install_path) {
 #' @param inst_path inst path
 #' @keywords internal
 #' @return if anything could be located or not
-#' @seealso
-#' * [install_misnet_from_file()]
 mistnet_install_lib <- function(library_name, library_url,
                                 install_path, source_path, filter, md5hash,
                                 inst_path) {
@@ -303,6 +301,9 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #' reported length, an increase of the \code{timeout} value should help.
 #'
 #' @export
+#'
+#' @seealso
+#' * [install_mistnet_from_file()]
 install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
                           path = install_path(), timeout = 360, ...) {
   assert_that(version %in% supported_pytorch_versions,
@@ -422,7 +423,8 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
 #'
 #' @export
 #'
-#' @seealso [install_mistnet_from_file()]
+#' @seealso
+#' * [install_mistnet_from_file()]
 get_install_urls <- function(version = "1.10.2", type = install_type(version = version)) {
   assert_that(version %in% supported_pytorch_versions)
   libtorch <- install_config[[version]][[type]][[install_os()]][["libtorch"]][["url"]]

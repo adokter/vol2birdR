@@ -40,3 +40,8 @@ cases and troubleshooting only.
 When timeout error occurs during library archive download, or length of downloaded files differ from
 reported length, an increase of the \code{timeout} value should help.
 }
+\seealso{
+\itemize{
+\item \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}
+}
+}

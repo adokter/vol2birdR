@@ -13,7 +13,7 @@ nexrad_station_file(file)
 The path of the nexrad location file
 }
 \description{
-Retreives and sets the path of the RSL nexrad location file
+Retrieves and sets the path of the RSL nexrad location file
 }
 \details{
 The RSL library stores the locations and names of NEXRAD stations in a fixed-width

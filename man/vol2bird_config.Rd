@@ -118,7 +118,7 @@ Enable these printing options only for debugging purposes
 in a terminal, since large amounts of data will be dumped into the console.
 \itemize{
 \item \code{printCell}: Logical. Print precipitation cell data to stderr. Default \code{FALSE}
-\item \code{printCellProp}: Logical. Print precipitaion cell properties to stderr. Default \code{FALSE}
+\item \code{printCellProp}: Logical. Print precipitation cell properties to stderr. Default \code{FALSE}
 \item \code{printClut}: Logical. Print clutter data to stderr. Default \code{FALSE}
 \item \code{printDbz}: Logical. Print reflectivity factor data to stderr. Default \code{FALSE}
 \item \code{printDealias}: Logical. \code{FALSE}

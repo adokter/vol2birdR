@@ -35,9 +35,4 @@ if anything could be located or not
 \description{
 Installs the library
 }
-\seealso{
-\itemize{
-\item \code{\link[=install_misnet_from_file]{install_misnet_from_file()}}
-}
-}
 \keyword{internal}

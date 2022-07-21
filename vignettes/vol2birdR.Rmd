@@ -9,7 +9,7 @@ vignette: >
 ---
 
 
-vol2birdR is an R package for calculating vertical profiles and other biological scatteres from weather radar data. The original **vol2bird** is written as a C-package and has been migrated to also work as an R package.
+vol2birdR is an R package for calculating vertical profiles and other biological scatterers from weather radar data. The original **vol2bird** is written as a C-package and has been migrated to also work as an R package.
 
 ## Introduction
 The vol2birdR package provides necessary functions to process polar volume data of C-band and S-band radars into vertical profiles of biological scatterers. This package also enables libtorch and the MistNet model for segmentation of meteorological and biological signals.
@@ -43,11 +43,11 @@ Finally, the vertical profile can be calculated using function `vol2bird()`:
 vol2bird(file="/your/input/pvolfile",config=config, vpfile="/your/output/vpfile")
 ```
 
-The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format, or NEXRAD format. The ouput vpfile containing the profile will be in ODIM HDF5 format.
+The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format, or NEXRAD format. The output vpfile containing the profile will be in ODIM HDF5 format.
 
-## Mistnet 
+## MistNet 
 ### Installation
-Mistnet is a deep convolution neural net for segmentating out rain in S-band radar data, see the publication at https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280. 
+MistNet is a deep convolution neural net for segmentating out rain in S-band radar data, see the publication at https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280. 
 To use MistNet, follow the following additional installation steps:
 
 After installing and loading vol2birdR, run `install_mistnet()` from R. This will download libtorch from the download section of https://pytorch.org as well as a wrapper library from AWS that enables the mistnet functionality:

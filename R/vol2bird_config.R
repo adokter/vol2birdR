@@ -92,7 +92,7 @@
 #' Enable these printing options only for debugging purposes
 #' in a terminal, since large amounts of data will be dumped into the console.
 #' * `printCell`: Logical. Print precipitation cell data to stderr. Default `FALSE`
-#' * `printCellProp`: Logical. Print precipitaion cell properties to stderr. Default `FALSE`
+#' * `printCellProp`: Logical. Print precipitation cell properties to stderr. Default `FALSE`
 #' * `printClut`: Logical. Print clutter data to stderr. Default `FALSE`
 #' * `printDbz`: Logical. Print reflectivity factor data to stderr. Default `FALSE`
 #' * `printDealias`: Logical. `FALSE`
