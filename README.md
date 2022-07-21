@@ -33,7 +33,7 @@ of **vol2birdR**:
 
 | System                                      | Command                                                           |
 |:--------------------------------------------|:------------------------------------------------------------------|
-| **OS X (using Homebrew)**                   | `brew install hdf5@1.10 proj gsl`                                 |
+| **OS X (using Homebrew)**                   | `brew install hdf5 proj gsl`                                      |
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
 | **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`            |
 
