@@ -37,7 +37,7 @@ For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 libraries nee
 |**Debian-based systems (including Ubuntu)**| `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev`
 |**Systems supporting yum and RPMs**        | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`
 
-Next, you can install the released version of bioRad from [CRAN](https://CRAN.R-project.org) with:
+Next, you can install the released version of vol2birdR from [CRAN](https://CRAN.R-project.org) with:
 
 ```{r eval = FALSE}
 install.packages("vol2birdR")

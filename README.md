@@ -37,7 +37,7 @@ of **vol2birdR**:
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
 | **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`            |
 
-Next, you can install the released version of bioRad from
+Next, you can install the released version of vol2birdR from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
