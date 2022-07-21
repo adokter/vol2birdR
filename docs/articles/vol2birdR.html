@@ -79,93 +79,106 @@ Dokter &amp; Anders Henja</h4>
 
     
     
-<p>vol2birdR is an R package for providing support to calculate vertical
-profiles and other biological scatteres from weather radar data. The
-original <strong>vol2bird</strong> is written as a C-package and has
-been migrated to also work as an R package.</p>
+<p>vol2birdR is an R package for calculating vertical profiles and other
+biological scatterers from weather radar data. The original
+<strong>vol2bird</strong> is written as a C-package and has been
+migrated to also work as an R package.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The vol2birdR package provides necessary functions to process radar
-data. This package can also use libtorch to utilize machine learning
-during the processing of radar data. This documentation only gives a
-brief introduction on how to use vol2birdR. For more information just
-type: <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library(help=vol2birdR)</a></code></p>
+<p>The vol2birdR package provides necessary functions to process polar
+volume data of C-band and S-band radars into vertical profiles of
+biological scatterers. This package also enables libtorch and the
+MistNet model for segmentation of meteorological and biological
+signals.</p>
 </div>
 <div class="section level2">
-<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+<h2 id="calculating-vertical-profiles">Calculating vertical profiles<a class="anchor" aria-label="anchor" href="#calculating-vertical-profiles"></a>
+</h2>
+<p>First, define a configuration instance, and modify configuration
+settings according to needs.</p>
+<pre><code><span class="co"># load the library</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
+
+<span class="co"># create a configuration instance</span>
+<span class="va">config</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="co"># modify the configuration instance as needed</span>
+<span class="co"># in this example we set the maximum range to 25 km:</span>
+<span class="va">config</span><span class="op">$</span><span class="va">rangeMax</span> <span class="op">&lt;-</span> <span class="fl">25000</span></code></pre>
+<p>The configuration object can be modified heavily. Learn more about
+the available options in the documentation of
+<code><a href="../reference/vol2bird_config.html">vol2bird_config()</a></code></p>
+<p>Note that configuration objects are copied by reference by default,
+and true copies that can be used independently should be assigned
+using:</p>
+<pre><code><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">config_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="va">config</span><span class="op">)</span></code></pre>
+<p>Finally, the vertical profile can be calculated using function
+<code><a href="../reference/vol2bird.html">vol2bird()</a></code>:</p>
+<pre><code><span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>,config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></code></pre>
+<p>The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format,
+or NEXRAD format. The output vpfile containing the profile will be in
+ODIM HDF5 format.</p>
+</div>
+<div class="section level2">
+<h2 id="mistnet">MistNet<a class="anchor" aria-label="anchor" href="#mistnet"></a>
 </h2>
 <div class="section level3">
-<h3 id="mistnet">Mistnet<a class="anchor" aria-label="anchor" href="#mistnet"></a>
+<h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
-<p>Mistnet is a deep convolution neural net for segmentating out rain in
+<p>MistNet is a deep convolution neural net for segmentating out rain in
 S-band radar data, see the publication at <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280" class="external-link uri">https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280</a>.
-To use this functionality you will have to install the mistnet software
-as part of running the vol2birdR library. This is easilly done by
-calling install_mistnet after the library has been loaded.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
-<span class="fu"><a href="../reference/install_mistnet.html">install_mistnet</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>This will download libtorch from the download section of <a href="https://pytorch.org" class="external-link uri">https://pytorch.org</a> as well
-as a wrapper library from our AWS that enables the mistnet
-functionality. The mistnet model has to be manually downloaded and
-specified in the configuration instance. The default location of the
-mistnet model is /opt/vol2bird/etc/mistnet_nexrad.pt. You can download
-the mistnet model from <a href="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt" class="external-link uri">http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt</a>.
-<code>wget http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt -O "/home/docuser/etc/mistnet_nexrad.pt"</code></p>
+To use MistNet, follow the following additional installation steps:</p>
+<p>After installing and loading vol2birdR, run
+<code><a href="../reference/install_mistnet.html">install_mistnet()</a></code> from R. This will download libtorch from
+the download section of <a href="https://pytorch.org" class="external-link uri">https://pytorch.org</a> as well as a wrapper library from
+AWS that enables the mistnet functionality:</p>
+<pre><code><span class="co"># STEP 1: install mistnet libraries</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
+<span class="fu"><a href="../reference/install_mistnet.html">install_mistnet</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<p>After completing this step, the following command should evaluate to
+<code>TRUE</code>:</p>
+<pre><code><span class="fu"><a href="../reference/mistnet_exists.html">mistnet_exists</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<p>Next, the pytorch mistnet model needs to be downloaded, which is
+hosted at <a href="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt" class="external-link uri">http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt</a>. Note
+that this file is large, over 500Mb. It can be downloaded directly from
+R using <code><a href="../reference/install_mistnet_model.html">install_mistnet_model()</a></code>:</p>
+<pre><code><span class="co"># STEP 2: download mistnet model:</span>
+<span class="co"># install mistnet model into vol2birdR package:</span>
+<span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<p><code><a href="../reference/install_mistnet_model.html">install_mistnet_model()</a></code> installs the model by default
+into the vol2birdR package directory. As a result, when reinstalling
+vol2birdR the model file will have to be re-downloaded as well.</p>
+<p>Alternatively, you can store the model in an alternative location
+outside the vol2birdR package directory. This has the advantage that you
+don’t have to re-download the model when reinstalling vol2birdR. Simply
+store the path of the mistnet_nexrad.pt file in the
+<code>mistNetPath</code> element of your configuration object (see
+<code><a href="../reference/vol2bird_config.html">vol2bird_config()</a></code>)</p>
+<p>vol2birdR will automatically locate the file if it is located at
+<code>/opt/vol2bird/etc/mistnet_nexrad.pt</code>, which can be done as
+follows:</p>
+<pre><code><span class="co"># create the directory</span>
+<span class="co"># (in case of a permission-denied error, create the directory manually)</span>
+<span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"/opt/vol2bird/etc"</span>, recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
+
+<span class="co"># download the model</span>
+<span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"/opt/vol2bird/etc/mistnet_nexrad.pt"</span><span class="op">)</span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="processing">Processing<a class="anchor" aria-label="anchor" href="#processing"></a>
+<h3 id="using-misnet">Using MisNet<a class="anchor" aria-label="anchor" href="#using-misnet"></a>
 </h3>
-<p>Processing of the radar data will always be performed in a similar
-way. First you create the configuration instance and modify
-configuration according to needs. Then the actual processor is initiated
-and then the processing is performed.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
-<span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">config</span><span class="op">$</span><span class="va">verbose</span><span class="op">&lt;-</span><span class="cn">TRUE</span>
-<span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span><span class="op">&lt;-</span><span class="cn">TRUE</span>
-<span class="va">processor</span><span class="op">&lt;-</span><span class="va">Vol2Bird</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">processor</span><span class="op">$</span><span class="fu">process</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"/...../volume.h5"</span><span class="op">)</span>,<span class="va">config</span>,<span class="st">"vp.h5"</span>,<span class="st">"pvol.h5"</span><span class="op">)</span></code></pre></div>
-<p>Let’s break down the above example.</p>
-<p>First the vol2birdR library is loaded by using
-<code><a href="https://github.com/adokter/vol2birdR/" class="external-link">library(vol2birdR)</a></code></p>
-<p>The next step is where we setup the configuration required. This can
-be modified heavily and the best way to learn about this is to read the
-documentation about the config-class. In this example, the configuration
-is set to printout verbose output and that the torch library (mistnet)
-should be used using the mistnet model downloaded earlier.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">config</span><span class="op">$</span><span class="va">verbose</span><span class="op">&lt;-</span><span class="cn">TRUE</span>
-<span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span><span class="op">&lt;-</span><span class="cn">TRUE</span>
-<span class="va">config</span><span class="op">$</span><span class="va">mistNetPath</span><span class="op">&lt;-</span><span class="st">"/home/docuser/etc/mistnet_nexrad.pt"</span></code></pre></div>
-<p>In the final step the processing is performed where the input is a
-ODIM H5 volume, above defined configuration and output is a vertical
-profile and a polar volume.</p>
-</div>
-<div class="section level3">
-<h3 id="vol2birdconfig">Vol2BirdConfig<a class="anchor" aria-label="anchor" href="#vol2birdconfig"></a>
-</h3>
-<p>As mentioned earlier, all processing involves a config instance where
-all options are set. These options involves everything from printing
-certain information to what type of processing that should be performed.
-In some cases it might be necessary to copy configuration instances for
-whatever reason. In these cases you can’t just assign the instances
-like</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">extraconfig</span><span class="op">&lt;-</span><span class="va">config</span></code></pre></div>
-<p>When doing like this, the config and extraconfig instances will both
-refer to the same object. To avoid this, use either clone or the copy
-constructor like</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
-<span class="va">extraconfig</span><span class="op">&lt;-</span><span class="va">config</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span>             <span class="co"># Clone method</span>
-<span class="va">otherconfig</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">config</span><span class="op">)</span> <span class="co"># Copy constructor</span></code></pre></div>
-<p>Copyright 2010-2021 Adriaan M. Dokter (Cornell lab of Ornithology,
-University of Amsterdam) &amp; Netherlands eScience Centre</p>
+<p>After installing the MistNet libraries and model file, a profile can
+be calculated as follows:</p>
+<pre><code><span class="co"># define configuration object:</span>
+<span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="co"># enable MistNet:</span>
+<span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
+
+<span class="co"># calculate the profile:</span>
+<span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>, config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

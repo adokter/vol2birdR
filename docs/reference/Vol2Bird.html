@@ -72,7 +72,7 @@ volume (<code>pvol</code>) file using the algorithm
   vpfile <span class="op">=</span> <span class="st">""</span>,
   pvolfile_out <span class="op">=</span> <span class="st">""</span>,
   verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  return_config <span class="op">=</span> <span class="cn">FALSE</span>
+  update_config <span class="op">=</span> <span class="cn">FALSE</span>
 <span class="op">)</span></code></pre></div>
     </div>
 
@@ -99,7 +99,7 @@ volume (<code>pvol</code>) file in the ODIM HDF5 format to disk. Useful for conv
 RSL formats to ODIM, and for adding MistNet segmentation output.</p></dd>
 <dt>verbose</dt>
 <dd><p>logical. When TRUE print profile output to console.</p></dd>
-<dt>return_config</dt>
+<dt>update_config</dt>
 <dd><p>logical. When TRUE processing options that are determined based on
 input file characteristics are returned and updated in the object specified by the <code>config</code>
 argument. Do not set to <code>TRUE</code> when <code>vol2bird()</code> is used in loops like <code><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply()</a></code> or in parallel processes.</p></dd>
