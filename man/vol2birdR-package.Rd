@@ -39,5 +39,10 @@ Authors:
   \item Anders Henja \email{anders.henja@gmail.com}
 }
 
+Other contributors:
+\itemize{
+  \item GloBAM (https://globam.science) [funder]
+}
+
 }
 \keyword{internal}

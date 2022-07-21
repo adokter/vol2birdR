@@ -22,14 +22,14 @@
 #'   volume (`pvol`) file in the ODIM HDF5 format to disk. Useful for converting
 #'   RSL formats to ODIM, and for adding MistNet segmentation output.
 #' @param verbose logical. When TRUE print profile output to console.
-#' @param return_config logical. When TRUE processing options that are determined based on
+#' @param update_config logical. When TRUE processing options that are determined based on
 #' input file characteristics are returned and updated in the object specified by the `config`
 #' argument. Do not set to `TRUE` when `vol2bird()` is used in loops like `lapply()` or in parallel processes.
-#' 
+#'
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
-vol2bird <- function(file, config, vpfile="", pvolfile_out="", verbose=TRUE, return_config=FALSE){
+vol2bird <- function(file, config, vpfile="", pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
     assert_that(file.exists(filename))
   }
@@ -40,25 +40,25 @@ vol2bird <- function(file, config, vpfile="", pvolfile_out="", verbose=TRUE, ret
     config <- vol2bird_config()
   }
   assert_that(is.flag(verbose))
-  assert_that(is.flag(return_config))
-  
+  assert_that(is.flag(update_config))
+
   if(config$useMistNet){
     assert_that(mistnet_exists(),msg="mistnet installation not found, install with `install_mistnet()`")
     assert_that(file.exists(config$mistNetPath),msg="mistnet model file not found, point `mistNetPath` option to valid mistnet file or download the model with `install_mistnet_model()`")
   }
-  
+
   assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))
-  
+
   # make a copy of the configuration object for parallel processes.
   # The processor might change the configuration object based on the
   # input file characteristics
-  if(return_config){
+  if(update_config){
     config_instance <- config
   }
   else{
-    config_instance <- vol2bird_config(config)  
+    config_instance <- vol2bird_config(config)
   }
-  
+
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
   processor$process(path.expand(file), config_instance, path.expand(vpfile), path.expand(pvolfile_out))

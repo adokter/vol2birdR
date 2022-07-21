@@ -9,7 +9,7 @@ rsl2odim(
   config,
   pvolfile_out = "",
   verbose = TRUE,
-  return_config = FALSE
+  update_config = FALSE
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ RSL formats to ODIM, and for adding MistNet segmentation output.}
 
 \item{verbose}{logical. When TRUE print profile output to console.}
 
-\item{return_config}{logical. When TRUE processing options that are determined based on
+\item{update_config}{logical. When TRUE processing options that are determined based on
 input file characteristics are returned and updated in the object specified by the \code{config}
 argument. Do not set to \code{TRUE} when \code{vol2bird()} is used in loops like \code{lapply()} or in parallel processes.}
 }

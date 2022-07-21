@@ -13,7 +13,7 @@ install_mistnet(
 )
 }
 \arguments{
-\item{version}{The MistNet version to install.}
+\item{version}{The libtorch version to install.}
 
 \item{reinstall}{Re-install MistNet even if its already installed?}
 
@@ -24,14 +24,19 @@ install_mistnet(
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
 }
 \description{
-Installs MistNet libraries and dependencies.
+Installs libraries and dependencies for using MistNet.
 }
 \details{
+By default libraries are installed in the vol2birdR package directory.
+
 When using \code{path} to install in a specific location, make sure the \code{MISTNET_HOME} environment
-variable is set to this same path to reuse this installation. The \code{TORCH_INSTALL} environment
+variable is set to this same path to reuse this installation.
+
+The \code{TORCH_INSTALL} environment
 variable can be set to \code{0} to prevent auto-installing torch and \code{TORCH_LOAD} set to \code{0}
 to avoid loading dependencies automatically. These environment variables are meant for advanced use
 cases and troubleshooting only.
+
 When timeout error occurs during library archive download, or length of downloaded files differ from
 reported length, an increase of the \code{timeout} value should help.
 }

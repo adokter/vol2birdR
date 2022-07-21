@@ -1,11 +1,11 @@
 #' Create a vol2bird configuration instance
-#' 
+#'
 #' Creates or copies a vol2bird configuration instance of class `Rcpp_Vol2BirdConfig`
 #'
 #' @param config a configuration instance to be copied.
 #'
 #' @return an object of class `Rcpp_Vol2BirdConfig`
-#' 
+#'
 #' @details
 #' ## Copying configuration instances
 #' All processing options for [vol2bird()] are set using a configuration instance of class `Rcpp_Vol2BirdConfig`
@@ -23,7 +23,7 @@
 #' # create a copy identical to object config:
 #' extra_config<-vol2bird_config(config)
 #' ```
-#' 
+#'
 #' ## User configuration options
 #' The `Rcpp_Vol2BirdConfig` class object sets the following vol2bird processing options:
 #' * `azimMax`: Numeric. The minimum azimuth (0-360 degrees) used for constructing the bird density profile
@@ -47,7 +47,7 @@
 #' * `stdDevMinBird`: Numeric. VVP Radial velocity standard deviation threshold. Default 2 m/s.
 #' * `useClutterMap`: Logical. Whether to use a static clutter map. Default `FALSE`
 #' * `useMistNet`: Logical. Whether to use the MistNet segmentation model. Default `FALSE`.
-#' 
+#'
 #' ## Advanced configuration options
 #' Changing these settings is rarely needed.
 #' * `cellEtaMin`:  Numeric. Maximum mean reflectivity in cm^2/km^3 for cells containing birds
@@ -87,7 +87,7 @@
 #' * `constant_nRangNeighborhood`: vrad's texture is calculated based on the local neighborhood. The neighborhood size in the range direction is equal to this value. Default 3
 #' * `constant_refracIndex`: Refractive index of the scatterers. Default equal to water 0.964
 #' * `constant_vradMin`: When analyzing cells, radial velocities lower than vradMin are treated as clutter. Default 1 m/s.
-#' 
+#'
 #' ## Debug printing options
 #' Enable these printing options only for debugging purposes
 #' in a terminal, since large amounts of data will be dumped into the console.
@@ -102,9 +102,9 @@
 #' * `printRhohv`: Logical. Print correlation coefficient data to stderr. Default `FALSE`
 #' * `printTex`: Logical. Print radial velocity texture data to stderr. Default `FALSE`
 #' * `printVrad`: Logical. Print radial velocity data to stderr. Default `FALSE`
-#' 
+#'
 #' @export
-#' 
+#'
 #' @seealso
 #' * [vol2bird()]
 #'
@@ -120,7 +120,10 @@
 vol2bird_config <- function(config){
   if(missing(config)){
     output=Vol2BirdConfig$new()
-    output$mistNetPath <- file.path(find.package("vol2birdR"), "data", "mistnet_nexrad.pt")
+    mistnet_model_path <- file.path(find.package("vol2birdR"), "data", "mistnet_nexrad.pt")
+    if(file.exists(mistnet_model_path)){
+      output$mistNetPath <-  mistnet_model_path
+    }
   }
   else{
     assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))

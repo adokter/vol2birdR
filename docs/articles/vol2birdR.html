@@ -69,7 +69,8 @@
 <div class="row">
   <main id="main"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Introduction to vol2birdR</h1>
-                        <h4 data-toc-skip class="author">Adriaan M. Dokter &amp; Anders Henja</h4>
+                        <h4 data-toc-skip class="author">Adriaan M.
+Dokter &amp; Anders Henja</h4>
             
       
       <small class="dont-index">Source: <a href="https://github.com/adokter/vol2birdR/blob/HEAD/vignettes/vol2birdR.Rmd" class="external-link"><code>vignettes/vol2birdR.Rmd</code></a></small>
@@ -78,11 +79,18 @@
 
     
     
-<p>vol2birdR is an R package for providing support to calculate vertical profiles and other biological scatteres from weather radar data. The original <strong>vol2bird</strong> is written as a C-package and has been migrated to also work as an R package.</p>
+<p>vol2birdR is an R package for providing support to calculate vertical
+profiles and other biological scatteres from weather radar data. The
+original <strong>vol2bird</strong> is written as a C-package and has
+been migrated to also work as an R package.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The vol2birdR package provides necessary functions to process radar data. This package can also use libtorch to utilize machine learning during the processing of radar data. This documentation only gives a brief introduction on how to use vol2birdR. For more information just type: <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library(help=vol2birdR)</a></code></p>
+<p>The vol2birdR package provides necessary functions to process radar
+data. This package can also use libtorch to utilize machine learning
+during the processing of radar data. This documentation only gives a
+brief introduction on how to use vol2birdR. For more information just
+type: <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library(help=vol2birdR)</a></code></p>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -90,16 +98,29 @@
 <div class="section level3">
 <h3 id="mistnet">Mistnet<a class="anchor" aria-label="anchor" href="#mistnet"></a>
 </h3>
-<p>Mistnet is a deep convolution neural net for segmentating out rain in S-band radar data, see the publication at <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280" class="external-link uri">https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280</a>. To use this functionality you will have to install the mistnet software as part of running the vol2birdR library. This is easilly done by calling install_mistnet after the library has been loaded.</p>
+<p>Mistnet is a deep convolution neural net for segmentating out rain in
+S-band radar data, see the publication at <a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280" class="external-link uri">https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280</a>.
+To use this functionality you will have to install the mistnet software
+as part of running the vol2birdR library. This is easilly done by
+calling install_mistnet after the library has been loaded.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
 <span class="fu"><a href="../reference/install_mistnet.html">install_mistnet</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<p>This will download libtorch from the download section of <a href="https://pytorch.org" class="external-link uri">https://pytorch.org</a> as well as a wrapper library from our AWS that enables the mistnet functionality. The mistnet model has to be manually downloaded and specified in the configuration instance. The default location of the mistnet model is /opt/vol2bird/etc/mistnet_nexrad.pt. You can download the mistnet model from <a href="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt" class="external-link uri">http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt</a>. <code>wget http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt -O "/home/docuser/etc/mistnet_nexrad.pt"</code></p>
+<p>This will download libtorch from the download section of <a href="https://pytorch.org" class="external-link uri">https://pytorch.org</a> as well
+as a wrapper library from our AWS that enables the mistnet
+functionality. The mistnet model has to be manually downloaded and
+specified in the configuration instance. The default location of the
+mistnet model is /opt/vol2bird/etc/mistnet_nexrad.pt. You can download
+the mistnet model from <a href="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt" class="external-link uri">http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt</a>.
+<code>wget http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt -O "/home/docuser/etc/mistnet_nexrad.pt"</code></p>
 </div>
 <div class="section level3">
 <h3 id="processing">Processing<a class="anchor" aria-label="anchor" href="#processing"></a>
 </h3>
-<p>Processing of the radar data will always be performed in a similar way. First you create the configuration instance and modify configuration according to needs. Then the actual processor is initiated and then the processing is performed.</p>
+<p>Processing of the radar data will always be performed in a similar
+way. First you create the configuration instance and modify
+configuration according to needs. Then the actual processor is initiated
+and then the processing is performed.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
 <span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
@@ -108,28 +129,43 @@
 <span class="va">processor</span><span class="op">&lt;-</span><span class="va">Vol2Bird</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
 <span class="va">processor</span><span class="op">$</span><span class="fu">process</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"/...../volume.h5"</span><span class="op">)</span>,<span class="va">config</span>,<span class="st">"vp.h5"</span>,<span class="st">"pvol.h5"</span><span class="op">)</span></code></pre></div>
 <p>Let’s break down the above example.</p>
-<p>First the vol2birdR library is loaded by using <code><a href="https://github.com/adokter/vol2birdR/" class="external-link">library(vol2birdR)</a></code></p>
-<p>The next step is where we setup the configuration required. This can be modified heavily and the best way to learn about this is to read the documentation about the config-class. In this example, the configuration is set to printout verbose output and that the torch library (mistnet) should be used using the mistnet model downloaded earlier.</p>
+<p>First the vol2birdR library is loaded by using
+<code><a href="https://github.com/adokter/vol2birdR/" class="external-link">library(vol2birdR)</a></code></p>
+<p>The next step is where we setup the configuration required. This can
+be modified heavily and the best way to learn about this is to read the
+documentation about the config-class. In this example, the configuration
+is set to printout verbose output and that the torch library (mistnet)
+should be used using the mistnet model downloaded earlier.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
 <span class="va">config</span><span class="op">$</span><span class="va">verbose</span><span class="op">&lt;-</span><span class="cn">TRUE</span>
 <span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span><span class="op">&lt;-</span><span class="cn">TRUE</span>
 <span class="va">config</span><span class="op">$</span><span class="va">mistNetPath</span><span class="op">&lt;-</span><span class="st">"/home/docuser/etc/mistnet_nexrad.pt"</span></code></pre></div>
-<p>In the final step the processing is performed where the input is a ODIM H5 volume, above defined configuration and output is a vertical profile and a polar volume.</p>
+<p>In the final step the processing is performed where the input is a
+ODIM H5 volume, above defined configuration and output is a vertical
+profile and a polar volume.</p>
 </div>
 <div class="section level3">
 <h3 id="vol2birdconfig">Vol2BirdConfig<a class="anchor" aria-label="anchor" href="#vol2birdconfig"></a>
 </h3>
-<p>As mentioned earlier, all processing involves a config instance where all options are set. These options involves everything from printing certain information to what type of processing that should be performed. In some cases it might be necessary to copy configuration instances for whatever reason. In these cases you can’t just assign the instances like</p>
+<p>As mentioned earlier, all processing involves a config instance where
+all options are set. These options involves everything from printing
+certain information to what type of processing that should be performed.
+In some cases it might be necessary to copy configuration instances for
+whatever reason. In these cases you can’t just assign the instances
+like</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
 <span class="va">extraconfig</span><span class="op">&lt;-</span><span class="va">config</span></code></pre></div>
-<p>When doing like this, the config and extraconfig instances will both refer to the same object. To avoid this, use either clone or the copy constructor like</p>
+<p>When doing like this, the config and extraconfig instances will both
+refer to the same object. To avoid this, use either clone or the copy
+constructor like</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">config</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>
 <span class="va">extraconfig</span><span class="op">&lt;-</span><span class="va">config</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span><span class="op">)</span>             <span class="co"># Clone method</span>
 <span class="va">otherconfig</span><span class="op">&lt;-</span><span class="va">Vol2BirdConfig</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">config</span><span class="op">)</span> <span class="co"># Copy constructor</span></code></pre></div>
-<p>Copyright 2010-2021 Adriaan M. Dokter (Cornell lab of Ornithology, University of Amsterdam) &amp; Netherlands eScience Centre</p>
+<p>Copyright 2010-2021 Adriaan M. Dokter (Cornell lab of Ornithology,
+University of Amsterdam) &amp; Netherlands eScience Centre</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -140,7 +176,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by <a href="https://www.linkedin.com/in/anders-henja-03a1b05" class="external-link">Anders Henja</a>, <a href="http://adriaandokter.com" class="external-link">Adriaan M. Dokter</a>.</p>
+<p>Developed by <a href="https://www.linkedin.com/in/anders-henja-03a1b05" class="external-link">Anders Henja</a>, <a href="http://adriaandokter.com" class="external-link">Adriaan M. Dokter</a>, GloBAM.</p>
 </div>
 
 <div class="pkgdown-footer-right">

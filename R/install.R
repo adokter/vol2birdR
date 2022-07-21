@@ -81,7 +81,7 @@ mistnet_exists <- function() {
   if (!length(list.files(file.path(install_path(), "lib"), "mistnet")) > 0) {
     return(FALSE)
   }
-  
+
   TRUE
 }
 
@@ -110,6 +110,8 @@ lib_installed <- function(library_name, install_path) {
 #' @param inst_path inst path
 #' @keywords internal
 #' @return if anything could be located or not
+#' @seealso
+#' * [install_misnet_from_file()]
 mistnet_install_lib <- function(library_name, library_url,
                                 install_path, source_path, filter, md5hash,
                                 inst_path) {
@@ -135,11 +137,11 @@ mistnet_install_lib <- function(library_name, library_url,
   uncompress <- if (identical(library_extension, "tgz")) utils::untar else utils::unzip
 
   uncompress(temp_file, exdir = temp_path)
-  
+
   #if (!file.exists(file.path(install_path, inst_path))){
   #  dir.create(file.path(install_path, inst_path))
   #}
-  
+
   file.copy(
     from = dir(file.path(temp_path, source_path), full.names = TRUE),
     to = file.path(install_path, inst_path),
@@ -191,7 +193,7 @@ mistnet_install_libs <- function(version, type, install_path, install_config) {
     }
 
     library_info <- install_info[[library_name]]
-    
+
     if (!is.list(library_info)) {
       library_info <- list(url = library_info, filter = "", path = "", inst_path = "lib")
     }
@@ -229,21 +231,37 @@ install_type <- function(version) {
 #' @param ... other optional arguments (like \code{`load`} for manual installation).
 #'
 #' @details
-#' Used to download and install the mistnet model file
+#' Download and install the mistnet model file. By default the library is downloaded to
+#' data/mistnet_nexrad.pt in the vol2birdR package directory.
+#'
+#' Alternatively, the model file can be downloaded to a different location, which has the
+#' advantage that it doesn't have to be redownloaded after a reinstall of vol2birdR.
+#'
+#' vol2birdR will automatically detect the model file if it is downloaded to
+#' `/opt/vol2bird/etc/mistnet_nexrad.pt`, which can be done as follows
+#' ```R
+#' download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
+#' ```
 #'
 #' @export
-install_mistnet_model <- function(reinstall=FALSE, path = install_path(), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", ...)
+install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_install_path(),"data","mistnet_nexrad.pt"), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", ...)
 {
-  if (reinstall) {
-    if (file.exists(file.path(path, "data/mistnet_nexrad.pt"))) {
-      unlink(file.path(path, "data/mistnet_nexrad.pt"))
+  if (!dir.exists(dirname(path))) {
+    if(!dir.create(dirname(path), recursive=TRUE)){
+      stop("cannot create directory")
     }
   }
-  
-  if (file.exists(file.path(path, "data/mistnet_nexrad.pt"))) {
+
+  if (reinstall) {
+    if (file.exists(path)) {
+      unlink(path)
+    }
+  }
+
+  if (file.exists(path)) {
     return(TRUE)
   }
-  
+
   temp_file <- tempfile(fileext = ".pt")
 
   withr::with_options(
@@ -252,46 +270,46 @@ install_mistnet_model <- function(reinstall=FALSE, path = install_path(), timeou
   )
   on.exit(try(unlink(temp_file)))
 
-  if (!dir.exists(file.path(path,"data"))) {
-    dir.create(file.path(path,"data"))
-  }
-  
   file.copy(
     from = temp_file,
-    to = file.path(path, "data/mistnet_nexrad.pt")
+    to = path
   )
-  
+
   return(TRUE)
 }
 
 #' Install MistNet libraries
 #'
-#' Installs MistNet libraries and dependencies.
+#' Installs libraries and dependencies for using MistNet.
 #'
-#' @param version The MistNet version to install.
+#' @param version The libtorch version to install.
 #' @param reinstall Re-install MistNet even if its already installed?
 #' @param path Optional path to install or check for an already existing installation.
 #' @param timeout Optional timeout in seconds for large file download.
 #' @param ... other optional arguments (like \code{`load`} for manual installation).
 #'
 #' @details
+#' By default libraries are installed in the vol2birdR package directory.
 #'
 #' When using \code{path} to install in a specific location, make sure the \code{MISTNET_HOME} environment
-#' variable is set to this same path to reuse this installation. The \code{TORCH_INSTALL} environment
+#' variable is set to this same path to reuse this installation.
+#'
+#' The \code{TORCH_INSTALL} environment
 #' variable can be set to \code{0} to prevent auto-installing torch and \code{TORCH_LOAD} set to \code{0}
 #' to avoid loading dependencies automatically. These environment variables are meant for advanced use
 #' cases and troubleshooting only.
+#'
 #' When timeout error occurs during library archive download, or length of downloaded files differ from
 #' reported length, an increase of the \code{timeout} value should help.
 #'
 #' @export
 install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
                           path = install_path(), timeout = 360, ...) {
-  assert_that(version %in% supported_pytorch_versions, 
+  assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
   assert_that(is.flag(reinstall))
   assert_that(is.number(timeout))
-  
+
   if (reinstall) {
     unlink(path, recursive = TRUE)
   }
@@ -343,9 +361,9 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' @details
 #'
 #' When [install_mistnet()] initiated download is not possible, but installation archive files are
-#' present on local filesystem, [install_mistnet_from_file()] can be used as a workaround to installation issue.
+#' present on local filesystem, [install_mistnet_from_file()] can be used as a workaround to installation issues.
 #' \code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
-#' that is used for the R package. Both are highly dependent, and should be checked through [get_install_urls()]
+#' that is used for the R package. Both are highly platform dependent, and should be checked through [get_install_urls()]
 #'
 #' ```R
 #' > get_install_urls()
@@ -369,13 +387,16 @@ install_mistnet <- function(version = "1.10.2", reinstall = FALSE,
 #' ```
 #' Then in R, type:
 #' ```R
-#' > install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip", 
+#' > install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
 #'      libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
 #'      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 #' ```
 #' @export
+#'
+#' @seealso
+#' * [install_mistnet()]
 install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, mistnet_model=NULL, ...) {
-  assert_that(version %in% supported_pytorch_versions, 
+  assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
 
   assert_that(inherits(url(libtorch), "file"))
@@ -385,13 +406,13 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
   install_config[[version]][["cpu"]][[install_os()]][["libmistnet"]] <- libmistnet
 
   install_mistnet(version = version, type = "cpu", install_config = install_config, ...)
-  
+
   if (!is.null(mistnet_model)) {
     install_mistnet_model(from_url=mistnet_model)
-  } 
+  }
 }
 
-#' List of files to download
+#' List of installation files to download
 #'
 #' List the Torch and mistnet files to download as local files
 #' in order to proceed with [install_mistnet_from_file()].
@@ -400,6 +421,7 @@ install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, 
 #' @param type The installation type for Torch. Valid value is currently \code{"cpu"}.
 #'
 #' @export
+#'
 #' @seealso [install_mistnet_from_file()]
 get_install_urls <- function(version = "1.10.2", type = install_type(version = version)) {
   assert_that(version %in% supported_pytorch_versions)

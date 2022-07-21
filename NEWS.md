@@ -1,3 +1,3 @@
-# bioRad 0.1.0
+# vol2birdR 0.1.0
 
-First release of new package
+Initial release of new package

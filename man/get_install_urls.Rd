@@ -2,18 +2,18 @@
 % Please edit documentation in R/install.R
 \name{get_install_urls}
 \alias{get_install_urls}
-\title{List of files to download}
+\title{List of installation files to download}
 \usage{
 get_install_urls(version = "1.10.2", type = install_type(version = version))
 }
 \arguments{
 \item{version}{The Torch version to install.}
 
-\item{type}{The installation type for Torch. Valid values is currently \code{"cpu"}.}
+\item{type}{The installation type for Torch. Valid value is currently \code{"cpu"}.}
 }
 \description{
-List the Torch and mistnet files to download as local files in order to proceed with install_mistnet_from_file().
-See \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}} for example usage.
+List the Torch and mistnet files to download as local files
+in order to proceed with \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}.
 }
 \seealso{
 \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}
