@@ -38,10 +38,10 @@ int check_mistnet_loaded_c(void)
 }
 }
 
-std::thread::id main_thread_id() noexcept {
-  static const auto tid = std::this_thread::get_id();
-  return tid;
-}
+//std::thread::id main_thread_id() noexcept {
+//  static const auto tid = std::this_thread::get_id();
+//  return tid;
+//}
 
 //' Sets the main thread id
 //'
@@ -49,7 +49,9 @@ std::thread::id main_thread_id() noexcept {
 // [[Rcpp::export]]
 void cpp_vol2bird_namespace__store_main_thread_id() {
   // called upon package load to remember the thread ID of the main thread
-  main_thread_id();
+
+  // AHE: Temporary removed. Requires C++ 11.
+  // main_thread_id();
 }
 
 void Vol2Bird_Rprintf(const char* msg) {
