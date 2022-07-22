@@ -4791,7 +4791,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     alldata->misc.dbzMax = 10*log(alldata->options.etaMax / alldata->misc.dbzFactor)/log(10);
     alldata->misc.cellDbzMin = 10*log(alldata->options.cellEtaMin / alldata->misc.dbzFactor)/log(10);
     // if stdDevMinBird not set by STDEV_BIRD in options.conf, initialize it depending on wavelength:
-    if (alldata->options.stdDevMinBird == -FLT_MAX){
+    if (alldata->options.stdDevMinBird < 0){
         if (alldata->options.radarWavelength < 7.5){
             //C-band default:
             alldata->options.stdDevMinBird = STDEV_BIRD;
