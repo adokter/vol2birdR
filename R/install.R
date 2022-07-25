@@ -226,6 +226,7 @@ install_type <- function(version) {
 #' @param path Optional path to install or check for an already existing installation.
 #' @param timeout Optional timeout in seconds for large file download.
 #' @param from_url From where the mistnet model file should be downloaded.
+#' @param method The download method to use, see \link[utils]{download.file}
 #' @param ... other optional arguments (like \code{`load`} for manual installation).
 #'
 #' @details
@@ -242,7 +243,7 @@ install_type <- function(version) {
 #' ```
 #'
 #' @export
-install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_install_path(),"data","mistnet_nexrad.pt"), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", ...)
+install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_install_path(),"data","mistnet_nexrad.pt"), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", method="libcurl", ...)
 {
   if (!dir.exists(dirname(path))) {
     if(!dir.create(dirname(path), recursive=TRUE)){
@@ -264,7 +265,7 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 
   withr::with_options(
     list(timeout = timeout),
-    utils::download.file(from_url, temp_file)
+    utils::download.file(from_url, temp_file, method=method)
   )
   on.exit(try(unlink(temp_file)))
 
