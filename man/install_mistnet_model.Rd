@@ -9,7 +9,7 @@ install_mistnet_model(
   path = file.path(torch_install_path(), "data", "mistnet_nexrad.pt"),
   timeout = 1800,
   from_url = "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt",
-  method = "libcurl",
+  method = "curl",
   ...
 )
 }
