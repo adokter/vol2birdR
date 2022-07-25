@@ -18,9 +18,9 @@ network for precipitation segmentation, installing PyTorch libraries and
 model.
 
 **vol2birdR** can be used as a stand-alone package, but we recommend
-[bioRad](http://adokter.github.io/bioRad) as the primary user interface,
+[bioRad](https://adriaandokter.com/bioRad/) as the primary user interface,
 with **vol2birdR** acting as a dependency of
-[bioRad](http://adokter.github.io/bioRad).
+[bioRad](https://adriaandokter.com/bioRad/).
 
 # Install
 
