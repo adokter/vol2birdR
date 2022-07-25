@@ -9,6 +9,7 @@ install_mistnet_model(
   path = file.path(torch_install_path(), "data", "mistnet_nexrad.pt"),
   timeout = 1800,
   from_url = "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt",
+  method = "libcurl",
   ...
 )
 }
@@ -20,6 +21,8 @@ install_mistnet_model(
 \item{timeout}{Optional timeout in seconds for large file download.}
 
 \item{from_url}{From where the mistnet model file should be downloaded.}
+
+\item{method}{The download method to use, see \link[utils]{download.file}}
 
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
 }
