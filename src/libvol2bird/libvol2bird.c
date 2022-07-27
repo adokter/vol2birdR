@@ -2301,24 +2301,41 @@ double PolarVolume_getWavelength(PolarVolume_t* pvol)
     RAVE_ASSERT((pvol != NULL), "pvol == NULL");
     
     double value = 0;
+    int speed_of_light = 299792458;
 
     RaveAttribute_t* attr = PolarVolume_getAttribute(pvol, "how/wavelength");
     if (attr != (RaveAttribute_t *) NULL){
         RaveAttribute_getDouble(attr, &value);
     }
     else{
-        // wavelength attribute was not found in the root /how attribute
-        // check whether we can find it under /dataset1/how 
-        PolarScan_t* scan = PolarVolume_getScan(pvol, 1);
-        if (scan != (PolarScan_t *) NULL){
-            attr = PolarScan_getAttribute(scan, "how/wavelength");
-            if (attr != (RaveAttribute_t *) NULL){
-                RaveAttribute_getDouble(attr, &value);
-                vol2bird_err_printf( "Warning: using radar wavelength stored for scan 1 (%f cm) for all scans ...\n", value);
+        attr = PolarVolume_getAttribute(pvol, "how/frequency");
+        if (attr != (RaveAttribute_t *) NULL){
+            RaveAttribute_getDoubleo(attr, &value);
+            // convert frequency in Hz to wavelength in cm
+            value = 100*speed_of_light/value;
+        }
+        else{
+            // wavelength attribute was not found in the root /how attribute
+            // check whether we can find it under /dataset1/how 
+            PolarScan_t* scan = PolarVolume_getScan(pvol, 1);
+            if (scan != (PolarScan_t *) NULL){
+                attr = PolarScan_getAttribute(scan, "how/wavelength");
+                if (attr != (RaveAttribute_t *) NULL){
+                    RaveAttribute_getDouble(attr, &value);
+                    vol2bird_err_printf( "Warning: using radar wavelength stored for scan 1 (%f cm) for all scans ...\n", value);
+                }
+                else{
+                    attr = PolarScan_getAttribute(scan, "how/frequency");
+                    if (attr != (RaveAttribute_t *) NULL){
+                        RaveAttribute_getDouble(attr, &value);
+                        // convert frequency in Hz to wavelength in cm
+                        value = 100*speed_of_light/value;
+                        vol2bird_err_printf( "Warning: using radar frequency stored for scan 1 (%f Hz) for all scans ...\n", value);
+                    }
+                }
             }
         }
     }
-    
     return value;
 }
 
