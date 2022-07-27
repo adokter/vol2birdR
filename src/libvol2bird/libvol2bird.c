@@ -2310,7 +2310,7 @@ double PolarVolume_getWavelength(PolarVolume_t* pvol)
     else{
         attr = PolarVolume_getAttribute(pvol, "how/frequency");
         if (attr != (RaveAttribute_t *) NULL){
-            RaveAttribute_getDoubleo(attr, &value);
+            RaveAttribute_getDouble(attr, &value);
             // convert frequency in Hz to wavelength in cm
             value = 100*speed_of_light/value;
         }
