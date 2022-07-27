@@ -1,7 +1,7 @@
 Package: vol2birdR
 Type: Package
 Title: Vertical Profiles of Biological Signals in Weather Radar Data
-Version: 0.1.1
+Version: 0.1.1.9913
 Date: 2022-07-25
 Authors@R: c(
     person("Anders", "Henja", email = "anders.henja@gmail.com", role = "aut"),
@@ -24,7 +24,7 @@ Imports:
     utils,
     withr
 LinkingTo: Rcpp, RcppGSL
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 SystemRequirements: GNU make, GSL, HDF5, PROJ

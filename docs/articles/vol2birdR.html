@@ -8,8 +8,8 @@
 <meta name="description" content="vol2birdR">
 <title>Introduction to vol2birdR • vol2birdR</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to vol2birdR">
 <meta property="og:description" content="vol2birdR">
@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9913</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,7 +67,7 @@
 
 
 <div class="row">
-  <main id="main"><div class="page-header">
+  <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Introduction to vol2birdR</h1>
                         <h4 data-toc-skip class="author">Adriaan M.
 Dokter &amp; Anders Henja</h4>
@@ -97,26 +97,26 @@ signals.</p>
 </h2>
 <p>First, define a configuration instance, and modify configuration
 settings according to needs.</p>
-<pre><code><span class="co"># load the library</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
-
-<span class="co"># create a configuration instance</span>
-<span class="va">config</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="co"># modify the configuration instance as needed</span>
-<span class="co"># in this example we set the maximum range to 25 km:</span>
-<span class="va">config</span><span class="op">$</span><span class="va">rangeMax</span> <span class="op">&lt;-</span> <span class="fl">25000</span></code></pre>
+<pre><code><span><span class="co"># load the library</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># create a configuration instance</span></span>
+<span><span class="va">config</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># modify the configuration instance as needed</span></span>
+<span><span class="co"># in this example we set the maximum range to 25 km:</span></span>
+<span><span class="va">config</span><span class="op">$</span><span class="va">rangeMax</span> <span class="op">&lt;-</span> <span class="fl">25000</span></span></code></pre>
 <p>The configuration object can be modified heavily. Learn more about
 the available options in the documentation of
 <code><a href="../reference/vol2bird_config.html">vol2bird_config()</a></code></p>
 <p>Note that configuration objects are copied by reference by default,
 and true copies that can be used independently should be assigned
 using:</p>
-<pre><code><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">config_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="va">config</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">config_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="va">config</span><span class="op">)</span></span></code></pre>
 <p>Finally, the vertical profile can be calculated using function
 <code><a href="../reference/vol2bird.html">vol2bird()</a></code>:</p>
-<pre><code><span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>,config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>,config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></span></code></pre>
 <p>The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format,
 or NEXRAD format. The output vpfile containing the profile will be in
 ODIM HDF5 format.</p>
@@ -134,19 +134,19 @@ To use MistNet, follow the following additional installation steps:</p>
 <code><a href="../reference/install_mistnet.html">install_mistnet()</a></code> from R. This will download libtorch from
 the download section of <a href="https://pytorch.org" class="external-link uri">https://pytorch.org</a> as well as a wrapper library from
 AWS that enables the mistnet functionality:</p>
-<pre><code><span class="co"># STEP 1: install mistnet libraries</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span>
-<span class="fu"><a href="../reference/install_mistnet.html">install_mistnet</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="co"># STEP 1: install mistnet libraries</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/install_mistnet.html">install_mistnet</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
 <p>After completing this step, the following command should evaluate to
 <code>TRUE</code>:</p>
-<pre><code><span class="fu"><a href="../reference/mistnet_exists.html">mistnet_exists</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="fu"><a href="../reference/mistnet_exists.html">mistnet_exists</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
 <p>Next, the pytorch mistnet model needs to be downloaded, which is
 hosted at <a href="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt" class="external-link uri">http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt</a>. Note
 that this file is large, over 500Mb. It can be downloaded directly from
 R using <code><a href="../reference/install_mistnet_model.html">install_mistnet_model()</a></code>:</p>
-<pre><code><span class="co"># STEP 2: download mistnet model:</span>
-<span class="co"># install mistnet model into vol2birdR package:</span>
-<span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="co"># STEP 2: download mistnet model:</span></span>
+<span><span class="co"># install mistnet model into vol2birdR package:</span></span>
+<span><span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
 <p><code><a href="../reference/install_mistnet_model.html">install_mistnet_model()</a></code> installs the model by default
 into the vol2birdR package directory. As a result, when reinstalling
 vol2birdR the model file will have to be re-downloaded as well.</p>
@@ -159,26 +159,26 @@ store the path of the mistnet_nexrad.pt file in the
 <p>vol2birdR will automatically locate the file if it is located at
 <code>/opt/vol2bird/etc/mistnet_nexrad.pt</code>, which can be done as
 follows:</p>
-<pre><code><span class="co"># create the directory</span>
-<span class="co"># (in case of a permission-denied error, create the directory manually)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"/opt/vol2bird/etc"</span>, recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span>
-
-<span class="co"># download the model</span>
-<span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"/opt/vol2bird/etc/mistnet_nexrad.pt"</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="co"># create the directory</span></span>
+<span><span class="co"># (in case of a permission-denied error, create the directory manually)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"/opt/vol2bird/etc"</span>, recursive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># download the model</span></span>
+<span><span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"/opt/vol2bird/etc/mistnet_nexrad.pt"</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="using-misnet">Using MisNet<a class="anchor" aria-label="anchor" href="#using-misnet"></a>
 </h3>
 <p>After installing the MistNet libraries and model file, a profile can
 be calculated as follows:</p>
-<pre><code><span class="co"># define configuration object:</span>
-<span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="co"># enable MistNet:</span>
-<span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
-
-<span class="co"># calculate the profile:</span>
-<span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>, config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></code></pre>
+<pre><code><span><span class="co"># define configuration object:</span></span>
+<span><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># enable MistNet:</span></span>
+<span><span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span></span>
+<span><span class="co"># calculate the profile:</span></span>
+<span><span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>, config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></span></code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -194,7 +194,7 @@ be calculated as follows:</p>
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>
