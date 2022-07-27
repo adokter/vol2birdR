@@ -888,7 +888,7 @@ public:
       fileIn[i] = (char*) files(i);
     }
 
-    volume = vol2birdGetVolume(fileIn, files.size(), 1000000, 1);
+    volume = vol2birdGetVolume(fileIn, files.size(), 1000000, 0);
     if (volume == NULL) {
       throw std::runtime_error("Could not read file(s)");
     }
