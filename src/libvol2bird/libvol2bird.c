@@ -3056,7 +3056,14 @@ static int verticalProfile_AddCustomField(VerticalProfile_t* self, RaveField_t* 
     int result = 0;
     RAVE_ASSERT((self != NULL), "self == NULL");
     RaveAttribute_t* attr = RaveAttributeHelp_createString("what/quantity", quantity);
-    RaveAttribute_t* attr_gain = RaveAttributeHelp_createDouble("what/gain", 1.0);
+    // FIXME: this is a hotfix to undo a gain multiplier by RAVE for HGHT
+    RaveAttribute_t* attr_gain;
+    if(strncmp("HGHT",quantity,4)==0){
+        attr_gain = RaveAttributeHelp_createDouble("what/gain", 1.0/1000);
+    }
+    else{
+        attr_gain = RaveAttributeHelp_createDouble("what/gain", 1.0);
+    }
     RaveAttribute_t* attr_offset = RaveAttributeHelp_createDouble("what/offset", 0.0);
     RaveAttribute_t* attr_nodata = RaveAttributeHelp_createDouble("what/nodata", NODATA);
     RaveAttribute_t* attr_undetect = RaveAttributeHelp_createDouble("what/undetect", UNDETECT);
