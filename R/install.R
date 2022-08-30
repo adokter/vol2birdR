@@ -243,7 +243,7 @@ install_type <- function(version) {
 #' ```
 #'
 #' @export
-install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_install_path(),"data","mistnet_nexrad.pt"), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", method="curl", ...)
+install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_install_path(),"data","mistnet_nexrad.pt"), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", method="libcurl", ...)
 {
   if (!dir.exists(dirname(path))) {
     if(!dir.create(dirname(path), recursive=TRUE)){
@@ -265,7 +265,7 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 
   withr::with_options(
     list(timeout = timeout),
-    utils::download.file(from_url, temp_file, method=method)
+    utils::download.file(from_url, temp_file, method=method, mode="wb")
   )
   on.exit(try(unlink(temp_file)))
 
