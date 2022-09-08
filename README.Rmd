@@ -31,6 +31,36 @@ It also provides an R interface to the MistNet convolutional neural network for 
 
 For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 libraries need to be installed as system libraries prior to installation of **vol2birdR**:
 
+<details>
+<summary>Additional information when installing the dependencies on macOS</summary>
+Since the installation process requires the [Homebrew](https://brew.sh/) package manager you will have to install it. Open a terminal and
+issue the following command:
+```
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+When the installation has completed it will print out some additional information that is essential to follow.
+```
+==> Next steps:
+- Run these two commands in your terminal to add Homebrew to your PATH:
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/anders/.zprofile
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+- Run brew help to get started
+- Further documentation:
+    https://docs.brew.sh
+```
+
+You need to ensure that you follow the above two commands. The first one will add the necessary environment variables to your user
+```
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/anders/.zprofile
+```
+
+The second command will ensure that you get the necessary environment variables into the terminal where you ran the installation process of Homebrew.
+```
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+```
+</details>
+
 | System                                    | Command
 |:------------------------------------------|:---------------------------------------------|
 |**OS X (using Homebrew)**                  | `brew install hdf5 proj gsl`
