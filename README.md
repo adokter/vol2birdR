@@ -46,7 +46,7 @@ When the installation has completed it will print out some additional informatio
 
     ==> Next steps:
     - Run these two commands in your terminal to add Homebrew to your PATH:
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/<your username>/.zprofile
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
         eval "$(/opt/homebrew/bin/brew shellenv)"
     - Run brew help to get started
     - Further documentation:
@@ -55,9 +55,11 @@ When the installation has completed it will print out some additional informatio
 You need to ensure that you follow the above two commands. The first one will add the necessary environment variables to your user
 
 ``` 
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/<your username>/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
 ```
 
+(You may also edit your `.zprofile` file and add the output of the `brew shellenv` command manually)
+    
 The second command will ensure that you get the necessary environment variables into the terminal where you ran the installation process of Homebrew.
 
 ``` 
