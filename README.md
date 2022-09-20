@@ -34,39 +34,34 @@ of **vol2birdR**:
 
 <details>
 
-<summary>Additional information when installing the dependencies on
-macOS</summary> Since the installation process requires the
-[Homebrew](https://brew.sh/) package manager you will have to install
-it. Open a terminal and issue the following command:
+<summary><b>Click here</b> for additional information when installing the dependencies on <b>macOS</b></summary>
+
+Since the installation process requires the [Homebrew](https://brew.sh/) package manager you will have to install it. Open a terminal and issue the following command:
 
 ``` 
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-When the installation has completed it will print out some additional
-information that is essential to follow.
+When the installation has completed it will print out some additional information that is essential to follow.
 
     ==> Next steps:
     - Run these two commands in your terminal to add Homebrew to your PATH:
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/anders/.zprofile
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/<your username>/.zprofile
         eval "$(/opt/homebrew/bin/brew shellenv)"
     - Run brew help to get started
     - Further documentation:
         https://docs.brew.sh
 
-You need to ensure that you follow the above two commands. The first one
-will add the necessary environment variables to your user
+You need to ensure that you follow the above two commands. The first one will add the necessary environment variables to your user
 
 ``` 
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/anders/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/<your username>/.zprofile
 ```
 
-The second command will ensure that you get the necessary environment
-variables into the terminal where you ran the installation process of
-Homebrew.
+The second command will ensure that you get the necessary environment variables into the terminal where you ran the installation process of Homebrew.
 
 ``` 
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
 </details>
