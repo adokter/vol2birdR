@@ -7,6 +7,16 @@ Authors@R: c(
     person("Anders", "Henja", email = "anders.henja@gmail.com", role = "aut"),
     person("Adriaan M.", "Dokter", email = "amd427@cornell.edu",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6573-066X")),
+    person("Jurriaan H.", "Spaaks", role = "ctb"),
+    person("Lourens", "Veen", role = "ctb"),
+    person("Iwan", "Holleman", role = "ctb"),
+    person("Hidde", "Leijnse", role = "ctb"),
+    person("John H.", "Merritt", role = "ctb"),
+    person("Bart", "Kelley", role = "ctb"),
+    person("Daniel", "Michelson", role = "ctb"),
+    person("Mark", "Couture", role = "ctb"),
+    person("Harri", "Hohti", role = "ctb"),
+    person("Ulf E.", "Nordh", role = "ctb"),
     person("GloBAM", role = "fnd", comment = "https://globam.science")
   )
 Description: R implementation of the vol2bird software for generating vertical profiles
