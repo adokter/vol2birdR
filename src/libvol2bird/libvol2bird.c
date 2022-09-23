@@ -3056,14 +3056,7 @@ static int verticalProfile_AddCustomField(VerticalProfile_t* self, RaveField_t* 
     int result = 0;
     RAVE_ASSERT((self != NULL), "self == NULL");
     RaveAttribute_t* attr = RaveAttributeHelp_createString("what/quantity", quantity);
-    // FIXME: this is a hotfix to undo a gain multiplier by RAVE for HGHT
-    RaveAttribute_t* attr_gain;
-    if(strncmp("HGHT",quantity,4)==0){
-        attr_gain = RaveAttributeHelp_createDouble("what/gain", 1.0/1000);
-    }
-    else{
-        attr_gain = RaveAttributeHelp_createDouble("what/gain", 1.0);
-    }
+    RaveAttribute_t* attr_gain = RaveAttributeHelp_createDouble("what/gain", 1.0);
     RaveAttribute_t* attr_offset = RaveAttributeHelp_createDouble("what/offset", 0.0);
     RaveAttribute_t* attr_nodata = RaveAttributeHelp_createDouble("what/nodata", NODATA);
     RaveAttribute_t* attr_undetect = RaveAttributeHelp_createDouble("what/undetect", UNDETECT);
@@ -3105,6 +3098,10 @@ int saveToODIM(RaveCoreObject* object, const char* filename){
     //define new Rave IO instance
     RaveIO_t* raveio = RAVE_OBJECT_NEW(&RaveIO_TYPE);
     //VpOdimIO_t* raveio = RAVE_OBJECT_NEW(&VpOdimIO_TYPE);
+
+    //save in ODIM version 2.3, to keep HGHT in unit m and
+    //keep deprecated wavelength attribute, as expected by bioRad
+    RaveIO_setOdimVersion(raveio, RaveIO_ODIM_Version_2_3);
 
     //set the object to be saved
     RaveIO_setObject(raveio, object);
