@@ -37,6 +37,8 @@ Alternatively, the model file can be downloaded to a different location, which h
 advantage that it doesn't have to be redownloaded after a reinstall of vol2birdR.
 
 vol2birdR will automatically detect the model file if it is downloaded to
-\verb{/opt/vol2bird/etc/mistnet_nexrad.pt}, which can be done as follows\if{html}{\out{<div class="sourceCode R">}}\preformatted{download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
+\verb{/opt/vol2bird/etc/mistnet_nexrad.pt}, which can be done as follows
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
 }\if{html}{\out{</div>}}
 }
