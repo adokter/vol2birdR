@@ -1,3 +1,3 @@
-# vol2birdR 0.1.0
+# vol2birdR 0.2.0
 
-Initial release of new package
+Initial release on CRAN of new package
