@@ -25,6 +25,7 @@
 #include <confuse.h>
 #endif
 #include <stdlib.h>
+#include <stdarg.h>
 #include <math.h>
 #include <unistd.h>
 #include <vertical_profile.h>
