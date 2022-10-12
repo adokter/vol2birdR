@@ -24,20 +24,20 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef IRIS2LIST_INTERFACE_H
 #define IRIS2LIST_INTERFACE_H
-#include "dlist.h"
+#include "irisdlist.h"
 
 
 sweep_element_s *handle_ingest_data_headers(
-                              DList **sweeplist,
+                    IrisDList_t **sweeplist,
                     sweep_element_s **sweep_list_element,
-                            IRISbuf *IRISbuf_p,
-                              _Bool target_is_big_endian);
+                    IRISbuf *IRISbuf_p,
+                    _Bool target_is_big_endian);
 
 rhd_s *extract_ray_header(UINT1 *ptr_s0);
 
 rayplus_s *extract_rayplus(IRISbuf **IRISbuf_pp,
                              UINT2 offset,
-                             DList **sweeplist_pp,
+                             IrisDList_t **sweeplist_pp,
                    sweep_element_s **sweep_list_element_pp,
                              SINT2 current_sweep,
                               FILE *fp,
