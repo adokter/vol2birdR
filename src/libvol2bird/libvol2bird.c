@@ -3011,9 +3011,9 @@ float nanify(float value){
 
 void nanify_str(char* buff, const char* fmt, double v) {
   if (v == NODATA) {
-    strcpy(buff, "nan");
-  } else if (v == UNDETECT) {
     strcpy(buff, "na");
+  } else if (v == UNDETECT) {
+    strcpy(buff, "nan");
   } else {
     sprintf(buff, fmt, v);
   }
