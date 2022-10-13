@@ -3009,8 +3009,43 @@ float nanify(float value){
     return output;
 } // nanify
 
+void nanify_str(char* buff, const char* fmt, double v) {
+  if (v == NODATA) {
+    strcpy(buff, "nan");
+  } else if (v == UNDETECT) {
+    strcpy(buff, "na");
+  } else {
+    sprintf(buff, fmt, v);
+  }
+}
 
-
+void create_profile_printout_str(char* printbuffer, int buflen, const char* date, const char* time,
+    float HGHT, float u, float v, float w, float ff, float dd,
+    float sd_vvp, char gap, float dbz, float eta, float dens, float DBZH,
+    float n, float n_dbz, float n_all, float n_dbz_all)
+{
+  char s_HGHT[8], s_u[16], s_v[16], s_w[16], s_ff[16], s_dd[16];
+  char s_sd_vvp[16], s_dbz[16], s_eta[16], s_dens[16], s_DBZH[16];
+  char s_n[16], s_n_dbz[16], s_n_all[16], s_n_dbz_all[16];
+  memset(printbuffer, 0, sizeof(char)*buflen);
+  sprintf(s_HGHT, "%4.f", HGHT);
+  nanify_str(s_u, "%6.2f", u);
+  nanify_str(s_v, "%6.2f", v);
+  nanify_str(s_w, "%7.2f", w);
+  nanify_str(s_ff, "%5.2f", ff);
+  nanify_str(s_dd, "%5.1f", dd);
+  nanify_str(s_sd_vvp, "%6.2f", sd_vvp);
+  nanify_str(s_dbz, "%6.2f", dbz);
+  nanify_str(s_eta, "%6.1f", eta);
+  nanify_str(s_dens, "%6.2f", dens);
+  nanify_str(s_DBZH, "%6.2f", DBZH);
+  nanify_str(s_n, "%5.f", n);
+  nanify_str(s_n_dbz, "%5.f", n_dbz);
+  nanify_str(s_n_all, "%5.f", n_all);
+  nanify_str(s_n_dbz_all, "%5.f", n_dbz_all);
+  sprintf(printbuffer, "%8s %.4s %4s %6s %6s %7s %5s %5s %6s %1c %6s %6s %6s %6s %5s %5s %5s %5s", date, time, s_HGHT,
+      s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz, s_n_all, s_n_dbz_all);
+}
 
 static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_quantity, const char* quantity, RaveDataType raveType){
     int result = 0;
