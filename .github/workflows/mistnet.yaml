@@ -50,7 +50,7 @@ jobs:
             artifacts: libmistnet.dylib
             upload: macOS
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Create environment
         run: cmake -E make_directory ${{runner.workspace}}/build
       - name: Free up 24GB of disk space
