@@ -11,7 +11,7 @@
 #'   [ODIM](https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf)
 #'    format, which is the implementation of the OPERA data information model in
 #'   the [HDF5](https://support.hdfgroup.org/HDF5/) format, 2) NEXRAD format
-#'   supported by the [RSL
+#'   supported by the ['RSL'
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
 #'   IRIS (IRIS RAW) format.
 #' @param config optional configuration object of class `Rcpp_Vol2BirdConfig`,
@@ -20,7 +20,7 @@
 #'   file (`vpfile`) in the ODIM HDF5 format to disk.
 #' @param pvolfile_out Character. File name. When provided, writes a polar
 #'   volume (`pvol`) file in the ODIM HDF5 format to disk. Useful for converting
-#'   RSL formats to ODIM, and for adding MistNet segmentation output.
+#'   'RSL' formats to ODIM, and for adding 'MistNet' segmentation output.
 #' @param verbose logical. When TRUE print profile output to console.
 #' @param update_config logical. When TRUE processing options that are determined based on
 #' input file characteristics are returned and updated in the object specified by the `config`
@@ -45,8 +45,8 @@ vol2bird <- function(file, config, vpfile="", pvolfile_out="", verbose=TRUE, upd
   assert_that(inherits(config,"Rcpp_Vol2BirdConfig"))
 
   if(config$useMistNet){
-    assert_that(mistnet_exists(),msg="mistnet installation not found, install with `install_mistnet()`")
-    assert_that(file.exists(config$mistNetPath),msg="mistnet model file not found, point `mistNetPath` option to valid mistnet file or download the model with `install_mistnet_model()`")
+    assert_that(mistnet_exists(),msg="'MistNet' installation not found, install with `install_mistnet()`")
+    assert_that(file.exists(config$mistNetPath),msg="'MistNet' model file not found, point `mistNetPath` option to valid 'MistNet' file or download the model with `install_mistnet_model()`")
   }
 
   # make a copy of the configuration object for parallel processes.

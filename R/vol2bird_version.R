@@ -1,12 +1,12 @@
-#' Return vol2bird version
+#' Return 'vol2bird' version
 #'
-#' Return version of the vol2bird algorithm
+#' Return version of the 'vol2bird' algorithm
 #'
 #' @return an object of class \link{numeric_version}
 #'
 #' @export
 #' @examples
-#' # check installed vol2bird version:
+#' # check installed 'vol2bird' version:
 #' vol2bird_version()
 vol2bird_version <- function(){
   constants_header_file <- file.path(find.package("vol2birdR"),"libvol2bird","constants.h")

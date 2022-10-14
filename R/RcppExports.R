@@ -15,14 +15,14 @@ NULL
 
 #' @name Vol2BirdConfig-class
 #' @title Vol2Bird configuration
-#' @description The vol2bird configuration used during processing
+#' @description The 'vol2bird' configuration used during processing
 #' @keywords internal
 #' @seealso [vol2bird_config()]
 NULL
 
 #' @name Vol2Bird-class
 #' @title Vol2Bird processor class
-#' @description The vol2bird processing class.
+#' @description The 'vol2bird' processing class.
 #' Provides methods for processing polar volumes/scans.
 #' @keywords internal
 #' @seealso [vol2bird()]
@@ -45,14 +45,14 @@ NULL
 #' @rdname Vol2BirdConfig-class
 #' @name Rcpp_Vol2BirdConfig-class
 #' @title Rcpp_Vol2BirdConfig-class
-#' @description The Rcpp vol2bird configuration class.
+#' @description The Rcpp 'vol2bird' configuration class.
 #' Configuration instance used when processing data.
 NULL
 
 #' @rdname Vol2Bird-class
 #' @name Rcpp_Vol2Bird-class
 #' @title Rcpp_Vol2Bird-class
-#' @description The Rcpp vol2bird processing class.
+#' @description The Rcpp 'vol2bird' processing class.
 NULL
 
 #' Sets the main thread id
@@ -62,7 +62,7 @@ cpp_vol2bird_namespace__store_main_thread_id <- function() {
     invisible(.Call(`_vol2birdR_cpp_vol2bird_namespace__store_main_thread_id`))
 }
 
-#' Initializes the vol2birdR library
+#' Initializes the 'vol2birdR' library
 #'
 #' @keywords internal
 cpp_vol2bird_initialize <- function() {
@@ -85,7 +85,7 @@ cpp_vol2bird_get_wsr88d_site_location <- function() {
     .Call(`_vol2birdR_cpp_vol2bird_get_wsr88d_site_location`)
 }
 
-#' Initializes the mistnet shared library pointed to by the path
+#' Initializes the 'MistNet' shared library pointed to by the path
 #'
 #' @keywords internal
 #' @param path The shared library
