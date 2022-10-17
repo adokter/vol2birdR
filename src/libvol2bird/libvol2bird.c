@@ -3024,7 +3024,7 @@ void create_profile_printout_str(char* printbuffer, int buflen, const char* date
     float sd_vvp, char gap, float dbz, float eta, float dens, float DBZH,
     float n, float n_dbz, float n_all, float n_dbz_all)
 {
-  char s_HGHT[8], s_u[16], s_v[16], s_w[16], s_ff[16], s_dd[16];
+  char s_HGHT[16], s_u[16], s_v[16], s_w[16], s_ff[16], s_dd[16];
   char s_sd_vvp[16], s_dbz[16], s_eta[16], s_dens[16], s_DBZH[16];
   char s_n[16], s_n_dbz[16], s_n_all[16], s_n_dbz_all[16];
   memset(printbuffer, 0, sizeof(char)*buflen);
