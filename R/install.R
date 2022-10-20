@@ -437,7 +437,7 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE,
 #'
 #' @seealso
 #' * [install_mistnet()]
-install_mistnet_from_file <- function(version = "1.10.2", libtorch, libmistnet, mistnet_model=NULL, ...) {
+install_mistnet_from_file <- function(version = "1.12.1", libtorch, libmistnet, mistnet_model=NULL, ...) {
   assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
 
