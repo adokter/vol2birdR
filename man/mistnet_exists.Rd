@@ -2,13 +2,13 @@
 % Please edit documentation in R/install.R
 \name{mistnet_exists}
 \alias{mistnet_exists}
-\title{Checks if the torch and mistnet libraries have been installed or not.}
+\title{Checks if the 'Torch' and 'MistNet' libraries have been installed or not.}
 \usage{
 mistnet_exists()
 }
 \value{
-TRUE if both torch and mistnet libraries can be found, otherwise FALSE
+TRUE if both 'Torch' and 'MistNet' libraries can be found, otherwise FALSE
 }
 \description{
-Checks if the torch and mistnet libraries have been installed or not.
+Checks if the 'Torch' and 'MistNet' libraries have been installed or not.
 }

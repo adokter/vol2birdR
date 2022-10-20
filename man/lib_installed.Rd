@@ -2,12 +2,12 @@
 % Please edit documentation in R/install.R
 \name{lib_installed}
 \alias{lib_installed}
-\title{Returns the path of the mistnet libraries for specified version}
+\title{Returns the path of the 'MistNet' libraries for specified version}
 \usage{
 lib_installed(library_name, install_path)
 }
 \arguments{
-\item{library_name}{The name of the library searched for, either libmistnet or libtorch}
+\item{library_name}{The name of the library searched for, either 'libmistnet' or 'libtorch'}
 
 \item{install_path}{The location where to look for the libraries}
 }
@@ -15,6 +15,6 @@ lib_installed(library_name, install_path)
 if anything could be located or not
 }
 \description{
-Returns the path of the mistnet libraries for specified version
+Returns the path of the 'MistNet' libraries for specified version
 }
 \keyword{internal}

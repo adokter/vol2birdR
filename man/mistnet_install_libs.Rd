@@ -2,7 +2,7 @@
 % Please edit documentation in R/install.R
 \name{mistnet_install_libs}
 \alias{mistnet_install_libs}
-\title{Installs the mistnet libraries}
+\title{Installs the 'MistNet' libraries}
 \usage{
 mistnet_install_libs(version, type, install_path, install_config)
 }
@@ -16,6 +16,6 @@ mistnet_install_libs(version, type, install_path, install_config)
 \item{install_config}{the library config}
 }
 \description{
-Installs the mistnet libraries
+Installs the 'MistNet' libraries
 }
 \keyword{internal}

@@ -2,17 +2,17 @@
 % Please edit documentation in R/install.R
 \name{install_path}
 \alias{install_path}
-\title{Returns the path of the mistnet libraries for specified version}
+\title{Returns the path of the 'MistNet' libraries for specified version}
 \usage{
 install_path(version = "1.0")
 }
 \arguments{
-\item{version}{The MistNet version checked for}
+\item{version}{The 'MistNet' version checked for}
 }
 \value{
 the path to the libraries
 }
 \description{
-Returns the path of the mistnet libraries for specified version
+Returns the path of the 'MistNet' libraries for specified version
 }
 \keyword{internal}
