@@ -4755,7 +4755,7 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-LIBS="${LIBS} ${PKG_LIBS} -lsqlite3"
+LIBS="${LIBS} ${PKG_LIBS}"
 
 
 
@@ -5191,6 +5191,7 @@ fi
 
 if [ "$useproj6" = "yes" ]; then
   proj6ok=yes
+  LIBS="${LIBS} -lsqlite3"
          for ac_header in proj.h
 do :
   ac_fn_cxx_check_header_compile "$LINENO" "proj.h" "ac_cv_header_proj_h" "$ac_includes_default"

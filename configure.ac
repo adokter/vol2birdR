@@ -166,7 +166,7 @@ AC_CHECK_HEADERS(proj_api.h,,[
 
 dnl changes needed for static PROJ 6
 AC_LANG(C++)
-LIBS="${LIBS} ${PKG_LIBS} -lsqlite3"
+LIBS="${LIBS} ${PKG_LIBS}"
 
 AC_CHECK_LIB(proj,pj_init_plus,,proj4ok=no)
 
@@ -180,6 +180,7 @@ fi
 
 if [[ "$useproj6" = "yes" ]]; then
   proj6ok=yes
+  LIBS="${LIBS} -lsqlite3"
   AC_CHECK_HEADERS(proj.h,, proj6ok=no)
   AC_CHECK_LIB(proj, proj_create_crs_to_crs,, proj6ok=no)
 fi
