@@ -838,16 +838,29 @@ public:
       profileAll = vol2birdGetProfile(3, config.alldata());
 
       int iRowProfile;
-      int iCopied = 0;
 
       for (iRowProfile = 0; iRowProfile < nRowsProfile; iRowProfile++) {
-        iCopied = iRowProfile * nColsProfile;
-        Rprintf("%8s %.4s ", date, time);
-        Rprintf("%4.f %6.2f %6.2f %7.2f %5.2f %5.1f %6.2f %1c %6.2f %6.1f %6.2f %6.2f %5.f %5.f %5.f %5.f\n", profileBio[0 + iCopied],
-            nanify(profileBio[2 + iCopied]), nanify(profileBio[3 + iCopied]), nanify(profileBio[4 + iCopied]), nanify(profileBio[5 + iCopied]),
-            nanify(profileBio[6 + iCopied]), nanify(profileAll[7 + iCopied]), profileBio[8 + iCopied] == TRUE ? 'T' : 'F', nanify(profileBio[9 + iCopied]),
-            nanify(profileBio[11 + iCopied]), nanify(profileBio[12 + iCopied]), nanify(profileAll[9 + iCopied]), nanify(profileBio[10 + iCopied]),
-            nanify(profileBio[13 + iCopied]), nanify(profileAll[10 + iCopied]), nanify(profileAll[13 + iCopied]));
+        char printbuffer[1024];
+        int iCopied = iRowProfile * nColsProfile;
+        float HGHT = profileBio[0 + iCopied];
+        float u = profileBio[2 + iCopied];
+        float v = profileBio[3 + iCopied];
+        float w = profileBio[4 + iCopied];
+        float ff = profileBio[5 + iCopied];
+        float dd = profileBio[6 + iCopied];
+        float sd_vvp = profileAll[7 + iCopied];
+        char gap = profileBio[8 + iCopied] == TRUE ? 'T' : 'F';
+        float dbz = profileBio[9 + iCopied];
+        float eta = profileBio[11 + iCopied];
+        float dens = profileBio[12 + iCopied];
+        float DBZH = profileAll[9 + iCopied];
+        float n = profileBio[10 + iCopied];
+        float n_dbz = profileBio[13 + iCopied];
+        float n_all = profileAll[10 + iCopied];
+        float n_dbz_all = profileAll[13 + iCopied];
+
+        create_profile_printout_str(printbuffer, 1024, date, time, HGHT, u, v, w, ff, dd, sd_vvp, gap, dbz, eta, dens, DBZH, n, n_dbz, n_all, n_dbz_all);
+        Rprintf("%s\n", printbuffer);
       }
 
       profileAll = NULL;

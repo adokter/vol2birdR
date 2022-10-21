@@ -2,16 +2,16 @@
 % Please edit documentation in R/mistnet_load.R
 \name{mistnet_start}
 \alias{mistnet_start}
-\title{Initialize the mistnet system if enabled.}
+\title{Initialize the 'MistNet' system if enabled.}
 \usage{
 mistnet_start(version = mistnet_default(), reload = FALSE)
 }
 \arguments{
-\item{version}{version of mistnet library}
+\item{version}{version of 'MistNet' library}
 
-\item{reload}{if mistnet library should be reloaded or not, default FALSE.}
+\item{reload}{if 'MistNet' library should be reloaded or not, default FALSE.}
 }
 \description{
-Initialize the mistnet system if enabled.
+Initialize the 'MistNet' system if enabled.
 }
 \keyword{internal}

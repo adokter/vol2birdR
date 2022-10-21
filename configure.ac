@@ -142,13 +142,15 @@ LIBS="${PKG_LIBS} ${LIBS}"
 # since we'll set PKG_CPPFLAGS with this, but that shouldn't hurt
 CPPFLAGS="${PKG_CPPFLAGS} ${CPPFLAGS} "
 
+with_proj6=no
 AC_ARG_ENABLE([proj6],
   AS_HELP_STRING(--enable-proj6, [use the new PROJ6 API even if PROJ4 API is available. The default is @<:@disable@:>@ since PROJ6 API has issues, use with caution.]),
-  [with_proj6=$withval], [with_proj6=no])
+  [with_proj6=$enableval], [with_proj6=$with_proj6])
 
 # unless forced, try to use PROJ4 first
+useproj6=no
 proj4ok=yes
-use6=no
+proj6ok=no
 
 AC_CHECK_HEADERS(proj_api.h,,[
   AC_MSG_CHECKING([with ACCEPT_USE_OF_DEPRECATED_PROJ_API_H])
@@ -157,61 +159,45 @@ AC_CHECK_HEADERS(proj_api.h,,[
   CPPFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1 $CPPFLAGS"
   unset ac_cv_header_proj_api_h
   AC_CHECK_HEADERS(proj_api.h,,[
+    proj4ok=no
     CPPFLAGS="$savCPPFLAGS"
-    AC_CHECK_HEADERS(proj.h, use6=yes, proj4ok=no)
   ])
 ])
 
 dnl changes needed for static PROJ 6
 AC_LANG(C++)
-LIBS="${LIBS} ${PKG_LIBS} -lsqlite3"
+LIBS="${LIBS} ${PKG_LIBS}"
 
-AC_CHECK_LIB(proj,pj_init_plus,,[
-  use6=yes
-  AC_CHECK_LIB(proj,proj_create_crs_to_crs,, proj4ok=no)
-])
+AC_CHECK_LIB(proj,pj_init_plus,,proj4ok=no)
 
 AC_MSG_CHECKING([whether to require PROJ6 API])
-if test x"${with_proj6}" = xno; then
-   AC_MSG_RESULT([no])
- else
+if [[ "$with_proj6" = "yes" -o "$proj4ok" = "no" ]]; then
   AC_MSG_RESULT([yes])
-  use6=yes
-  AC_CHECK_HEADERS(proj.h,, proj4ok=no)
-  AC_CHECK_LIB(proj,proj_create_crs_to_crs,, proj4ok=no)
+  useproj6=yes
+else
+  AC_MSG_RESULT([no])
 fi
 
-AC_MSG_CHECKING([whether to use PROJ6 API])
-AC_MSG_RESULT([$use6])
-if test "x$use6" = xyes; then
-   CPPFLAGS="${PKG_CPPFLAGS}"
+if [[ "$useproj6" = "yes" ]]; then
+  proj6ok=yes
+  LIBS="${LIBS} -lsqlite3"
+  AC_CHECK_HEADERS(proj.h,, proj6ok=no)
+  AC_CHECK_LIB(proj, proj_create_crs_to_crs,, proj6ok=no)
+fi
+
+AC_MSG_CHECKING([If proj6 is usable])
+AC_MSG_RESULT([$proj6ok])
+if [[ "$proj6ok" = "yes" ]]; then
+   CPPFLAGS="${CPPFLAGS}"
 else
    CPPFLAGS="${CPPFLAGS} -DUSE_PROJ4_API=1"
-fi
-if test "${proj4ok}" = no; then
+fi  
+
+if [[ "$proj4ok" = "no" -a "$proj6ok" = "no" ]]; then
    AC_MSG_ERROR([libproj and/or proj.h/proj_api.h not found in standard search locations.
 
 *** Install PROJ library and if necessary set PKG_CPPFLAGS/PKG_LIBS accordingly.])
 fi
-
-WITH_TORCH=no
-
-AC_ARG_WITH(torch, [ --with-torch=yes/no/path Compile with torch support],
-                    , withval=no)
-AC_MSG_CHECKING(if torch should be used)
-case $withval in
-  no)
-    AC_MSG_RESULT(suppressed)
-    ;;
-  yes)
-    WITH_TORCH=yes
-    AC_MSG_RESULT($WITH_TORCH)
-    ;;
-  *)
-
-    ;;
-esac
-    
 
 AC_ARG_VAR([PKG_CPPFLAGS],[custom C preprocessor flags for packages compilation])
 AC_ARG_VAR([PKG_LIBS],[custom libraries for package compilation])

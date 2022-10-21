@@ -2,7 +2,7 @@
 % Please edit documentation in R/vol2bird_version.R
 \name{vol2bird_version}
 \alias{vol2bird_version}
-\title{Return vol2bird version}
+\title{Return 'vol2bird' version}
 \usage{
 vol2bird_version()
 }
@@ -10,9 +10,9 @@ vol2bird_version()
 an object of class \link{numeric_version}
 }
 \description{
-Return version of the vol2bird algorithm
+Return version of the 'vol2bird' algorithm
 }
 \examples{
-# check installed vol2bird version:
+# check installed 'vol2bird' version:
 vol2bird_version()
 }

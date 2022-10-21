@@ -1,6 +1,6 @@
-#' Create a vol2bird configuration instance
+#' Create a 'vol2bird' configuration instance
 #'
-#' Creates or copies a vol2bird configuration instance of class `Rcpp_Vol2BirdConfig`
+#' Creates or copies a 'vol2bird' configuration instance of class `Rcpp_Vol2BirdConfig`
 #'
 #' @param config a configuration instance to be copied.
 #'
@@ -25,7 +25,7 @@
 #' ```
 #'
 #' ## User configuration options
-#' The `Rcpp_Vol2BirdConfig` class object sets the following vol2bird processing options:
+#' The `Rcpp_Vol2BirdConfig` class object sets the following 'vol2bird' processing options:
 #' * `azimMax`: Numeric. The minimum azimuth (0-360 degrees) used for constructing the bird density profile
 #' * `azimMin`: Numeric. The maximum azimuth (0-360 degrees) used for constructing the bird density profile
 #' * `birdRadarCrossSection`: Numeric. Radar cross section in cm^2
@@ -37,7 +37,7 @@
 #' * `elevMax`: Numeric. The minimum scan elevation in degrees used for constructing the bird density profile
 #' * `elevMin`: Numeric. The maximum scan elevation in degrees used for constructing the bird density profile
 #' * `layerThickness`: Numeric. The width/thickness of an altitude layer in m. Default 200
-#' * `mistNetPath`: Character. Path of mistnet segmentation model in pytorch (.pt) format
+#' * `mistNetPath`: Character. Path of 'MistNet' segmentation model in pytorch (.pt) format
 #' * `nLayers`: Integer. The number of layers in an altitude profile. Default 25
 #' * `radarWavelength`: Numeric. The radar wavelength in cm to assume when unavailable as an attribute in the input file. Default 5.3
 #' * `rangeMax`: Numeric. The maximum range in m used for constructing the bird density profile. Default 35000
@@ -46,7 +46,7 @@
 #' * `singlePol`: Logical. Whether to use single-pol moments for filtering meteorological echoes. Default `TRUE`
 #' * `stdDevMinBird`: Numeric. VVP Radial velocity standard deviation threshold. Default 2 m/s.
 #' * `useClutterMap`: Logical. Whether to use a static clutter map. Default `FALSE`
-#' * `useMistNet`: Logical. Whether to use the MistNet segmentation model. Default `FALSE`.
+#' * `useMistNet`: Logical. Whether to use the 'MistNet' segmentation model. Default `FALSE`.
 #'
 #' ## Advanced configuration options
 #' Changing these settings is rarely needed.
@@ -61,8 +61,8 @@
 #' * `fitVrad`: Logical. Whether or not to fit a model to the observed vrad. Default `TRUE`
 #' * `maxNyquistDealias`: Numeric. When all scans have nyquist velocity higher than this value, dealiasing is suppressed. Default 25 m/s.
 #' * `minNyquist`: Numeric. Scans with Nyquist velocity lower than this value are excluded. Default 5 m/s.
-#' * `mistNetElevs`: Numeric vector of length 5. Elevations to use in Cartesian projection for MistNet. Default `c(0.5, 1.5, 2.5, 3.5, 4.5)`
-#' * `mistNetElevsOnly`: Logical. When `TRUE` (default), use only the specified elevation scans for mistnet to calculate profile, otherwise use all available elevation scans
+#' * `mistNetElevs`: Numeric vector of length 5. Elevations to use in Cartesian projection for 'MistNet'. Default `c(0.5, 1.5, 2.5, 3.5, 4.5)`
+#' * `mistNetElevsOnly`: Logical. When `TRUE` (default), use only the specified elevation scans for 'MistNet' to calculate profile, otherwise use all available elevation scans
 #' * `requireVrad`: Logical. For a range gate to contribute it should have a valid radial velocity. Default `FALSE`
 #' * `resample`: Logical. Whether to resample the input polar volume. Downsampling speeds up the calculation. Default `FALSE`
 #' * `resampleNbins`: Numeric. Resampled number of range bins. Ignored when `resample` is `FALSE`. Default 100
@@ -142,5 +142,5 @@ setMethod(f = "show",
             # hide print options
             str_capture <- str_capture[!grepl("print",str_capture)]
             # remove first and last two lines of str output, and add header:
-            cat(c("vol2bird configuration:",str_capture[2:(length(str_capture)-2)]),sep="\n")
+            cat(c("'vol2bird' configuration:",str_capture[2:(length(str_capture)-2)]),sep="\n")
           })

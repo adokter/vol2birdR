@@ -15,7 +15,7 @@ mistnet_install_lib(
 )
 }
 \arguments{
-\item{library_name}{The name of the library searched for, either libmistnet or libtorch}
+\item{library_name}{The name of the library searched for, either 'libmistnet' or 'libtorch'}
 
 \item{library_url}{Where to fetch the library}
 

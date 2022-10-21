@@ -462,6 +462,12 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata);
 
 float nanify(float value);
 
+void nanify_str(char* buff, const char* fmt, double v);
+
+void create_profile_printout_str(char* printbuffer, int buflen, const char* date, const char* time,
+    float HGHT, float u, float v, float w, float ff, float dd, float sd_vvp, char gap, float dbz,
+    float eta, float dens, float DBZH, float n, float n_dbz, float n_all, float n_dbz_all);
+
 int saveToODIM(RaveCoreObject* object, const char* filename);
 
 const char* libvol2bird_version(void);

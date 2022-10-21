@@ -7,12 +7,12 @@
 get_install_urls(version = "1.10.2", type = install_type(version = version))
 }
 \arguments{
-\item{version}{The Torch version to install.}
+\item{version}{The 'Torch' version to install.}
 
-\item{type}{The installation type for Torch. Valid value is currently \code{"cpu"}.}
+\item{type}{The installation type for 'Torch'. Valid value is currently \code{"cpu"}.}
 }
 \description{
-List the Torch and mistnet files to download as local files
+List the 'Torch' and 'MistNet' files to download as local files
 in order to proceed with \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}.
 }
 \seealso{

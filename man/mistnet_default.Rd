@@ -2,14 +2,14 @@
 % Please edit documentation in R/mistnet_load.R
 \name{mistnet_default}
 \alias{mistnet_default}
-\title{The default mistnet version}
+\title{The default 'MistNet' version}
 \usage{
 mistnet_default()
 }
 \value{
-the default mistnet version
+the default 'MistNet' version
 }
 \description{
-The default mistnet version
+The default 'MistNet' version
 }
 \keyword{internal}

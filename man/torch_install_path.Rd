@@ -2,10 +2,10 @@
 % Please edit documentation in R/install.R
 \name{torch_install_path}
 \alias{torch_install_path}
-\title{Returns the torch installation path.}
+\title{Returns the 'Torch' installation path.}
 \usage{
 torch_install_path()
 }
 \description{
-Returns the torch installation path.
+Returns the 'Torch' installation path.
 }
