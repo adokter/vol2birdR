@@ -39,6 +39,16 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Jurriaan H. Spaaks [contributor]
+  \item Lourens Veen [contributor]
+  \item Iwan Holleman [contributor]
+  \item Hidde Leijnse [contributor]
+  \item John H. Merritt [contributor]
+  \item Bart Kelley [contributor]
+  \item Daniel Michelson [contributor]
+  \item Mark Couture [contributor]
+  \item Harri Hohti [contributor]
+  \item Ulf E. Nordh [contributor]
   \item GloBAM (https://globam.science) [funder]
 }
 
