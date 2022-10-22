@@ -55,7 +55,7 @@ install_config <- list(
           filter = ".dylib",
           md5hash = "96ebbf1e2e44f30ee80bf3c8e4a31e15"
         ),
-        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-cpu.zip", branch)
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-cpu_1_10_2.zip", branch)
       ),
       "darwin-arm64" = list(
         "libtorch" = list(
@@ -64,7 +64,7 @@ install_config <- list(
           filter = ".dylib",
           md5hash = "96ebbf1e2e44f30ee80bf3c8e4a31e15"
         ),
-        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-arm64-cpu.zip", branch)
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-arm64-cpu_1_10_2.zip", branch)
       ),
       "windows" = list(
         "libtorch" = list(
@@ -73,7 +73,7 @@ install_config <- list(
           filter = ".dll",
           md5hash = "c49ddfd07ba65e0ff4a54e041ed22c42"
         ),
-        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Windows-cpu.zip", branch)
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Windows-cpu_1_10_2.zip", branch)
       ),
       "linux" = list(
         "libtorch" = list(
@@ -81,7 +81,7 @@ install_config <- list(
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip",
           md5hash = "99d16043865716f5e38a8d15480b61c6"
         ),
-        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Linux-cpu.zip", branch)
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Linux-cpu_1_10_2.zip", branch)
       )
     )
   )
