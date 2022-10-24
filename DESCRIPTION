@@ -20,6 +20,7 @@ Imports:
     methods,
     pkgbuild,
     Rcpp (>= 1.0.4),
+    RcppGSL,
     rlang, 
     utils,
     withr
