@@ -20,6 +20,7 @@
 #' @importFrom rlang abort
 #' @importFrom utils capture.output
 #' @import Rcpp
+#' @importFrom RcppGSL fastLm
 "_PACKAGE"
 
 loadModule("RaveIO",TRUE)
