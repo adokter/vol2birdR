@@ -346,16 +346,16 @@ static void calcTexture(PolarScan_t *scan, vol2birdScanUse_t scanUse, vol2bird_t
     PolarScanParam_t* dbzImage = PolarScan_getParameter(scan, scanUse.dbzName);
 
     if(scanUse.useScan != 1){
-      fprintf(stderr, "Error: scanUse unequal to 1 (%i), this scan should not be used\n",scanUse.useScan);
+      vol2bird_err_printf("Error: scanUse unequal to 1 (%i), this scan should not be used\n",scanUse.useScan);
     }
     if (texImage == NULL) {
-      fprintf(stderr, "Error: Couldn't fetch texture parameter for texture calculation\n");
+      vol2bird_err_printf("Error: Couldn't fetch texture parameter for texture calculation\n");
     }
     if (vradImage == NULL) {
-      fprintf(stderr, "Error: Couldn't fetch radial velocity parameter for texture calculation\n");
+      vol2bird_err_printf("Error: Couldn't fetch radial velocity parameter for texture calculation\n");
     }
     if (dbzImage == NULL) {
-      fprintf(stderr, "Error: Couldn't fetch reflectivity parameter for texture calculation\n");
+      vol2bird_err_printf("Error: Couldn't fetch reflectivity parameter for texture calculation\n");
     }
 
     dbzOffset = PolarScanParam_getOffset(dbzImage);

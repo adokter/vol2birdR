@@ -46,6 +46,9 @@
     <loc>/reference/cpp_mistnet_init.html</loc>
   </url>
   <url>
+    <loc>/reference/cpp_printMemory.html</loc>
+  </url>
+  <url>
     <loc>/reference/cpp_vol2bird_get_wsr88d_site_location.html</loc>
   </url>
   <url>
@@ -89,6 +92,9 @@
   </url>
   <url>
     <loc>/reference/lib_installed.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_volume.html</loc>
   </url>
   <url>
     <loc>/reference/mistnet_default.html</loc>
