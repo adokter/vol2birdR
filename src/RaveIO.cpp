@@ -760,6 +760,31 @@ public:
     _verbose = verbose;
   }
 
+  PolarVolume load_volume(StringVector& files)
+  {
+    PolarVolume_t *volume = NULL;
+    PolarVolume result;
+    char *fileIn[INPUTFILESMAX];
+    int initSuccessful = 0;
+
+    if (files.size() == 0) {
+      throw std::invalid_argument("Must specify at least one input filename");
+    }
+    for (int i = 0; i < files.size(); i++) {
+      fileIn[i] = (char*) files(i);
+    }
+
+    volume = vol2birdGetVolume(fileIn, files.size(), 1000000, 1);
+    if (volume == NULL) {
+      throw std::runtime_error("Could not read file(s)");
+    }
+
+    result = PolarVolume(volume);
+
+    return result;
+
+  }
+
   void process(StringVector &files, Vol2BirdConfig &config, std::string vpOutName, std::string volOutName) {
     PolarVolume_t *volume = NULL;
     char *fileIn[INPUTFILESMAX];
@@ -808,6 +833,7 @@ public:
     if (!volOutName.empty()) {
       saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
     }
+
 
     vol2birdCalcProfiles(config.alldata());
 
@@ -1039,6 +1065,7 @@ RCPP_MODULE(Vol2Bird) {
   .constructor("Constructor")
   .method("process", &Vol2Bird::process, "Processes the volume/scans")
   .method("rsl2odim", &Vol2Bird::rsl2odim, "Converts the file into odim format")
+  .method("load_volume", &Vol2Bird::load_volume, "Loads a volume")
   .property("verbose", &Vol2Bird::isVerbose, &Vol2Bird::setVerbose, "If processing should be verbose or not")
   ;
 }
