@@ -339,13 +339,12 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
                 vol2bird_err_printf("PolarScan_RSL2Rave failed to add parameter %i to RAVE polar scan\n",iParam);
                 RAVE_OBJECT_RELEASE(param_proj);
             }
- 
-            RAVE_OBJECT_RELEASE(param);
         }
-        
+        RAVE_OBJECT_RELEASE(param);
     }
 
     done:
+        RAVE_OBJECT_RELEASE(param);
         return scan;
 }
 
@@ -461,6 +460,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     free(pvsource);
     
     done:
+        RAVE_OBJECT_RELEASE(scan);
         return volume;
 }
 
