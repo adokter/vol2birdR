@@ -303,6 +303,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     else{    
         PolarScan_addAttribute(scan, attr_NI);
     }
+    RAVE_OBJECT_RELEASE(attr_NI);
 
     // add range scale Atribute to scan
     rscale = rslRay->h.gate_size;
@@ -435,6 +436,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     else{    
         PolarVolume_addAttribute(volume, attr_vcp);
     }
+    RAVE_OBJECT_RELEASE(attr_vcp);
 
     // third, copy metadata stored in ray header; assume attributes of first ray applies to entire volume
     float wavelength = rslRay->h.wavelength*100;
@@ -445,6 +447,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     else{    
         PolarVolume_addAttribute(volume, attr_wavelength);
     }
+    RAVE_OBJECT_RELEASE(attr_wavelength);
         
     // read the RSL scans (sweeps) and add them to RAVE polar volume
     int result;
@@ -455,12 +458,12 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
         if(result == 0){
            vol2bird_err_printf("PolarVolume_RSL2Rave failed to add RSL scan %i to RAVE polar volume\n",iScan);
         }
+        RAVE_OBJECT_RELEASE(scan);
     }
    
     free(pvsource);
     
     done:
-        RAVE_OBJECT_RELEASE(scan);
         return volume;
 }
 
