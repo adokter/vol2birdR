@@ -834,7 +834,6 @@ public:
       saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
     }
 
-
     vol2birdCalcProfiles(config.alldata());
 
     const char *date;

@@ -2146,6 +2146,7 @@ PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, Ra
 
     if (scanParam == NULL){
         vol2bird_err_printf( "failed to allocate memory for new polar scan parameter\n");
+        RAVE_OBJECT_RELEASE(scanParam);
         return NULL;
     }
     
@@ -4546,6 +4547,7 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
             }
             
             if (!outputInitialised){
+                RAVE_OBJECT_RELEASE(output); //may have been initialized earlier above
                 output = RAVE_OBJECT_CLONE(volume);
                 RAVE_OBJECT_RELEASE(volume);
                 outputInitialised = TRUE;
