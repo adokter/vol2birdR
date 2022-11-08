@@ -13,7 +13,7 @@ install_mistnet(
 )
 }
 \arguments{
-\item{version}{The 'libtorch' version to install.}
+\item{version}{The 'LibTorch' version to install.}
 
 \item{reinstall}{Re-install 'MistNet' even if its already installed?}
 
@@ -22,6 +22,9 @@ install_mistnet(
 \item{timeout}{Optional timeout in seconds for large file download.}
 
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
+}
+\value{
+no value returned. Installs libraries into the package
 }
 \description{
 Installs libraries and dependencies for using 'MistNet'.
@@ -33,12 +36,18 @@ When using \code{path} to install in a specific location, make sure the \code{MI
 variable is set to this same path to reuse this installation.
 
 The \code{TORCH_INSTALL} environment
-variable can be set to \code{0} to prevent auto-installing 'Torch and \code{TORCH_LOAD} set to \code{0}
+variable can be set to \code{0} to prevent auto-installing 'LibTorch and \code{TORCH_LOAD} set to \code{0}
 to avoid loading dependencies automatically. These environment variables are meant for advanced use
 cases and troubleshooting only.
 
 When timeout error occurs during library archive download, or length of downloaded files differ from
 reported length, an increase of the \code{timeout} value should help.
+}
+\examples{
+\dontrun{
+install_mistnet()
+}
+
 }
 \seealso{
 \itemize{

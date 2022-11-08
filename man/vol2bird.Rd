@@ -39,11 +39,28 @@ volume (\code{pvol}) file in the ODIM HDF5 format to disk. Useful for converting
 input file characteristics are returned and updated in the object specified by the \code{config}
 argument. Do not set to \code{TRUE} when \code{vol2bird()} is used in loops like \code{lapply()} or in parallel processes.}
 }
+\value{
+No value returned, creates a file specified by \code{file} argument
+}
 \description{
 Calculates a vertical profile of biological scatterers (\code{vp}) from a polar
 volume (\code{pvol}) file using the algorithm
 \href{https://github.com/adokter/vol2bird/}{vol2bird} (Dokter et al.
 2011 \doi{10.1098/rsif.2010.0116}).
+}
+\examples{
+# Locate the polar volume example file
+pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
+
+# Create a configuration instance:
+conf <- vol2bird_config()
+
+# Define output file
+output_file <- paste0(tempdir(), "/vp.h5")
+
+# Calculate the profile:
+vol2bird(file = pvolfile, config = conf, vpfile = output_file)
+
 }
 \seealso{
 \itemize{

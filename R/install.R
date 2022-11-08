@@ -7,7 +7,7 @@ supported_pytorch_versions=c("1.10.2", "1.12.1")
 #' @keywords internal
 install_config <- list(
   "1.12.1" = list(
-    # Future version is 1.12.1. Need it to build for macOS ARM  
+    # Future version is 1.12.1. Need it to build for macOS ARM
     "cpu" = list(
       "darwin" = list(
         "libtorch" = list(
@@ -100,14 +100,21 @@ install_path <- function(version = "1.0") {
   }
 }
 
-#' Returns the 'Torch' installation path.
+#' Returns the 'LibTorch' installation path.
+#'
+#' Returns the directory where the LibTorch library has been downloaded
 #' @export
+#'
+#' @return a character path
+#'
+#' @examples
+#' torch_install_path()
 torch_install_path <- function() {
   install_path()
 }
 
-#' Checks if the 'Torch' and 'MistNet' libraries have been installed or not.
-#' @return TRUE if both 'Torch' and 'MistNet' libraries can be found, otherwise FALSE
+#' Checks if the 'LibTorch' and 'MistNet' libraries have been installed or not.
+#' @return TRUE if both 'LibTorch' and 'MistNet' libraries can be found, otherwise FALSE
 #' @export
 mistnet_exists <- function() {
   if (!dir.exists(install_path())) {
@@ -126,7 +133,7 @@ mistnet_exists <- function() {
 }
 
 #' Returns the path of the 'MistNet' libraries for specified version
-#' @param library_name The name of the library searched for, either 'libmistnet' or 'libtorch'
+#' @param library_name The name of the library searched for, either 'libmistnet' or 'LibTorch'
 #' @param install_path The location where to look for the libraries
 #' @return if anything could be located or not
 #' @keywords internal
@@ -252,7 +259,7 @@ mistnet_install_libs <- function(version, type, install_path, install_config) {
   invisible(install_path)
 }
 
-#' Returns the Torch install type
+#' Returns the LibTorch install type
 #' @keywords internal
 install_type <- function(version) {
   return("cpu")
@@ -260,7 +267,7 @@ install_type <- function(version) {
 
 #' Install 'MistNet' model file
 #'
-#' Installs the 'PyTorch' 'MistNet' model file
+#' Installs the 'MistNet' model file in 'PyTorch' format
 #'
 #' @param reinstall Re-install the model even if its already installed
 #' @param path Optional path to install or check for an already existing installation.
@@ -268,6 +275,8 @@ install_type <- function(version) {
 #' @param from_url From where the 'MistNet' model file should be downloaded.
 #' @param method The download method to use, see \link[utils]{download.file}
 #' @param ... other optional arguments (like \code{`load`} for manual installation).
+#'
+#' @return No value returned, this function downloads a file
 #'
 #' @details
 #' Download and install the 'MistNet' model file. By default the library is downloaded to
@@ -281,6 +290,10 @@ install_type <- function(version) {
 #' ```R
 #' download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
 #' ```
+#' @examples
+#' \dontrun{
+#' download_mistnet_model()
+#' }
 #'
 #' @export
 install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_install_path(),"data","mistnet_nexrad.pt"), timeout = 1800, from_url="http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt", method="libcurl", ...)
@@ -321,11 +334,13 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #'
 #' Installs libraries and dependencies for using 'MistNet'.
 #'
-#' @param version The 'libtorch' version to install.
+#' @param version The 'LibTorch' version to install.
 #' @param reinstall Re-install 'MistNet' even if its already installed?
 #' @param path Optional path to install or check for an already existing installation.
 #' @param timeout Optional timeout in seconds for large file download.
 #' @param ... other optional arguments (like \code{`load`} for manual installation).
+#'
+#' @return no value returned. Installs libraries into the package
 #'
 #' @details
 #' By default libraries are installed in the 'vol2birdR' package directory.
@@ -334,7 +349,7 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #' variable is set to this same path to reuse this installation.
 #'
 #' The \code{TORCH_INSTALL} environment
-#' variable can be set to \code{0} to prevent auto-installing 'Torch and \code{TORCH_LOAD} set to \code{0}
+#' variable can be set to \code{0} to prevent auto-installing 'LibTorch and \code{TORCH_LOAD} set to \code{0}
 #' to avoid loading dependencies automatically. These environment variables are meant for advanced use
 #' cases and troubleshooting only.
 #'
@@ -342,6 +357,11 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #' reported length, an increase of the \code{timeout} value should help.
 #'
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' install_mistnet()
+#' }
 #'
 #' @seealso
 #' * [install_mistnet_from_file()]
@@ -392,19 +412,21 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE,
 
 #' Install 'MistNet' libraries from files
 #'
-#' Installs 'Torch' and 'MistNet' dependencies from files.
+#' Installs 'LibTorch' and 'MistNet' dependencies from files.
 #'
-#' @param version The 'Torch' version to install.
-#' @param libtorch The installation archive file to use for 'Torch'. Shall be a \code{"file://"} URL scheme.
+#' @param version The 'LibTorch' version to install.
+#' @param libtorch The installation archive file to use for 'LibTorch'. Shall be a \code{"file://"} URL scheme.
 #' @param libmistnet The installation archive file to use for 'MistNet'. Shall be a \code{"file://"} URL scheme.
 #' @param mistnet_model The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!
 #' @param ... other parameters to be passed to `install_torch()`
+#'
+#' @return a list with character urls
 #'
 #' @details
 #'
 #' When [install_mistnet()] initiated download is not possible, but installation archive files are
 #' present on local filesystem, [install_mistnet_from_file()] can be used as a workaround to installation issues.
-#' \code{"libtorch"} is the archive containing all 'Torch' modules, and \code{"libmistnet"} is the 'C' interface to 'libtorch'
+#' \code{"libtorch"} is the archive containing all 'LibTorch' modules, and \code{"libmistnet"} is the 'C' interface to 'LibTorch'
 #' that is used for the 'R' package. Both are highly platform dependent, and should be checked through [get_install_urls()]
 #'
 #' ```R
@@ -435,6 +457,17 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE,
 #' ```
 #' @export
 #'
+#' @examples
+#' # get paths to files to be downloaded
+#' get_install_urls()
+#' # download the files to a directory on disk, e.g. to /tmp/myfile,
+#' # then install with:
+#' \dontrun{
+#' install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
+#'      libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
+#'      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
+#' }
+#'
 #' @seealso
 #' * [install_mistnet()]
 install_mistnet_from_file <- function(version = "1.12.1", libtorch, libmistnet, mistnet_model=NULL, ...) {
@@ -456,11 +489,11 @@ install_mistnet_from_file <- function(version = "1.12.1", libtorch, libmistnet, 
 
 #' List of installation files to download
 #'
-#' List the 'Torch' and 'MistNet' files to download as local files
+#' List the 'LibTorch' and 'MistNet' files to download as local files
 #' in order to proceed with [install_mistnet_from_file()].
 #'
-#' @param version The 'Torch' version to install.
-#' @param type The installation type for 'Torch'. Valid value is currently \code{"cpu"}.
+#' @param version The 'LibTorch' version to install.
+#' @param type The installation type for 'LibTorch'. Valid value is currently \code{"cpu"}.
 #'
 #' @export
 #'

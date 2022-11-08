@@ -5,6 +5,11 @@
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
+#'
+#' @examples
+#' \dontrun{
+#' rsl2odim("/tmp/KBGM20221108_000019_V06")
+#' }
 rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
     assert_that(file.exists(filename))

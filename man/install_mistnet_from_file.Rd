@@ -13,9 +13,9 @@ install_mistnet_from_file(
 )
 }
 \arguments{
-\item{version}{The 'Torch' version to install.}
+\item{version}{The 'LibTorch' version to install.}
 
-\item{libtorch}{The installation archive file to use for 'Torch'. Shall be a \code{"file://"} URL scheme.}
+\item{libtorch}{The installation archive file to use for 'LibTorch'. Shall be a \code{"file://"} URL scheme.}
 
 \item{libmistnet}{The installation archive file to use for 'MistNet'. Shall be a \code{"file://"} URL scheme.}
 
@@ -23,13 +23,16 @@ install_mistnet_from_file(
 
 \item{...}{other parameters to be passed to \code{install_torch()}}
 }
+\value{
+a list with character urls
+}
 \description{
-Installs 'Torch' and 'MistNet' dependencies from files.
+Installs 'LibTorch' and 'MistNet' dependencies from files.
 }
 \details{
 When \code{\link[=install_mistnet]{install_mistnet()}} initiated download is not possible, but installation archive files are
 present on local filesystem, \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}} can be used as a workaround to installation issues.
-\code{"libtorch"} is the archive containing all 'Torch' modules, and \code{"libmistnet"} is the 'C' interface to 'libtorch'
+\code{"libtorch"} is the archive containing all 'LibTorch' modules, and \code{"libmistnet"} is the 'C' interface to 'LibTorch'
 that is used for the 'R' package. Both are highly platform dependent, and should be checked through \code{\link[=get_install_urls]{get_install_urls()}}
 
 \if{html}{\out{<div class="sourceCode R">}}\preformatted{> get_install_urls()
@@ -58,6 +61,18 @@ Then in R, type:
      libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 }\if{html}{\out{</div>}}
+}
+\examples{
+# get paths to files to be downloaded
+get_install_urls()
+# download the files to a directory on disk, e.g. to /tmp/myfile,
+# then install with:
+\dontrun{
+install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
+     libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
+     mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
+}
+
 }
 \seealso{
 \itemize{

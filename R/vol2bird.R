@@ -26,6 +26,21 @@
 #' input file characteristics are returned and updated in the object specified by the `config`
 #' argument. Do not set to `TRUE` when `vol2bird()` is used in loops like `lapply()` or in parallel processes.
 #'
+#' @return No value returned, creates a file specified by `file` argument
+#'
+#' @examples
+#' # Locate the polar volume example file
+#' pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
+#'
+#' # Create a configuration instance:
+#' conf <- vol2bird_config()
+#'
+#' # Define output file
+#' output_file <- paste0(tempdir(), "/vp.h5")
+#'
+#' # Calculate the profile:
+#' vol2bird(file = pvolfile, config = conf, vpfile = output_file)
+#'
 #' @seealso
 #' * [vol2bird_config()]
 #' @export

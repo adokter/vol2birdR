@@ -38,6 +38,11 @@ argument. Do not set to \code{TRUE} when \code{vol2bird()} is used in loops like
 \description{
 Convert a NEXRAD polar volume file to an ODIM polar volume file
 }
+\examples{
+\dontrun{
+rsl2odim("/tmp/KBGM20221108_000019_V06")
+}
+}
 \seealso{
 \itemize{
 \item \code{\link[=vol2bird_config]{vol2bird_config()}}
