@@ -643,6 +643,10 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
         }
         RSL_printf( "Current sweep index: %d\n"
             "Last ray read: %d\n", isweep, prev_raynum);
+        // FIX for vol2birdR segfaults:
+        RSL_free_radar(radar);
+        return(NULL);
+        // END FIX
         wsr88d_load_sweep_header(radar, isweep);
 
         return radar;
@@ -666,6 +670,10 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
         }
         RSL_printf( "Current sweep index: %d\n"
             "Last ray read: %d\n", isweep, prev_raynum);
+        // FIX for vol2birdR segfaults:
+        RSL_free_radar(radar);
+        return(NULL);
+        // END FIX
         wsr88d_load_sweep_header(radar, isweep);
 
         end_of_vos = 1;
