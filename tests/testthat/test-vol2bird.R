@@ -1,5 +1,3 @@
-
-
 test_that("example polar volume file exists",{
   pvolfile <- system.file("extdata", "volume.h5", package = "vol2birdR")
   expect_true(file.exists(pvolfile))
@@ -14,11 +12,11 @@ vpfile2 <- paste(tmpdir, "vp2.h5", sep = "/")
 
 test_that("temporary directory is writeable", {
   expect_true(is.writeable(tmpdir))
-  expect_true(file.copy(system.file("extdata", "volume.h5", package = "bioRad"), pvolfile_in, overwrite = TRUE))
+  expect_true(file.copy(system.file("extdata", "volume.h5", package = "vol2birdR"), pvolfile_in, overwrite = TRUE))
   expect_true(file.exists(pvolfile_in))
 })
 
-file.copy(system.file("extdata", "volume.h5", package = "bioRad"), pvolfile_in, overwrite = TRUE)
+file.copy(system.file("extdata", "volume.h5", package = "vol2birdR"), pvolfile_in, overwrite = TRUE)
 
 test_that("vol2bird writes output files", {
   conf <- vol2bird_config()
