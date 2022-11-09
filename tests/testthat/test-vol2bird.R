@@ -14,7 +14,7 @@ vpfile2 <- paste(tmpdir, "vp2.h5", sep = "/")
 
 test_that("temporary directory is writeable", {
   expect_true(is.writeable(tmpdir))
-  file.copy(system.file("extdata", "volume.h5", package = "bioRad"), pvolfile_in, overwrite = TRUE)
+  expect_true(file.copy(system.file("extdata", "volume.h5", package = "bioRad"), pvolfile_in, overwrite = TRUE))
   expect_true(file.exists(pvolfile_in))
 })
 

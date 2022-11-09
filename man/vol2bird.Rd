@@ -50,7 +50,7 @@ volume (\code{pvol}) file using the algorithm
 }
 \examples{
 # Locate the polar volume example file
-pvolfile <- system.file("extdata", "volume.h5", package = "bioRad")
+pvolfile <- system.file("extdata", "volume.h5", package = "vol2birdR")
 
 # Create a configuration instance:
 conf <- vol2bird_config()

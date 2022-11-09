@@ -68,7 +68,8 @@ get_install_urls()
 # download the files to a directory on disk, e.g. to /tmp/myfile,
 # then install with:
 \dontrun{
-install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
+install_mistnet_from_file(
+     libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
      libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 }
