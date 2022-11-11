@@ -1,18 +1,16 @@
-test_that("example polar volume file exists",{
-  pvolfile <- system.file("extdata", "volume.h5", package = "vol2birdR")
-  expect_true(file.exists(pvolfile))
-})
-
 # prepare test file names
+pvolfile_in <- system.file("extdata", "volume.h5", package = "vol2birdR")
 tmpdir <- tempdir()
-pvolfile_in <- paste(tmpdir, "pvol.h5", sep = "/")
 pvolfile_out <- paste(tmpdir,"pvol_out.h5", sep = "/")
 vpfile1 <- paste(tmpdir, "vp1.h5", sep = "/")
 vpfile2 <- paste(tmpdir, "vp2.h5", sep = "/")
 
+test_that("example polar volume file exists",{
+  expect_true(file.exists(pvolfile_in))
+})
+
 test_that("vol2bird writes output files", {
   skip_if_no_temp_access()
-  expect_true(file.copy(system.file("extdata", "volume.h5", package = "vol2birdR"), pvolfile_in, overwrite = TRUE))
   conf <- vol2bird_config()
   expect_s4_class(conf,"Rcpp_Vol2BirdConfig")
   # suppress dealiasing warning messages:
