@@ -49,7 +49,7 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf);
  * volume scan when SAILS is in effect for VCPs 12 and 212.
  */
 static int keep_sails = 0;
-void RSL_wsr88d_keep_sails()
+void RSL_wsr88d_keep_sails(void)
 {
     keep_sails = 1;
 }
@@ -57,7 +57,7 @@ void RSL_wsr88d_keep_sails()
 /* Function to specify that all sweeps are to be stored as read.  Don't combine
  * split-cuts by elevation or remove short-range reflectivity in Doppler cuts.
  */
-void RSL_wsr88d_asis()
+void RSL_wsr88d_asis(void)
 {
     RSL_wsr88d_merge_split_cuts_off();
     RSL_wsr88d_keep_sails();

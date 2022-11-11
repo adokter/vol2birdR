@@ -129,7 +129,7 @@ void HL_printf(const char* fmt, ...)
 #endif
 }
 
-void HL_InitializeDebugger()
+void HL_InitializeDebugger(void)
 {
   if (initialized == 0) {
     initialized = 1;
@@ -151,12 +151,12 @@ void HL_setDebugFunction(void(*dbgfun)(char* filename, int lineno,
   hlhdfDbg.dbgfun = dbgfun;
 }
 
-void HL_disableHdf5ErrorReporting()
+void HL_disableHdf5ErrorReporting(void)
 {
   hlhdfDbg.hdf5showerror = 0;
 }
 
-void HL_enableHdf5ErrorReporting()
+void HL_enableHdf5ErrorReporting(void)
 {
   hlhdfDbg.hdf5showerror = 1;
 }

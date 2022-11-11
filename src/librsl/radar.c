@@ -58,7 +58,7 @@
 
 #include "rsl.h"
 
-void RSL_print_version()
+void RSL_print_version(void)
 {
   RSL_printf("RSL version %s.\n", RSL_VERSION_STR);
 }
@@ -66,11 +66,11 @@ void RSL_print_version()
 /* Debug printing global variable: radar_verbose_flag */
 int radar_verbose_flag = 0;
 
-void RSL_radar_verbose_on()
+void RSL_radar_verbose_on(void)
 {
   radar_verbose_flag = 1;
 }
-void RSL_radar_verbose_off()
+void RSL_radar_verbose_off(void)
 {
   radar_verbose_flag = 0;
 }

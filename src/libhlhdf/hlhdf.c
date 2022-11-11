@@ -96,7 +96,7 @@ static const char* VALID_FORMAT_SPECIFIERS[] = {
 /************************************************
  * disableErrorReporting
  ***********************************************/
-void HL_disableErrorReporting()
+void HL_disableErrorReporting(void)
 {
   /*Disable error reporting*/
   if (errorReportingOn == 1) {
@@ -109,7 +109,7 @@ void HL_disableErrorReporting()
 /************************************************
  * enableErrorReporting
  ***********************************************/
-void HL_enableErrorReporting()
+void HL_enableErrorReporting(void)
 {
   if (errorReportingOn == 0) {
     H5Eset_auto2(H5E_DEFAULT, errorFunction, edata);
@@ -117,7 +117,7 @@ void HL_enableErrorReporting()
   }
 }
 
-int HL_isErrorReportingEnabled()
+int HL_isErrorReportingEnabled(void)
 {
   return errorReportingOn;
 }
@@ -133,7 +133,7 @@ static void hlhdf_dump_memory_information(void)
 /************************************************
  * initHlHdf
  ***********************************************/
-void HL_init()
+void HL_init(void)
 {
   if (initialized == 0) {
     initialized = 1;
@@ -188,7 +188,7 @@ int HL_isHDF5File(const char* filename)
 /************************************************
  * createHlHdfFileCreationProperty
  ***********************************************/
-HL_FileCreationProperty* HLFileCreationProperty_new()
+HL_FileCreationProperty* HLFileCreationProperty_new(void)
 {
   HL_FileCreationProperty* retv = NULL;
   hid_t theHid = -1;
@@ -322,7 +322,7 @@ const char* HL_getFormatSpecifierString(HL_FormatSpecifier specifier)
   return VALID_FORMAT_SPECIFIERS[specifier];
 }
 
-const char* HL_getHDF5Version() {
+const char* HL_getHDF5Version(void) {
   if (strcmp("", H5_VERS_SUBRELEASE)==0) {
     sprintf(HLHDF_HDF5_VERSION_STRING, "%d.%d.%d", H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
   } else {
