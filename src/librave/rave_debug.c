@@ -112,7 +112,7 @@ static void Rave_defaultDebugFunction(const char* filename, int lineno, Rave_Deb
 /*@} End of Private functions */
 
 /*@{ Interface functions */
-void Rave_initializeDebugger()
+void Rave_initializeDebugger(void)
 {
   if (initialized == 0) {
     initialized = 1;
@@ -129,7 +129,7 @@ void Rave_setDebugLevel(Rave_Debug lvl)
   }
 }
 
-Rave_Debug Rave_getDebugLevel()
+Rave_Debug Rave_getDebugLevel(void)
 {
   Rave_initializeDebugger();
   return raveDebugLevel;

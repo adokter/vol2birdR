@@ -5,22 +5,22 @@
 
 static int merge_split_cuts = 1;
 
-void RSL_wsr88d_merge_split_cuts_on()
+void RSL_wsr88d_merge_split_cuts_on(void)
 {
     merge_split_cuts = 1;
 }
 
-void RSL_wsr88d_merge_split_cuts_off()
+void RSL_wsr88d_merge_split_cuts_off(void)
 {
     merge_split_cuts = 0;
 }
 
-void RSL_wsr88d_keep_short_refl()
+void RSL_wsr88d_keep_short_refl(void)
 {
     RSL_wsr88d_merge_split_cuts_off();
 }
 
-int wsr88d_merge_split_cuts_is_set()
+int wsr88d_merge_split_cuts_is_set(void)
 {
     return merge_split_cuts;
 }

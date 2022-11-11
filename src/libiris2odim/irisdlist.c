@@ -26,7 +26,7 @@ along with this file.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <stdio.h>
 
-IrisDListElement_t* IrisDListElement_create()
+IrisDListElement_t* IrisDListElement_create(void)
 {
   IrisDListElement_t* result = RAVE_MALLOC(sizeof(IrisDListElement_t));
   result->next = NULL;
@@ -35,7 +35,7 @@ IrisDListElement_t* IrisDListElement_create()
   return result;
 }
 
-IrisDList_t* IrisDList_create()
+IrisDList_t* IrisDList_create(void)
 {
   IrisDList_t* result = RAVE_MALLOC(sizeof(IrisDList_t));
   result->head=NULL;

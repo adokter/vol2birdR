@@ -678,18 +678,18 @@ void RSL_get_groundr_and_h(float slant_r, float elev, float *gr, float *h);
 void RSL_get_slantr_and_elev(float gr, float h, float *slant_r, float *elev);
 void RSL_get_slantr_and_h(float gr, float elev, float *slant_r, float *h);
 void RSL_load_color_table(char *infile, char buffer[256], int *ncolors);
-void RSL_load_height_color_table();
-void RSL_load_rainfall_color_table();
-void RSL_load_refl_color_table();
-void RSL_load_vel_color_table();
-void RSL_load_sw_color_table();
-void RSL_load_zdr_color_table();
+void RSL_load_height_color_table(void);
+void RSL_load_rainfall_color_table(void);
+void RSL_load_refl_color_table(void);
+void RSL_load_vel_color_table(void);
+void RSL_load_sw_color_table(void);
+void RSL_load_zdr_color_table(void);
 void RSL_load_red_table(char *infile);
 void RSL_load_green_table(char *infile);
 void RSL_load_blue_table(char *infile);
 void RSL_print_histogram(Histogram *histogram, int min_range, int max_range,
                          char *filename);
-void RSL_print_version();
+void RSL_print_version(void);
 void RSL_radar_to_uf(Radar *r, char *outfile);
 void RSL_radar_to_uf_gzip(Radar *r, char *outfile);
 void RSL_radar_verbose_off(void);
@@ -895,14 +895,14 @@ double       angle_diff(float x, float y);
 int rsl_query_field(char *c_field);
 
 /* Functions to control the handling of WSR-88D split cuts. */
-void RSL_wsr88d_merge_split_cuts_on();
-void RSL_wsr88d_merge_split_cuts_off();
-void RSL_wsr88d_keep_short_refl();
-int wsr88d_merge_split_cuts_is_set();
+void RSL_wsr88d_merge_split_cuts_on(void);
+void RSL_wsr88d_merge_split_cuts_off(void);
+void RSL_wsr88d_keep_short_refl(void);
+int wsr88d_merge_split_cuts_is_set(void);
 
 Radar *wsr88d_merge_split_cuts(Radar *radar);
-void RSL_wsr88d_asis();
-void RSL_wsr88d_keep_sails();
+void RSL_wsr88d_asis(void);
+void RSL_wsr88d_keep_sails(void);
 
 /* Debugging prototypes. */
 void poke_around_volume(Volume *v);

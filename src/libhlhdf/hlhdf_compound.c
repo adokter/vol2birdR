@@ -62,7 +62,7 @@ fail:
   return retv;
 }
 
-HL_CompoundTypeDescription* newHL_CompoundTypeDescription()
+HL_CompoundTypeDescription* newHL_CompoundTypeDescription(void)
 {
    HL_CompoundTypeDescription* retv=NULL;
    int i;
