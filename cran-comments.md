@@ -4,5 +4,6 @@ resubmitting after second review by Benjamin Altmann
 
 * missing \value tags added for get_install_urls
 * expanded the example for rsl2odim
+* changed dontrun blocks into donttest blocks
 
 We carefully reviewed the remaining \dontrun{} blocks in examples. These blocks are in place because these examples trigger or require large file downloads, which we therefore don't want to run in continuous integration tests. We have replaced them with less strict \donttest() blocks where possible, except for two instances where the user is required to adjust the paths in the examples.
