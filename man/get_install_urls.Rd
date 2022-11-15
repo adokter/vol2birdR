@@ -11,6 +11,9 @@ get_install_urls(version = "1.10.2", type = install_type(version = version))
 
 \item{type}{The installation type for 'LibTorch'. Valid value is currently \code{"cpu"}.}
 }
+\value{
+a named list with character urls
+}
 \description{
 List the 'LibTorch' and 'MistNet' files to download as local files
 in order to proceed with \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}}.

@@ -498,6 +498,8 @@ install_mistnet_from_file <- function(version = "1.12.1", libtorch, libmistnet, 
 #'
 #' @export
 #'
+#' @return a named list with character urls
+#'
 #' @seealso
 #' * [install_mistnet_from_file()]
 get_install_urls <- function(version = "1.10.2", type = install_type(version = version)) {

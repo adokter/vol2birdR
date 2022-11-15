@@ -35,12 +35,25 @@ volume (\code{pvol}) file in the ODIM HDF5 format to disk. Useful for converting
 input file characteristics are returned and updated in the object specified by the \code{config}
 argument. Do not set to \code{TRUE} when \code{vol2bird()} is used in loops like \code{lapply()} or in parallel processes.}
 }
+\value{
+No value returned, creates a file specified by \code{pvolfile_out} argument.
+}
 \description{
 Convert a NEXRAD polar volume file to an ODIM polar volume file
 }
 \examples{
 \dontrun{
-rsl2odim("/tmp/KBGM20221108_000019_V06")
+# define filenames
+nexrad_file <- paste0(tempdir(),"/KBGM20221001_000243_V06")
+odim_file <- paste0(tempdir(),"/KBGM20221001_000243_V06.h5")
+# download NEXRAD file:
+download.file("https://noaa-nexrad-level2.s3.amazonaws.com/2022/10/01/KBGM/KBGM20221001_000243_V06",
+destfile = nexrad_file)
+# convert NEXRAD file to ODIM hdf5 format:
+rsl2odim(nexrad_file, pvolfile_out = odim_file)
+# clean up
+file.remove(nexrad_file)
+file.remove(odim_file)
 }
 }
 \seealso{
