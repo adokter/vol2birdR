@@ -291,7 +291,7 @@ install_type <- function(version) {
 #' download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
 #' ```
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' download_mistnet_model()
 #' }
 #'
@@ -359,7 +359,7 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' install_mistnet()
 #' }
 #'

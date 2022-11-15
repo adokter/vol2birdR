@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # define filenames
 #' nexrad_file <- paste0(tempdir(),"/KBGM20221001_000243_V06")
 #' odim_file <- paste0(tempdir(),"/KBGM20221001_000243_V06.h5")

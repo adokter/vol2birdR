@@ -23,8 +23,9 @@ the path to a different location file.
 \examples{
 # return current location file
 nexrad_station_file()
-# set new location location file
-\dontrun{
-nexrad_station_file("/path/to/my/station_file")
-}
+# store nexrad station file path
+file_path <- nexrad_station_file()
+# set station location file
+nexrad_station_file(file_path)
+
 }

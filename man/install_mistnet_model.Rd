@@ -46,7 +46,7 @@ advantage that it doesn't have to be redownloaded after a reinstall of 'vol2bird
 }\if{html}{\out{</div>}}
 }
 \examples{
-\dontrun{
+\donttest{
 download_mistnet_model()
 }
 

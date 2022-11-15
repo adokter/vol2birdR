@@ -44,7 +44,7 @@ When timeout error occurs during library archive download, or length of download
 reported length, an increase of the \code{timeout} value should help.
 }
 \examples{
-\dontrun{
+\donttest{
 install_mistnet()
 }
 

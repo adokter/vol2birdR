@@ -42,7 +42,7 @@ No value returned, creates a file specified by \code{pvolfile_out} argument.
 Convert a NEXRAD polar volume file to an ODIM polar volume file
 }
 \examples{
-\dontrun{
+\donttest{
 # define filenames
 nexrad_file <- paste0(tempdir(),"/KBGM20221001_000243_V06")
 odim_file <- paste0(tempdir(),"/KBGM20221001_000243_V06.h5")
