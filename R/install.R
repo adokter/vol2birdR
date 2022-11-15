@@ -288,11 +288,11 @@ install_type <- function(version) {
 #' 'vol2birdR' will automatically detect the model file if it is downloaded to
 #' `/opt/vol2bird/etc/mistnet_nexrad.pt`, which can be done as follows
 #' ```R
-#' download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
+#' install_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
 #' ```
 #' @examples
 #' \donttest{
-#' download_mistnet_model()
+#' install_mistnet_model()
 #' }
 #'
 #' @export
