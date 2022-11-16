@@ -11,9 +11,9 @@
 #include <string.h>
 #include <math.h>
 
-//#ifdef MISTNET
-//#include "../libmistnet/libmistnet.h"
-//#endif
+#ifdef MISTNET
+#include "../libmistnet/libmistnet.h"
+#endif
 
 
 /**
@@ -57,7 +57,7 @@ PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdS
 
 PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volume, double elev);
 
-#ifdef R_MISTNET
+#ifdef MISTNET
 int run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
 #endif
 
@@ -485,8 +485,11 @@ double*** init3DTensor(int dim1, int dim2, int dim3, double init)
     
     if(tensor == NULL){
         vol2bird_err_printf("failed to initialize 3D tensor (1)");
-        // exit(0)
+#ifdef VOL2BIRD_R
         return NULL;
+#else        
+        exit(0);
+#endif        
     }
 
     for (int i = 0; i < dim1; i++) {
@@ -499,8 +502,11 @@ double*** init3DTensor(int dim1, int dim2, int dim3, double init)
         if(tensor[i] == NULL){
             vol2bird_err_printf("failed to initialize 3D tensor (2)");
             free3DTensor(tensor, dim1, dim2);
-            //exit(0);
+#ifdef VOL2BIRD_R
             return NULL;
+#else
+            exit(0);
+#endif            
         } else {
             for (int j = 0; j < dim2; j++) {
                 tensor[i][j] = NULL;
@@ -512,8 +518,11 @@ double*** init3DTensor(int dim1, int dim2, int dim3, double init)
             if(tensor[i][j] == NULL){
                 vol2bird_err_printf("failed to initialize 3D tensor (3)");
 	              free3DTensor(tensor, dim1, dim2);
-                // exit(0);
+#ifdef VOL2BIRD_R	              
                 return NULL;
+#else                
+                exit(0);
+#endif                
             }
         } // j
     } // i
@@ -1019,7 +1028,7 @@ int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int di
 
 }
 
-//#if defined(MISTNET) or defined(R_MISTNET)
+#if defined(MISTNET)
 // segments biology from precipitation using mistnet deep convolution net.
 int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata){    
     // volume with only the 5 selected elevations
@@ -1104,4 +1113,4 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
     
     return result;
 }   // segmentScansUsingMistnet
-//#endif
+#endif
