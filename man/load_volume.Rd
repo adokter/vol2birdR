@@ -17,3 +17,4 @@ The loaded volume as a Rcpp_PolarVolume that can be passed around
 Loads a volume vol2bird-style meaning that a number of different file formats
 are tried and eventually loaded.
 }
+\keyword{internal}
