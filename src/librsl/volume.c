@@ -1698,7 +1698,7 @@ void RSL_add_dbz_offset_to_volume(Volume *v, float dbz_offset)
 
 /*********************************************************************/
 /*                                                                   */
-/*                 RSL_add_dbz_offset_to_volume                      */
+/*                 RSL_set_printfun                                  */
 /*                                                                   */
 /*********************************************************************/
 static RSL_printfun RSL_internal_printf_fun = RSL_default_printfun;
@@ -1709,7 +1709,7 @@ void RSL_set_printfun(RSL_printfun fun)
 
 /*********************************************************************/
 /*                                                                   */
-/*                 RSL_add_dbz_offset_to_volume                      */
+/*                 RSL_default_printfun                              */
 /*                                                                   */
 /*********************************************************************/
 void RSL_default_printfun(const char* msg)
