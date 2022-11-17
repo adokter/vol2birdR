@@ -1,9 +1,2 @@
-## vol2birdR 0.2.0
-This version is the initial release of this package,
-resubmitting after second review by Benjamin Altmann
-
-* missing \value tags added for get_install_urls
-* expanded the example for rsl2odim
-* changed dontrun blocks into donttest blocks
-
-We carefully reviewed the remaining \dontrun{} blocks in examples. These blocks are in place because these examples trigger or require large file downloads, which we therefore don't want to run in continuous integration tests. We have replaced them with less strict \donttest() blocks where possible, except for two instances where the user is required to adjust the paths in the examples.
+## vol2birdR 0.2.1
+Changes into how system dependencies are located, to address a failing build on CRAN's m1mac as a result of the proj system library not being found. Now first trying pkg-config on all architectures. If it can't find pkg-config also try try homebrew on mac. Using that information, we first try to build with proj.4 support. If that doesn't work we try proj.6
