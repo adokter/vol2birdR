@@ -37,6 +37,9 @@ AC_SUBST(HDF5_VERSION_USE)
 AC_SUBST(HDF5_API_VERS_USE)
 AC_SUBST(DEFINE_H5FREE_MEMORY)
 
+echo "HDF5_LIBS=$HDF5_LIBS"
+echo ""
+
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
   echo "could not determine R_HOME"
@@ -71,7 +74,7 @@ if test -z "${LIBS}"; then
   ]
   
   dnl Fix for newer Debian versions
-  VOL2BIRD_LIBS="${LIBS} -L. -lhdf5 -lz -lm"
+  LIBS="${LIBS} -L. -lhdf5 -lz -lm"
 fi
 
 if test -z "${CPPFLAGS}"; then
@@ -92,55 +95,10 @@ if test -z "${CPPFLAGS}"; then
 
 
   [
-  VOL2BIRD_CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
+  CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
   ]
   rm -f myconftest.c
 fi
-
-dnl If running mac osx we want to check if we have brew so that we can identify PROJ...
-dnl
-kernelname=`uname -s | tr 'A-Z' 'a-z'`
-ISMACOS=no
-case "$kernelname" in
-  darwin*)
-    ISMACOS=yes
-    ;;
-esac
-
-HASHOMEBREW=no
-HOMEBREWPREFIX=
-if [[ "$ISMACOS" = "yes" ]]; then
-  AC_MSG_CHECKING(for homebrew)
-  which brew
-  if [[ $? -ne 0 ]]; then
-    AC_MSG_RESULT(not found)
-  else
-    HASHOMEBREW=yes  
-    AC_MSG_RESULT(found)
-  fi
-  
-  if [[ "$HASHOMEBREW" = "yes" ]]; then
-    AC_MSG_CHECKING(for homebrew prefix)
-    HOMEBREWPREFIX=`brew --prefix`
-    if [[ $? -ne 0 ]]; then
-      HOMEBREWPREFIX=
-      AC_MSG_RESULT(not found)
-    else
-      AC_MSG_RESULT($HOMEBREWPREFIX)
-    fi
-  fi
-  
-  if [[ "$HOMEBREWPREFIX" != "" ]]; then
-    LIBS="$LIBS -L$HOMEBREWPREFIX/lib"
-    CPPFLAGS="$CPPFLAGS -I$HOMEBREWPREFIX/include"
-  fi
-fi
-
-# honor PKG_xx overrides
-LIBS="${PKG_LIBS} ${LIBS}"
-# for CPPFLAGS we will superfluously double R's flags
-# since we'll set PKG_CPPFLAGS with this, but that shouldn't hurt
-CPPFLAGS="${PKG_CPPFLAGS} ${CPPFLAGS} "
 
 with_proj6=no
 AC_ARG_ENABLE([proj6],
@@ -151,6 +109,81 @@ AC_ARG_ENABLE([proj6],
 useproj6=no
 proj4ok=yes
 proj6ok=no
+
+# Keep track of LIBS before we start identifying PROJ
+saved_LIBS=${LIBS}
+
+PROJ_PKG_IDENTIFIED=no
+
+AC_MSG_CHECKING([for proj using pkg-config])
+if pkg-config proj; then
+  AC_MSG_RESULT([yes])
+
+  PROJ_PKG_IDENTIFIED=yes
+  
+  AC_MSG_CHECKING([for proj CFLAGS])
+  PROJ_CFLAGS=`pkg-config --cflags proj`
+  AC_MSG_RESULT($PROJ_CFLAGS)
+
+  AC_MSG_CHECKING([for proj LIBS])
+  PROJ_LIBS=`pkg-config --libs proj`
+  AC_MSG_RESULT($PROJ_LIBS)
+
+  AC_MSG_CHECKING([for static proj LIBS, if any])
+  STATIC_PROJ_LIBS=`pkg-config --static --libs proj`
+  AC_MSG_RESULT($STATIC_PROJ_LIBS)
+  
+  CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
+  LIBS="${LIBS} ${PROJ_LIBS}"
+else
+  AC_MSG_RESULT([no])
+fi
+
+# If we can't identify PROJ using pkg-config, we revert back to homebrew generic if we are running mac...
+if [[ "$PROJ_PKG_IDENTIFIED" = "no" ]]; then
+  kernelname=`uname -s | tr 'A-Z' 'a-z'`
+  ISMACOS=no
+  case "$kernelname" in
+  darwin*)
+    ISMACOS=yes
+    ;;
+  esac
+
+  HASHOMEBREW=no
+  HOMEBREWPREFIX=
+  if [[ "$ISMACOS" = "yes" ]]; then
+    AC_MSG_CHECKING(for homebrew)
+    which brew
+    if [[ $? -ne 0 ]]; then
+      AC_MSG_RESULT(not found)
+    else
+      HASHOMEBREW=yes  
+      AC_MSG_RESULT(found)
+    fi
+  
+    if [[ "$HASHOMEBREW" = "yes" ]]; then
+      AC_MSG_CHECKING(for homebrew prefix)
+      HOMEBREWPREFIX=`brew --prefix`
+      if [[ $? -ne 0 ]]; then
+        HOMEBREWPREFIX=
+        AC_MSG_RESULT(not found)
+      else
+        AC_MSG_RESULT($HOMEBREWPREFIX)
+      fi
+    fi
+  
+    if [[ "$HOMEBREWPREFIX" != "" ]]; then
+      LIBS="$LIBS -L$HOMEBREWPREFIX/lib"
+      CPPFLAGS="$CPPFLAGS -I$HOMEBREWPREFIX/include"
+    fi
+  fi
+fi
+
+# honor PKG_xx overrides
+LIBS="${PKG_LIBS} ${LIBS}"
+# for CPPFLAGS we will superfluously double R's flags
+# since we'll set PKG_CPPFLAGS with this, but that shouldn't hurt
+CPPFLAGS="${PKG_CPPFLAGS} ${CPPFLAGS}"
 
 AC_CHECK_HEADERS(proj_api.h,,[
   AC_MSG_CHECKING([with ACCEPT_USE_OF_DEPRECATED_PROJ_API_H])
@@ -164,11 +197,21 @@ AC_CHECK_HEADERS(proj_api.h,,[
   ])
 ])
 
-dnl changes needed for static PROJ 6
-AC_LANG(C++)
-LIBS="${LIBS} ${PKG_LIBS}"
-
-AC_CHECK_LIB(proj,pj_init_plus,,proj4ok=no)
+if [[ "$proj4ok" = "yes" ]] ; then
+  AC_CHECK_LIB(proj, pj_init_plus,, [proj4ok=no])
+  if [[ "$proj4ok" = "no" && "$PROJ_PKG_IDENTIFIED" = "yes" ]]; then
+    AC_MSG_NOTICE([Retrying with static proj libraries])
+    LIBS="${saved_LIBS} ${STATIC_PROJ_LIBS}"
+    AC_CHECK_LIB(proj, pj_init_plus, [ 
+    	proj4ok=yes
+    	PROJ_LIBS="$STATIC_PROJ_LIBS" 
+    ], [
+    	LIBS="$saved_LIBS"
+    ])
+  elif [[ "$proj4ok" = "no" ]]; then
+    AC_MSG_NOTICE([Could not identify PROJ.4])
+  fi
+fi
 
 AC_MSG_CHECKING([whether to require PROJ6 API])
 if [[ "$with_proj6" = "yes" -o "$proj4ok" = "no" ]]; then
@@ -179,14 +222,29 @@ else
 fi
 
 if [[ "$useproj6" = "yes" ]]; then
+  savedp6_LIBS=$LIBS
   proj6ok=yes
-  LIBS="${LIBS} -lsqlite3"
   AC_CHECK_HEADERS(proj.h,, proj6ok=no)
-  AC_CHECK_LIB(proj, proj_create_crs_to_crs,, proj6ok=no)
+  if [[ "$proj6ok" = "yes" ]]; then
+    AC_CHECK_LIB(proj, proj_create_crs_to_crs,, proj6ok=no)
+    if [[ "$proj6ok" = "no" -a "$PROJ_PKG_IDENTIFIED" = "yes" ]]; then
+      AC_MSG_NOTICE([Retrying with static proj libraries])
+      LIBS="${saved_LIBS} ${STATIC_PROJ_LIBS}"
+      AC_CHECK_LIB(proj, proj_create_crs_to_crs, [ 
+    	  proj6ok=yes
+    	  PROJ_LIBS="$STATIC_PROJ_LIBS" 
+      ], [
+    	  LIBS="$savedp6_LIBS"
+      ])
+    elif [[ "$proj6ok" = "no" ]]; then
+      AC_MSG_NOTICE([Could not identify PROJ.6])
+    fi
+  fi
 fi
 
 AC_MSG_CHECKING([If proj6 is usable])
 AC_MSG_RESULT([$proj6ok])
+
 if [[ "$proj6ok" = "yes" ]]; then
    CPPFLAGS="${CPPFLAGS}"
 else
@@ -202,8 +260,8 @@ fi
 AC_ARG_VAR([PKG_CPPFLAGS],[custom C preprocessor flags for packages compilation])
 AC_ARG_VAR([PKG_LIBS],[custom libraries for package compilation])
 
-VOL2BIRD_LIBS="$VOL2BIRD_LIBS $LIBS"
-VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $CPPFLAGS"
+VOL2BIRD_LIBS="$LIBS"
+VOL2BIRD_CPPFLAGS="$CPPFLAGS"
 
 dnl dummy substitute HDF5R_CFLAGS
 VOL2BIRD_CFLAGS=""

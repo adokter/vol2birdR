@@ -652,9 +652,6 @@ VOL2BIRD_CPPFLAGS
 VOL2BIRD_CFLAGS
 PKG_LIBS
 PKG_CPPFLAGS
-ac_ct_CXX
-CXXFLAGS
-CXX
 DEFINE_H5FREE_MEMORY
 HDF5_API_VERS_USE
 HDF5_VERSION_USE
@@ -735,9 +732,6 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
-CXX
-CXXFLAGS
-CCC
 PKG_CPPFLAGS
 PKG_LIBS'
 
@@ -1375,8 +1369,6 @@ Some influential environment variables:
   LIBS        libraries to pass to the linker, e.g. -l<library>
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
-  CXX         C++ compiler command
-  CXXFLAGS    C++ compiler flags
   PKG_CPPFLAGS
               custom C preprocessor flags for packages compilation
   PKG_LIBS    custom libraries for package compilation
@@ -1580,125 +1572,6 @@ fi
   as_fn_set_status $ac_retval
 
 } # ac_fn_c_try_link
-
-# ac_fn_cxx_try_compile LINENO
-# ----------------------------
-# Try to compile conftest.$ac_ext, and return whether this succeeded.
-ac_fn_cxx_try_compile ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest.beam
-  if { { ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-printf "%s\n" "$ac_try_echo"; } >&5
-  (eval "$ac_compile") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext
-then :
-  ac_retval=0
-else $as_nop
-  printf "%s\n" "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_cxx_try_compile
-
-# ac_fn_cxx_try_link LINENO
-# -------------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded.
-ac_fn_cxx_try_link ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest.beam conftest$ac_exeext
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-printf "%s\n" "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_cxx_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 test -x conftest$ac_exeext
-       }
-then :
-  ac_retval=0
-else $as_nop
-  printf "%s\n" "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
-  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
-  # interfere with the next link command; also delete a directory that is
-  # left behind by Apple's compiler.  We do this before executing the actions.
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_cxx_try_link
-
-# ac_fn_cxx_check_header_compile LINENO HEADER VAR INCLUDES
-# ---------------------------------------------------------
-# Tests whether HEADER exists and can be compiled using the include files in
-# INCLUDES, setting the cache variable VAR accordingly.
-ac_fn_cxx_check_header_compile ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
-printf %s "checking for $2... " >&6; }
-if eval test \${$3+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$4
-#include <$2>
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"
-then :
-  eval "$3=yes"
-else $as_nop
-  eval "$3=no"
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-eval ac_res=\$$3
-	       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-printf "%s\n" "$ac_res" >&6; }
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-
-} # ac_fn_cxx_check_header_compile
 ac_configure_args_raw=
 for ac_arg
 do
@@ -2311,222 +2184,6 @@ as_fn_append ac_header_c_list " strings.h strings_h HAVE_STRINGS_H"
 as_fn_append ac_header_c_list " sys/stat.h sys_stat_h HAVE_SYS_STAT_H"
 as_fn_append ac_header_c_list " sys/types.h sys_types_h HAVE_SYS_TYPES_H"
 as_fn_append ac_header_c_list " unistd.h unistd_h HAVE_UNISTD_H"
-# Test code for whether the C++ compiler supports C++98 (global declarations)
-ac_cxx_conftest_cxx98_globals='
-// Does the compiler advertise C++98 conformance?
-#if !defined __cplusplus || __cplusplus < 199711L
-# error "Compiler does not advertise C++98 conformance"
-#endif
-
-// These inclusions are to reject old compilers that
-// lack the unsuffixed header files.
-#include <cstdlib>
-#include <exception>
-
-// <cassert> and <cstring> are *not* freestanding headers in C++98.
-extern void assert (int);
-namespace std {
-  extern int strcmp (const char *, const char *);
-}
-
-// Namespaces, exceptions, and templates were all added after "C++ 2.0".
-using std::exception;
-using std::strcmp;
-
-namespace {
-
-void test_exception_syntax()
-{
-  try {
-    throw "test";
-  } catch (const char *s) {
-    // Extra parentheses suppress a warning when building autoconf itself,
-    // due to lint rules shared with more typical C programs.
-    assert (!(strcmp) (s, "test"));
-  }
-}
-
-template <typename T> struct test_template
-{
-  T const val;
-  explicit test_template(T t) : val(t) {}
-  template <typename U> T add(U u) { return static_cast<T>(u) + val; }
-};
-
-} // anonymous namespace
-'
-
-# Test code for whether the C++ compiler supports C++98 (body of main)
-ac_cxx_conftest_cxx98_main='
-  assert (argc);
-  assert (! argv[0]);
-{
-  test_exception_syntax ();
-  test_template<double> tt (2.0);
-  assert (tt.add (4) == 6.0);
-  assert (true && !false);
-}
-'
-
-# Test code for whether the C++ compiler supports C++11 (global declarations)
-ac_cxx_conftest_cxx11_globals='
-// Does the compiler advertise C++ 2011 conformance?
-#if !defined __cplusplus || __cplusplus < 201103L
-# error "Compiler does not advertise C++11 conformance"
-#endif
-
-namespace cxx11test
-{
-  constexpr int get_val() { return 20; }
-
-  struct testinit
-  {
-    int i;
-    double d;
-  };
-
-  class delegate
-  {
-  public:
-    delegate(int n) : n(n) {}
-    delegate(): delegate(2354) {}
-
-    virtual int getval() { return this->n; };
-  protected:
-    int n;
-  };
-
-  class overridden : public delegate
-  {
-  public:
-    overridden(int n): delegate(n) {}
-    virtual int getval() override final { return this->n * 2; }
-  };
-
-  class nocopy
-  {
-  public:
-    nocopy(int i): i(i) {}
-    nocopy() = default;
-    nocopy(const nocopy&) = delete;
-    nocopy & operator=(const nocopy&) = delete;
-  private:
-    int i;
-  };
-
-  // for testing lambda expressions
-  template <typename Ret, typename Fn> Ret eval(Fn f, Ret v)
-  {
-    return f(v);
-  }
-
-  // for testing variadic templates and trailing return types
-  template <typename V> auto sum(V first) -> V
-  {
-    return first;
-  }
-  template <typename V, typename... Args> auto sum(V first, Args... rest) -> V
-  {
-    return first + sum(rest...);
-  }
-}
-'
-
-# Test code for whether the C++ compiler supports C++11 (body of main)
-ac_cxx_conftest_cxx11_main='
-{
-  // Test auto and decltype
-  auto a1 = 6538;
-  auto a2 = 48573953.4;
-  auto a3 = "String literal";
-
-  int total = 0;
-  for (auto i = a3; *i; ++i) { total += *i; }
-
-  decltype(a2) a4 = 34895.034;
-}
-{
-  // Test constexpr
-  short sa[cxx11test::get_val()] = { 0 };
-}
-{
-  // Test initializer lists
-  cxx11test::testinit il = { 4323, 435234.23544 };
-}
-{
-  // Test range-based for
-  int array[] = {9, 7, 13, 15, 4, 18, 12, 10, 5, 3,
-                 14, 19, 17, 8, 6, 20, 16, 2, 11, 1};
-  for (auto &x : array) { x += 23; }
-}
-{
-  // Test lambda expressions
-  using cxx11test::eval;
-  assert (eval ([](int x) { return x*2; }, 21) == 42);
-  double d = 2.0;
-  assert (eval ([&](double x) { return d += x; }, 3.0) == 5.0);
-  assert (d == 5.0);
-  assert (eval ([=](double x) mutable { return d += x; }, 4.0) == 9.0);
-  assert (d == 5.0);
-}
-{
-  // Test use of variadic templates
-  using cxx11test::sum;
-  auto a = sum(1);
-  auto b = sum(1, 2);
-  auto c = sum(1.0, 2.0, 3.0);
-}
-{
-  // Test constructor delegation
-  cxx11test::delegate d1;
-  cxx11test::delegate d2();
-  cxx11test::delegate d3(45);
-}
-{
-  // Test override and final
-  cxx11test::overridden o1(55464);
-}
-{
-  // Test nullptr
-  char *c = nullptr;
-}
-{
-  // Test template brackets
-  test_template<::test_template<int>> v(test_template<int>(12));
-}
-{
-  // Unicode literals
-  char const *utf8 = u8"UTF-8 string \u2500";
-  char16_t const *utf16 = u"UTF-8 string \u2500";
-  char32_t const *utf32 = U"UTF-32 string \u2500";
-}
-'
-
-# Test code for whether the C compiler supports C++11 (complete).
-ac_cxx_conftest_cxx11_program="${ac_cxx_conftest_cxx98_globals}
-${ac_cxx_conftest_cxx11_globals}
-
-int
-main (int argc, char **argv)
-{
-  int ok = 0;
-  ${ac_cxx_conftest_cxx98_main}
-  ${ac_cxx_conftest_cxx11_main}
-  return ok;
-}
-"
-
-# Test code for whether the C compiler supports C++98 (complete).
-ac_cxx_conftest_cxx98_program="${ac_cxx_conftest_cxx98_globals}
-int
-main (int argc, char **argv)
-{
-  int ok = 0;
-  ${ac_cxx_conftest_cxx98_main}
-  return ok;
-}
-"
-
 # Check that the precious variables saved in the cache have kept the same
 # value.
 ac_cache_corrupted=false
@@ -4504,6 +4161,9 @@ fi
 
 
 
+echo "HDF5_LIBS=$HDF5_LIBS"
+echo ""
+
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
   echo "could not determine R_HOME"
@@ -4580,7 +4240,7 @@ printf "%s\n" "no" >&6; }
   LIBS=`${H5CC} -show | ${GREP} -o " \-[lL][^[:space:]]\+" | tr "\n" " "`
 
 
-    VOL2BIRD_LIBS="${LIBS} -L. -lhdf5 -lz -lm"
+    LIBS="${LIBS} -L. -lhdf5 -lz -lm"
 fi
 
 if test -z "${CPPFLAGS}"; then
@@ -4644,59 +4304,10 @@ printf "%s\n" "no" >&6; }
 
 
 
-  VOL2BIRD_CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
+  CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
 
   rm -f myconftest.c
 fi
-
-kernelname=`uname -s | tr 'A-Z' 'a-z'`
-ISMACOS=no
-case "$kernelname" in
-  darwin*)
-    ISMACOS=yes
-    ;;
-esac
-
-HASHOMEBREW=no
-HOMEBREWPREFIX=
-if [ "$ISMACOS" = "yes" ]; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew" >&5
-printf %s "checking for homebrew... " >&6; }
-  which brew
-  if [ $? -ne 0 ]; then
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
-printf "%s\n" "not found" >&6; }
-  else
-    HASHOMEBREW=yes
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: found" >&5
-printf "%s\n" "found" >&6; }
-  fi
-
-  if [ "$HASHOMEBREW" = "yes" ]; then
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew prefix" >&5
-printf %s "checking for homebrew prefix... " >&6; }
-    HOMEBREWPREFIX=`brew --prefix`
-    if [ $? -ne 0 ]; then
-      HOMEBREWPREFIX=
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
-printf "%s\n" "not found" >&6; }
-    else
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $HOMEBREWPREFIX" >&5
-printf "%s\n" "$HOMEBREWPREFIX" >&6; }
-    fi
-  fi
-
-  if [ "$HOMEBREWPREFIX" != "" ]; then
-    LIBS="$LIBS -L$HOMEBREWPREFIX/lib"
-    CPPFLAGS="$CPPFLAGS -I$HOMEBREWPREFIX/include"
-  fi
-fi
-
-# honor PKG_xx overrides
-LIBS="${PKG_LIBS} ${LIBS}"
-# for CPPFLAGS we will superfluously double R's flags
-# since we'll set PKG_CPPFLAGS with this, but that shouldn't hurt
-CPPFLAGS="${PKG_CPPFLAGS} ${CPPFLAGS} "
 
 with_proj6=no
 # Check whether --enable-proj6 was given.
@@ -4712,6 +4323,96 @@ fi
 useproj6=no
 proj4ok=yes
 proj6ok=no
+
+# Keep track of LIBS before we start identifying PROJ
+saved_LIBS=${LIBS}
+
+PROJ_PKG_IDENTIFIED=no
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj using pkg-config" >&5
+printf %s "checking for proj using pkg-config... " >&6; }
+if pkg-config proj; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+  PROJ_PKG_IDENTIFIED=yes
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj CFLAGS" >&5
+printf %s "checking for proj CFLAGS... " >&6; }
+  PROJ_CFLAGS=`pkg-config --cflags proj`
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_CFLAGS" >&5
+printf "%s\n" "$PROJ_CFLAGS" >&6; }
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj LIBS" >&5
+printf %s "checking for proj LIBS... " >&6; }
+  PROJ_LIBS=`pkg-config --libs proj`
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_LIBS" >&5
+printf "%s\n" "$PROJ_LIBS" >&6; }
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for static proj LIBS, if any" >&5
+printf %s "checking for static proj LIBS, if any... " >&6; }
+  STATIC_PROJ_LIBS=`pkg-config --static --libs proj`
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $STATIC_PROJ_LIBS" >&5
+printf "%s\n" "$STATIC_PROJ_LIBS" >&6; }
+
+  CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
+  LIBS="${LIBS} ${PROJ_LIBS}"
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+# If we can't identify PROJ using pkg-config, we revert back to homebrew generic if we are running mac...
+if [ "$PROJ_PKG_IDENTIFIED" = "no" ]; then
+  kernelname=`uname -s | tr 'A-Z' 'a-z'`
+  ISMACOS=no
+  case "$kernelname" in
+  darwin*)
+    ISMACOS=yes
+    ;;
+  esac
+
+  HASHOMEBREW=no
+  HOMEBREWPREFIX=
+  if [ "$ISMACOS" = "yes" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew" >&5
+printf %s "checking for homebrew... " >&6; }
+    which brew
+    if [ $? -ne 0 ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+printf "%s\n" "not found" >&6; }
+    else
+      HASHOMEBREW=yes
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: found" >&5
+printf "%s\n" "found" >&6; }
+    fi
+
+    if [ "$HASHOMEBREW" = "yes" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew prefix" >&5
+printf %s "checking for homebrew prefix... " >&6; }
+      HOMEBREWPREFIX=`brew --prefix`
+      if [ $? -ne 0 ]; then
+        HOMEBREWPREFIX=
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+printf "%s\n" "not found" >&6; }
+      else
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $HOMEBREWPREFIX" >&5
+printf "%s\n" "$HOMEBREWPREFIX" >&6; }
+      fi
+    fi
+
+    if [ "$HOMEBREWPREFIX" != "" ]; then
+      LIBS="$LIBS -L$HOMEBREWPREFIX/lib"
+      CPPFLAGS="$CPPFLAGS -I$HOMEBREWPREFIX/include"
+    fi
+  fi
+fi
+
+# honor PKG_xx overrides
+LIBS="${PKG_LIBS} ${LIBS}"
+# for CPPFLAGS we will superfluously double R's flags
+# since we'll set PKG_CPPFLAGS with this, but that shouldn't hurt
+CPPFLAGS="${PKG_CPPFLAGS} ${CPPFLAGS}"
 
        for ac_header in proj_api.h
 do :
@@ -4749,391 +4450,8 @@ fi
 
 done
 
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-LIBS="${LIBS} ${PKG_LIBS}"
-
-
-
-
-
-
-
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-if test -z "$CXX"; then
-  if test -n "$CCC"; then
-    CXX=$CCC
-  else
-    if test -n "$ac_tool_prefix"; then
-  for ac_prog in g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++
-  do
-    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
-set dummy $ac_tool_prefix$ac_prog; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_prog_CXX+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  if test -n "$CXX"; then
-  ac_cv_prog_CXX="$CXX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_prog_CXX="$ac_tool_prefix$ac_prog"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-CXX=$ac_cv_prog_CXX
-if test -n "$CXX"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $CXX" >&5
-printf "%s\n" "$CXX" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-    test -n "$CXX" && break
-  done
-fi
-if test -z "$CXX"; then
-  ac_ct_CXX=$CXX
-  for ac_prog in g++ c++ gpp aCC CC cxx cc++ cl.exe FCC KCC RCC xlC_r xlC clang++
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_prog_ac_ct_CXX+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  if test -n "$ac_ct_CXX"; then
-  ac_cv_prog_ac_ct_CXX="$ac_ct_CXX" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_CXX="$ac_prog"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-fi
-fi
-ac_ct_CXX=$ac_cv_prog_ac_ct_CXX
-if test -n "$ac_ct_CXX"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_ct_CXX" >&5
-printf "%s\n" "$ac_ct_CXX" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-  test -n "$ac_ct_CXX" && break
-done
-
-  if test "x$ac_ct_CXX" = x; then
-    CXX="g++"
-  else
-    case $cross_compiling:$ac_tool_warned in
-yes:)
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
-printf "%s\n" "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
-ac_tool_warned=yes ;;
-esac
-    CXX=$ac_ct_CXX
-  fi
-fi
-
-  fi
-fi
-# Provide some information about the compiler.
-printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for C++ compiler version" >&5
-set X $ac_compile
-ac_compiler=$2
-for ac_option in --version -v -V -qversion; do
-  { { ac_try="$ac_compiler $ac_option >&5"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-printf "%s\n" "$ac_try_echo"; } >&5
-  (eval "$ac_compiler $ac_option >&5") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    sed '10a\
-... rest of stderr output deleted ...
-         10q' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-  fi
-  rm -f conftest.er1 conftest.err
-  printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }
-done
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the compiler supports GNU C++" >&5
-printf %s "checking whether the compiler supports GNU C++... " >&6; }
-if test ${ac_cv_cxx_compiler_gnu+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-#ifndef __GNUC__
-       choke me
-#endif
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"
-then :
-  ac_compiler_gnu=yes
-else $as_nop
-  ac_compiler_gnu=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-ac_cv_cxx_compiler_gnu=$ac_compiler_gnu
-
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_cxx_compiler_gnu" >&5
-printf "%s\n" "$ac_cv_cxx_compiler_gnu" >&6; }
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-if test $ac_compiler_gnu = yes; then
-  GXX=yes
-else
-  GXX=
-fi
-ac_test_CXXFLAGS=${CXXFLAGS+y}
-ac_save_CXXFLAGS=$CXXFLAGS
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether $CXX accepts -g" >&5
-printf %s "checking whether $CXX accepts -g... " >&6; }
-if test ${ac_cv_prog_cxx_g+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_save_cxx_werror_flag=$ac_cxx_werror_flag
-   ac_cxx_werror_flag=yes
-   ac_cv_prog_cxx_g=no
-   CXXFLAGS="-g"
-   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"
-then :
-  ac_cv_prog_cxx_g=yes
-else $as_nop
-  CXXFLAGS=""
-      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"
-then :
-
-else $as_nop
-  ac_cxx_werror_flag=$ac_save_cxx_werror_flag
-	 CXXFLAGS="-g"
-	 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"
-then :
-  ac_cv_prog_cxx_g=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-   ac_cxx_werror_flag=$ac_save_cxx_werror_flag
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_g" >&5
-printf "%s\n" "$ac_cv_prog_cxx_g" >&6; }
-if test $ac_test_CXXFLAGS; then
-  CXXFLAGS=$ac_save_CXXFLAGS
-elif test $ac_cv_prog_cxx_g = yes; then
-  if test "$GXX" = yes; then
-    CXXFLAGS="-g -O2"
-  else
-    CXXFLAGS="-g"
-  fi
-else
-  if test "$GXX" = yes; then
-    CXXFLAGS="-O2"
-  else
-    CXXFLAGS=
-  fi
-fi
-ac_prog_cxx_stdcxx=no
-if test x$ac_prog_cxx_stdcxx = xno
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++11 features" >&5
-printf %s "checking for $CXX option to enable C++11 features... " >&6; }
-if test ${ac_cv_prog_cxx_11+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_cv_prog_cxx_11=no
-ac_save_CXX=$CXX
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$ac_cxx_conftest_cxx11_program
-_ACEOF
-for ac_arg in '' -std=gnu++11 -std=gnu++0x -std=c++11 -std=c++0x -qlanglvl=extended0x -AA
-do
-  CXX="$ac_save_CXX $ac_arg"
-  if ac_fn_cxx_try_compile "$LINENO"
-then :
-  ac_cv_prog_cxx_cxx11=$ac_arg
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam
-  test "x$ac_cv_prog_cxx_cxx11" != "xno" && break
-done
-rm -f conftest.$ac_ext
-CXX=$ac_save_CXX
-fi
-
-if test "x$ac_cv_prog_cxx_cxx11" = xno
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
-printf "%s\n" "unsupported" >&6; }
-else $as_nop
-  if test "x$ac_cv_prog_cxx_cxx11" = x
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
-printf "%s\n" "none needed" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_cxx11" >&5
-printf "%s\n" "$ac_cv_prog_cxx_cxx11" >&6; }
-     CXX="$CXX $ac_cv_prog_cxx_cxx11"
-fi
-  ac_cv_prog_cxx_stdcxx=$ac_cv_prog_cxx_cxx11
-  ac_prog_cxx_stdcxx=cxx11
-fi
-fi
-if test x$ac_prog_cxx_stdcxx = xno
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $CXX option to enable C++98 features" >&5
-printf %s "checking for $CXX option to enable C++98 features... " >&6; }
-if test ${ac_cv_prog_cxx_98+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_cv_prog_cxx_98=no
-ac_save_CXX=$CXX
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-$ac_cxx_conftest_cxx98_program
-_ACEOF
-for ac_arg in '' -std=gnu++98 -std=c++98 -qlanglvl=extended -AA
-do
-  CXX="$ac_save_CXX $ac_arg"
-  if ac_fn_cxx_try_compile "$LINENO"
-then :
-  ac_cv_prog_cxx_cxx98=$ac_arg
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam
-  test "x$ac_cv_prog_cxx_cxx98" != "xno" && break
-done
-rm -f conftest.$ac_ext
-CXX=$ac_save_CXX
-fi
-
-if test "x$ac_cv_prog_cxx_cxx98" = xno
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: unsupported" >&5
-printf "%s\n" "unsupported" >&6; }
-else $as_nop
-  if test "x$ac_cv_prog_cxx_cxx98" = x
-then :
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: none needed" >&5
-printf "%s\n" "none needed" >&6; }
-else $as_nop
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_cxx_cxx98" >&5
-printf "%s\n" "$ac_cv_prog_cxx_cxx98" >&6; }
-     CXX="$CXX $ac_cv_prog_cxx_cxx98"
-fi
-  ac_cv_prog_cxx_stdcxx=$ac_cv_prog_cxx_cxx98
-  ac_prog_cxx_stdcxx=cxx98
-fi
-fi
-
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_init_plus in -lproj" >&5
+if [ "$proj4ok" = "yes" ] ; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_init_plus in -lproj" >&5
 printf %s "checking for pj_init_plus in -lproj... " >&6; }
 if test ${ac_cv_lib_proj_pj_init_plus+y}
 then :
@@ -5144,18 +4462,19 @@ LIBS="-lproj  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int pj_init_plus ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char pj_init_plus ();
 int
 main (void)
 {
-return conftest::pj_init_plus ();
+return pj_init_plus ();
   ;
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
   ac_cv_lib_proj_pj_init_plus=yes
 else $as_nop
@@ -5177,6 +4496,62 @@ else $as_nop
   proj4ok=no
 fi
 
+  if [ "$proj4ok" = "no" && "$PROJ_PKG_IDENTIFIED" = "yes" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Retrying with static proj libraries" >&5
+printf "%s\n" "$as_me: Retrying with static proj libraries" >&6;}
+    LIBS="${saved_LIBS} ${STATIC_PROJ_LIBS}"
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_init_plus in -lproj" >&5
+printf %s "checking for pj_init_plus in -lproj... " >&6; }
+if test ${ac_cv_lib_proj_pj_init_plus+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lproj  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char pj_init_plus ();
+int
+main (void)
+{
+return pj_init_plus ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_proj_pj_init_plus=yes
+else $as_nop
+  ac_cv_lib_proj_pj_init_plus=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_proj_pj_init_plus" >&5
+printf "%s\n" "$ac_cv_lib_proj_pj_init_plus" >&6; }
+if test "x$ac_cv_lib_proj_pj_init_plus" = xyes
+then :
+
+    	proj4ok=yes
+    	PROJ_LIBS="$STATIC_PROJ_LIBS"
+
+else $as_nop
+
+    	LIBS="$saved_LIBS"
+
+fi
+
+  elif [ "$proj4ok" = "no" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Could not identify PROJ.4" >&5
+printf "%s\n" "$as_me: Could not identify PROJ.4" >&6;}
+  fi
+fi
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to require PROJ6 API" >&5
 printf %s "checking whether to require PROJ6 API... " >&6; }
@@ -5190,11 +4565,11 @@ printf "%s\n" "no" >&6; }
 fi
 
 if [ "$useproj6" = "yes" ]; then
+  savedp6_LIBS=$LIBS
   proj6ok=yes
-  LIBS="${LIBS} -lsqlite3"
          for ac_header in proj.h
 do :
-  ac_fn_cxx_check_header_compile "$LINENO" "proj.h" "ac_cv_header_proj_h" "$ac_includes_default"
+  ac_fn_c_check_header_compile "$LINENO" "proj.h" "ac_cv_header_proj_h" "$ac_includes_default"
 if test "x$ac_cv_header_proj_h" = xyes
 then :
   printf "%s\n" "#define HAVE_PROJ_H 1" >>confdefs.h
@@ -5204,7 +4579,8 @@ else $as_nop
 fi
 
 done
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_create_crs_to_crs in -lproj" >&5
+  if [ "$proj6ok" = "yes" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_create_crs_to_crs in -lproj" >&5
 printf %s "checking for proj_create_crs_to_crs in -lproj... " >&6; }
 if test ${ac_cv_lib_proj_proj_create_crs_to_crs+y}
 then :
@@ -5215,18 +4591,19 @@ LIBS="-lproj  $LIBS"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-namespace conftest {
-  extern "C" int proj_create_crs_to_crs ();
-}
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char proj_create_crs_to_crs ();
 int
 main (void)
 {
-return conftest::proj_create_crs_to_crs ();
+return proj_create_crs_to_crs ();
   ;
   return 0;
 }
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
   ac_cv_lib_proj_proj_create_crs_to_crs=yes
 else $as_nop
@@ -5248,12 +4625,69 @@ else $as_nop
   proj6ok=no
 fi
 
+    if [ "$proj6ok" = "no" -a "$PROJ_PKG_IDENTIFIED" = "yes" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Retrying with static proj libraries" >&5
+printf "%s\n" "$as_me: Retrying with static proj libraries" >&6;}
+      LIBS="${saved_LIBS} ${STATIC_PROJ_LIBS}"
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_create_crs_to_crs in -lproj" >&5
+printf %s "checking for proj_create_crs_to_crs in -lproj... " >&6; }
+if test ${ac_cv_lib_proj_proj_create_crs_to_crs+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lproj  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char proj_create_crs_to_crs ();
+int
+main (void)
+{
+return proj_create_crs_to_crs ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_proj_proj_create_crs_to_crs=yes
+else $as_nop
+  ac_cv_lib_proj_proj_create_crs_to_crs=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_proj_proj_create_crs_to_crs" >&5
+printf "%s\n" "$ac_cv_lib_proj_proj_create_crs_to_crs" >&6; }
+if test "x$ac_cv_lib_proj_proj_create_crs_to_crs" = xyes
+then :
+
+    	  proj6ok=yes
+    	  PROJ_LIBS="$STATIC_PROJ_LIBS"
+
+else $as_nop
+
+    	  LIBS="$savedp6_LIBS"
+
+fi
+
+    elif [ "$proj6ok" = "no" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Could not identify PROJ.6" >&5
+printf "%s\n" "$as_me: Could not identify PROJ.6" >&6;}
+    fi
+  fi
 fi
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking If proj6 is usable" >&5
 printf %s "checking If proj6 is usable... " >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $proj6ok" >&5
 printf "%s\n" "$proj6ok" >&6; }
+
 if [ "$proj6ok" = "yes" ]; then
    CPPFLAGS="${CPPFLAGS}"
 else
@@ -5269,8 +4703,8 @@ fi
 
 
 
-VOL2BIRD_LIBS="$VOL2BIRD_LIBS $LIBS"
-VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $CPPFLAGS"
+VOL2BIRD_LIBS="$LIBS"
+VOL2BIRD_CPPFLAGS="$CPPFLAGS"
 
 VOL2BIRD_CFLAGS=""
 
