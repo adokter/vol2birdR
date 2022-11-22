@@ -38,9 +38,6 @@ AC_SUBST(HDF5_VERSION_USE)
 AC_SUBST(HDF5_API_VERS_USE)
 AC_SUBST(DEFINE_H5FREE_MEMORY)
 
-echo "HDF5_LIBS=$HDF5_LIBS"
-echo ""
-
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
   echo "could not determine R_HOME"
@@ -75,7 +72,7 @@ if test -z "${LIBS}"; then
   ]
   
   dnl Fix for newer Debian versions
-  LIBS="${LIBS} -L. -lhdf5 -lz -lm"
+  VOL2BIRD_LIBS="${LIBS} -L. -lhdf5 -lz -lm"
 fi
 
 if test -z "${CPPFLAGS}"; then
@@ -96,7 +93,7 @@ if test -z "${CPPFLAGS}"; then
 
 
   [
-  CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
+  VOL2BIRD_CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
   ]
   rm -f myconftest.c
 fi
@@ -118,8 +115,8 @@ fi
 AC_ARG_VAR([PKG_CPPFLAGS],[custom C preprocessor flags for packages compilation])
 AC_ARG_VAR([PKG_LIBS],[custom libraries for package compilation])
 
-VOL2BIRD_LIBS="$LIBS"
-VOL2BIRD_CPPFLAGS="$CPPFLAGS"
+VOL2BIRD_LIBS="$VOL2BIRD_LIBS $LIBS"
+VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $CPPFLAGS"
 
 dnl dummy substitute HDF5R_CFLAGS
 VOL2BIRD_CFLAGS=""
