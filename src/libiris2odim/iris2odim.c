@@ -1308,6 +1308,15 @@ int populateObject(RaveCoreObject* object, file_element_s* file_element_p) {
       file_element_p->product_header_p->end.site_name);
    if(ncopied > 0 ) rltrim(sname);
    source = mapSource2Nod(sname);
+   /* add site_name as RAD identifier if lookup by mapSource1Nod fails */
+   char source_missing[50];
+   if(strcmp(source,"NOD:xxxxx,PLC:Unknown")==0){
+      strcpy(source_missing,"RAD:");
+      strcat(source_missing,sname);
+      strcat(source_missing,",NOD:xxxxx,PLC:Unknown");
+      source=source_missing;
+   }
+   
    /*
     * The top-level 'what' group has a time and date that are referred to
     * in the OPERA Data Information Model for HDF as 'Nominal' date and time.

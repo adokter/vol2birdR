@@ -722,6 +722,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_hdf5
+with_proj
 enable_proj6
 '
       ac_precious_vars='build_alias
@@ -1353,13 +1354,15 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-proj6          use the new PROJ6 API even if PROJ4 API is
-                          available. The default is [disable] since PROJ6 API
-                          has issues, use with caution.
+                          available.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-hdf5=yes/no/PATH location of h5cc or h5pcc for HDF5 configuration
+  --with-proj=yes|no|<path to proj>
+                          location of <proj>-root or a comma separated list
+                          specifying include and library directory
 
 Some influential environment variables:
   CC          C compiler command
@@ -2435,23 +2438,61 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #serial 11
 
 
+#
+# SYNOPSIS
+#
+#   AC_LIB_PROJ([keepvar])
+#
+#   Optional argument 'keepvar' that will indicate to the script that CPPFLAGS & LDFLAGS should be restored after
+#   macro has been run.
+#
+# DESCRIPTION
+#
+#   Macro for identifying PROJ.4 (and/or) PROJ.6 library.
+#
+#   The macro provides two options.
+#
+#   --with-proj=[yes | no | path]
+#                        where path can either be a proj-root or a commaseparated list of <root>/include,<other-root>/lib
+#                        default is "yes" meaning that pkg-config first will be used to identify compiler flags. After that, if on mac and
+#                        pkg-config couldn't be found, brew will be identified and used to specify generic include/library flags.
+#
+#                        If path is specified, then this path will be used for an atempt to compile the code.
+#
+#   --enable-proj6       Will force building against PROJ >= 6. The default behaviour is however to always first try proj.4 and if that
+#                        doesn't work out. Proj >= 6 will be tried instead.
+#
+#   The macro first checks if with-proj was specified with path or not. If path was specified, that include/library
+#   paths will be used for setting CFLAGS & LIBS and try to compile the software. This branch of the macro will also
+#   ensure that it can find proj_api.h/proj.h in the specified include-dir and libproj* in specified lib-dir. If that isn't possible
+#   the macro will abort since there must be a manual error.
+#
+#   If path wasn't specified, the macro will instead use pkg-config to identify CFLAGS & LIBS if available. If that doesn't work if will keep
+#   on by checking if homebrew is available and in that case use the standard prefix as include/lib.
+#
+#   As a final resort, the macro will go back to use standard paths.
+#
+#
+#
+#   The following variables will be set after this function has been run.
+#
+#   PROJ_FOUND=yes|no         - If proj could be identified or not.
+#   PROJ_SUPPRESSED=yes|no    - If proj actively was suppressed by user (--with-proj=no)
+#   PROJ_VARIANT=4|6          - If proj variant 4 or >= 6 was identified.
+#   PROJ_CFLAGS=..            - Compiler flags that should be used.
+#   PROJ_LIBS=..              - Linker flags that should be used.
+#
+#   CPPFLAGS & LIBS will be updated with new flags unless AX_LIB_PROJ is called with [keepvar]. If not keepvar is specified
+#   both CPPFLAGS & LIBS will be updated with flags used when successfully identifying the proj-version
+#
+# LICENSE
+#   Copyright (c) 2022 Anders Henja (anders@henjab.se)
+#
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved. This file is offered as-is, without any
+#   warranty.
 
-#############################################################################
-##
-## Copyright 2016 Novartis Institutes for BioMedical Research Inc.
-## Licensed under the Apache License, Version 2.0 (the "License");
-## you may not use this file except in compliance with the License.
-## You may obtain a copy of the License at
-##
-## http://www.apache.org/licenses/LICENSE-2.0
-##
-## Unless required by applicable law or agreed to in writing, software
-## distributed under the License is distributed on an "AS IS" BASIS,
-## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-## See the License for the specific language governing permissions and
-## limitations under the License.
-##
-#############################################################################
 
 
 
@@ -4070,7 +4111,7 @@ fi
 
 
 if test "$with_hdf5" = "yes"; then
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Found hdf5 with version: $HDF5_VERSION" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Found hdf5 with version: $HDF5_VERSION" >&5
 printf "%s\n" "Found hdf5 with version: $HDF5_VERSION" >&6; }
 
 
@@ -4106,16 +4147,11 @@ x$ax_compare_version_B" | sed 's/^ *//' | sort -r | sed "s/x${ax_compare_version
     if test "$ax_compare_version" = "true" ; then
     hdf5_version_sufficient="yes"
     else as_fn_error $? "The version of hdf5 installed on your system is not sufficient. Please ensure that at least version 1.8.12 is installed" "$LINENO" 5
+
   fi
 
 else
-  as_fn_error $? "hdf5 does not seem to be installed on your platform.
-  Please install the hdf5 library.
-  The required HDF5 library files can be installed as follows:
-      - Debian-based (e.g. Debian >= 8.0, Ubuntu >= 15.04): 'sudo apt-get install libhdf5-dev'
-        - Old Debian-based (e.g Debian < 8.0, Ubuntu < 15.04): Install from source (see INSTALL)
-        - OS X using Homebrew: 'brew install hdf5'
-        - RPM-based (e.g Fedora): 'sudo yum install hdf5-devel'" "$LINENO" 5
+  as_fn_error $? "hdf5 does not seem to be installed on your platform." "$LINENO" 5
 fi
 
 if test "$hdf5_version_sufficient" = "yes"; then
@@ -4309,21 +4345,60 @@ printf "%s\n" "no" >&6; }
   rm -f myconftest.c
 fi
 
+<<<<<<< HEAD
 with_proj6=no
-# Check whether --enable-proj6 was given.
-if test ${enable_proj6+y}
+=======
+
+
+PROJ_CFLAGS=""
+PROJ_LIBS=""
+PROJ_VARIANT=X
+PROJ_FOUND=no
+PROJ_SUPPRESSED=no
+
+ax_lib_proj_path=
+ax_lib_proj_with_proj=yes
+ax_lib_proj_useproj6=no
+ax_lib_proj_proj4ok=yes
+ax_lib_proj_proj6ok=no
+ax_lib_proj_with_proj6=no
+ax_lib_proj_pkg_config_identified=no
+ax_lib_proj_fun_arg= # Store argument when calling AX_LIB_PROJ([keepvar])
+
+# Add a default --with-proj configuration option.
+
+# Check whether --with-proj was given.
+if test ${with_proj+y}
 then :
-  enableval=$enable_proj6; with_proj6=$enableval
+  withval=$with_proj;  if test "$withval" = "no" -o "$withval" = "yes"; then
+      ax_lib_proj_with_proj="$withval"
+    else
+      ax_lib_proj_with_proj="yes"
+      ax_lib_proj_path="$withval"
+    fi
+
 else $as_nop
-  with_proj6=$with_proj6
+  ax_lib_proj_with_proj="yes"
+
 fi
 
 
-# unless forced, try to use PROJ4 first
-useproj6=no
-proj4ok=yes
-proj6ok=no
+>>>>>>> main
+# Check whether --enable-proj6 was given.
+if test ${enable_proj6+y}
+then :
+  enableval=$enable_proj6; ax_lib_proj_with_proj6=$enableval
+else $as_nop
+  ax_lib_proj_with_proj6=$ax_lib_proj_with_proj6
 
+fi
+
+
+# Keep track of LIBS before we start identifying PROJ
+ax_lib_proj_save_LIBS=${LIBS}
+ax_lib_proj_save_CPPFLAGS=${CPPFLAGS}
+
+<<<<<<< HEAD
 # Keep track of LIBS before we start identifying PROJ
 saved_LIBS=${LIBS}
 
@@ -4415,43 +4490,188 @@ LIBS="${PKG_LIBS} ${LIBS}"
 CPPFLAGS="${PKG_CPPFLAGS} ${CPPFLAGS}"
 
        for ac_header in proj_api.h
+=======
+if [ "$ax_lib_proj_with_proj" != "no" ]; then
+  if [ "$ax_lib_proj_with_proj" = "yes" -a "$ax_lib_proj_path" = "" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Trying to identify PROJ using pkg-config" >&5
+printf "%s\n" "$as_me: Trying to identify PROJ using pkg-config" >&6;}
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj using pkg-config" >&5
+printf %s "checking for proj using pkg-config... " >&6; }
+    if pkg-config proj; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+      ax_lib_proj_pkg_config_identified=yes
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj CFLAGS" >&5
+printf %s "checking for proj CFLAGS... " >&6; }
+      PROJ_CFLAGS=`pkg-config --cflags proj`
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_CFLAGS" >&5
+printf "%s\n" "$PROJ_CFLAGS" >&6; }
+
+      # TODO: Replace PROJ_LIBS with --libs-only-l / --libs-only-L so that we
+      # can set two different variables PROJ_LIBRARIES & PROJ_LDFLAGS instead of the
+      # generic PROJ_LIBS that can be derived from the two above. Order of libraries
+      # might get scrambled which in some cases is not wanted
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj LIBS" >&5
+printf %s "checking for proj LIBS... " >&6; }
+      PROJ_LIBS=`pkg-config --libs proj`
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_LIBS" >&5
+printf "%s\n" "$PROJ_LIBS" >&6; }
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for static proj LIBS, if any" >&5
+printf %s "checking for static proj LIBS, if any... " >&6; }
+      STATIC_PROJ_LIBS=`pkg-config --static --libs proj`
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $STATIC_PROJ_LIBS" >&5
+printf "%s\n" "$STATIC_PROJ_LIBS" >&6; }
+
+      CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
+      LIBS="${LIBS} ${PROJ_LIBS}"
+    else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+    fi
+  fi
+
+  if [ "$ax_lib_proj_pkg_config_identified" = "no" -a "$ax_lib_proj_path" != "" ]; then
+    if [ "`echo $ax_lib_proj_path | grep ','`" = "" ]; then
+      ax_lib_proj_inc=$ax_lib_proj_path/include
+      ax_lib_proj_lib=$ax_lib_proj_path/lib
+    else
+      ax_lib_proj_inc="`echo $ax_lib_proj_path |cut -f1 -d,`"
+      ax_lib_proj_lib="`echo $ax_lib_proj_path |cut -f2 -d,`"
+    fi
+
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Checking if proj.h or proj_api.h can be found in proj-path" >&5
+printf %s "checking Checking if proj.h or proj_api.h can be found in proj-path... " >&6; }
+    if [ ! -f "$ax_lib_proj_inc/proj.h" -o ! -f "$ax_lib_proj_inc/proj_api.h" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+      as_fn_error $? "Could not identify proj.h or proj_api in include directory $ax_lib_proj_inc, aborting!" "$LINENO" 5
+    else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+    fi
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Checking if libproj can be found in proj-path" >&5
+printf %s "checking Checking if libproj can be found in proj-path... " >&6; }
+    TMP=`ls -1 "$ax_lib_proj_lib"/libproj.* 2>/dev/null`
+    if [ "$TMP" = "" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+      as_fn_error $? "Could not identify libproj in directory $ax_lib_proj_inc, aborting!" "$LINENO" 5
+    else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+    fi
+
+    PROJ_LIBS="-L$ax_lib_proj_lib -lproj"
+    PROJ_CFLAGS="-I$ax_lib_proj_inc"
+    CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
+    LIBS="${LIBS} ${PROJ_LIBS}"
+  elif [ "$ax_lib_proj_pkg_config_identified" = "no" ]; then
+    # If we can't identify pkg-config but is on mac, we might be able to use
+    # homebrew to at least get basic flags
+    ax_lib_proj_kernelname=`uname -s | tr 'A-Z' 'a-z'`
+    ax_lib_proj_ismacos=no
+    case "$ax_lib_proj_kernelname" in
+      darwin*)
+        ax_lib_proj_ismacos=yes
+        ;;
+    esac
+
+    ax_lib_proj_hasbrew=no
+    ax_lib_proj_homebrewprefix=
+    if [ "$ax_lib_proj_ismacos" = "yes" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew" >&5
+printf %s "checking for homebrew... " >&6; }
+      which brew
+      if [ $? -ne 0 ]; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+printf "%s\n" "not found" >&6; }
+      else
+        ax_lib_proj_hasbrew=yes
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: found" >&5
+printf "%s\n" "found" >&6; }
+      fi
+
+      if [ "$ax_lib_proj_hasbrew" = "yes" ]; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew prefix" >&5
+printf %s "checking for homebrew prefix... " >&6; }
+        ax_lib_proj_homebrewprefix=`brew --prefix`
+        if [ $? -ne 0 ]; then
+          ax_lib_proj_homebrewprefix=
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+printf "%s\n" "not found" >&6; }
+        else
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ax_lib_proj_homebrewprefix" >&5
+printf "%s\n" "$ax_lib_proj_homebrewprefix" >&6; }
+        fi
+      fi
+
+      if [ "$ax_lib_proj_homebrewprefix" != "" ]; then
+        PROJ_LIBS="-L$ax_lib_proj_homebrewprefix/lib -lproj"
+        PROJ_CFLAGS="-I$HOMEBREWPREFIX/include"
+        CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
+        LIBS="${LIBS} ${PROJ_LIBS}"
+      fi
+    fi
+  fi
+
+  if [ "$ax_lib_proj_with_proj6" != "yes" ]; then
+    # If proj6 isn't forced, then first atempt to find proj.4
+           for ac_header in proj_api.h
+>>>>>>> main
 do :
   ac_fn_c_check_header_compile "$LINENO" "proj_api.h" "ac_cv_header_proj_api_h" "$ac_includes_default"
 if test "x$ac_cv_header_proj_api_h" = xyes
 then :
   printf "%s\n" "#define HAVE_PROJ_API_H 1" >>confdefs.h
-
+ ax_lib_proj_proj4ok=yes
 else $as_nop
+  ax_lib_proj_proj4ok=no
+fi
 
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking with ACCEPT_USE_OF_DEPRECATED_PROJ_API_H" >&5
+done
+    if [ "$ax_lib_proj_proj4ok" = "no" ]; then
+      #  From PROJ >= 6, the proj_api.h header file was deprecated and requires ACCEPT_USE_OF_DEPRECATED_PROJ_API_H.
+      #  So we try to compile with that flag before we give up.
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking with ACCEPT_USE_OF_DEPRECATED_PROJ_API_H" >&5
 printf %s "checking with ACCEPT_USE_OF_DEPRECATED_PROJ_API_H... " >&6; }
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
-printf "%s\n" "" >&6; }
-  savCPPFLAGS="$CPPFLAGS"
-  CPPFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1 $CPPFLAGS"
-  unset ac_cv_header_proj_api_h
-         for ac_header in proj_api.h
+      ax_lib_proj_save_CPPFLAGS="$CPPFLAGS"
+      CPPFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1 $CPPFLAGS"
+      unset ac_cv_header_proj_api_h
+             for ac_header in proj_api.h
 do :
   ac_fn_c_check_header_compile "$LINENO" "proj_api.h" "ac_cv_header_proj_api_h" "$ac_includes_default"
 if test "x$ac_cv_header_proj_api_h" = xyes
 then :
   printf "%s\n" "#define HAVE_PROJ_API_H 1" >>confdefs.h
 
+          ax_lib_proj_proj4ok=yes
+          PROJ_CFLAGS="$PROJ_CFLAGS -DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
+
 else $as_nop
 
-    proj4ok=no
-    CPPFLAGS="$savCPPFLAGS"
+          ax_lib_proj_proj4ok=no
+          CPPFLAGS="$ax_lib_proj_save_CPPFLAGS"
 
 fi
 
 done
+    fi
 
+<<<<<<< HEAD
 fi
 
 done
 
 if [ "$proj4ok" = "yes" ] ; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_init_plus in -lproj" >&5
+=======
+    if [ "$ax_lib_proj_proj4ok" = "yes" ] ; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_init_plus in -lproj" >&5
+>>>>>>> main
 printf %s "checking for pj_init_plus in -lproj... " >&6; }
 if test ${ac_cv_lib_proj_pj_init_plus+y}
 then :
@@ -4488,14 +4708,64 @@ fi
 printf "%s\n" "$ac_cv_lib_proj_pj_init_plus" >&6; }
 if test "x$ac_cv_lib_proj_pj_init_plus" = xyes
 then :
-  printf "%s\n" "#define HAVE_LIBPROJ 1" >>confdefs.h
-
-  LIBS="-lproj $LIBS"
-
+  PROJ_VARIANT=4
 else $as_nop
-  proj4ok=no
+  ax_lib_proj_proj4ok=no
 fi
 
+      if [ "$ax_lib_proj_proj4ok" = "no" -a "$ax_lib_proj_pkg_config_identified" = "yes" ]; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Retrying with static proj libraries" >&5
+printf "%s\n" "$as_me: Retrying with static proj libraries" >&6;}
+        LIBS="${ax_lib_proj_save_LIBS} ${STATIC_PROJ_LIBS}"
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_init_plus in -lproj" >&5
+printf %s "checking for pj_init_plus in -lproj... " >&6; }
+if test ${ac_cv_lib_proj_pj_init_plus+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lproj  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char pj_init_plus ();
+int
+main (void)
+{
+return pj_init_plus ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_proj_pj_init_plus=yes
+else $as_nop
+  ac_cv_lib_proj_pj_init_plus=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_proj_pj_init_plus" >&5
+printf "%s\n" "$ac_cv_lib_proj_pj_init_plus" >&6; }
+if test "x$ac_cv_lib_proj_pj_init_plus" = xyes
+then :
+
+          ax_lib_proj_proj4ok=yes
+          PROJ_VARIANT=4
+          PROJ_LIBS="$STATIC_PROJ_LIBS"
+
+else $as_nop
+
+          LIBS="$ax_lib_proj_save_LIBS"
+
+fi
+
+<<<<<<< HEAD
   if [ "$proj4ok" = "no" && "$PROJ_PKG_IDENTIFIED" = "yes" ]; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Retrying with static proj libraries" >&5
 printf "%s\n" "$as_me: Retrying with static proj libraries" >&6;}
@@ -4552,22 +4822,39 @@ fi
 printf "%s\n" "$as_me: Could not identify PROJ.4" >&6;}
   fi
 fi
+=======
+      elif [ "$ax_lib_proj_proj4ok" = "no" ]; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Could not identify PROJ.4" >&5
+printf "%s\n" "$as_me: Could not identify PROJ.4" >&6;}
+      fi
+    fi
+  else
+    ax_lib_proj_proj4ok=no
+  fi
+>>>>>>> main
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to require PROJ6 API" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to require PROJ6 API" >&5
 printf %s "checking whether to require PROJ6 API... " >&6; }
-if [ "$with_proj6" = "yes" -o "$proj4ok" = "no" ]; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+  if [ "$ax_lib_proj_with_proj6" = "yes" -o "$ax_lib_proj_proj4ok" = "no" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
-  useproj6=yes
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+    ax_lib_proj_useproj6=yes
+  else
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
-fi
+  fi
 
+<<<<<<< HEAD
 if [ "$useproj6" = "yes" ]; then
   savedp6_LIBS=$LIBS
   proj6ok=yes
          for ac_header in proj.h
+=======
+  if [ "$ax_lib_proj_useproj6" = "yes" ]; then
+    savedp6_LIBS=$LIBS
+    ax_lib_proj_proj6ok=yes
+           for ac_header in proj.h
+>>>>>>> main
 do :
   ac_fn_c_check_header_compile "$LINENO" "proj.h" "ac_cv_header_proj_h" "$ac_includes_default"
 if test "x$ac_cv_header_proj_h" = xyes
@@ -4575,12 +4862,17 @@ then :
   printf "%s\n" "#define HAVE_PROJ_H 1" >>confdefs.h
 
 else $as_nop
-  proj6ok=no
+  ax_lib_proj_proj6ok=no
 fi
 
 done
+<<<<<<< HEAD
   if [ "$proj6ok" = "yes" ]; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_create_crs_to_crs in -lproj" >&5
+=======
+    if [ "$ax_lib_proj_proj6ok" = "yes" ]; then
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_create_crs_to_crs in -lproj" >&5
+>>>>>>> main
 printf %s "checking for proj_create_crs_to_crs in -lproj... " >&6; }
 if test ${ac_cv_lib_proj_proj_create_crs_to_crs+y}
 then :
@@ -4617,13 +4909,60 @@ fi
 printf "%s\n" "$ac_cv_lib_proj_proj_create_crs_to_crs" >&6; }
 if test "x$ac_cv_lib_proj_proj_create_crs_to_crs" = xyes
 then :
-  printf "%s\n" "#define HAVE_LIBPROJ 1" >>confdefs.h
+  PROJ_VARIANT=6
+else $as_nop
+  ax_lib_proj_proj6ok=no
+fi
 
-  LIBS="-lproj $LIBS"
+      if [ "$ax_lib_proj_proj6ok" = "no" -a "$ax_lib_proj_pkg_config_identified" = "yes" ]; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Retrying with static proj libraries" >&5
+printf "%s\n" "$as_me: Retrying with static proj libraries" >&6;}
+        LIBS="${ax_lib_proj_save_LIBS} ${STATIC_PROJ_LIBS}"
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_create_crs_to_crs in -lproj" >&5
+printf %s "checking for proj_create_crs_to_crs in -lproj... " >&6; }
+if test ${ac_cv_lib_proj_proj_create_crs_to_crs+y}
+then :
+  printf %s "(cached) " >&6
+else $as_nop
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lproj  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+char proj_create_crs_to_crs ();
+int
+main (void)
+{
+return proj_create_crs_to_crs ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_proj_proj_create_crs_to_crs=yes
+else $as_nop
+  ac_cv_lib_proj_proj_create_crs_to_crs=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_proj_proj_create_crs_to_crs" >&5
+printf "%s\n" "$ac_cv_lib_proj_proj_create_crs_to_crs" >&6; }
+if test "x$ac_cv_lib_proj_proj_create_crs_to_crs" = xyes
+then :
+
+    	    ax_lib_proj_proj6ok=yes
+    	    PROJ_VARIANT=6
+    	    PROJ_LIBS="$STATIC_PROJ_LIBS"
 
 else $as_nop
-  proj6ok=no
-fi
+
+    	    LIBS="$savedp6_LIBS"
 
     if [ "$proj6ok" = "no" -a "$PROJ_PKG_IDENTIFIED" = "yes" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Retrying with static proj libraries" >&5
@@ -4683,6 +5022,7 @@ printf "%s\n" "$as_me: Could not identify PROJ.6" >&6;}
   fi
 fi
 
+<<<<<<< HEAD
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking If proj6 is usable" >&5
 printf %s "checking If proj6 is usable... " >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $proj6ok" >&5
@@ -4690,14 +5030,55 @@ printf "%s\n" "$proj6ok" >&6; }
 
 if [ "$proj6ok" = "yes" ]; then
    CPPFLAGS="${CPPFLAGS}"
+=======
+      elif [ "$ax_lib_proj_proj6ok" = "no" ]; then
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Could not identify PROJ.6" >&5
+printf "%s\n" "$as_me: Could not identify PROJ.6" >&6;}
+      fi
+    fi
+  fi
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking If PROJ could be identified" >&5
+printf %s "checking If PROJ could be identified... " >&6; }
+  if [ "$ax_lib_proj_proj4ok" = "yes" -o "$ax_lib_proj_proj6ok" = "yes" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Yes" >&5
+printf "%s\n" "Yes" >&6; }
+    PROJ_FOUND=yes
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: PROJ variant: $PROJ_VARIANT" >&5
+printf "%s\n" "$as_me: PROJ variant: $PROJ_VARIANT" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: PROJ cflags:  $PROJ_CFLAGS" >&5
+printf "%s\n" "$as_me: PROJ cflags:  $PROJ_CFLAGS" >&6;}
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: PROJ libs:    $PROJ_LIBS" >&5
+printf "%s\n" "$as_me: PROJ libs:    $PROJ_LIBS" >&6;}
+  else
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: No" >&5
+printf "%s\n" "No" >&6; }
+    as_fn_error $? "Proj not found in standard search locations. Install proj.4/proj.6 library" "$LINENO" 5
+  fi
+>>>>>>> main
 else
-   CPPFLAGS="${CPPFLAGS} -DUSE_PROJ4_API=1"
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: PROJ check suppressed" >&5
+printf "%s\n" "$as_me: PROJ check suppressed" >&6;}
+  PROJ_SUPPRESSED=yes
 fi
 
-if [ "$proj4ok" = "no" -a "$proj6ok" = "no" ]; then
-   as_fn_error $? "libproj and/or proj.h/proj_api.h not found in standard search locations.
+if [ "$ax_lib_proj_fun_arg" = "keepvar" ]; then
+  LIBS=$ax_lib_proj_save_LIBS
+  CPPFLAGS=$ax_lib_proj_save_CPPFLAGS
+fi
 
-*** Install PROJ library and if necessary set PKG_CPPFLAGS/PKG_LIBS accordingly." "$LINENO" 5
+
+
+if [ "$PROJ_SUPPRESSED" = "yes" ]; then
+  as_fn_error $? "proj required and should not be suppressed." "$LINENO" 5
+fi
+
+if [ "$PROJ_FOUND" = "yes" ]; then
+  if [ "$PROJ_VARIANT" = "4" ]; then
+    VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS -DUSE_PROJ4_API=1"
+  fi
+else
+  as_fn_error $? "proj does not seem to be installed on your platform." "$LINENO" 5
 fi
 
 

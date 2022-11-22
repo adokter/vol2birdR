@@ -280,10 +280,8 @@ struct vol2birdFlags {
     int flagPositionVradTooLow;
     // the bit in 'gateCode' that says whether this gate passed the VDIFMAX test
     int flagPositionVDifMax;
-    // the bit in 'gateCode' that says whether the gate's azimuth angle was too low
-    int flagPositionAzimTooLow;
-    // the bit in 'gateCode' that says whether the gate's azimuth angle was too high
-    int flagPositionAzimTooHigh;
+    // the bit in 'gateCode' that says whether the gate's azimuth angle was out of the selected range
+    int flagPositionAzimOutOfRange;
 };
 typedef struct vol2birdFlags vol2birdFlags_t;
 
@@ -452,7 +450,7 @@ void vol2birdPrintPointsArray(vol2bird_t* alldata);
 
 void vol2birdPrintPointsArraySimple(vol2bird_t* alldata);
 
-int vol2birdLoadConfig(vol2bird_t* alldata);
+int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile);
 
 int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata);
 

@@ -153,7 +153,9 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles);
 
 PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles);
 
+#ifdef VOL2BIRD_R
 int check_mistnet_loaded_c(void);
+#endif
 
 static vol2bird_printfun vol2bird_internal_printf_fun = vol2bird_default_print;
 
@@ -511,16 +513,19 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
             // flagPositionVDifMax
         }
 
-        if (azimValue < alldata->options.azimMin) {
-            // the user can specify to exclude gates based on their azimuth;
-            // this clause is for gates that have too low azimuth
-            gateCode |= 1<<(alldata->flags.flagPositionAzimTooLow);
+        if (alldata->options.azimMin < alldata->options.azimMax){
+            if ((azimValue < alldata->options.azimMin) || (azimValue > alldata->options.azimMax)) {
+                // the user can specify to exclude gates based on their azimuth;
+                // this clause is for gates that have too low azimuth
+                gateCode |= 1<<(alldata->flags.flagPositionAzimOutOfRange);
+            }
         }
-        
-        if (azimValue > alldata->options.azimMax) {
-            // the user can specify to exclude gates based on their azimuth;
-            // this clause is for gates that have too high azimuth
-            gateCode |= 1<<(alldata->flags.flagPositionAzimTooHigh);
+        else{
+            if ((azimValue < alldata->options.azimMin) && (azimValue > alldata->options.azimMax)) {
+                // the user can specify to exclude gates based on their azimuth;
+                // this clause is for gates that have too low azimuth
+                gateCode |= 1<<(alldata->flags.flagPositionAzimOutOfRange);
+            }
         }
 
         alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol] = (float) gateCode;
@@ -1089,7 +1094,11 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
     if (f == NULL)
     {
         vol2bird_printf("Error opening file 'vol2bird-profile1.json'!\n");
+#ifdef VOL2BIRD_R        
         return;
+#else
+	exit(1);
+#endif        
     }
     
     fprintf(f,"[\n");
@@ -2772,7 +2781,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
 
 
 
-    if (!iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionAzimTooLow))) {
+    if (!iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionAzimOutOfRange))) {
 
         // i.e. iQuantityType == 0, we are NOT dealing with a selection for svdfit, but with a selection of reflectivities.
 	// Azimuth selection does not apply to svdfit, because svdfit requires data at all azimuths
@@ -2796,31 +2805,6 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
     }
 
 
-    if (!iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionAzimTooHigh))) {
-
-        // i.e. iQuantityType == 0, we are NOT dealing with a selection for svdfit, but with a selection of reflectivities.
-	// Azimuth selection does not apply to svdfit, because svdfit requires data at all azimuths
-        // i.e. flag 8 in gateCode is true
-        // the user can specify to exclude gates based on their azimuth;
-        // this clause is for gates that have too high azimuth
-        
-        switch (iProfileType) {
-            case 1 : 
-                doInclude = FALSE;
-                break;
-            case 2 : 
-                doInclude = FALSE;
-                break;
-            case 3 : 
-                doInclude = FALSE;
-                break;
-            default :
-                vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
-        }
-    }
-
-
-
     return doInclude;
 
 } // includeGate
@@ -2836,7 +2820,6 @@ int isRegularFile(const char *path) {
 } /* end function is_regular_file */
 
 #ifndef NOCONFUSE
-
 static int readUserConfigOptions(cfg_t** cfg, const char * optsConfFilename) {
 
 
@@ -4762,13 +4745,18 @@ done:
 // loads configuration data in the alldata struct
 #ifndef NOCONFUSE
 
-int vol2birdLoadConfig(vol2bird_t* alldata) {
+int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
     alldata->misc.loadConfigSuccessful = FALSE;
 
     const char * optsConfFilename = getenv(OPTIONS_CONF);
     if (optsConfFilename == NULL) {
-        optsConfFilename = OPTIONS_FILE;
+         if(optionsFile == NULL){
+            optsConfFilename = OPTIONS_FILE;
+        }
+        else{
+            optsConfFilename = optionsFile;
+        }
     }
     else{
         vol2bird_err_printf( "Searching user configuration file '%s' specified in environmental variable '%s'\n",optsConfFilename,OPTIONS_CONF);
@@ -4909,6 +4897,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     alldata->misc.dbzMax = 10*log(alldata->options.etaMax / alldata->misc.dbzFactor)/log(10);
     alldata->misc.cellDbzMin = 10*log(alldata->options.cellEtaMin / alldata->misc.dbzFactor)/log(10);
     // if stdDevMinBird not set by STDEV_BIRD in options.conf, initialize it depending on wavelength:
+    // was initialized to -FLT_MAX, i.e. negative
     if (alldata->options.stdDevMinBird < 0){
         if (alldata->options.radarWavelength < 7.5){
             //C-band default:
@@ -5175,19 +5164,22 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     alldata->flags.flagPositionDbzTooHighForBirds = 4;
     alldata->flags.flagPositionVradTooLow = 5;
     alldata->flags.flagPositionVDifMax = 6;
-    alldata->flags.flagPositionAzimTooLow = 7;
-    alldata->flags.flagPositionAzimTooHigh = 8;
+    alldata->flags.flagPositionAzimOutOfRange = 7;
 
     // segment precipitation using Mistnet deep convolutional neural net
-    //#ifdef MISTNET
+#ifdef MISTNET
+#ifdef VOL2BIRD_R
     if (check_mistnet_loaded_c()) {
+#endif    
       if(alldata->options.useMistNet){
         vol2bird_err_printf("Running segmentScansUsingMistnet.\n");
         int result = segmentScansUsingMistnet(volume, scanUse, alldata);
         if (result < 0) return -1;
       }
+#ifdef VOL2BIRD_R      
     }
-    //#endif
+#endif    
+#endif
 
     // construct the 'points' array
     constructPointsArray(volume, scanUse, alldata);
