@@ -93,6 +93,7 @@ private:
   vol2bird_t _alldata;
   void initialize_config(vol2bird_t *alldata) {
     strcpy(alldata->misc.filename_pvol, "");
+    strcpy(alldata->misc.filename_vp, "");
     alldata->options.elevMin = 0.0;
     alldata->options.elevMax = 90.0;
     strcpy(alldata->options.dbzType, "DBZH");
@@ -138,6 +139,7 @@ private:
     alldata->options.resampleNbins = 100;
     alldata->options.resampleNrays = 360;
     alldata->options.mistNetNElevs = 5;
+    memset(alldata->options.mistNetElevs, 0, sizeof(float)*100);
     alldata->options.mistNetElevs[0] = 0.5;
     alldata->options.mistNetElevs[1] = 1.5;
     alldata->options.mistNetElevs[2] = 2.5;
@@ -188,6 +190,7 @@ public:
   Vol2BirdConfig(const Vol2BirdConfig& other) {
     initialize_config(&_alldata);
     strcpy(_alldata.misc.filename_pvol, other._alldata.misc.filename_pvol);
+    strcpy(_alldata.misc.filename_vp, other._alldata.misc.filename_vp);
     _alldata.options.elevMin = other._alldata.options.elevMin;
     _alldata.options.elevMax = other._alldata.options.elevMax;
     strcpy(_alldata.options.dbzType, other._alldata.options.dbzType);
@@ -233,6 +236,7 @@ public:
     _alldata.options.resampleNbins = other._alldata.options.resampleNbins;
     _alldata.options.resampleNrays = other._alldata.options.resampleNrays;
     _alldata.options.mistNetNElevs = other._alldata.options.mistNetNElevs;
+    memcpy(_alldata.options.mistNetElevs, other._alldata.options.mistNetElevs, sizeof(float)*100);
     _alldata.options.mistNetElevs[0] = other._alldata.options.mistNetElevs[0];
     _alldata.options.mistNetElevs[1] = other._alldata.options.mistNetElevs[1];
     _alldata.options.mistNetElevs[2] = other._alldata.options.mistNetElevs[2];
