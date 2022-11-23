@@ -34,19 +34,22 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Anders Henja \email{anders.henja@gmail.com}
+  \item Anders Henja \email{anders.henja@gmail.com} (vol2birdR package author and author of RAVE and HLHDF libraries)
 }
 
 Other contributors:
 \itemize{
-  \item Jurriaan H. Spaaks [contributor]
-  \item Lourens Veen [contributor]
-  \item Iwan Holleman [contributor]
-  \item Hidde Leijnse [contributor]
-  \item John H. Merritt [contributor]
-  \item Bart Kelley [contributor]
-  \item Daniel Michelson [contributor]
-  \item Mark Couture [contributor]
+  \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID}) [contributor]
+  \item Jurriaan H. Spaaks (contributor to vol2bird library) [contributor]
+  \item Lourens Veen (contributor to vol2bird library) [contributor]
+  \item Iwan Holleman (contributor to vol2bird library) [contributor]
+  \item Hidde Leijnse (contributor to vol2bird library) [contributor]
+  \item John H. Merritt (author of RSL library) [contributor, copyright holder]
+  \item Bart Kelley (contributor and maintainer of RSL library) [contributor]
+  \item Daniel Michelson (author of iris2odim add-on to RAVE library) [contributor]
+  \item Mark Couture (author of iris2odim add-on to RAVE library) [contributor]
+  \item Swedish Meteorological and Hydrological Institute, SMHI (copyright holder of HLHDF and RAVE libraries) [copyright holder]
+  \item The Crown (i.e. Her Majesty the Queen in Right of Canada) (copyright holder of iris2odim add-on to RAVE library) [copyright holder]
   \item GloBAM (https://globam.science) [funder]
 }
 
