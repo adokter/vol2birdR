@@ -19,12 +19,13 @@
 #        
 #                        If path is specified, then this path will be used for an atempt to compile the code.
 #
-#   --enable-proj6       Will force building against PROJ >= 6. The default behaviour is however to always first try proj.4 and if that
-#                        doesn't work out. Proj >= 6 will be tried instead.
+#
+#   The code will first try to identify PROJ.6, then if unsuccessful PROJ.4. If it can't find PROJ >= 6, it will
+#   revert to PROJ < 6.
 #
 #   The macro first checks if with-proj was specified with path or not. If path was specified, that include/library
 #   paths will be used for setting CFLAGS & LIBS and try to compile the software. This branch of the macro will also
-#   ensure that it can find proj_api.h/proj.h in the specified include-dir and libproj* in specified lib-dir. If that isn't possible
+#   ensure that it can find projects.h/proj.h in the specified include-dir and libproj* in specified lib-dir. If that isn't possible
 #   the macro will abort since there must be a manual error.
 #
 #   If path wasn't specified, the macro will instead use pkg-config to identify CFLAGS & LIBS if available. If that doesn't work if will keep
@@ -32,15 +33,14 @@
 #
 #   As a final resort, the macro will go back to use standard paths.
 #
-# 
-#
 #   The following variables will be set after this function has been run.
 #
 #   PROJ_FOUND=yes|no         - If proj could be identified or not.
 #   PROJ_SUPPRESSED=yes|no    - If proj actively was suppressed by user (--with-proj=no)
 #   PROJ_VARIANT=4|6          - If proj variant 4 or >= 6 was identified.
 #   PROJ_CFLAGS=..            - Compiler flags that should be used.
-#   PROJ_LIBS=..              - Linker flags that should be used.
+#   PROJ_LIBS=..              - Libs that should be used.
+#   PROJ_LDFLAGS=..           - Linker flags that should be used.
 #
 #   CPPFLAGS & LIBS will be updated with new flags unless AX_LIB_PROJ is called with [keepvar]. If not keepvar is specified
 #   both CPPFLAGS & LIBS will be updated with flags used when successfully identifying the proj-version
@@ -54,7 +54,10 @@
 #   warranty.
 AC_DEFUN([AX_LIB_PROJ], [
 
+AC_REQUIRE([AC_PROG_SED])
+
 PROJ_CFLAGS=""
+PROJ_LDFLAGS=""
 PROJ_LIBS=""
 PROJ_VARIANT=X
 PROJ_FOUND=no
@@ -65,7 +68,6 @@ ax_lib_proj_with_proj=yes
 ax_lib_proj_useproj6=no
 ax_lib_proj_proj4ok=yes
 ax_lib_proj_proj6ok=no
-ax_lib_proj_with_proj6=no
 ax_lib_proj_pkg_config_identified=no
 ax_lib_proj_fun_arg=$1 # Store argument when calling AX_LIB_PROJ([keepvar])
 
@@ -85,47 +87,31 @@ AC_ARG_WITH([proj],
   [ax_lib_proj_with_proj="yes"]
 )
 
-AC_ARG_ENABLE([proj6],
-  AS_HELP_STRING(
-    --enable-proj6, 
-    [use the new PROJ6 API even if PROJ4 API is available.]
-  ),
-  [ax_lib_proj_with_proj6=$enableval], 
-  [ax_lib_proj_with_proj6=$ax_lib_proj_with_proj6]
-)
-  
+
 # Keep track of LIBS before we start identifying PROJ
+ax_lib_proj_save_LDFLAGS=${LDFLAGS}
 ax_lib_proj_save_LIBS=${LIBS}
 ax_lib_proj_save_CPPFLAGS=${CPPFLAGS}
 
 if [[ "$ax_lib_proj_with_proj" != "no" ]]; then
   if [[ "$ax_lib_proj_with_proj" = "yes" -a "$ax_lib_proj_path" = "" ]]; then
-    AC_MSG_NOTICE([Trying to identify PROJ using pkg-config])
-
-    AC_MSG_CHECKING([for proj using pkg-config])
-    if pkg-config proj; then
+    AC_MSG_CHECKING([for pkg-config])
+    pkg-config proj > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
       AC_MSG_RESULT([yes])
-
       ax_lib_proj_pkg_config_identified=yes
 
       AC_MSG_CHECKING([for proj CFLAGS])
       PROJ_CFLAGS=`pkg-config --cflags proj`
       AC_MSG_RESULT($PROJ_CFLAGS)
 
-      # TODO: Replace PROJ_LIBS with --libs-only-l / --libs-only-L so that we
-      # can set two different variables PROJ_LIBRARIES & PROJ_LDFLAGS instead of the
-      # generic PROJ_LIBS that can be derived from the two above. Order of libraries
-      # might get scrambled which in some cases is not wanted
-      AC_MSG_CHECKING([for proj LIBS])
-      PROJ_LIBS=`pkg-config --libs proj`
-      AC_MSG_RESULT($PROJ_LIBS)
+	  AC_MSG_CHECKING([for proj LDFLAGS])
+	  PROJ_LDFLAGS=`pkg-config --libs-only-L proj`
+      AC_MSG_RESULT($PROJ_LDFLAGS)
 
-      AC_MSG_CHECKING([for static proj LIBS, if any])
-      STATIC_PROJ_LIBS=`pkg-config --static --libs proj`
-      AC_MSG_RESULT($STATIC_PROJ_LIBS)
-  
-      CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
-      LIBS="${LIBS} ${PROJ_LIBS}"
+	  AC_MSG_CHECKING([for proj LIBS])
+	  PROJ_LIBS=`pkg-config --libs-only-l proj`
+	  AC_MSG_CHECKING([$PROJ_LIBS])
     else
       AC_MSG_RESULT([no])
     fi
@@ -140,10 +126,10 @@ if [[ "$ax_lib_proj_with_proj" != "no" ]]; then
       ax_lib_proj_lib="`echo $ax_lib_proj_path |cut -f2 -d,`"
     fi
   
-    AC_MSG_CHECKING([Checking if proj.h or proj_api.h can be found in proj-path])
-    if [[ ! -f "$ax_lib_proj_inc/proj.h" -o ! -f "$ax_lib_proj_inc/proj_api.h" ]]; then
+    AC_MSG_CHECKING([Checking if proj.h or projects.h can be found in $ax_lib_proj_inc/])
+    if [[ ! -f "$ax_lib_proj_inc/proj.h" -a ! -f "$ax_lib_proj_inc/projects.h" ]]; then
       AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Could not identify proj.h or proj_api in include directory $ax_lib_proj_inc, aborting!])
+      AC_MSG_ERROR([Could not identify proj.h or projects.h in include directory $ax_lib_proj_inc, aborting!])
     else
       AC_MSG_RESULT([yes])
     fi
@@ -155,11 +141,10 @@ if [[ "$ax_lib_proj_with_proj" != "no" ]]; then
     else
       AC_MSG_RESULT([yes])
     fi
-      
-    PROJ_LIBS="-L$ax_lib_proj_lib -lproj"
+    
+    PROJ_LDFLAGS="-L$ax_lib_proj_lib"
+    PROJ_LIBS="-lproj"
     PROJ_CFLAGS="-I$ax_lib_proj_inc"
-    CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
-    LIBS="${LIBS} ${PROJ_LIBS}"
   elif [[ "$ax_lib_proj_pkg_config_identified" = "no" ]]; then
     # If we can't identify pkg-config but is on mac, we might be able to use
     # homebrew to at least get basic flags
@@ -195,94 +180,84 @@ if [[ "$ax_lib_proj_with_proj" != "no" ]]; then
       fi
   
       if [[ "$ax_lib_proj_homebrewprefix" != "" ]]; then
-        PROJ_LIBS="-L$ax_lib_proj_homebrewprefix/lib -lproj"
+        PROJ_LDFLAGS="-L$ax_lib_proj_lib"
+        PROJ_LIBS="-lproj"
         PROJ_CFLAGS="-I$HOMEBREWPREFIX/include"
-        CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
-        LIBS="${LIBS} ${PROJ_LIBS}"
       fi
     fi
   fi
 
-  if [[ "$ax_lib_proj_with_proj6" != "yes" ]]; then
-    # If proj6 isn't forced, then first atempt to find proj.4
-    AC_CHECK_HEADERS(proj_api.h, [ax_lib_proj_proj4ok=yes], [ax_lib_proj_proj4ok=no])
-    if [[ "$ax_lib_proj_proj4ok" = "no" ]]; then
-      #  From PROJ >= 6, the proj_api.h header file was deprecated and requires ACCEPT_USE_OF_DEPRECATED_PROJ_API_H.
-      #  So we try to compile with that flag before we give up.
-      AC_MSG_CHECKING([with ACCEPT_USE_OF_DEPRECATED_PROJ_API_H])
-      ax_lib_proj_save_CPPFLAGS="$CPPFLAGS"
-      CPPFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1 $CPPFLAGS"
-      unset ac_cv_header_proj_api_h
-      AC_CHECK_HEADERS(proj_api.h,[
-          ax_lib_proj_proj4ok=yes
-          PROJ_CFLAGS="$PROJ_CFLAGS -DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
-        ],[
-          ax_lib_proj_proj4ok=no
-          CPPFLAGS="$ax_lib_proj_save_CPPFLAGS"
-      ])
-    fi
+  CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
+  LDFLAGS="${PROJ_LDFLAGS}"
+  LIBS="${LIBS} ${PROJ_LIBS}"
   
-    if [[ "$ax_lib_proj_proj4ok" = "yes" ]] ; then
-      AC_CHECK_LIB(proj, pj_init_plus, [PROJ_VARIANT=4], [ax_lib_proj_proj4ok=no])
-      if [[ "$ax_lib_proj_proj4ok" = "no" -a "$ax_lib_proj_pkg_config_identified" = "yes" ]]; then
-        AC_MSG_NOTICE([Retrying with static proj libraries])
-        LIBS="${ax_lib_proj_save_LIBS} ${STATIC_PROJ_LIBS}"
-        AC_CHECK_LIB(proj, pj_init_plus, [ 
-          ax_lib_proj_proj4ok=yes
-          PROJ_VARIANT=4
-          PROJ_LIBS="$STATIC_PROJ_LIBS" 
-        ], [
-          LIBS="$ax_lib_proj_save_LIBS"
-        ])
-      elif [[ "$ax_lib_proj_proj4ok" = "no" ]]; then
-        AC_MSG_NOTICE([Could not identify PROJ.4])
-      fi
+  AC_CHECK_HEADERS(proj.h, [ax_lib_proj_proj6ok=yes], [ax_lib_proj_proj6ok=no])
+  if [[ "$ax_lib_proj_proj6ok" = "yes" ]]; then
+    AC_CHECK_LIB(proj, proj_trans, [
+      PROJ_VARIANT=6
+    ], [
+      ax_lib_proj_proj6ok=no
+    ])
+    if [[ "$ax_lib_proj_proj6ok" = "no" -a "$ax_lib_proj_pkg_config_identified" = "yes" ]]; then
+      AC_MSG_NOTICE([Could not identify PROJ.6])
     fi
-  else
-    ax_lib_proj_proj4ok=no  
   fi
-
-  AC_MSG_CHECKING([whether to require PROJ6 API])
-  if [[ "$ax_lib_proj_with_proj6" = "yes" -o "$ax_lib_proj_proj4ok" = "no" ]]; then
-    AC_MSG_RESULT([yes])
-    ax_lib_proj_useproj6=yes
-  else
-    AC_MSG_RESULT([no])
-  fi
-
-  if [[ "$ax_lib_proj_useproj6" = "yes" ]]; then
-    savedp6_LIBS=$LIBS
-    ax_lib_proj_proj6ok=yes
-    AC_CHECK_HEADERS(proj.h,, ax_lib_proj_proj6ok=no)
-    if [[ "$ax_lib_proj_proj6ok" = "yes" ]]; then
-      AC_CHECK_LIB(proj, proj_create_crs_to_crs, [PROJ_VARIANT=6], [ax_lib_proj_proj6ok=no])
-      if [[ "$ax_lib_proj_proj6ok" = "no" -a "$ax_lib_proj_pkg_config_identified" = "yes" ]]; then
-        AC_MSG_NOTICE([Retrying with static proj libraries])
-        LIBS="${ax_lib_proj_save_LIBS} ${STATIC_PROJ_LIBS}"
-        AC_CHECK_LIB(proj, proj_create_crs_to_crs, [ 
-    	    ax_lib_proj_proj6ok=yes
-    	    PROJ_VARIANT=6
-    	    PROJ_LIBS="$STATIC_PROJ_LIBS" 
-          ], [
-    	    LIBS="$savedp6_LIBS"
-        ])
-      elif [[ "$ax_lib_proj_proj6ok" = "no" ]]; then
-        AC_MSG_NOTICE([Could not identify PROJ.6])
+  
+  if  [[ "$ax_lib_proj_proj6ok" = "no" ]]; then
+    AC_MSG_NOTICE([Trying to identify PROJ.4])
+    AC_CHECK_HEADERS(projects.h, [ax_lib_proj_proj4ok=yes], [ax_lib_proj_proj4ok=no])
+    if [[ "$ax_lib_proj_proj4ok" = "yes" ]]; then
+      AC_CHECK_LIB([proj],
+        [pj_transform],
+        [ax_lib_proj_proj4ok=yes],
+        [ax_lib_proj_proj4ok=no]
+      )      
+    fi
+    if [[ "$ax_lib_proj_proj4ok" = "yes" ]]; then
+      AC_RUN_IFELSE(
+        [AC_LANG_PROGRAM(
+          [[#include <projects.h>
+            #include <stdio.h>
+            #include <stdlib.h>]],
+          [[printf("%d\n", (int)PJ_VERSION/100); exit(0);]])
+        ],
+        [AC_SUBST(PROJ_VERSION, [[`./conftest$EXEEXT`]])],
+        [ax_lib_proj_proj4ok=no]
+      )
+      if [[ "$ax_lib_proj_proj4ok" = "yes" ]]; then
+        AC_MSG_CHECKING([proj.4 version])
+        PROJ_VERSION=`echo $PROJ_VERSION | egrep -e "^[[0-9]]+$"`
+        if [[ "$PROJ_VERSION" = "" ]]; then
+          AC_MSG_CHECKING([failed])
+          ax_lib_proj_proj4ok=no
+        else
+          AC_MSG_RESULT([$PROJ_VERSION])
+          if [[ "$PROJ_VERSION" -ge 5 ]]; then
+            AC_MSG_NOTICE([Could not identify proj version <= 5])
+            ax_lib_proj_proj4ok=no
+          else
+            PROJ_VARIANT=4
+          fi
+        fi
       fi
     fi
   fi
 
   AC_MSG_CHECKING([If PROJ could be identified])
-  if [[ "$ax_lib_proj_proj4ok" = "yes" -o "$ax_lib_proj_proj6ok" = "yes" ]]; then
+  if [[ "$ax_lib_proj_proj4ok" = "no" -a "$ax_lib_proj_proj6ok" = "no" ]]; then
+    AC_MSG_RESULT([No])
+    AC_MSG_ERROR([Proj not found in standard search locations. Install proj.4/proj.6 library])  
+    CPPFLAGS="${ax_lib_proj_save_CPPFLAGS}"
+    LDFLAGS="${ax_lib_proj_save_LDFLAGS}"
+    LIBS="${ax_lib_proj_save_LIBS}"
+  else
     AC_MSG_RESULT([Yes])
     PROJ_FOUND=yes
     AC_MSG_NOTICE([PROJ variant: $PROJ_VARIANT])
     AC_MSG_NOTICE([PROJ cflags:  $PROJ_CFLAGS])
+    AC_MSG_NOTICE([PROJ ldflags: $PROJ_LDFLAGS])
     AC_MSG_NOTICE([PROJ libs:    $PROJ_LIBS])
-  else
-    AC_MSG_RESULT([No])
-    AC_MSG_ERROR([Proj not found in standard search locations. Install proj.4/proj.6 library])  
-  fi
+  fi  
 else
   AC_MSG_NOTICE([PROJ check suppressed])
   PROJ_SUPPRESSED=yes
@@ -290,7 +265,9 @@ fi
 
 if [[ "$ax_lib_proj_fun_arg" = "keepvar" ]]; then
   LIBS=$ax_lib_proj_save_LIBS
-  CPPFLAGS=$ax_lib_proj_save_CPPFLAGS
+  CPPFLAGS="${ax_lib_proj_save_CPPFLAGS}"
+  LDFLAGS="${ax_lib_proj_save_LDFLAGS}"
+  LIBS="${ax_lib_proj_save_LIBS}"
 fi
 
 ])

@@ -98,7 +98,7 @@ if test -z "${CPPFLAGS}"; then
   rm -f myconftest.c
 fi
 
-AX_LIB_PROJ([])
+AX_LIB_PROJ([keepvar])
 
 if [[ "$PROJ_SUPPRESSED" = "yes" ]]; then
   AC_MSG_ERROR([proj required and should not be suppressed.])  
@@ -115,8 +115,8 @@ fi
 AC_ARG_VAR([PKG_CPPFLAGS],[custom C preprocessor flags for packages compilation])
 AC_ARG_VAR([PKG_LIBS],[custom libraries for package compilation])
 
-VOL2BIRD_LIBS="$VOL2BIRD_LIBS $LIBS"
-VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $CPPFLAGS"
+VOL2BIRD_LIBS="$VOL2BIRD_LIBS $PROJ_LDFLAGS $PROJ_LIBS $LIBS"
+VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $PROJ_CFLAGS $CPPFLAGS"
 
 dnl dummy substitute HDF5R_CFLAGS
 VOL2BIRD_CFLAGS=""
