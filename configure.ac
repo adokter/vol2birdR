@@ -9,7 +9,7 @@ dnl All above scripts are open source, use as you want provided that copyright n
 dnl
 m4_include([inst/m4/ax_lib_hdf5.m4])
 m4_include([inst/m4/ax_compare_version.m4])
-m4_include([inst/m4/ax_lib_proj.m4])
+m4_include([inst/m4/proj_macro.m4])
 
 AX_LIB_HDF5()
 
@@ -98,7 +98,7 @@ if test -z "${CPPFLAGS}"; then
   rm -f myconftest.c
 fi
 
-AX_LIB_PROJ([keepvar])
+PROJ_MACRO([keepvar])
 
 if [[ "$PROJ_SUPPRESSED" = "yes" ]]; then
   AC_MSG_ERROR([proj required and should not be suppressed.])  

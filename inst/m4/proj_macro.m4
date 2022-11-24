@@ -1,7 +1,7 @@
 #
 # SYNOPSIS
 #
-#   AC_LIB_PROJ([keepvar])
+#   PROJ_MACRO([keepvar])
 #
 #   Optional argument 'keepvar' that will indicate to the script that CPPFLAGS & LDFLAGS should be restored after
 #   macro has been run.
@@ -52,7 +52,7 @@
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
-AC_DEFUN([AX_LIB_PROJ], [
+AC_DEFUN([PROJ_MACRO], [
 
 AC_REQUIRE([AC_PROG_SED])
 

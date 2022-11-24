@@ -2477,7 +2477,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #
 # SYNOPSIS
 #
-#   AC_LIB_PROJ([keepvar])
+#   PROJ_MACRO([keepvar])
 #
 #   Optional argument 'keepvar' that will indicate to the script that CPPFLAGS & LDFLAGS should be restored after
 #   macro has been run.
