@@ -188,7 +188,7 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
   fi
 
   CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
-  LDFLAGS="${PROJ_LDFLAGS}"
+  LDFLAGS="${LDFLAGS} ${PROJ_LDFLAGS}"
   LIBS="${LIBS} ${PROJ_LIBS}"
   
   AC_CHECK_HEADERS(proj.h, [proj_macro_proj_proj6ok=yes], [proj_macro_proj_proj6ok=no])

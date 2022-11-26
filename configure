@@ -4537,7 +4537,7 @@ printf "%s\n" "$proj_macro_proj_homebrewprefix" >&6; }
   fi
 
   CPPFLAGS="${CPPFLAGS} ${PROJ_CFLAGS}"
-  LDFLAGS="${PROJ_LDFLAGS}"
+  LDFLAGS="${LDFLAGS} ${PROJ_LDFLAGS}"
   LIBS="${LIBS} ${PROJ_LIBS}"
 
          for ac_header in proj.h
