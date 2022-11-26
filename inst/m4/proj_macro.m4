@@ -105,13 +105,13 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
       PROJ_CFLAGS=`pkg-config --cflags proj`
       AC_MSG_RESULT($PROJ_CFLAGS)
 
-	  AC_MSG_CHECKING([for proj LDFLAGS])
-	  PROJ_LDFLAGS=`pkg-config --libs-only-L proj`
+      AC_MSG_CHECKING([for proj LDFLAGS])
+      PROJ_LDFLAGS=`pkg-config --libs-only-L proj`
       AC_MSG_RESULT($PROJ_LDFLAGS)
 
-	  AC_MSG_CHECKING([for proj LIBS])
-	  PROJ_LIBS=`pkg-config --libs-only-l proj`
-	  AC_MSG_CHECKING([$PROJ_LIBS])
+      AC_MSG_CHECKING([for proj LIBS])
+      PROJ_LIBS=`pkg-config --libs-only-l proj`
+      AC_MSG_RESULT([$PROJ_LIBS])
     else
       AC_MSG_RESULT([no])
     fi

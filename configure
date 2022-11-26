@@ -4437,17 +4437,17 @@ printf %s "checking for proj CFLAGS... " >&6; }
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_CFLAGS" >&5
 printf "%s\n" "$PROJ_CFLAGS" >&6; }
 
-	  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj LDFLAGS" >&5
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj LDFLAGS" >&5
 printf %s "checking for proj LDFLAGS... " >&6; }
-	  PROJ_LDFLAGS=`pkg-config --libs-only-L proj`
+      PROJ_LDFLAGS=`pkg-config --libs-only-L proj`
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_LDFLAGS" >&5
 printf "%s\n" "$PROJ_LDFLAGS" >&6; }
 
-	  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj LIBS" >&5
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj LIBS" >&5
 printf %s "checking for proj LIBS... " >&6; }
-	  PROJ_LIBS=`pkg-config --libs-only-l proj`
-	  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking $PROJ_LIBS" >&5
-printf %s "checking $PROJ_LIBS... " >&6; }
+      PROJ_LIBS=`pkg-config --libs-only-l proj`
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_LIBS" >&5
+printf "%s\n" "$PROJ_LIBS" >&6; }
     else
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
