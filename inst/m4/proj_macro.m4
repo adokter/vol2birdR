@@ -233,7 +233,7 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
         else
           AC_MSG_RESULT([$PROJ_VERSION])
           if [[ "$PROJ_VERSION" -ge 5 ]]; then
-            AC_MSG_NOTICE([Could not identify proj version <= 5])
+            AC_MSG_NOTICE([Could not identify proj 4])
             proj_macro_proj_proj4ok=no
           else
             PROJ_VARIANT=4
