@@ -1,7 +1,7 @@
 #
 # SYNOPSIS
 #
-#   PROJ_MACRO([keepvar])
+#   CHECK_PROJ([keepvar])
 #
 #   Optional argument 'keepvar' that will indicate to the script that CPPFLAGS & LDFLAGS should be restored after
 #   macro has been run.
@@ -52,7 +52,7 @@
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
-AC_DEFUN([PROJ_MACRO], [
+AC_DEFUN([CHECK_PROJ], [
 
 AC_REQUIRE([AC_PROG_SED])
 
@@ -63,13 +63,13 @@ PROJ_VARIANT=X
 PROJ_FOUND=no
 PROJ_SUPPRESSED=no
 
-proj_macro_proj_path=
-proj_macro_proj_with_proj=yes
-proj_macro_proj_useproj6=no
-proj_macro_proj_proj4ok=yes
-proj_macro_proj_proj6ok=no
-proj_macro_proj_pkg_config_identified=no
-proj_macro_proj_fun_arg=$1 # Store argument when calling PROJ_MACRO([keepvar])
+check_proj_proj_path=
+check_proj_proj_with_proj=yes
+check_proj_proj_useproj6=no
+check_proj_proj_proj4ok=yes
+check_proj_proj_proj6ok=no
+check_proj_proj_pkg_config_identified=no
+check_proj_proj_fun_arg=$1 # Store argument when calling CHECK_PROJ([keepvar])
 
 # Add a default --with-proj configuration option.
 AC_ARG_WITH([proj],
@@ -78,28 +78,28 @@ AC_ARG_WITH([proj],
             [location of <proj>-root or a comma separated list specifying include and library directory]
   ),
   [ if test "$withval" = "no" -o "$withval" = "yes"; then
-      proj_macro_proj_with_proj="$withval"
+      check_proj_proj_with_proj="$withval"
     else
-      proj_macro_proj_with_proj="yes"
-      proj_macro_proj_path="$withval"
+      check_proj_proj_with_proj="yes"
+      check_proj_proj_path="$withval"
     fi
   ],
-  [proj_macro_proj_with_proj="yes"]
+  [check_proj_proj_with_proj="yes"]
 )
 
 
 # Keep track of LIBS before we start identifying PROJ
-proj_macro_proj_save_LDFLAGS=${LDFLAGS}
-proj_macro_proj_save_LIBS=${LIBS}
-proj_macro_proj_save_CPPFLAGS=${CPPFLAGS}
+check_proj_proj_save_LDFLAGS=${LDFLAGS}
+check_proj_proj_save_LIBS=${LIBS}
+check_proj_proj_save_CPPFLAGS=${CPPFLAGS}
 
-if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
-  if [[ "$proj_macro_proj_with_proj" = "yes" -a "$proj_macro_proj_path" = "" ]]; then
+if [[ "$check_proj_proj_with_proj" != "no" ]]; then
+  if [[ "$check_proj_proj_with_proj" = "yes" -a "$check_proj_proj_path" = "" ]]; then
     AC_MSG_CHECKING([for pkg-config])
     pkg-config proj > /dev/null 2>&1
     if [[ $? -eq 0 ]]; then
       AC_MSG_RESULT([yes])
-      proj_macro_proj_pkg_config_identified=yes
+      check_proj_proj_pkg_config_identified=yes
 
       AC_MSG_CHECKING([for proj CFLAGS])
       PROJ_CFLAGS=`pkg-config --cflags proj`
@@ -117,70 +117,70 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
     fi
   fi
 
-  if [[ "$proj_macro_proj_pkg_config_identified" = "no" -a "$proj_macro_proj_path" != "" ]]; then
-    if [[ "`echo $proj_macro_proj_path | grep ','`" = "" ]]; then
-      proj_macro_proj_inc=$proj_macro_proj_path/include
-      proj_macro_proj_lib=$proj_macro_proj_path/lib
+  if [[ "$check_proj_proj_pkg_config_identified" = "no" -a "$check_proj_proj_path" != "" ]]; then
+    if [[ "`echo $check_proj_proj_path | grep ','`" = "" ]]; then
+      check_proj_proj_inc=$check_proj_proj_path/include
+      check_proj_proj_lib=$check_proj_proj_path/lib
     else
-      proj_macro_proj_inc="`echo $proj_macro_proj_path |cut -f1 -d,`"
-      proj_macro_proj_lib="`echo $proj_macro_proj_path |cut -f2 -d,`"
+      check_proj_proj_inc="`echo $check_proj_proj_path |cut -f1 -d,`"
+      check_proj_proj_lib="`echo $check_proj_proj_path |cut -f2 -d,`"
     fi
   
-    AC_MSG_CHECKING([Checking if proj.h or projects.h can be found in $proj_macro_proj_inc/])
-    if [[ ! -f "$proj_macro_proj_inc/proj.h" -a ! -f "$proj_macro_proj_inc/projects.h" ]]; then
+    AC_MSG_CHECKING([Checking if proj.h or projects.h can be found in $check_proj_proj_inc/])
+    if [[ ! -f "$check_proj_proj_inc/proj.h" -a ! -f "$check_proj_proj_inc/projects.h" ]]; then
       AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Could not identify proj.h or projects.h in include directory $proj_macro_proj_inc, aborting!])
+      AC_MSG_ERROR([Could not identify proj.h or projects.h in include directory $check_proj_proj_inc, aborting!])
     else
       AC_MSG_RESULT([yes])
     fi
     AC_MSG_CHECKING([Checking if libproj can be found in proj-path])
-    TMP=`ls -1 "$proj_macro_proj_lib"/libproj.* 2>/dev/null`
+    TMP=`ls -1 "$check_proj_proj_lib"/libproj.* 2>/dev/null`
     if [[ "$TMP" = "" ]]; then
       AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Could not identify libproj in directory $proj_macro_proj_inc, aborting!])
+      AC_MSG_ERROR([Could not identify libproj in directory $check_proj_proj_inc, aborting!])
     else
       AC_MSG_RESULT([yes])
     fi
     
-    PROJ_LDFLAGS="-L$proj_macro_proj_lib"
+    PROJ_LDFLAGS="-L$check_proj_proj_lib"
     PROJ_LIBS="-lproj"
-    PROJ_CFLAGS="-I$proj_macro_proj_inc"
-  elif [[ "$proj_macro_proj_pkg_config_identified" = "no" ]]; then
+    PROJ_CFLAGS="-I$check_proj_proj_inc"
+  elif [[ "$check_proj_proj_pkg_config_identified" = "no" ]]; then
     # If we can't identify pkg-config but is on mac, we might be able to use
     # homebrew to at least get basic flags
-    proj_macro_proj_kernelname=`uname -s | tr 'A-Z' 'a-z'`
-    proj_macro_proj_ismacos=no
-    case "$proj_macro_proj_kernelname" in
+    check_proj_proj_kernelname=`uname -s | tr 'A-Z' 'a-z'`
+    check_proj_proj_ismacos=no
+    case "$check_proj_proj_kernelname" in
       darwin*)
-        proj_macro_proj_ismacos=yes
+        check_proj_proj_ismacos=yes
         ;;
     esac
 
-    proj_macro_proj_hasbrew=no
-    proj_macro_proj_homebrewprefix=
-    if [[ "$proj_macro_proj_ismacos" = "yes" ]]; then
+    check_proj_proj_hasbrew=no
+    check_proj_proj_homebrewprefix=
+    if [[ "$check_proj_proj_ismacos" = "yes" ]]; then
       AC_MSG_CHECKING(for homebrew)
       which brew
       if [[ $? -ne 0 ]]; then
         AC_MSG_RESULT([not found])
       else
-        proj_macro_proj_hasbrew=yes  
+        check_proj_proj_hasbrew=yes  
         AC_MSG_RESULT([found])
       fi
   
-      if [[ "$proj_macro_proj_hasbrew" = "yes" ]]; then
+      if [[ "$check_proj_proj_hasbrew" = "yes" ]]; then
         AC_MSG_CHECKING([for homebrew prefix])
-        proj_macro_proj_homebrewprefix=`brew --prefix`
+        check_proj_proj_homebrewprefix=`brew --prefix`
         if [[ $? -ne 0 ]]; then
-          proj_macro_proj_homebrewprefix=
+          check_proj_proj_homebrewprefix=
           AC_MSG_RESULT([not found])
         else
-          AC_MSG_RESULT($proj_macro_proj_homebrewprefix)
+          AC_MSG_RESULT($check_proj_proj_homebrewprefix)
         fi
       fi
   
-      if [[ "$proj_macro_proj_homebrewprefix" != "" ]]; then
-        PROJ_LDFLAGS="-L$proj_macro_proj_lib"
+      if [[ "$check_proj_proj_homebrewprefix" != "" ]]; then
+        PROJ_LDFLAGS="-L$check_proj_proj_lib"
         PROJ_LIBS="-lproj"
         PROJ_CFLAGS="-I$HOMEBREWPREFIX/include"
       fi
@@ -191,29 +191,29 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
   LDFLAGS="${LDFLAGS} ${PROJ_LDFLAGS}"
   LIBS="${LIBS} ${PROJ_LIBS}"
   
-  AC_CHECK_HEADERS(proj.h, [proj_macro_proj_proj6ok=yes], [proj_macro_proj_proj6ok=no])
-  if [[ "$proj_macro_proj_proj6ok" = "yes" ]]; then
+  AC_CHECK_HEADERS(proj.h, [check_proj_proj_proj6ok=yes], [check_proj_proj_proj6ok=no])
+  if [[ "$check_proj_proj_proj6ok" = "yes" ]]; then
     AC_CHECK_LIB(proj, proj_trans, [
       PROJ_VARIANT=6
     ], [
-      proj_macro_proj_proj6ok=no
+      check_proj_proj_proj6ok=no
     ])
-    if [[ "$proj_macro_proj_proj6ok" = "no" -a "$proj_macro_proj_pkg_config_identified" = "yes" ]]; then
+    if [[ "$check_proj_proj_proj6ok" = "no" -a "$check_proj_proj_pkg_config_identified" = "yes" ]]; then
       AC_MSG_NOTICE([Could not identify PROJ.6])
     fi
   fi
   
-  if  [[ "$proj_macro_proj_proj6ok" = "no" ]]; then
+  if  [[ "$check_proj_proj_proj6ok" = "no" ]]; then
     AC_MSG_NOTICE([Trying to identify PROJ.4])
-    AC_CHECK_HEADERS(projects.h, [proj_macro_proj_proj4ok=yes], [proj_macro_proj_proj4ok=no])
-    if [[ "$proj_macro_proj_proj4ok" = "yes" ]]; then
+    AC_CHECK_HEADERS(projects.h, [check_proj_proj_proj4ok=yes], [check_proj_proj_proj4ok=no])
+    if [[ "$check_proj_proj_proj4ok" = "yes" ]]; then
       AC_CHECK_LIB([proj],
         [pj_transform],
-        [proj_macro_proj_proj4ok=yes],
-        [proj_macro_proj_proj4ok=no]
+        [check_proj_proj_proj4ok=yes],
+        [check_proj_proj_proj4ok=no]
       )      
     fi
-    if [[ "$proj_macro_proj_proj4ok" = "yes" ]]; then
+    if [[ "$check_proj_proj_proj4ok" = "yes" ]]; then
       AC_RUN_IFELSE(
         [AC_LANG_PROGRAM(
           [[#include <projects.h>
@@ -222,19 +222,19 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
           [[printf("%d\n", (int)PJ_VERSION/100); exit(0);]])
         ],
         [AC_SUBST(PROJ_VERSION, [[`./conftest$EXEEXT`]])],
-        [proj_macro_proj_proj4ok=no]
+        [check_proj_proj_proj4ok=no]
       )
-      if [[ "$proj_macro_proj_proj4ok" = "yes" ]]; then
+      if [[ "$check_proj_proj_proj4ok" = "yes" ]]; then
         AC_MSG_CHECKING([proj.4 version])
         PROJ_VERSION=`echo $PROJ_VERSION | egrep -e "^[[0-9]]+$"`
         if [[ "$PROJ_VERSION" = "" ]]; then
           AC_MSG_CHECKING([failed])
-          proj_macro_proj_proj4ok=no
+          check_proj_proj_proj4ok=no
         else
           AC_MSG_RESULT([$PROJ_VERSION])
           if [[ "$PROJ_VERSION" -ge 5 ]]; then
             AC_MSG_NOTICE([Could not identify proj 4])
-            proj_macro_proj_proj4ok=no
+            check_proj_proj_proj4ok=no
           else
             PROJ_VARIANT=4
           fi
@@ -244,12 +244,12 @@ if [[ "$proj_macro_proj_with_proj" != "no" ]]; then
   fi
 
   AC_MSG_CHECKING([If PROJ could be identified])
-  if [[ "$proj_macro_proj_proj4ok" = "no" -a "$proj_macro_proj_proj6ok" = "no" ]]; then
+  if [[ "$check_proj_proj_proj4ok" = "no" -a "$check_proj_proj_proj6ok" = "no" ]]; then
     AC_MSG_RESULT([No])
     AC_MSG_ERROR([Proj not found in standard search locations. Install proj.4/proj.6 library])  
-    CPPFLAGS="${proj_macro_proj_save_CPPFLAGS}"
-    LDFLAGS="${proj_macro_proj_save_LDFLAGS}"
-    LIBS="${proj_macro_proj_save_LIBS}"
+    CPPFLAGS="${check_proj_proj_save_CPPFLAGS}"
+    LDFLAGS="${check_proj_proj_save_LDFLAGS}"
+    LIBS="${check_proj_proj_save_LIBS}"
   else
     AC_MSG_RESULT([Yes])
     PROJ_FOUND=yes
@@ -263,11 +263,11 @@ else
   PROJ_SUPPRESSED=yes
 fi
 
-if [[ "$proj_macro_proj_fun_arg" = "keepvar" ]]; then
-  LIBS=$proj_macro_proj_save_LIBS
-  CPPFLAGS="${proj_macro_proj_save_CPPFLAGS}"
-  LDFLAGS="${proj_macro_proj_save_LDFLAGS}"
-  LIBS="${proj_macro_proj_save_LIBS}"
+if [[ "$check_proj_proj_fun_arg" = "keepvar" ]]; then
+  LIBS=$check_proj_proj_save_LIBS
+  CPPFLAGS="${check_proj_proj_save_CPPFLAGS}"
+  LDFLAGS="${check_proj_proj_save_LDFLAGS}"
+  LIBS="${check_proj_proj_save_LIBS}"
 fi
 
 ])

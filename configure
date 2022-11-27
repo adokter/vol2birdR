@@ -647,15 +647,12 @@ ac_includes_default="\
 ac_header_c_list=
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+HDF5_API_VERS_USE
 VOL2BIRD_LIBS
 VOL2BIRD_CPPFLAGS
-VOL2BIRD_CFLAGS
 PKG_LIBS
 PKG_CPPFLAGS
 PROJ_VERSION
-DEFINE_H5FREE_MEMORY
-HDF5_API_VERS_USE
-HDF5_VERSION_USE
 HDF5_FLIBS
 HDF5_FFLAGS
 HDF5_FC
@@ -2477,7 +2474,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 #
 # SYNOPSIS
 #
-#   PROJ_MACRO([keepvar])
+#   CHECK_PROJ([keepvar])
 #
 #   Optional argument 'keepvar' that will indicate to the script that CPPFLAGS & LDFLAGS should be restored after
 #   macro has been run.
@@ -4146,6 +4143,7 @@ printf "%s\n" "#define HAVE_HDF5 1" >>confdefs.h
 fi
 
 
+hdf5_version_sufficient=no
 if test "$with_hdf5" = "yes"; then
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Found hdf5 with version: $HDF5_VERSION" >&5
 printf "%s\n" "Found hdf5 with version: $HDF5_VERSION" >&6; }
@@ -4229,10 +4227,6 @@ x$ax_compare_version_B" | sed 's/^ *//' | sort -r | sed "s/x${ax_compare_version
 
 fi
 
-
-
-
-
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
   echo "could not determine R_HOME"
@@ -4249,134 +4243,26 @@ RBIN="${R_HOME}/bin/R"
 : ${CXX=`"${RBIN}" CMD config CXX`}
 : ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
 
-if test -z "${LIBS}"; then
-    # Extract the first word of "ggrep", so it can be a program name with args.
-set dummy ggrep; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_prog_GREP+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  if test -n "$GREP"; then
-  ac_cv_prog_GREP="$GREP" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
+# HDF5_LIBS is in bad order and some linkers might obstruct. Reverse it
+NEW_HDF5_LIBS=""
+for x in $HDF5_LIBS; do
+  case "$x" in
+    -lhdf5*)
+      # HDF5_LIBS contains -hdf5xx and we don't want that since we aren't interested in hdf5_hl...
+      ;;
+    *)
+      NEW_HDF5_LIBS="$x $NEW_HDF5_LIBS"
+      ;;
   esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_prog_GREP="`which ggrep`"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
 done
-  done
-IFS=$as_save_IFS
 
-  test -z "$ac_cv_prog_GREP" && ac_cv_prog_GREP="`which grep`"
-fi
-fi
-GREP=$ac_cv_prog_GREP
-if test -n "$GREP"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $GREP" >&5
-printf "%s\n" "$GREP" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
+VOL2BIRD_LIBS="-lhdf5 $NEW_HDF5_LIBS -lz -lm"
+VOL2BIRD_LDFLAGS="$HDF5_LDFLAGS"
+VOL2BIRD_CPPFLAGS="$HDF5_CPPFLAGS"
 
-
-
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether ${GREP} accepts -o" >&5
-printf %s "checking whether ${GREP} accepts -o... " >&6; }
-  if `echo '' | ${GREP} -o '' >/dev/null 2>&1`
-  then
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-  else
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-    as_fn_error $? "${GREP} does not support option -o" "$LINENO" 5
-  fi
-
-  LIBS=`${H5CC} -show | ${GREP} -o " \-[lL][^[:space:]]\+" | tr "\n" " "`
-
-
-    VOL2BIRD_LIBS="${LIBS} -L. -lhdf5 -lz -lm"
-fi
-
-if test -z "${CPPFLAGS}"; then
-    # Extract the first word of "ggrep", so it can be a program name with args.
-set dummy ggrep; ac_word=$2
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_prog_GREP+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  if test -n "$GREP"; then
-  ac_cv_prog_GREP="$GREP" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_prog_GREP="`which ggrep`"
-    printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_prog_GREP" && ac_cv_prog_GREP="`which grep`"
-fi
-fi
-GREP=$ac_cv_prog_GREP
-if test -n "$GREP"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $GREP" >&5
-printf "%s\n" "$GREP" >&6; }
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-fi
-
-
-
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether ${GREP} accepts -o" >&5
-printf %s "checking whether ${GREP} accepts -o... " >&6; }
-  if `echo '' | ${GREP} -o '' >/dev/null 2>&1`
-  then
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf "%s\n" "yes" >&6; }
-  else
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf "%s\n" "no" >&6; }
-    as_fn_error $? "${GREP} does not support option -o" "$LINENO" 5
-  fi
-
-  echo 'int main() { return; }' > myconftest.c
-
-
-
-  VOL2BIRD_CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
-
-  rm -f myconftest.c
-fi
+LIBS="$LIBS $VOL2BIRD_LIBS"
+LDFLAGS="$LDFLAGS $VOL2BIRD_LDFLAGS"
+CPPFLAGS="$CPPFLAGS $VOL2BIRD_CPPFLAGS"
 
 
 
@@ -4389,13 +4275,13 @@ PROJ_VARIANT=X
 PROJ_FOUND=no
 PROJ_SUPPRESSED=no
 
-proj_macro_proj_path=
-proj_macro_proj_with_proj=yes
-proj_macro_proj_useproj6=no
-proj_macro_proj_proj4ok=yes
-proj_macro_proj_proj6ok=no
-proj_macro_proj_pkg_config_identified=no
-proj_macro_proj_fun_arg=keepvar # Store argument when calling PROJ_MACRO([keepvar])
+check_proj_proj_path=
+check_proj_proj_with_proj=yes
+check_proj_proj_useproj6=no
+check_proj_proj_proj4ok=yes
+check_proj_proj_proj6ok=no
+check_proj_proj_pkg_config_identified=no
+check_proj_proj_fun_arg=keepvar # Store argument when calling CHECK_PROJ([keepvar])
 
 # Add a default --with-proj configuration option.
 
@@ -4403,33 +4289,33 @@ proj_macro_proj_fun_arg=keepvar # Store argument when calling PROJ_MACRO([keepva
 if test ${with_proj+y}
 then :
   withval=$with_proj;  if test "$withval" = "no" -o "$withval" = "yes"; then
-      proj_macro_proj_with_proj="$withval"
+      check_proj_proj_with_proj="$withval"
     else
-      proj_macro_proj_with_proj="yes"
-      proj_macro_proj_path="$withval"
+      check_proj_proj_with_proj="yes"
+      check_proj_proj_path="$withval"
     fi
 
 else $as_nop
-  proj_macro_proj_with_proj="yes"
+  check_proj_proj_with_proj="yes"
 
 fi
 
 
 
 # Keep track of LIBS before we start identifying PROJ
-proj_macro_proj_save_LDFLAGS=${LDFLAGS}
-proj_macro_proj_save_LIBS=${LIBS}
-proj_macro_proj_save_CPPFLAGS=${CPPFLAGS}
+check_proj_proj_save_LDFLAGS=${LDFLAGS}
+check_proj_proj_save_LIBS=${LIBS}
+check_proj_proj_save_CPPFLAGS=${CPPFLAGS}
 
-if [ "$proj_macro_proj_with_proj" != "no" ]; then
-  if [ "$proj_macro_proj_with_proj" = "yes" -a "$proj_macro_proj_path" = "" ]; then
+if [ "$check_proj_proj_with_proj" != "no" ]; then
+  if [ "$check_proj_proj_with_proj" = "yes" -a "$check_proj_proj_path" = "" ]; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pkg-config" >&5
 printf %s "checking for pkg-config... " >&6; }
     pkg-config proj > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
-      proj_macro_proj_pkg_config_identified=yes
+      check_proj_proj_pkg_config_identified=yes
 
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj CFLAGS" >&5
 printf %s "checking for proj CFLAGS... " >&6; }
@@ -4454,54 +4340,54 @@ printf "%s\n" "no" >&6; }
     fi
   fi
 
-  if [ "$proj_macro_proj_pkg_config_identified" = "no" -a "$proj_macro_proj_path" != "" ]; then
-    if [ "`echo $proj_macro_proj_path | grep ','`" = "" ]; then
-      proj_macro_proj_inc=$proj_macro_proj_path/include
-      proj_macro_proj_lib=$proj_macro_proj_path/lib
+  if [ "$check_proj_proj_pkg_config_identified" = "no" -a "$check_proj_proj_path" != "" ]; then
+    if [ "`echo $check_proj_proj_path | grep ','`" = "" ]; then
+      check_proj_proj_inc=$check_proj_proj_path/include
+      check_proj_proj_lib=$check_proj_proj_path/lib
     else
-      proj_macro_proj_inc="`echo $proj_macro_proj_path |cut -f1 -d,`"
-      proj_macro_proj_lib="`echo $proj_macro_proj_path |cut -f2 -d,`"
+      check_proj_proj_inc="`echo $check_proj_proj_path |cut -f1 -d,`"
+      check_proj_proj_lib="`echo $check_proj_proj_path |cut -f2 -d,`"
     fi
 
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Checking if proj.h or projects.h can be found in $proj_macro_proj_inc/" >&5
-printf %s "checking Checking if proj.h or projects.h can be found in $proj_macro_proj_inc/... " >&6; }
-    if [ ! -f "$proj_macro_proj_inc/proj.h" -a ! -f "$proj_macro_proj_inc/projects.h" ]; then
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Checking if proj.h or projects.h can be found in $check_proj_proj_inc/" >&5
+printf %s "checking Checking if proj.h or projects.h can be found in $check_proj_proj_inc/... " >&6; }
+    if [ ! -f "$check_proj_proj_inc/proj.h" -a ! -f "$check_proj_proj_inc/projects.h" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
-      as_fn_error $? "Could not identify proj.h or projects.h in include directory $proj_macro_proj_inc, aborting!" "$LINENO" 5
+      as_fn_error $? "Could not identify proj.h or projects.h in include directory $check_proj_proj_inc, aborting!" "$LINENO" 5
     else
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
     fi
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking Checking if libproj can be found in proj-path" >&5
 printf %s "checking Checking if libproj can be found in proj-path... " >&6; }
-    TMP=`ls -1 "$proj_macro_proj_lib"/libproj.* 2>/dev/null`
+    TMP=`ls -1 "$check_proj_proj_lib"/libproj.* 2>/dev/null`
     if [ "$TMP" = "" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
-      as_fn_error $? "Could not identify libproj in directory $proj_macro_proj_inc, aborting!" "$LINENO" 5
+      as_fn_error $? "Could not identify libproj in directory $check_proj_proj_inc, aborting!" "$LINENO" 5
     else
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
     fi
 
-    PROJ_LDFLAGS="-L$proj_macro_proj_lib"
+    PROJ_LDFLAGS="-L$check_proj_proj_lib"
     PROJ_LIBS="-lproj"
-    PROJ_CFLAGS="-I$proj_macro_proj_inc"
-  elif [ "$proj_macro_proj_pkg_config_identified" = "no" ]; then
+    PROJ_CFLAGS="-I$check_proj_proj_inc"
+  elif [ "$check_proj_proj_pkg_config_identified" = "no" ]; then
     # If we can't identify pkg-config but is on mac, we might be able to use
     # homebrew to at least get basic flags
-    proj_macro_proj_kernelname=`uname -s | tr 'A-Z' 'a-z'`
-    proj_macro_proj_ismacos=no
-    case "$proj_macro_proj_kernelname" in
+    check_proj_proj_kernelname=`uname -s | tr 'A-Z' 'a-z'`
+    check_proj_proj_ismacos=no
+    case "$check_proj_proj_kernelname" in
       darwin*)
-        proj_macro_proj_ismacos=yes
+        check_proj_proj_ismacos=yes
         ;;
     esac
 
-    proj_macro_proj_hasbrew=no
-    proj_macro_proj_homebrewprefix=
-    if [ "$proj_macro_proj_ismacos" = "yes" ]; then
+    check_proj_proj_hasbrew=no
+    check_proj_proj_homebrewprefix=
+    if [ "$check_proj_proj_ismacos" = "yes" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew" >&5
 printf %s "checking for homebrew... " >&6; }
       which brew
@@ -4509,27 +4395,27 @@ printf %s "checking for homebrew... " >&6; }
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
 printf "%s\n" "not found" >&6; }
       else
-        proj_macro_proj_hasbrew=yes
+        check_proj_proj_hasbrew=yes
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: found" >&5
 printf "%s\n" "found" >&6; }
       fi
 
-      if [ "$proj_macro_proj_hasbrew" = "yes" ]; then
+      if [ "$check_proj_proj_hasbrew" = "yes" ]; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for homebrew prefix" >&5
 printf %s "checking for homebrew prefix... " >&6; }
-        proj_macro_proj_homebrewprefix=`brew --prefix`
+        check_proj_proj_homebrewprefix=`brew --prefix`
         if [ $? -ne 0 ]; then
-          proj_macro_proj_homebrewprefix=
+          check_proj_proj_homebrewprefix=
           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
 printf "%s\n" "not found" >&6; }
         else
-          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $proj_macro_proj_homebrewprefix" >&5
-printf "%s\n" "$proj_macro_proj_homebrewprefix" >&6; }
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $check_proj_proj_homebrewprefix" >&5
+printf "%s\n" "$check_proj_proj_homebrewprefix" >&6; }
         fi
       fi
 
-      if [ "$proj_macro_proj_homebrewprefix" != "" ]; then
-        PROJ_LDFLAGS="-L$proj_macro_proj_lib"
+      if [ "$check_proj_proj_homebrewprefix" != "" ]; then
+        PROJ_LDFLAGS="-L$check_proj_proj_lib"
         PROJ_LIBS="-lproj"
         PROJ_CFLAGS="-I$HOMEBREWPREFIX/include"
       fi
@@ -4546,13 +4432,13 @@ do :
 if test "x$ac_cv_header_proj_h" = xyes
 then :
   printf "%s\n" "#define HAVE_PROJ_H 1" >>confdefs.h
- proj_macro_proj_proj6ok=yes
+ check_proj_proj_proj6ok=yes
 else $as_nop
-  proj_macro_proj_proj6ok=no
+  check_proj_proj_proj6ok=no
 fi
 
 done
-  if [ "$proj_macro_proj_proj6ok" = "yes" ]; then
+  if [ "$check_proj_proj_proj6ok" = "yes" ]; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for proj_trans in -lproj" >&5
 printf %s "checking for proj_trans in -lproj... " >&6; }
 if test ${ac_cv_lib_proj_proj_trans+y}
@@ -4595,17 +4481,17 @@ then :
 
 else $as_nop
 
-      proj_macro_proj_proj6ok=no
+      check_proj_proj_proj6ok=no
 
 fi
 
-    if [ "$proj_macro_proj_proj6ok" = "no" -a "$proj_macro_proj_pkg_config_identified" = "yes" ]; then
+    if [ "$check_proj_proj_proj6ok" = "no" -a "$check_proj_proj_pkg_config_identified" = "yes" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Could not identify PROJ.6" >&5
 printf "%s\n" "$as_me: Could not identify PROJ.6" >&6;}
     fi
   fi
 
-  if  [ "$proj_macro_proj_proj6ok" = "no" ]; then
+  if  [ "$check_proj_proj_proj6ok" = "no" ]; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Trying to identify PROJ.4" >&5
 printf "%s\n" "$as_me: Trying to identify PROJ.4" >&6;}
            for ac_header in projects.h
@@ -4614,13 +4500,13 @@ do :
 if test "x$ac_cv_header_projects_h" = xyes
 then :
   printf "%s\n" "#define HAVE_PROJECTS_H 1" >>confdefs.h
- proj_macro_proj_proj4ok=yes
+ check_proj_proj_proj4ok=yes
 else $as_nop
-  proj_macro_proj_proj4ok=no
+  check_proj_proj_proj4ok=no
 fi
 
 done
-    if [ "$proj_macro_proj_proj4ok" = "yes" ]; then
+    if [ "$check_proj_proj_proj4ok" = "yes" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for pj_transform in -lproj" >&5
 printf %s "checking for pj_transform in -lproj... " >&6; }
 if test ${ac_cv_lib_proj_pj_transform+y}
@@ -4658,14 +4544,14 @@ fi
 printf "%s\n" "$ac_cv_lib_proj_pj_transform" >&6; }
 if test "x$ac_cv_lib_proj_pj_transform" = xyes
 then :
-  proj_macro_proj_proj4ok=yes
+  check_proj_proj_proj4ok=yes
 else $as_nop
-  proj_macro_proj_proj4ok=no
+  check_proj_proj_proj4ok=no
 
 fi
 
     fi
-    if [ "$proj_macro_proj_proj4ok" = "yes" ]; then
+    if [ "$check_proj_proj_proj4ok" = "yes" ]; then
       if test "$cross_compiling" = yes
 then :
   { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
@@ -4692,28 +4578,28 @@ then :
   PROJ_VERSION=`./conftest$EXEEXT`
 
 else $as_nop
-  proj_macro_proj_proj4ok=no
+  check_proj_proj_proj4ok=no
 
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
-      if [ "$proj_macro_proj_proj4ok" = "yes" ]; then
+      if [ "$check_proj_proj_proj4ok" = "yes" ]; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking proj.4 version" >&5
 printf %s "checking proj.4 version... " >&6; }
         PROJ_VERSION=`echo $PROJ_VERSION | egrep -e "^[0-9]+$"`
         if [ "$PROJ_VERSION" = "" ]; then
           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking failed" >&5
 printf %s "checking failed... " >&6; }
-          proj_macro_proj_proj4ok=no
+          check_proj_proj_proj4ok=no
         else
           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $PROJ_VERSION" >&5
 printf "%s\n" "$PROJ_VERSION" >&6; }
           if [ "$PROJ_VERSION" -ge 5 ]; then
             { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Could not identify proj 4" >&5
 printf "%s\n" "$as_me: Could not identify proj 4" >&6;}
-            proj_macro_proj_proj4ok=no
+            check_proj_proj_proj4ok=no
           else
             PROJ_VARIANT=4
           fi
@@ -4724,13 +4610,13 @@ printf "%s\n" "$as_me: Could not identify proj 4" >&6;}
 
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking If PROJ could be identified" >&5
 printf %s "checking If PROJ could be identified... " >&6; }
-  if [ "$proj_macro_proj_proj4ok" = "no" -a "$proj_macro_proj_proj6ok" = "no" ]; then
+  if [ "$check_proj_proj_proj4ok" = "no" -a "$check_proj_proj_proj6ok" = "no" ]; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: No" >&5
 printf "%s\n" "No" >&6; }
     as_fn_error $? "Proj not found in standard search locations. Install proj.4/proj.6 library" "$LINENO" 5
-    CPPFLAGS="${proj_macro_proj_save_CPPFLAGS}"
-    LDFLAGS="${proj_macro_proj_save_LDFLAGS}"
-    LIBS="${proj_macro_proj_save_LIBS}"
+    CPPFLAGS="${check_proj_proj_save_CPPFLAGS}"
+    LDFLAGS="${check_proj_proj_save_LDFLAGS}"
+    LIBS="${check_proj_proj_save_LIBS}"
   else
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Yes" >&5
 printf "%s\n" "Yes" >&6; }
@@ -4750,11 +4636,11 @@ printf "%s\n" "$as_me: PROJ check suppressed" >&6;}
   PROJ_SUPPRESSED=yes
 fi
 
-if [ "$proj_macro_proj_fun_arg" = "keepvar" ]; then
-  LIBS=$proj_macro_proj_save_LIBS
-  CPPFLAGS="${proj_macro_proj_save_CPPFLAGS}"
-  LDFLAGS="${proj_macro_proj_save_LDFLAGS}"
-  LIBS="${proj_macro_proj_save_LIBS}"
+if [ "$check_proj_proj_fun_arg" = "keepvar" ]; then
+  LIBS=$check_proj_proj_save_LIBS
+  CPPFLAGS="${check_proj_proj_save_CPPFLAGS}"
+  LDFLAGS="${check_proj_proj_save_LDFLAGS}"
+  LIBS="${check_proj_proj_save_LIBS}"
 fi
 
 
@@ -4774,14 +4660,12 @@ fi
 
 
 
-VOL2BIRD_LIBS="$VOL2BIRD_LIBS $PROJ_LDFLAGS $PROJ_LIBS $LIBS"
-VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $PROJ_CFLAGS $CPPFLAGS"
-
-VOL2BIRD_CFLAGS=""
-
+VOL2BIRD_LIBS="$VOL2BIRD_LDFLAGS $PROJ_LDFLAGS $PROJ_LIBS $VOL2BIRD_LIBS $PKG_LIBS"
+VOL2BIRD_CPPFLAGS="$PKG_CPPFLAGS $PROJ_CFLAGS $VOL2BIRD_CPPFLAGS"
 
 echo "VOL2BIRD_CPPFLAGS=$VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_LIBS=$VOL2BIRD_LIBS"
+
 
 
 
