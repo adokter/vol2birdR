@@ -9,10 +9,11 @@ dnl All above scripts are open source, use as you want provided that copyright n
 dnl
 m4_include([inst/m4/ax_lib_hdf5.m4])
 m4_include([inst/m4/ax_compare_version.m4])
-m4_include([inst/m4/ax_lib_proj.m4])
+m4_include([inst/m4/check_proj.m4])
 
 AX_LIB_HDF5()
 
+hdf5_version_sufficient=no
 if test "$with_hdf5" = "yes"; then 
   AC_MSG_RESULT([Found hdf5 with version: $HDF5_VERSION])
   AX_COMPARE_VERSION([$HDF5_VERSION], 
@@ -34,10 +35,6 @@ if test "$hdf5_version_sufficient" = "yes"; then
         [HDF5_API_VERS_USE=""])
 fi
 
-AC_SUBST(HDF5_VERSION_USE)
-AC_SUBST(HDF5_API_VERS_USE)
-AC_SUBST(DEFINE_H5FREE_MEMORY)
-
 : ${R_HOME=`R RHOME`}
 if test -z "${R_HOME}"; then
   echo "could not determine R_HOME"
@@ -54,51 +51,28 @@ RBIN="${R_HOME}/bin/R"
 : ${CXX=`"${RBIN}" CMD config CXX`}
 : ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
 
-if test -z "${LIBS}"; then
-  dnl prefer ggrep if installed
-  AC_CHECK_PROG(GREP,ggrep,`which ggrep`, `which grep`)
+# HDF5_LIBS is in bad order and some linkers might obstruct. Reverse it
+NEW_HDF5_LIBS=""
+for x in $HDF5_LIBS; do
+  case "$x" in
+    -lhdf5*)
+      # HDF5_LIBS contains -hdf5xx and we don't want that since we aren't interested in hdf5_hl...
+      ;;
+    *)
+      NEW_HDF5_LIBS="$x $NEW_HDF5_LIBS"
+      ;;
+  esac
+done
 
-  dnl check if $GREP supports option -o
-  AC_MSG_CHECKING([whether ${GREP} accepts -o])
-  if `echo '' | ${GREP} -o '' >/dev/null 2>&1`
-  then
-    AC_MSG_RESULT([yes])
-  else
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([${GREP} does not support option -o])
-  fi
-  [
-  LIBS=`${H5CC} -show | ${GREP} -o " \-[lL][^[:space:]]\+" | tr "\n" " "` 
-  ]
-  
-  dnl Fix for newer Debian versions
-  VOL2BIRD_LIBS="${LIBS} -L. -lhdf5 -lz -lm"
-fi
+VOL2BIRD_LIBS="-lhdf5 $NEW_HDF5_LIBS -lz -lm"
+VOL2BIRD_LDFLAGS="$HDF5_LDFLAGS"
+VOL2BIRD_CPPFLAGS="$HDF5_CPPFLAGS"
 
-if test -z "${CPPFLAGS}"; then
-  dnl prefer ggrep if installed
-  AC_CHECK_PROG(GREP,ggrep,`which ggrep`, `which grep`)
+LIBS="$LIBS $VOL2BIRD_LIBS"
+LDFLAGS="$LDFLAGS $VOL2BIRD_LDFLAGS"
+CPPFLAGS="$CPPFLAGS $VOL2BIRD_CPPFLAGS"
 
-  dnl check if $GREP supports option -o
-  AC_MSG_CHECKING([whether ${GREP} accepts -o])
-  if `echo '' | ${GREP} -o '' >/dev/null 2>&1`
-  then
-    AC_MSG_RESULT([yes])
-  else
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([${GREP} does not support option -o])
-  fi
-
-  echo 'int main() { return; }' > myconftest.c
-
-
-  [
-  VOL2BIRD_CPPFLAGS=`${H5CC} -show -c myconftest.c | ${GREP} -o "\-I[^[:space:]]\+" | tr "\n" " "`
-  ]
-  rm -f myconftest.c
-fi
-
-AX_LIB_PROJ([])
+CHECK_PROJ([keepvar])
 
 if [[ "$PROJ_SUPPRESSED" = "yes" ]]; then
   AC_MSG_ERROR([proj required and should not be suppressed.])  
@@ -115,12 +89,8 @@ fi
 AC_ARG_VAR([PKG_CPPFLAGS],[custom C preprocessor flags for packages compilation])
 AC_ARG_VAR([PKG_LIBS],[custom libraries for package compilation])
 
-VOL2BIRD_LIBS="$VOL2BIRD_LIBS $LIBS"
-VOL2BIRD_CPPFLAGS="$VOL2BIRD_CPPFLAGS $CPPFLAGS"
-
-dnl dummy substitute HDF5R_CFLAGS
-VOL2BIRD_CFLAGS=""
-AC_SUBST(VOL2BIRD_CFLAGS)
+VOL2BIRD_LIBS="$VOL2BIRD_LDFLAGS $PROJ_LDFLAGS $PROJ_LIBS $VOL2BIRD_LIBS $PKG_LIBS"
+VOL2BIRD_CPPFLAGS="$PKG_CPPFLAGS $PROJ_CFLAGS $VOL2BIRD_CPPFLAGS"
 
 echo "VOL2BIRD_CPPFLAGS=$VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_LIBS=$VOL2BIRD_LIBS"
@@ -128,6 +98,7 @@ echo "VOL2BIRD_LIBS=$VOL2BIRD_LIBS"
 dnl substitute CPPFLAGS and LIBS
 AC_SUBST(VOL2BIRD_CPPFLAGS)
 AC_SUBST(VOL2BIRD_LIBS)
+AC_SUBST(HDF5_API_VERS_USE)
 dnl and do subsitution in the src/Makevars.in 
 AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
