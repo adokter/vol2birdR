@@ -12,7 +12,7 @@ PKG_LIBS=@VOL2BIRD_LIBS@
 PKG_CPPFLAGS= @VOL2BIRD_CPPFLAGS@ @HDF5_API_VERS_USE@
 
 #
-PKG_CPPFLAGS+= -I. -I../inst -I../inst/libvol2bird -I../inst/libmistnet -I../inst/librave -I../inst/libhlhdf -I../inst/librsl -I../inst/libiris2odim 
+PKG_CPPFLAGS+= -I. -I./includes -I./includes/libvol2bird -I./includes/libmistnet -I./includes/librave -I./includes/libhlhdf -I./includes/librsl -I./includes/libiris2odim 
 
 # VOL2BIRD flags
 PKG_CPPFLAGS+= -DNOCONFUSE -DMISTNET -DVOL2BIRD_R -DNO_VOL2BIRD_PRINTF 
