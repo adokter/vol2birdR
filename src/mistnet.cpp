@@ -2,6 +2,7 @@
 #include <memory>
 #include <librave.h>
 #include <libmistnet/mistnet.h>
+#include <libvol2bird/constants.h>
 
 //  #include <thread>
 
@@ -107,6 +108,15 @@ void cpp_vol2bird_set_wsr88d_site_location(std::string loc)
 std::string cpp_vol2bird_get_wsr88d_site_location()
 {
   return std::string(wsr88d_get_site_info_file());
+}
+
+//' Initializes the mistnet shared library pointed to by the path
+//'
+//' @keywords internal
+//' @param path The shared library
+// [[Rcpp::export]]
+std::string cpp_vol2bird_version() {
+  return VERSION;
 }
 
 
