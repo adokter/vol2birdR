@@ -1,15 +1,15 @@
 AC_INIT([volbirdr],[0.1])
 
 dnl This configure script uses three different scripts (free software) for finding dependencies
-dnl tools/m4/ax_lib_proj.m4 for identifying PROJ include & libraries.
-dnl tools/m4/ax_lib_hdf5.m4 for identifying HDF5 include & libraries.
-dnl tools/m4/ax_compare_version.m4  for comparing HDF5-versions
+dnl inst/m4/ax_lib_proj.m4 for identifying PROJ include & libraries.
+dnl inst/m4/ax_lib_hdf5.m4 for identifying HDF5 include & libraries.
+dnl inst/m4/ax_compare_version.m4  for comparing HDF5-versions
 dnl
 dnl All above scripts are open source, use as you want provided that copyright notice is kept. 
 dnl
-m4_include([tools/m4/ax_lib_hdf5.m4])
-m4_include([tools/m4/ax_compare_version.m4])
-m4_include([tools/m4/check_proj.m4])
+m4_include([inst/m4/ax_lib_hdf5.m4])
+m4_include([inst/m4/ax_compare_version.m4])
+m4_include([inst/m4/check_proj.m4])
 
 AX_LIB_HDF5()
 
