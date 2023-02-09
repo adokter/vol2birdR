@@ -1,8 +1,3 @@
-#
-# Ideas and some code in this file originates from https://github.com/mlverse/torch after
-# some mail exchange with Daniel Falbel (Copyright) about pros and cons. All credit should go to him.
-# Original licensed with MIT. https://github.com/mlverse/torch/blob/main/LICENSE.md
-#
 cmake_minimum_required(VERSION 3.10)
 
 project(mistnet)
