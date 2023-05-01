@@ -11,9 +11,9 @@
 #include <string.h>
 #include <math.h>
 
-//#ifdef MISTNET
-//#include "../libmistnet/libmistnet.h"
-//#endif
+#ifdef MISTNET
+#include "../libmistnet/libmistnet.h"
+#endif
 
 
 /**
@@ -57,7 +57,7 @@ PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdS
 
 PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volume, double elev);
 
-#ifdef R_MISTNET
+#ifdef MISTNET
 int run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
 #endif
 
@@ -335,7 +335,7 @@ RaveObjectList_t* polarVolumeToCartesianList(PolarVolume_t* pvol, long dim, long
     for (int iScan = 0; iScan < nScans; iScan++) {
                 
         // extract the scan object from the volume object
-        scan = PolarVolume_getScan(pvol,iScan);
+        scan = PolarVolume_getScan(pvol, iScan);
                 
         cartesian = polarScanToCartesian(scan, dim, res, init);
         
@@ -344,6 +344,8 @@ RaveObjectList_t* polarVolumeToCartesianList(PolarVolume_t* pvol, long dim, long
         RaveObjectList_add(list, (RaveCoreObject*) cartesian); 
         
         RAVE_OBJECT_RELEASE(cartesian);
+
+        RAVE_OBJECT_RELEASE(scan);
 
     }
     
@@ -367,6 +369,10 @@ Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double 
     
     // create a new Cartesian grid object
     cartesian = RAVE_OBJECT_NEW(&Cartesian_TYPE);
+    if (cartesian == NULL){
+        vol2bird_err_printf( "failed to allocate memory for new cartesian object\n");
+        return NULL;
+    }
 
     // copy metadata from volume
     Cartesian_setTime(cartesian, PolarScan_getTime(scan));
@@ -377,11 +383,6 @@ Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double 
     Cartesian_setObjectType(cartesian, Rave_ObjectType_IMAGE);
     Cartesian_setProduct(cartesian, Rave_ProductType_PPI);
     
-    if (cartesian == NULL){
-        vol2bird_err_printf( "failed to allocate memory for new cartesian object\n");
-        return NULL;
-    }
-
     //set dimensions and resolution of the grid
     Cartesian_setXSize(cartesian, dim);
     Cartesian_setYSize(cartesian, dim);
@@ -396,6 +397,7 @@ Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double 
     
     if(RaveList_size(scanParameterNames)<=0){
         vol2bird_err_printf("Warning: scan without scan parameters\n");
+        RaveList_freeAndDestroy(&scanParameterNames);
         RAVE_OBJECT_RELEASE(cartesian);
         return NULL;
     }
@@ -437,6 +439,7 @@ Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double 
         RAVE_OBJECT_RELEASE(cartesianParam);
     } // iParam
     
+    RaveList_freeAndDestroy(&scanParameterNames);
     return cartesian;
 }
 
@@ -482,8 +485,11 @@ double*** init3DTensor(int dim1, int dim2, int dim3, double init)
     
     if(tensor == NULL){
         vol2bird_err_printf("failed to initialize 3D tensor (1)");
-        // exit(0)
+#ifdef VOL2BIRD_R
         return NULL;
+#else        
+        exit(0);
+#endif        
     }
 
     for (int i = 0; i < dim1; i++) {
@@ -496,8 +502,11 @@ double*** init3DTensor(int dim1, int dim2, int dim3, double init)
         if(tensor[i] == NULL){
             vol2bird_err_printf("failed to initialize 3D tensor (2)");
             free3DTensor(tensor, dim1, dim2);
-            //exit(0);
+#ifdef VOL2BIRD_R
             return NULL;
+#else
+            exit(0);
+#endif            
         } else {
             for (int j = 0; j < dim2; j++) {
                 tensor[i][j] = NULL;
@@ -509,8 +518,11 @@ double*** init3DTensor(int dim1, int dim2, int dim3, double init)
             if(tensor[i][j] == NULL){
                 vol2bird_err_printf("failed to initialize 3D tensor (3)");
 	              free3DTensor(tensor, dim1, dim2);
-                // exit(0);
+#ifdef VOL2BIRD_R	              
                 return NULL;
+#else                
+                exit(0);
+#endif                
             }
         } // j
     } // i
@@ -558,11 +570,13 @@ int fill3DTensor(double ***tensor, RaveObjectList_t* list, int dim1, int dim2, i
         
         if(dim2 != xSize){
             vol2bird_err_printf( "Error: expecting %i bins in X dimension, but found only %li\n", dim2, xSize);
+            RAVE_OBJECT_RELEASE(cartesian);
             return -1;
         }
 
         if(dim3 != ySize){
             vol2bird_err_printf( "Error: expecting %i bins in Y dimension, but found only %li\n", dim3, ySize);
+            RAVE_OBJECT_RELEASE(cartesian);
             return -1;
         }
         
@@ -611,6 +625,8 @@ int fill3DTensor(double ***tensor, RaveObjectList_t* list, int dim1, int dim2, i
 
                 if(iScan+nScan*iOrder>=dim1){
                    vol2bird_err_printf( "Error: exceeding 3D tensor dimension\n");
+                   RaveList_freeAndDestroy(&cartesianParameterNames);
+                   RAVE_OBJECT_RELEASE(cartesian);
                    RAVE_OBJECT_RELEASE(cartesianParam);
                    return(-1);
                 }
@@ -648,6 +664,8 @@ int fill3DTensor(double ***tensor, RaveObjectList_t* list, int dim1, int dim2, i
         if(dbz_count == 0) vol2bird_err_printf( "Warning: no reflectivity data found for MistNet input scan %i, initializing with values %i instead.\n", iScan, MISTNET_INIT);
         if(vrad_count == 0) vol2bird_err_printf( "Warning: no radial velocity data found for MistNet input scan %i, initializing with values %i instead.\n", iScan, MISTNET_INIT);
         if(wrad_count == 0) vol2bird_err_printf( "Warning: no spectrum width data found for MistNet input scan %i, initializing with values %i instead.\n", iScan, MISTNET_INIT);
+        RaveList_freeAndDestroy(&cartesianParameterNames);
+        RAVE_OBJECT_RELEASE(cartesian);
     }  // iScan
     
     return 0;
@@ -678,13 +696,13 @@ int polarVolumeTo3DTensor(PolarVolume_t* pvol, double ****tensor, int dim, long 
     // convert polar volume to a list of Cartesian objects, one for each scan
     // store the total number of scan parameters for all scans in nCartesianParam
     int nCartesianParam = 0;
+
     RaveObjectList_t* list = polarVolumeToCartesianList(pvol, dim, res, 0, &nCartesianParam);
-    
+
     if(list == NULL){
         vol2bird_err_printf( "Error: failed to load Cartesian objects from polar volume\n");
         return -1;
     }
-    
     // if nParam is specified, restrict the number of output parameters to its value.
     // nParam typically equals 3x5=15, selecting DBZ, VRAD and WRAD for Misnet segmentation model input.
     if(nParam > 0){
@@ -699,7 +717,7 @@ int polarVolumeTo3DTensor(PolarVolume_t* pvol, double ****tensor, int dim, long 
 
     // clean up
     RAVE_OBJECT_RELEASE(list);
-    
+
     return(nCartesianParam);
 }
 
@@ -752,6 +770,7 @@ PolarVolume_t* PolarVolume_selectScansByElevation(PolarVolume_t* volume, float e
         
         // add it to the selected volume
         PolarVolume_addScan(volume_select, scan);
+        RAVE_OBJECT_RELEASE(scan);
     }
     
     // sort polar volume by ascending elevation
@@ -799,6 +818,7 @@ PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdS
         if (scanUse[iScan].useScan){
             PolarVolume_addScan(volume_select, scan);
         }
+        RAVE_OBJECT_RELEASE(scan);
     }
 
     // sort polar volume by ascending elevation
@@ -841,14 +861,17 @@ PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volum
         if(elevDifferenceCandidate == elevDifference){
             // pick the higest resolution scan
             if (PolarScan_getRscale(scanCandidate) < PolarScan_getRscale(scan)){
-                scan = scanCandidate;
+                RAVE_OBJECT_RELEASE(scan);
+                scan = RAVE_OBJECT_COPY(scanCandidate);
             }
         }
     
         if(elevDifferenceCandidate < elevDifference){
             elevDifference = elevDifferenceCandidate;
-            scan = scanCandidate;
+            RAVE_OBJECT_RELEASE(scan);
+            scan = RAVE_OBJECT_COPY(scanCandidate);
         }
+        RAVE_OBJECT_RELEASE(scanCandidate);
     }
 
     return(scan);
@@ -875,6 +898,7 @@ int addTensorToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int 
         
         if(PolarScan_hasParameter(scan, "WEATHER")){
             vol2bird_err_printf( "Warning: scan used multiple times as MistNet input, ignoring segmentation %i/%i\n", iScan+1, MISTNET_N_ELEV);
+            RAVE_OBJECT_RELEASE(scan);
             continue;
         }
         
@@ -925,7 +949,12 @@ int addTensorToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int 
                 PolarScanParam_setValue(mistnetParamWeather, iRang, iAzim, valueWeather);
                 PolarScanParam_setValue(mistnetParamClassification, iRang, iAzim, valueClassification);                
             }            
-        }        
+        }
+        RAVE_OBJECT_RELEASE(mistnetParamWeather);
+        RAVE_OBJECT_RELEASE(mistnetParamBiology);
+        RAVE_OBJECT_RELEASE(mistnetParamBackground);
+        RAVE_OBJECT_RELEASE(mistnetParamClassification);
+        RAVE_OBJECT_RELEASE(scan);
     }
     
     return(0);
@@ -948,6 +977,7 @@ int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int di
         scan = PolarVolume_getScan(pvol,iScan);
 
         if(PolarScan_hasParameter(scan, CELLNAME)){
+            RAVE_OBJECT_RELEASE(scan);
             continue;
         }
 
@@ -990,18 +1020,21 @@ int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int di
         }
         
         PolarScan_addParameter(scan, mistnetParamClassification);
+        RAVE_OBJECT_RELEASE(mistnetParamClassification);
+        RAVE_OBJECT_RELEASE(scan);
     }
     
     return(0);
 
 }
 
-//#if defined(MISTNET) or defined(R_MISTNET)
+#if defined(MISTNET)
 // segments biology from precipitation using mistnet deep convolution net.
 int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata){    
     // volume with only the 5 selected elevations
     PolarVolume_t* volume_mistnet = NULL;
     PolarVolume_t* volume_select = NULL;
+    int result = 0;
 
     volume_select = PolarVolume_selectScansByScanUse(volume, scanUse, alldata->misc.nScansUsed);
     volume_mistnet = PolarVolume_selectScansByElevation(volume_select, alldata->options.mistNetElevs, alldata->options.mistNetNElevs);
@@ -1013,24 +1046,27 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
             RAVE_OBJECT_RELEASE(volume_mistnet);
             return -1;
     }
-    
+
     // set scanUse to false for scans not entering the MistNet segmentation model
     if(alldata->options.mistNetElevsOnly){
         int printWarning = TRUE;
         for(int iScan = 0; iScan < PolarVolume_getNumberOfScans(volume); iScan++){
-            if(PolarVolume_indexOf(volume_mistnet, PolarVolume_getScan(volume, iScan)) == -1){
+            PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
+            if(PolarVolume_indexOf(volume_mistnet, scan) == -1){
                 if(printWarning) vol2bird_err_printf("Warning: Ignoring scan(s) not used as MistNet input: ");
                 vol2bird_err_printf( "%i ", iScan + 1);
                 printWarning = FALSE;
                 scanUse[iScan].useScan = FALSE;
             }
-        }        
+            RAVE_OBJECT_RELEASE(scan);
+        }
         if(!printWarning) vol2bird_err_printf( "...\n");
     }
 
     // convert polar volume into 3D tensor array
     double ***mistnetTensorInput3D = NULL;
     int nCartesianParam = polarVolumeTo3DTensor(volume_mistnet,&mistnetTensorInput3D,MISTNET_DIMENSION,MISTNET_RESOLUTION,3*alldata->options.mistNetNElevs);
+
     // flatten 3D tensor into a 1D array
     float *mistnetTensorInput;
     mistnetTensorInput = flatten3DTensor(mistnetTensorInput3D,3*alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION);
@@ -1039,7 +1075,6 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
     float *mistnetTensorOutput = (float *) malloc(mistnetTensorSize*sizeof(float));
 
     vol2bird_err_printf( "Running MistNet...");
-    int result = 0;
 
     result = run_mistnet(mistnetTensorInput, &mistnetTensorOutput, alldata->options.mistNetPath, mistnetTensorSize);
 
@@ -1054,12 +1089,13 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
         vol2bird_err_printf( "failed\n");
         return -1;
     }
-    
+
     vol2bird_err_printf( "done\n");
     // convert mistnet 1D array into a 4D tensor
     float ****mistnetTensorOutput4D = create4DTensor(mistnetTensorOutput,3,alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION);
     // add segmentation to polar volume
     addTensorToPolarVolume(volume_mistnet, mistnetTensorOutput4D,3,alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION,MISTNET_RESOLUTION);
+
     // add segmentation for scans that weren't input to the segmentation model to polar volume
     // note: all scans in 'volume_mistnet' are also contained in 'volume', i.e. its scan pointers point to the same objects
     addClassificationToPolarVolume(volume, mistnetTensorOutput4D,3,alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION,MISTNET_RESOLUTION);
@@ -1071,10 +1107,10 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
         free3DTensor(mistnetTensorInput3D,nCartesianParam,MISTNET_RESOLUTION);
         free4DTensor(mistnetTensorOutput4D, 3, alldata->options.mistNetNElevs, MISTNET_RESOLUTION);
     }
-    
+
     RAVE_OBJECT_RELEASE(volume_select);
     RAVE_OBJECT_RELEASE(volume_mistnet);
     
     return result;
 }   // segmentScansUsingMistnet
-//#endif
+#endif

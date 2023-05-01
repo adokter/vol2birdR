@@ -147,8 +147,8 @@ Radar *RSL_anyformat_to_radar(char *infile, ...)
 	va_end(ap);
 	radar = RSL_wsr88d_to_radar(infile, callid_or_file);
 	break;
-#ifdef NOT_USED	
   case      UF_FILE: radar = RSL_uf_to_radar(infile);     break;
+#ifdef NOT_USED
   case    TOGA_FILE: radar = RSL_toga_to_radar(infile);   break;
   case NSIG_FILE_V1: radar = RSL_nsig_to_radar(infile);	  break;
   case NSIG_FILE_V2: radar = RSL_nsig2_to_radar(infile);  break;

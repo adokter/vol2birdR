@@ -60,6 +60,15 @@ BEGIN_RCPP
     return R_NilValue;
 END_RCPP
 }
+// cpp_printMemory
+void cpp_printMemory();
+RcppExport SEXP _vol2birdR_cpp_printMemory() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    cpp_printMemory();
+    return R_NilValue;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_PolarVolume();
 RcppExport SEXP _rcpp_module_boot_RaveIO();
@@ -72,6 +81,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_vol2birdR_cpp_vol2bird_set_wsr88d_site_location", (DL_FUNC) &_vol2birdR_cpp_vol2bird_set_wsr88d_site_location, 1},
     {"_vol2birdR_cpp_vol2bird_get_wsr88d_site_location", (DL_FUNC) &_vol2birdR_cpp_vol2bird_get_wsr88d_site_location, 0},
     {"_vol2birdR_cpp_mistnet_init", (DL_FUNC) &_vol2birdR_cpp_mistnet_init, 1},
+    {"_vol2birdR_cpp_printMemory", (DL_FUNC) &_vol2birdR_cpp_printMemory, 0},
     {"_rcpp_module_boot_PolarVolume", (DL_FUNC) &_rcpp_module_boot_PolarVolume, 0},
     {"_rcpp_module_boot_RaveIO", (DL_FUNC) &_rcpp_module_boot_RaveIO, 0},
     {"_rcpp_module_boot_Vol2BirdConfig", (DL_FUNC) &_rcpp_module_boot_Vol2BirdConfig, 0},

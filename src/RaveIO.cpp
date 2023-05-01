@@ -93,6 +93,7 @@ private:
   vol2bird_t _alldata;
   void initialize_config(vol2bird_t *alldata) {
     strcpy(alldata->misc.filename_pvol, "");
+    strcpy(alldata->misc.filename_vp, "");
     alldata->options.elevMin = 0.0;
     alldata->options.elevMax = 90.0;
     strcpy(alldata->options.dbzType, "DBZH");
@@ -138,6 +139,7 @@ private:
     alldata->options.resampleNbins = 100;
     alldata->options.resampleNrays = 360;
     alldata->options.mistNetNElevs = 5;
+    memset(alldata->options.mistNetElevs, 0, sizeof(float)*100);
     alldata->options.mistNetElevs[0] = 0.5;
     alldata->options.mistNetElevs[1] = 1.5;
     alldata->options.mistNetElevs[2] = 2.5;
@@ -188,6 +190,7 @@ public:
   Vol2BirdConfig(const Vol2BirdConfig& other) {
     initialize_config(&_alldata);
     strcpy(_alldata.misc.filename_pvol, other._alldata.misc.filename_pvol);
+    strcpy(_alldata.misc.filename_vp, other._alldata.misc.filename_vp);
     _alldata.options.elevMin = other._alldata.options.elevMin;
     _alldata.options.elevMax = other._alldata.options.elevMax;
     strcpy(_alldata.options.dbzType, other._alldata.options.dbzType);
@@ -233,6 +236,7 @@ public:
     _alldata.options.resampleNbins = other._alldata.options.resampleNbins;
     _alldata.options.resampleNrays = other._alldata.options.resampleNrays;
     _alldata.options.mistNetNElevs = other._alldata.options.mistNetNElevs;
+    memcpy(_alldata.options.mistNetElevs, other._alldata.options.mistNetElevs, sizeof(float)*100);
     _alldata.options.mistNetElevs[0] = other._alldata.options.mistNetElevs[0];
     _alldata.options.mistNetElevs[1] = other._alldata.options.mistNetElevs[1];
     _alldata.options.mistNetElevs[2] = other._alldata.options.mistNetElevs[2];
@@ -760,6 +764,31 @@ public:
     _verbose = verbose;
   }
 
+  PolarVolume load_volume(StringVector& files)
+  {
+    PolarVolume_t *volume = NULL;
+    PolarVolume result;
+    char *fileIn[INPUTFILESMAX];
+    int initSuccessful = 0;
+
+    if (files.size() == 0) {
+      throw std::invalid_argument("Must specify at least one input filename");
+    }
+    for (int i = 0; i < files.size(); i++) {
+      fileIn[i] = (char*) files(i);
+    }
+
+    volume = vol2birdGetVolume(fileIn, files.size(), 1000000, 1);
+    if (volume == NULL) {
+      throw std::runtime_error("Could not read file(s)");
+    }
+
+    result = PolarVolume(volume);
+
+    return result;
+
+  }
+
   void process(StringVector &files, Vol2BirdConfig &config, std::string vpOutName, std::string volOutName) {
     PolarVolume_t *volume = NULL;
     char *fileIn[INPUTFILESMAX];
@@ -838,16 +867,29 @@ public:
       profileAll = vol2birdGetProfile(3, config.alldata());
 
       int iRowProfile;
-      int iCopied = 0;
 
       for (iRowProfile = 0; iRowProfile < nRowsProfile; iRowProfile++) {
-        iCopied = iRowProfile * nColsProfile;
-        Rprintf("%8s %.4s ", date, time);
-        Rprintf("%4.f %6.2f %6.2f %7.2f %5.2f %5.1f %6.2f %1c %6.2f %6.1f %6.2f %6.2f %5.f %5.f %5.f %5.f\n", profileBio[0 + iCopied],
-            nanify(profileBio[2 + iCopied]), nanify(profileBio[3 + iCopied]), nanify(profileBio[4 + iCopied]), nanify(profileBio[5 + iCopied]),
-            nanify(profileBio[6 + iCopied]), nanify(profileAll[7 + iCopied]), profileBio[8 + iCopied] == TRUE ? 'T' : 'F', nanify(profileBio[9 + iCopied]),
-            nanify(profileBio[11 + iCopied]), nanify(profileBio[12 + iCopied]), nanify(profileAll[9 + iCopied]), nanify(profileBio[10 + iCopied]),
-            nanify(profileBio[13 + iCopied]), nanify(profileAll[10 + iCopied]), nanify(profileAll[13 + iCopied]));
+        char printbuffer[1024];
+        int iCopied = iRowProfile * nColsProfile;
+        float HGHT = profileBio[0 + iCopied];
+        float u = profileBio[2 + iCopied];
+        float v = profileBio[3 + iCopied];
+        float w = profileBio[4 + iCopied];
+        float ff = profileBio[5 + iCopied];
+        float dd = profileBio[6 + iCopied];
+        float sd_vvp = profileAll[7 + iCopied];
+        char gap = profileBio[8 + iCopied] == TRUE ? 'T' : 'F';
+        float dbz = profileBio[9 + iCopied];
+        float eta = profileBio[11 + iCopied];
+        float dens = profileBio[12 + iCopied];
+        float DBZH = profileAll[9 + iCopied];
+        float n = profileBio[10 + iCopied];
+        float n_dbz = profileBio[13 + iCopied];
+        float n_all = profileAll[10 + iCopied];
+        float n_dbz_all = profileAll[13 + iCopied];
+
+        create_profile_printout_str(printbuffer, 1024, date, time, HGHT, u, v, w, ff, dd, sd_vvp, gap, dbz, eta, dens, DBZH, n, n_dbz, n_all, n_dbz_all);
+        Rprintf("%s\n", printbuffer);
       }
 
       profileAll = NULL;
@@ -1026,6 +1068,7 @@ RCPP_MODULE(Vol2Bird) {
   .constructor("Constructor")
   .method("process", &Vol2Bird::process, "Processes the volume/scans")
   .method("rsl2odim", &Vol2Bird::rsl2odim, "Converts the file into odim format")
+  .method("load_volume", &Vol2Bird::load_volume, "Loads a volume")
   .property("verbose", &Vol2Bird::isVerbose, &Vol2Bird::setVerbose, "If processing should be verbose or not")
   ;
 }

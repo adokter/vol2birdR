@@ -19,7 +19,7 @@ files containing a single scan/sweep. The file data format should be either 1)
 \href{https://github.com/adokter/vol2bird/blob/master/doc/OPERA2014_O4_ODIM_H5-v2.2.pdf}{ODIM}
 format, which is the implementation of the OPERA data information model in
 the \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, 2) NEXRAD format
-supported by the \href{https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{RSL library} or 3) Vaisala
+supported by the \href{https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{'RSL' library} or 3) Vaisala
 IRIS (IRIS RAW) format.}
 
 \item{config}{optional configuration object of class \code{Rcpp_Vol2BirdConfig},
@@ -27,7 +27,7 @@ typically output from \link{vol2bird_config}}
 
 \item{pvolfile_out}{Character. File name. When provided, writes a polar
 volume (\code{pvol}) file in the ODIM HDF5 format to disk. Useful for converting
-RSL formats to ODIM, and for adding MistNet segmentation output.}
+'RSL' formats to ODIM, and for adding 'MistNet' segmentation output.}
 
 \item{verbose}{logical. When TRUE print profile output to console.}
 

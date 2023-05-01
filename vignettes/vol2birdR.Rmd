@@ -86,7 +86,7 @@ dir.create("/opt/vol2bird/etc", recursive=TRUE)
 install_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
 ```
 
-### Using MisNet
+### Using MistNet
 After installing the MistNet libraries and model file, a profile can be calculated as follows:
 ```
 # define configuration object:

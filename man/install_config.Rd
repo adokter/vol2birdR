@@ -3,14 +3,14 @@
 \docType{data}
 \name{install_config}
 \alias{install_config}
-\title{Contains a list of mistnet libraries for the various OS's}
+\title{Contains a list of 'MistNet' libraries for the various OS's}
 \format{
-An object of class \code{list} of length 1.
+An object of class \code{list} of length 2.
 }
 \usage{
 install_config
 }
 \description{
-Contains a list of mistnet libraries for the various OS's
+Contains a list of 'MistNet' libraries for the various OS's
 }
 \keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/vol2bird_config.R
 \name{vol2bird_config}
 \alias{vol2bird_config}
-\title{Create a vol2bird configuration instance}
+\title{Create a 'vol2bird' configuration instance}
 \usage{
 vol2bird_config(config)
 }
@@ -13,7 +13,7 @@ vol2bird_config(config)
 an object of class \code{Rcpp_Vol2BirdConfig}
 }
 \description{
-Creates or copies a vol2bird configuration instance of class \code{Rcpp_Vol2BirdConfig}
+Creates or copies a 'vol2bird' configuration instance of class \code{Rcpp_Vol2BirdConfig}
 }
 \details{
 \subsection{Copying configuration instances}{
@@ -38,7 +38,7 @@ extra_config<-vol2bird_config(config)
 
 \subsection{User configuration options}{
 
-The \code{Rcpp_Vol2BirdConfig} class object sets the following vol2bird processing options:
+The \code{Rcpp_Vol2BirdConfig} class object sets the following 'vol2bird' processing options:
 \itemize{
 \item \code{azimMax}: Numeric. The minimum azimuth (0-360 degrees) used for constructing the bird density profile
 \item \code{azimMin}: Numeric. The maximum azimuth (0-360 degrees) used for constructing the bird density profile
@@ -51,7 +51,7 @@ this threshold will be considered clutter-contaminated. Default 0.1
 \item \code{elevMax}: Numeric. The minimum scan elevation in degrees used for constructing the bird density profile
 \item \code{elevMin}: Numeric. The maximum scan elevation in degrees used for constructing the bird density profile
 \item \code{layerThickness}: Numeric. The width/thickness of an altitude layer in m. Default 200
-\item \code{mistNetPath}: Character. Path of mistnet segmentation model in pytorch (.pt) format
+\item \code{mistNetPath}: Character. Path of 'MistNet' segmentation model in pytorch (.pt) format
 \item \code{nLayers}: Integer. The number of layers in an altitude profile. Default 25
 \item \code{radarWavelength}: Numeric. The radar wavelength in cm to assume when unavailable as an attribute in the input file. Default 5.3
 \item \code{rangeMax}: Numeric. The maximum range in m used for constructing the bird density profile. Default 35000
@@ -60,7 +60,7 @@ this threshold will be considered clutter-contaminated. Default 0.1
 \item \code{singlePol}: Logical. Whether to use single-pol moments for filtering meteorological echoes. Default \code{TRUE}
 \item \code{stdDevMinBird}: Numeric. VVP Radial velocity standard deviation threshold. Default 2 m/s.
 \item \code{useClutterMap}: Logical. Whether to use a static clutter map. Default \code{FALSE}
-\item \code{useMistNet}: Logical. Whether to use the MistNet segmentation model. Default \code{FALSE}.
+\item \code{useMistNet}: Logical. Whether to use the 'MistNet' segmentation model. Default \code{FALSE}.
 }
 }
 
@@ -79,8 +79,8 @@ vrad (aka the texture) is less than cellStdDevMax are considered in the rest of 
 \item \code{fitVrad}: Logical. Whether or not to fit a model to the observed vrad. Default \code{TRUE}
 \item \code{maxNyquistDealias}: Numeric. When all scans have nyquist velocity higher than this value, dealiasing is suppressed. Default 25 m/s.
 \item \code{minNyquist}: Numeric. Scans with Nyquist velocity lower than this value are excluded. Default 5 m/s.
-\item \code{mistNetElevs}: Numeric vector of length 5. Elevations to use in Cartesian projection for MistNet. Default \code{c(0.5, 1.5, 2.5, 3.5, 4.5)}
-\item \code{mistNetElevsOnly}: Logical. When \code{TRUE} (default), use only the specified elevation scans for mistnet to calculate profile, otherwise use all available elevation scans
+\item \code{mistNetElevs}: Numeric vector of length 5. Elevations to use in Cartesian projection for 'MistNet'. Default \code{c(0.5, 1.5, 2.5, 3.5, 4.5)}
+\item \code{mistNetElevsOnly}: Logical. When \code{TRUE} (default), use only the specified elevation scans for 'MistNet' to calculate profile, otherwise use all available elevation scans
 \item \code{requireVrad}: Logical. For a range gate to contribute it should have a valid radial velocity. Default \code{FALSE}
 \item \code{resample}: Logical. Whether to resample the input polar volume. Downsampling speeds up the calculation. Default \code{FALSE}
 \item \code{resampleNbins}: Numeric. Resampled number of range bins. Ignored when \code{resample} is \code{FALSE}. Default 100

@@ -2,10 +2,10 @@
 % Please edit documentation in R/install.R
 \name{install_mistnet_from_file}
 \alias{install_mistnet_from_file}
-\title{Install MistNet libraries from files}
+\title{Install 'MistNet' libraries from files}
 \usage{
 install_mistnet_from_file(
-  version = "1.10.2",
+  version = "1.12.1",
   libtorch,
   libmistnet,
   mistnet_model = NULL,
@@ -13,24 +13,24 @@ install_mistnet_from_file(
 )
 }
 \arguments{
-\item{version}{The Torch version to install.}
+\item{version}{The 'Torch' version to install.}
 
-\item{libtorch}{The installation archive file to use for Torch. Shall be a \code{"file://"} URL scheme.}
+\item{libtorch}{The installation archive file to use for 'Torch'. Shall be a \code{"file://"} URL scheme.}
 
-\item{libmistnet}{The installation archive file to use for MistNet. Shall be a \code{"file://"} URL scheme.}
+\item{libmistnet}{The installation archive file to use for 'MistNet'. Shall be a \code{"file://"} URL scheme.}
 
 \item{mistnet_model}{The installation archive file to use for the model. Shall be a \code{"file://"} URL scheme. Is optional!}
 
 \item{...}{other parameters to be passed to \code{install_torch()}}
 }
 \description{
-Installs Torch and MistNet dependencies from files.
+Installs 'Torch' and 'MistNet' dependencies from files.
 }
 \details{
 When \code{\link[=install_mistnet]{install_mistnet()}} initiated download is not possible, but installation archive files are
 present on local filesystem, \code{\link[=install_mistnet_from_file]{install_mistnet_from_file()}} can be used as a workaround to installation issues.
-\code{"libtorch"} is the archive containing all torch modules, and \code{"libmistnet"} is the C interface to libtorch
-that is used for the R package. Both are highly platform dependent, and should be checked through \code{\link[=get_install_urls]{get_install_urls()}}
+\code{"libtorch"} is the archive containing all 'Torch' modules, and \code{"libmistnet"} is the 'C' interface to 'libtorch'
+that is used for the 'R' package. Both are highly platform dependent, and should be checked through \code{\link[=get_install_urls]{get_install_urls()}}
 
 \if{html}{\out{<div class="sourceCode R">}}\preformatted{> get_install_urls()
 $libtorch

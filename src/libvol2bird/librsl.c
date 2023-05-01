@@ -7,6 +7,7 @@
 #ifdef RSL
 
 #include "rsl.h"
+#include <string.h>
 #include <libgen.h>
 #include "polarvolume.h"
 #include "polarscan.h"
@@ -303,9 +304,13 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     else{    
         PolarScan_addAttribute(scan, attr_NI);
     }
+    RAVE_OBJECT_RELEASE(attr_NI);
 
     // add range scale Atribute to scan
     rscale = rslRay->h.gate_size;
+    if(ABS(rscale - (RSL_get_first_ray_of_volume(rslVol)->h.gate_size))>0.0001){
+        vol2bird_err_printf("DEBUG warning: scan %i has different range resolution (%i) than first scan of volume (%i)\n", iScan, ROUND(rscale), ROUND(RSL_get_first_ray_of_volume(rslVol)->h.gate_size));
+    }    
     PolarScan_setRscale(scan, rscale);
     
     // loop through the volume pointers
@@ -339,13 +344,12 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
                 vol2bird_err_printf("PolarScan_RSL2Rave failed to add parameter %i to RAVE polar scan\n",iParam);
                 RAVE_OBJECT_RELEASE(param_proj);
             }
- 
-            RAVE_OBJECT_RELEASE(param);
         }
-        
+        RAVE_OBJECT_RELEASE(param);
     }
 
     done:
+        RAVE_OBJECT_RELEASE(param);
         return scan;
 }
 
@@ -436,6 +440,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     else{    
         PolarVolume_addAttribute(volume, attr_vcp);
     }
+    RAVE_OBJECT_RELEASE(attr_vcp);
 
     // third, copy metadata stored in ray header; assume attributes of first ray applies to entire volume
     float wavelength = rslRay->h.wavelength*100;
@@ -446,6 +451,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
     else{    
         PolarVolume_addAttribute(volume, attr_wavelength);
     }
+    RAVE_OBJECT_RELEASE(attr_wavelength);
         
     // read the RSL scans (sweeps) and add them to RAVE polar volume
     int result;
@@ -456,6 +462,7 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
         if(result == 0){
            vol2bird_err_printf("PolarVolume_RSL2Rave failed to add RSL scan %i to RAVE polar volume\n",iScan);
         }
+        RAVE_OBJECT_RELEASE(scan);
     }
    
     free(pvsource);

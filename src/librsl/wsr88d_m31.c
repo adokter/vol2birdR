@@ -381,7 +381,7 @@ void wsr88d_load_ray_into_radar(Wsr88d_ray_m31 *wsr88d_ray, int isweep,
     int *field_offset;
     int ifield, nfields;
     int iray;
-    const nconstblocks = 3;
+    const short nconstblocks = 3;
 
     Data_moment_hdr data_hdr;
     int ngates, do_swap;
@@ -643,6 +643,10 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
         }
         RSL_printf( "Current sweep index: %d\n"
             "Last ray read: %d\n", isweep, prev_raynum);
+        // FIX for vol2birdR segfaults:
+        RSL_free_radar(radar);
+        return(NULL);
+        // END FIX
         wsr88d_load_sweep_header(radar, isweep);
 
         return radar;
@@ -666,6 +670,10 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
         }
         RSL_printf( "Current sweep index: %d\n"
             "Last ray read: %d\n", isweep, prev_raynum);
+        // FIX for vol2birdR segfaults:
+        RSL_free_radar(radar);
+        return(NULL);
+        // END FIX
         wsr88d_load_sweep_header(radar, isweep);
 
         end_of_vos = 1;

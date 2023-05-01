@@ -2,10 +2,10 @@
 % Please edit documentation in R/install.R
 \name{install_mistnet}
 \alias{install_mistnet}
-\title{Install MistNet libraries}
+\title{Install 'MistNet' libraries}
 \usage{
 install_mistnet(
-  version = "1.10.2",
+  version = "1.12.1",
   reinstall = FALSE,
   path = install_path(),
   timeout = 360,
@@ -13,9 +13,9 @@ install_mistnet(
 )
 }
 \arguments{
-\item{version}{The libtorch version to install.}
+\item{version}{The 'libtorch' version to install.}
 
-\item{reinstall}{Re-install MistNet even if its already installed?}
+\item{reinstall}{Re-install 'MistNet' even if its already installed?}
 
 \item{path}{Optional path to install or check for an already existing installation.}
 
@@ -24,16 +24,16 @@ install_mistnet(
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
 }
 \description{
-Installs libraries and dependencies for using MistNet.
+Installs libraries and dependencies for using 'MistNet'.
 }
 \details{
-By default libraries are installed in the vol2birdR package directory.
+By default libraries are installed in the 'vol2birdR' package directory.
 
 When using \code{path} to install in a specific location, make sure the \code{MISTNET_HOME} environment
 variable is set to this same path to reuse this installation.
 
 The \code{TORCH_INSTALL} environment
-variable can be set to \code{0} to prevent auto-installing torch and \code{TORCH_LOAD} set to \code{0}
+variable can be set to \code{0} to prevent auto-installing 'Torch and \code{TORCH_LOAD} set to \code{0}
 to avoid loading dependencies automatically. These environment variables are meant for advanced use
 cases and troubleshooting only.
 

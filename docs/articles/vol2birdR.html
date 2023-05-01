@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9913</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.9919</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -115,8 +115,8 @@ using:</p>
 <pre><code><span><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">config_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vol2bird_config.html">vol2bird_config</a></span><span class="op">(</span><span class="va">config</span><span class="op">)</span></span></code></pre>
 <p>Finally, the vertical profile can be calculated using function
-<code><a href="../reference/vol2bird.html">vol2bird()</a></code>:</p>
-<pre><code><span><span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>,config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></span></code></pre>
+<code>vol2bird()</code>:</p>
+<pre><code><span><span class="fu">vol2bird</span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>,config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></span></code></pre>
 <p>The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format,
 or NEXRAD format. The output vpfile containing the profile will be in
 ODIM HDF5 format.</p>
@@ -167,7 +167,7 @@ follows:</p>
 <span><span class="fu"><a href="../reference/install_mistnet_model.html">install_mistnet_model</a></span><span class="op">(</span>path<span class="op">=</span><span class="st">"/opt/vol2bird/etc/mistnet_nexrad.pt"</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="using-misnet">Using MisNet<a class="anchor" aria-label="anchor" href="#using-misnet"></a>
+<h3 id="using-mistnet">Using MistNet<a class="anchor" aria-label="anchor" href="#using-mistnet"></a>
 </h3>
 <p>After installing the MistNet libraries and model file, a profile can
 be calculated as follows:</p>
@@ -178,7 +178,7 @@ be calculated as follows:</p>
 <span><span class="va">config</span><span class="op">$</span><span class="va">useMistNet</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span></span>
 <span><span class="co"># calculate the profile:</span></span>
-<span><span class="fu"><a href="../reference/vol2bird.html">vol2bird</a></span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>, config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></span></code></pre>
+<span><span class="fu">vol2bird</span><span class="op">(</span>file<span class="op">=</span><span class="st">"/your/input/pvolfile"</span>, config<span class="op">=</span><span class="va">config</span>, vpfile<span class="op">=</span><span class="st">"/your/output/vpfile"</span><span class="op">)</span></span></code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

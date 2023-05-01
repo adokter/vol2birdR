@@ -2,14 +2,14 @@
 % Please edit documentation in R/install.R
 \name{install_mistnet_model}
 \alias{install_mistnet_model}
-\title{Install MistNet model file}
+\title{Install 'MistNet' model file}
 \usage{
 install_mistnet_model(
   reinstall = FALSE,
   path = file.path(torch_install_path(), "data", "mistnet_nexrad.pt"),
   timeout = 1800,
   from_url = "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt",
-  method = "curl",
+  method = "libcurl",
   ...
 )
 }
@@ -20,23 +20,23 @@ install_mistnet_model(
 
 \item{timeout}{Optional timeout in seconds for large file download.}
 
-\item{from_url}{From where the mistnet model file should be downloaded.}
+\item{from_url}{From where the 'MistNet' model file should be downloaded.}
 
 \item{method}{The download method to use, see \link[utils]{download.file}}
 
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
 }
 \description{
-Installs the PyTorch mistnet model file
+Installs the 'PyTorch' 'MistNet' model file
 }
 \details{
-Download and install the mistnet model file. By default the library is downloaded to
-data/mistnet_nexrad.pt in the vol2birdR package directory.
+Download and install the 'MistNet' model file. By default the library is downloaded to
+data/mistnet_nexrad.pt in the 'vol2birdR' package directory.
 
 Alternatively, the model file can be downloaded to a different location, which has the
-advantage that it doesn't have to be redownloaded after a reinstall of vol2birdR.
+advantage that it doesn't have to be redownloaded after a reinstall of 'vol2birdR'.
 
-vol2birdR will automatically detect the model file if it is downloaded to
+'vol2birdR' will automatically detect the model file if it is downloaded to
 \verb{/opt/vol2bird/etc/mistnet_nexrad.pt}, which can be done as follows
 
 \if{html}{\out{<div class="sourceCode R">}}\preformatted{download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")

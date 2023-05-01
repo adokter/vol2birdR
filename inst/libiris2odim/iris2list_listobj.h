@@ -28,7 +28,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 #define IRIS2LIST_LISTOBJ_H
 #include <time.h>
 #include "iris2list_sigmet.h"
-#include "dlist.h"
+#include "irisdlist.h"
 
 // define structure ray_attributes and type ra_s
 typedef struct ray_attributes {
@@ -44,7 +44,7 @@ typedef struct ray_attributes {
 typedef struct file_element {
   phd_s *product_header_p;  // pointer to a product header structure
   ihd_s *ingest_header_p;   // pointer to an ingest header structure
-  DList *sweep_list_p; // pointer to a doubly-linked list of sweep_element structures
+  IrisDList_t *sweep_list_p; // pointer to a doubly-linked list of sweep_element structures
 } file_element_s;
 
   
@@ -74,7 +74,7 @@ typedef struct ray {
 
 //define sweep_element structure and type sweep_element_s
 typedef struct sweep_element {
-  DList *types_list_p; // pointer to a doubly-linked list of data types recorded (structures that include ray data)
+  IrisDList_t *types_list_p; // pointer to a doubly-linked list of data types recorded (structures that include ray data)
 } sweep_element_s;
 
 // define structure 'IRISbuf' and type 'IRISbuf'
@@ -97,7 +97,7 @@ typedef struct rayplus {
 //define 'datatype_element' structure and type 'datatype_element_s'
 typedef struct datatype_element {
   idh_s *ingest_data_header_p; // pointer to a single 'ingest data header structure'
-  DList *ray_list_p;          // pointer to a doubly-linked list of rays (of one datatype, from one sweep)
+  IrisDList_t *ray_list_p;          // pointer to a doubly-linked list of rays (of one datatype, from one sweep)
 } datatype_element_s;
 
 // define structure 'my_timeval' and type 'mtv_s'

@@ -246,6 +246,11 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
   while (go) {
     ssize_t i = read(fdin, clength, 4);
     if (i != 4) {
+      if (i > 0) {
+        RSL_printf("RSL: Short block length\n");
+      } else {
+        RSL_printf("RSL: Can't read file identifier string\n");
+      }
       goto done;
     }
 
@@ -259,9 +264,7 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
       if (i != 20) {
         RSL_printf("Missing header\n");
         goto done;
-        //exit(1);
       }
-
       if (stid[0] != 0)
         memcpy(block + 20, stid, 4);
       lseek(fdout, 0, SEEK_SET);
@@ -276,7 +279,6 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
     /*
      * Otherwise, this is a compressed block.
      */
-
     int length = 0;
     for (i = 0; i < 4; i++)
       length = (length << 8) + (unsigned char) clength[i];
@@ -303,6 +305,7 @@ int uncompressAr2v(FILE* fpin, FILE* fpout) {
       RSL_printf("Short block read!\n");
       goto done;
     }
+
     if (length > 10) {
       int error;
 tryagain:
@@ -322,6 +325,7 @@ tryagain:
           }
           goto tryagain;
         }
+
         RSL_printf( "decompress error - %d\n", error);
         goto done;
       }
@@ -410,7 +414,10 @@ Wsr88d_file *wsr88d_open(char *filename)
     wf->fptr = fopen(filename, "rb");
   }
 
-  if (wf->fptr == NULL) return NULL;
+  if (wf->fptr == NULL) {
+    free(wf);
+    return NULL;
+  }
 
   // first check how the data are compressed by reading first few of magic bytes
   char hdrplus4[28];
@@ -441,7 +448,11 @@ Wsr88d_file *wsr88d_open(char *filename)
 
   // decompress
   if(ar2v6bzip){
-     wf->fptr = uncompress_pipe_ar2v(wf->fptr);
+    wf->fptr = uncompress_pipe_ar2v(wf->fptr);
+    if (wf->fptr == NULL) {
+      free(wf);
+      return NULL;
+    }
   }
   else{
      wf->fptr = uncompress_pipe(wf->fptr);
