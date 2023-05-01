@@ -908,9 +908,9 @@ public:
     if (!vpOutName.empty()) {
 
       if (isCSV(vpOutName.c_str())) {
-          result = writeCSV(vpOutName.c_str(), config.alldata(), volume);
+          int result = writeCSV(vpOutName.c_str(), config.alldata(), volume);
       } else {
-          result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
+          int result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
       }
       
       if (result == FALSE) {
