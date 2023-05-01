@@ -906,7 +906,13 @@ public:
     mapDataToRave(volume, config.alldata());
 
     if (!vpOutName.empty()) {
-      int result = saveToODIM((RaveCoreObject*) config.alldata()->vp, vpOutName.c_str());
+
+      if (isCSV(vpOutName.c_str())) {
+          result = writeCSV(vpOutName.c_str(), config.alldata(), volume);
+      } else {
+          result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
+      }
+      
       if (result == FALSE) {
         RAVE_OBJECT_RELEASE(volume);
         throw std::runtime_error(std::string("Can not write : ") + vpOutName);
