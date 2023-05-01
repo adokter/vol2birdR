@@ -647,6 +647,7 @@ ac_includes_default="\
 ac_header_c_list=
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+ENABLE_IRIS2ODIM
 HDF5_API_VERS_USE
 VOL2BIRD_LIBS
 VOL2BIRD_CPPFLAGS
@@ -4665,6 +4666,21 @@ VOL2BIRD_CPPFLAGS="$PKG_CPPFLAGS $PROJ_CFLAGS $VOL2BIRD_CPPFLAGS"
 
 echo "VOL2BIRD_CPPFLAGS=$VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_LIBS=$VOL2BIRD_LIBS"
+
+
+ENABLE_IRIS2ODIM=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if iris2odim support can be enabled" >&5
+printf %s "checking if iris2odim support can be enabled... " >&6; }
+if [ -f src/libiris2odim/iris2odim.c -a -f src/includes/libiris2odim/iris2odim.h ]; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+  ENABLE_IRIS2ODIM=yes
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+fi
+
+
 
 
 

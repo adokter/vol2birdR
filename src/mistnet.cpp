@@ -63,13 +63,18 @@ void RSL_Rprintf(const char* msg) {
   Rprintf("%s", msg);
 }
 
+#ifdef ENABLE_IRIS2ODIM
 void IRIS2ODIM_Rprintf(const char* msg) {
   Rprintf("%s", msg);
 }
+#endif
 
 extern "C" {
 void RSL_set_printfun(void(*printfun)(const char*));
+
+#ifdef ENABLE_IRIS2ODIM
 void Iris_set_printf(void(*printfun)(const char*));
+#endif
 }
 
 //' Initializes the vol2birdR library
@@ -81,7 +86,9 @@ void cpp_vol2bird_initialize() {
   HL_init();
   vol2bird_set_printf(Vol2Bird_Rprintf);
   vol2bird_set_err_printf(Vol2Bird_Rprintf);
+#ifdef ENABLE_IRIS2ODIM  
   Iris_set_printf(IRIS2ODIM_Rprintf);
+#endif  
   RSL_set_printfun(RSL_Rprintf);
 }
 

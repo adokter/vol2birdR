@@ -1,18 +1,27 @@
 $(info The name of the shared library to be created is: $(SHLIB))
 
-SOURCES = $(wildcard ./*.cpp )
+ENABLE_IRIS2ODIM=@ENABLE_IRIS2ODIM@
 
-SOURCES_C = $(wildcard ./libvol2bird/*.c ./librave/*.c ./libhlhdf/*.c ./librsl/*.c ./libiris2odim/*.c)
+SOURCES= $(wildcard ./*.cpp )
 
-OBJECTS_C = $(SOURCES_C:.c=.o)
+SOURCES_C= $(wildcard ./libvol2bird/*.c ./librave/*.c ./libhlhdf/*.c ./librsl/*.c)
 
-OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
+ifeq ($(ENABLE_IRIS2ODIM), yes)
+  SOURCES_C+= $(wildcard ./libiris2odim/*.c)
+endif
 
-PKG_LIBS=@VOL2BIRD_LIBS@
+OBJECTS_C= $(SOURCES_C:.c=.o)
+
+OBJECTS= $(SOURCES:.cpp=.o) $(OBJECTS_C)
+
+PKG_LIBS= @VOL2BIRD_LIBS@
 PKG_CPPFLAGS= @VOL2BIRD_CPPFLAGS@ @HDF5_API_VERS_USE@
 
 #
-PKG_CPPFLAGS+= -I. -I./includes -I./includes/libvol2bird -I./includes/libmistnet -I./includes/librave -I./includes/libhlhdf -I./includes/librsl -I./includes/libiris2odim 
+PKG_CPPFLAGS+= -I. -I./includes -I./includes/libvol2bird -I./includes/libmistnet -I./includes/librave -I./includes/libhlhdf -I./includes/librsl 
+ifeq ($(ENABLE_IRIS2ODIM), yes)
+  PKG_CPPFLAGS+= -I./includes/libiris2odim
+endif
 
 # VOL2BIRD flags
 PKG_CPPFLAGS+= -DNOCONFUSE -DMISTNET -DVOL2BIRD_R -DNO_VOL2BIRD_PRINTF 
@@ -27,7 +36,9 @@ PKG_CPPFLAGS+= -DNO_RAVE_PRINTF -DNO_RAVE_ABORT
 PKG_CPPFLAGS+= -DNO_UNZIP_PIPE -DRSL_NO_STDERR_PRINTF -DRSL=1  
 
 # IRIS flags
-PKG_CPPFLAGS+= -DIRIS_NO_EXIT_OR_STDERR -DIRIS=1
+ifeq ($(ENABLE_IRIS2ODIM), yes)
+  PKG_CPPFLAGS+= -DIRIS_NO_EXIT_OR_STDERR -DIRIS=1 -DENABLE_IRIS2ODIM
+endif
 
 # RCPP
 PKG_CPPFLAGS+= $(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::CFlags()")
