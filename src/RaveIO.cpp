@@ -907,10 +907,12 @@ public:
 
     if (!vpOutName.empty()) {
 
+      int result;
+
       if (isCSV(vpOutName.c_str())) {
-          int result = writeCSV(vpOutName.c_str(), config.alldata(), volume);
+          result = writeCSV(vpOutName.c_str(), config.alldata(), volume);
       } else {
-          int result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
+          result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
       }
       
       if (result == FALSE) {
