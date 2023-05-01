@@ -1,6 +1,4 @@
-## vol2birdR 0.1.1
-This version is the initial release of this package. This submission fixes two minor problems after initial CRAN review:
-
-* omit "+ file LICENSE" in description and remove file LICENSE
-* change http --> https in links and add trailing slashes
-* bugfix of the download_mistnet_model() function that affects Windows machines
+# vol2birdR 0.2.2
+* New macros for locating system libraries, removing hdf5r and proj4 configure scripts.
+* Fixes for valgrind additional warnings
+* Adding information on contributors and copyright holders to DESCRIPTION file, using comments

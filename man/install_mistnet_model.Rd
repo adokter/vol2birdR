@@ -26,8 +26,11 @@ install_mistnet_model(
 
 \item{...}{other optional arguments (like \code{`load`} for manual installation).}
 }
+\value{
+No value returned, this function downloads a file
+}
 \description{
-Installs the 'PyTorch' 'MistNet' model file
+Installs the 'MistNet' model file in 'PyTorch' format
 }
 \details{
 Download and install the 'MistNet' model file. By default the library is downloaded to
@@ -39,6 +42,12 @@ advantage that it doesn't have to be redownloaded after a reinstall of 'vol2bird
 'vol2birdR' will automatically detect the model file if it is downloaded to
 \verb{/opt/vol2bird/etc/mistnet_nexrad.pt}, which can be done as follows
 
-\if{html}{\out{<div class="sourceCode R">}}\preformatted{download_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{install_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
 }\if{html}{\out{</div>}}
+}
+\examples{
+\donttest{
+install_mistnet_model()
+}
+
 }

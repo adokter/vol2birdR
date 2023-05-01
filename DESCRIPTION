@@ -1,17 +1,32 @@
 Package: vol2birdR
 Type: Package
 Title: Vertical Profiles of Biological Signals in Weather Radar Data
-Version: 0.1.1.9923
-Date: 2022-11-08
+Version: 0.2.2
+Date: 2022-11-22
 Authors@R: c(
-    person("Anders", "Henja", email = "anders.henja@gmail.com", role = "aut"),
-    person("Adriaan M.", "Dokter", email = "amd427@cornell.edu",
-           role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6573-066X")),
+    person("Anders", "Henja", email = "anders.henja@gmail.com", role = "aut",
+    comment = "vol2birdR package author and author of RAVE and HLHDF libraries"),
+    person("Adriaan M.", "Dokter", email = "amd427@cornell.edu", role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0001-6573-066X")),
+    person("Bart", "Kranstauber", role = "ctb", email = "b.kranstauber@uva.nl",
+    comment = c(ORCID = "0000-0001-8303-780X")),
+    person("Jurriaan H.", "Spaaks", role = "ctb", comment = "contributor to vol2bird library"),
+    person("Lourens", "Veen", role = "ctb", comment = "contributor to vol2bird library"),
+    person("Iwan", "Holleman", role = "ctb", comment = "contributor to vol2bird library"),
+    person("Hidde", "Leijnse", role = "ctb", comment = "contributor to vol2bird library"),
+    person("John H.", "Merritt", role = c("ctb","cph"), comment = "author of RSL library"),
+    person("Bart", "Kelley", role = "ctb", comment = "contributor and  maintainer of RSL library"),
+    person("Mark", "Couture", role = "ctb", comment = "author of iris2odim add-on to RAVE library"),
+    person("Daniel", "Falbel", role = "ctb", comment = "Original idea on how to build with torch support"),
+    person("Swedish Meteorological and Hydrological Institute, SMHI", role = "cph",
+    comment = "copyright holder of HLHDF and RAVE libraries"),
+    person("The Crown (i.e. Her Majesty the Queen in Right of Canada)", role = "cph",
+    comment = "copyright holder of iris2odim add-on to RAVE library"),
     person("GloBAM", role = "fnd", comment = "https://globam.science")
   )
 Description: 'R' implementation of the 'vol2bird' software for generating vertical profiles
-    of birds and other biological signals in weather radar data. See <doi:10.1098/rsif.2010.0116>
-    for a paper describing the methodology.
+    of birds and other biological signals in weather radar data. See Dokter et al.
+    (2011) <doi:10.1098/rsif.2010.0116> for a paper describing the methodology.
 License: LGPL (>= 3)
 URL: https://github.com/adokter/vol2birdR/, https://adriaandokter.com/vol2bird/
 BugReports: https://github.com/adokter/vol2birdR/issues
@@ -20,7 +35,6 @@ Imports:
     methods,
     pkgbuild,
     Rcpp (>= 1.0.4),
-    RcppGSL,
     rlang, 
     utils,
     withr
@@ -36,4 +50,5 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Copyright: file COPYRIGHTS
 Encoding: UTF-8
