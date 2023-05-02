@@ -1,4 +1,3 @@
-#
 # Original idea and part of the code originates from https://github.com/mlverse/torch after some mail exchange
 # with Daniel Falbel (Copyright).
 # Original licensed with MIT. https://github.com/mlverse/torch/blob/main/LICENSE.md
