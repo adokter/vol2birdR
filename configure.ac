@@ -7,9 +7,9 @@ dnl tools/m4/check_proj.m4 for identifying proj
 dnl
 dnl All above scripts are open source, use as you want provided that copyright notice is kept. 
 dnl
-m4_include([inst/m4/ax_lib_hdf5.m4])
-m4_include([inst/m4/ax_compare_version.m4])
-m4_include([inst/m4/check_proj.m4])
+m4_include([tools/m4/ax_lib_hdf5.m4])
+m4_include([tools/m4/ax_compare_version.m4])
+m4_include([tools/m4/check_proj.m4])
 
 AX_LIB_HDF5()
 
