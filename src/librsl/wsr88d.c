@@ -71,6 +71,7 @@
 #include <bzlib.h>
 
 #include "wsr88d.h"
+#include <errno.h>
 
 void RSL_printf(const char* fmt, ...);
 
@@ -330,6 +331,8 @@ tryagain:
         goto done;
       }
       if (write(fdout, oblock, olength) != olength) {
+        char errbuffer[256];
+        strerror_r(errno, errbuffer, 256);
         RSL_printf( "Failed to write outblock\n");
         goto done;
       }
