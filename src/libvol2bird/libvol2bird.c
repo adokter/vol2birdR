@@ -17,6 +17,7 @@
  *
  */
 
+
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -28,6 +29,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <vertical_profile.h>
+
 #include "rave_io.h"
 #include "rave_debug.h"
 #include "polarvolume.h"
@@ -38,9 +40,8 @@
 #undef RAD2DEG // to suppress redefine warning, also defined in dealias.h
 #undef DEG2RAD // to suppress redefine warning, also defined in dealias.h
 #include "libdealias.h"
-#include "librender.h"
-#include <ctype.h>
 
+#include "librender.h"
 
 #ifdef RSL
 #include "rsl.h"
@@ -3036,43 +3037,11 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     
 }
 
-/*  /trim whitespace at beginnging and end
-void strtrim(char* str)
-{
-    char* start = str;
-    char* end = str + strlen(str) - 1;
 
-    while (*start && isspace((unsigned char) *start)) {
-        start++;
-    }
-
-    while (end > start && isspace((unsigned char) *end)) {
-        end--;
-    }
-
-    *(end + 1) = '\0';
-
-    if (start != str) {
-        memmove(str, start, (end - start) + 2);
-    }
-}
-*/
-
-void strtrim(char* str)
-{
-    char* dst = str;
-    while (*str != '\0') {
-        if (!isspace((unsigned char)*str)) {
-            *dst++ = *str;
-        }
-        str++;
-    }
-    *dst = '\0';
-}
 
 // this function replaces NODATA and UNDETECT float values to NA and NAN
-double nanify(double value){
-    double output = value;
+float nanify(float value){
+    float output = value;
     if(value == NODATA) output = NAN;
     if(value == UNDETECT) output = NAN;
     return output;
@@ -3080,9 +3049,9 @@ double nanify(double value){
 
 void nanify_str(char* buff, const char* fmt, double v) {
   if (v == NODATA) {
-    strcpy(buff, "");
+    strcpy(buff, "na");
   } else if (v == UNDETECT) {
-    strcpy(buff, "NaN");
+    strcpy(buff, "nan");
   } else {
     sprintf(buff, fmt, v);
   }
@@ -3114,50 +3083,6 @@ void create_profile_printout_str(char* printbuffer, int buflen, const char* date
   nanify_str(s_n_dbz_all, "%5.f", n_dbz_all);
   sprintf(printbuffer, "%8s %.4s %4s %6s %6s %7s %5s %5s %6s %1c %6s %6s %6s %6s %5s %5s %5s %5s", date, time, s_HGHT,
       s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz, s_n_all, s_n_dbz_all);
-}
-
-
-void write_line_vpts_profile(char* printbuffer, int buflen, 
-    char* radar_name, char* datetime, float HGHT, float u, float v, 
-    float w, float ff, float dd, float sd_vvp, char* gap, float dbz, 
-    float eta, float dens, float DBZH, float n, float n_dbz, float n_all, 
-    float n_dbz_all, float rcs, float sd_vvp_thresh, int vcp, float latitude,
-    float longitude, int height, float wavelength, const char* fileIn)
-{
-  
-  char s_HGHT[16], s_u[16], s_v[16], s_w[16], s_ff[16], s_dd[16];
-  char s_sd_vvp[16], s_dbz[16], s_eta[16], s_dens[16], s_DBZH[16];
-  char s_n[16], s_n_dbz[16], s_n_all[16], s_n_dbz_all[16], s_rcs[16];
-  char s_sd_vvp_thresh[16], s_vcp[16], s_lat[16], s_lon[16], s_height[16], s_wavelength[16];
-
-  memset(printbuffer, 0, sizeof(char)*buflen);
-
-  sprintf(s_HGHT, "%4.f", HGHT);
-  nanify_str(s_u, "%6.2f", u);
-  nanify_str(s_v, "%6.2f", v);
-  nanify_str(s_w, "%7.2f", w);
-  nanify_str(s_ff, "%5.2f", ff);
-  nanify_str(s_dd, "%5.1f", dd);
-  nanify_str(s_sd_vvp, "%5.2f", sd_vvp);
-  nanify_str(s_dbz, "%6.2f", dbz);
-  nanify_str(s_eta, "%6.1f", eta);
-  nanify_str(s_dens, "%6.2f", dens);
-  nanify_str(s_DBZH, "%6.2f", DBZH);
-  nanify_str(s_n, "%5.f", n);
-  nanify_str(s_n_dbz, "%5.f", n_dbz);
-  nanify_str(s_n_all, "%5.f", n_all);
-  nanify_str(s_n_dbz_all, "%5.f", n_dbz_all);
-  nanify_str(s_rcs, "%f", rcs); 
-  nanify_str(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
-  nanify_str(s_vcp, "%5.f", vcp);
-  nanify_str(s_lat, "%.5f", latitude);
-  nanify_str(s_lon, "%.5f", longitude);
-  nanify_str(s_height, "%5.f", height);
-  nanify_str(s_wavelength, "%f", wavelength);
-
-  sprintf(printbuffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
-    radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
-    s_n_all, s_n_dbz_all, s_rcs, s_sd_vvp_thresh, s_vcp, s_lat, s_lon, s_height, s_wavelength, fileIn);
 }
 
 static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_quantity, const char* quantity, RaveDataType raveType){
@@ -3264,113 +3189,6 @@ int saveToODIM(RaveCoreObject* object, const char* filename){
     return result;    
 }
 
-
-int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
-    
-    // ----------------------------------------------------------------------------------------- //
-    // this function writes the vertical profile to CSV format https://aloftdata.eu/vpts-csv     //
-    // ---------------------------------------------------------------------------------------- //
-
-    //get attributes from polar volume
-    double longitude, latitude;
-    int height;
-    char *source, *date, *time;
-
-    longitude = PolarVolume_getLongitude(pvol) / (M_PI/180.0);
-    latitude = PolarVolume_getLatitude(pvol) / (M_PI/180.0);
-    height = (int)PolarVolume_getHeight(pvol);
-    source = PolarVolume_getSource(pvol);
-    date= PolarVolume_getDate(pvol);
-    time = PolarVolume_getTime(pvol);    
-
-    FILE *fp;
-    fp = fopen(filename, "w");
-    if (fp == NULL) {
-        vol2bird_printf("Failed to open file %s for writing.\n", filename);
-        return 0;
-    }
-
-    //get attributes from vertical profile
-    int nRowsProfile = vol2birdGetNRowsProfile(alldata);
-    int nColsProfile = vol2birdGetNColsProfile(alldata);
-
-    float *profileBio, *profileAll;
-    profileBio = vol2birdGetProfile(1, alldata);
-    profileAll = vol2birdGetProfile(3, alldata);
-
-    float *rcs, *sd_vvp_thresh, *wavelength;
-    int *vcp;
-    char *radar_name, *fileIn;
-
-    rcs = &alldata->options.birdRadarCrossSection;
-    sd_vvp_thresh = &alldata->options.stdDevMinBird;
-    vcp = &alldata->misc.vcp;
-    wavelength = &alldata->options.radarWavelength;
-    radar_name = alldata->misc.radarName;
-    fileIn = alldata->misc.filename_pvol;
-
-    fprintf(fp,"radar,datetime,height,u,v,w,ff,dd,sd_vvp,gap,dbz,eta,dens,dbz_all,n,n_dbz,n_all,n_dbz_all,rcs,sd_vvp_threshold,vcp,radar_latitude,radar_longitude,radar_height,radar_wavelenght,source_file\n");
-
-    int iRowProfile;
-    int iCopied = 0;
-    for (iRowProfile = 0; iRowProfile < nRowsProfile; iRowProfile++) {
-        iCopied=iRowProfile*nColsProfile;
-
-        char datetime[24];
-        sprintf(datetime, "%.4s-%.2s-%.2sT%.2s:%.2s:00Z", date, date+4, date+6, time, time+2);
-        char printbuffer[1024];
-
-        //write to CSV format
-        write_line_vpts_profile(
-        printbuffer,
-        1024,
-        radar_name,                                                             //radar*
-        datetime,                                                               //datetime*    
-        profileBio[0 + iCopied],                                                //height*
-        profileBio[2 + iCopied],                                                //u
-        profileBio[3 + iCopied],                                                //v
-        profileBio[4 + iCopied],                                                //w
-        profileBio[5 + iCopied],                                                //ff
-        profileBio[6 + iCopied],                                                //dd
-        profileBio[7 + iCopied],                                                //sd_vvp
-        profileBio[8 + iCopied] == TRUE ? "TRUE" : "FALSE",                     // gap
-        profileBio[11 + iCopied],                                               // eta
-        profileBio[12 + iCopied],                                               // dens
-        profileBio[9 + iCopied],                                                // dbz
-        profileAll[9 + iCopied],                                                // dbz_all
-        profileBio[10 + iCopied],                                               // n
-        profileBio[13 + iCopied],                                               // n_dbz
-        profileAll[10 + iCopied],                                               // n_all
-        profileAll[13 + iCopied],                                               // n_dbz_all
-        *rcs, *sd_vvp_thresh, *vcp, latitude, longitude, height, *wavelength, fileIn);
-
-    strtrim(printbuffer);
-    fprintf(fp, "%s\n", printbuffer);
-    }
-
-    profileAll = NULL;
-    profileBio = NULL;
-    free((void*) profileAll);
-    free((void*) profileBio);
-    
-    if (fclose(fp) != 0) {
-        vol2bird_printf("Failed to close file %s.\n", filename);
-        return 0;
-    }
-    
-    // If everything succeeds, return 1
-    return 1;
-
-}
-
-    //check if file extension is csv
-int isCSV(const char *filename) {
-    const char *dot = strrchr(filename, '.');
-    if (dot && !strcasecmp(dot, ".csv")) {
-        return 1;
-    }
-    return 0;
-}
 
 static void printCellProp(CELLPROP* cellProp, float elev, int nCells, int nCellsValid, vol2bird_t *alldata){
     
@@ -4389,6 +4207,8 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
 } // vol2birdCalcProfiles
 
 
+
+
 int vol2birdGetNColsProfile(vol2bird_t *alldata) {
 
     if (alldata->misc.initializationSuccessful==FALSE) {
@@ -4573,6 +4393,10 @@ void vol2birdPrintPointsArraySimple(vol2bird_t* alldata) {
             vol2bird_err_printf( "\n");
     }    
 } // vol2birdPrintPointsArray
+
+
+
+
 
 
 void printProfile(vol2bird_t* alldata) {
@@ -5042,25 +4866,6 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
 #endif
 
-char* get_radar_name(char* source) {
-    char* radarName = NULL;
-    char* p = strstr(source, "RAD:");
-    if (p != NULL) {
-        p += strlen("RAD:");
-        radarName = p;
-        char* end = strchr(p, ',');
-        if (end != NULL) {
-            *end = '\0';
-        }
-    }
-
-    if (radarName == NULL) {
-        radarName = "UNKNOWN";
-    }
-
-    return radarName;
-}
-
 //int vol2birdSetUp(PolarVolume_t* volume, cfg_t** cfg, vol2bird_t* alldata) {
 int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     
@@ -5075,8 +4880,6 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         return -1;
     }
  
-    alldata -> misc.radarName = get_radar_name(PolarVolume_getSource(volume));
-
     // reading radar wavelength from polar volume attribute
     // if present, overwrite options.radarWavelength with the value found.
     double wavelength = PolarVolume_getWavelength(volume);
@@ -5367,7 +5170,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 #ifdef MISTNET
 #ifdef VOL2BIRD_R
     if (check_mistnet_loaded_c()) {
-#endif
+#endif    
       if(alldata->options.useMistNet){
         vol2bird_err_printf("Running segmentScansUsingMistnet.\n");
         int result = segmentScansUsingMistnet(volume, scanUse, alldata);
