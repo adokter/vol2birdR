@@ -19,7 +19,7 @@ jobs:
       matrix:
         config:
           - {os: macos-11,   r: 'release'}
-          #- {os: windows-latest, r: 'release'}
+          - {os: windows-latest, r: 'release'}
           - {os: ubuntu-20.04,   r: 'devel'}
           #- {os: ubuntu-latest,   r: 'release'}
     env:
