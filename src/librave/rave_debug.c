@@ -77,35 +77,35 @@ static void Rave_defaultDebugFunction(const char* filename, int lineno, Rave_Deb
   if (lvl >= raveDebugLevel || lvl == RAVE_CRITICAL) {
     switch (lvl) {
     case RAVE_SPEWDEBUG:
-      sprintf(dbgtype, "SDEBUG");
+      snprintf(dbgtype, 20, "SDEBUG");
       break;
     case RAVE_DEBUG:
-      sprintf(dbgtype, "DEBUG");
+      snprintf(dbgtype, 20, "DEBUG");
       break;
     case RAVE_DEPRECATED:
-      sprintf(dbgtype, "DEPRECATED");
+      snprintf(dbgtype, 20, "DEPRECATED");
       break;
     case RAVE_INFO:
-      sprintf(dbgtype, "INFO");
+      snprintf(dbgtype, 20, "INFO");
       break;
     case RAVE_WARNING:
-      sprintf(dbgtype, "WARNING");
+      snprintf(dbgtype, 20, "WARNING");
       break;
     case RAVE_ERROR:
-      sprintf(dbgtype, "ERROR");
+      snprintf(dbgtype, 20, "ERROR");
       break;
     case RAVE_CRITICAL:
-      sprintf(dbgtype, "CRITICAL");
+      snprintf(dbgtype, 20, "CRITICAL");
       break;
     default:
-      sprintf(dbgtype, "UNKNOWN");
+      snprintf(dbgtype, 20, "UNKNOWN");
       break;
     }
   } else {
     return;
   }
-  sprintf(infobuff, "%20s : %11s", strtime, dbgtype);
-  vsprintf(msgbuff, fmt, alist);
+  snprintf(infobuff, 120, "%20s : %11s", strtime, dbgtype);
+  vsnprintf(msgbuff, 512, fmt, alist);
 
   Rave_printf("%s : %s (%s:%d)\n", infobuff, msgbuff, filename, lineno);
 }

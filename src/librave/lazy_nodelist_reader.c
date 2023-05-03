@@ -101,7 +101,7 @@ int LazyNodeListReader_preloadQuantities(LazyNodeListReader_t* self, const char*
         int dsetid=0, did=0;
         if (sscanf(nodeName, "/dataset%d/data%d/data", &dsetid, &did) == 2) { /* This is a parameter and probably has a quantity */
           char qname[1024];
-          sprintf(qname, "/dataset%d/data%d/what/quantity", dsetid, did);
+          snprintf(qname, 1024, "/dataset%d/data%d/what/quantity", dsetid, did);
           if (quantitiesToPreload != NULL && RaveList_size(quantitiesToPreload) > 0 && HLNodeList_hasNodeByName(self->nodelist, qname)) {
             const char* quantity = (const char *)HLNode_getData(HLNodeList_getNodeByName(self->nodelist, qname));
             if (RaveList_find(quantitiesToPreload, (void*)quantity, LazyNodeListReaderInternal_liststrcmp) != NULL) {

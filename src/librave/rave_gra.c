@@ -296,7 +296,7 @@ CartesianParam_t* RaveGra_apply(RaveGra_t* self, RaveField_t* distance, Cartesia
       CartesianParam_setConvertedValue(grafield, x, y, applyGra(self, distanceInMeters/1000.0, v, dt), dt);
     }
   }
-  sprintf(coeffs, "GRA: A=%f, B=%f, C=%f, low_db=%f, high_db=%f",self->A, self->B, self->C, self->lowerThreshold, self->upperThreshold);
+  snprintf(coeffs, 256, "GRA: A=%f, B=%f, C=%f, low_db=%f, high_db=%f",self->A, self->B, self->C, self->lowerThreshold, self->upperThreshold);
   howTaskArgs = RaveAttributeHelp_createString("how/task_args", coeffs);
   if (howTaskArgs == NULL || !CartesianParam_addAttribute(grafield, howTaskArgs)) {
     RAVE_ERROR0("Could not add how/task_args to gra field");

@@ -324,9 +324,9 @@ const char* HL_getFormatSpecifierString(HL_FormatSpecifier specifier)
 
 const char* HL_getHDF5Version(void) {
   if (strcmp("", H5_VERS_SUBRELEASE)==0) {
-    sprintf(HLHDF_HDF5_VERSION_STRING, "%d.%d.%d", H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
+    snprintf(HLHDF_HDF5_VERSION_STRING, 64, "%d.%d.%d", H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE);
   } else {
-    sprintf(HLHDF_HDF5_VERSION_STRING, "%d.%d.%d-%s", H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE, H5_VERS_SUBRELEASE);
+    snprintf(HLHDF_HDF5_VERSION_STRING, 64, "%d.%d.%d-%s", H5_VERS_MAJOR, H5_VERS_MINOR, H5_VERS_RELEASE, H5_VERS_SUBRELEASE);
   }
   return HLHDF_HDF5_VERSION_STRING;
 }

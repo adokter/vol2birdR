@@ -597,7 +597,7 @@ int RaveHL_addAttribute(HL_NodeList* nodelist, RaveAttribute_t* attribute, const
   attrname = RaveAttribute_getName(attribute);
   if (attrname != NULL) {
     char attrNodeName[2048];
-    sprintf(attrNodeName, "%s/%s", nodeName, attrname);
+    snprintf(attrNodeName, 2048, "%s/%s", nodeName, attrname);
     if (!HLNodeList_hasNodeByName(nodelist, attrNodeName)) {
       HL_Node* node = HLNode_newAttribute(attrNodeName);
       if (node == NULL) {
