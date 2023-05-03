@@ -2,11 +2,11 @@
 % Please edit documentation in R/install.R
 \name{install_type}
 \alias{install_type}
-\title{Returns the Torch install type}
+\title{Returns the LibTorch install type}
 \usage{
 install_type(version)
 }
 \description{
-Returns the Torch install type
+Returns the LibTorch install type
 }
 \keyword{internal}

@@ -9,7 +9,5 @@
 #' # check installed 'vol2bird' version:
 #' vol2bird_version()
 vol2bird_version <- function(){
-  constants_header_file <- file.path(find.package("vol2birdR"),"libvol2bird","constants.h")
-  assert_that(file.exists(constants_header_file))
-  numeric_version(strsplit(grep("VERSION ",readLines(file.path(find.package("vol2birdR"),"libvol2bird","constants.h")),value=TRUE),"\"")[[1]][2])
+  numeric_version(cpp_vol2bird_version())
 }
