@@ -114,4 +114,3 @@ AC_SUBST(ENABLE_IRIS2ODIM)
 dnl and do subsitution in the src/Makevars.in 
 AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
-  
