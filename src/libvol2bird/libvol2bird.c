@@ -3141,7 +3141,7 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
 
   memset(printbuffer, 0, sizeof(char)*buflen);
 
-  sprintf(s_HGHT, "%4.f", HGHT);
+  snprintf(s_HGHT, sizeof(s_HGHT), "%4.f", HGHT);
   nanify_str(s_u, "%6.2f", u);
   nanify_str(s_v, "%6.2f", v);
   nanify_str(s_w, "%7.2f", w);
@@ -3164,7 +3164,7 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_str(s_height, "%5.f", height);
   nanify_str(s_wavelength, "%5.1f", wavelength);
 
-  sprintf(printbuffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
+  snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
     radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
     s_n_all, s_n_dbz_all, s_rcs, s_sd_vvp_thresh, s_vcp, s_lat, s_lon, s_height, s_wavelength, get_filename(fileIn));
 }
@@ -3326,7 +3326,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
         iCopied=iRowProfile*nColsProfile;
 
         char datetime[24];
-        sprintf(datetime, "%.4s-%.2s-%.2sT%.2s:%.2s:00Z", date, date+4, date+6, time, time+2);
+        snprintf(datetime, sizeof(datetime), "%.4s-%.2s-%.2sT%.2s:%.2s:00Z", date, date+4, date+6, time, time+2);
         char printbuffer[1024];
 
         //write to CSV format
