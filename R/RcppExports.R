@@ -101,6 +101,9 @@ cpp_mistnet_init <- function(path) {
     invisible(.Call(`_vol2birdR_cpp_mistnet_init`, path))
 }
 
+#' Print vol2birdR memory
+#'
+#' @keywords internal
 #' The software has to be compiled with -DRAVE_MEMORY_DEBUG and without -DNO_RAVE_PRINTF.
 #' Manual handling for now.
 cpp_printMemory <- function() {
