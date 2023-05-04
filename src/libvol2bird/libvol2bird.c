@@ -3351,7 +3351,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
         profileBio[13 + iCopied],                                               // n_dbz
         profileAll[10 + iCopied],                                               // n_all
         profileAll[13 + iCopied],                                               // n_dbz_all
-        *rcs, *sd_vvp_thresh, *vcp, latitude, longitude, height, *wavelength, fileIn);
+        *rcs, *sd_vvp_thresh, *vcp, latitude, longitude, height, *wavelength, fileIn[0]);
 
     strtrim(printbuffer);
     fprintf(fp, "%s\n", printbuffer);
