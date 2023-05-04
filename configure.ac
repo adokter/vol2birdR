@@ -1,15 +1,15 @@
 AC_INIT([volbirdr],[0.1])
 
 dnl This configure script uses three different scripts (free software) for finding dependencies
-dnl inst/m4/ax_lib_proj.m4 for identifying PROJ include & libraries.
-dnl inst/m4/ax_lib_hdf5.m4 for identifying HDF5 include & libraries.
-dnl inst/m4/ax_compare_version.m4  for comparing HDF5-versions
+dnl tools/m4/ax_lib_hdf5.m4 for identifying HDF5 include & libraries.
+dnl tools/m4/ax_compare_version.m4  for comparing HDF5-versions
+dnl tools/m4/check_proj.m4 for identifying proj
 dnl
 dnl All above scripts are open source, use as you want provided that copyright notice is kept. 
 dnl
-m4_include([inst/m4/ax_lib_hdf5.m4])
-m4_include([inst/m4/ax_compare_version.m4])
-m4_include([inst/m4/check_proj.m4])
+m4_include([tools/m4/ax_lib_hdf5.m4])
+m4_include([tools/m4/ax_compare_version.m4])
+m4_include([tools/m4/check_proj.m4])
 
 AX_LIB_HDF5()
 
@@ -95,11 +95,22 @@ VOL2BIRD_CPPFLAGS="$PKG_CPPFLAGS $PROJ_CFLAGS $VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_CPPFLAGS=$VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_LIBS=$VOL2BIRD_LIBS"
 
+
+ENABLE_IRIS2ODIM=no
+AC_MSG_CHECKING([if iris2odim support can be enabled])
+if [[ -f src/libiris2odim/iris2odim.c -a -f src/includes/libiris2odim/iris2odim.h ]]; then
+  AC_MSG_RESULT([yes])
+  ENABLE_IRIS2ODIM=yes
+else
+  AC_MSG_RESULT([no])
+fi
+
 dnl substitute CPPFLAGS and LIBS
 AC_SUBST(VOL2BIRD_CPPFLAGS)
 AC_SUBST(VOL2BIRD_LIBS)
 AC_SUBST(HDF5_API_VERS_USE)
+AC_SUBST(ENABLE_IRIS2ODIM)
+
 dnl and do subsitution in the src/Makevars.in 
 AC_CONFIG_FILES([src/Makevars])
 AC_OUTPUT
-  

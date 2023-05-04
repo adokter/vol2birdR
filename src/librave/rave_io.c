@@ -681,7 +681,7 @@ int RaveIO_save(RaveIO_t* raveio, const char* filename)
           result = RaveHL_createStringValue(nodelist, RaveIO_ODIM_Version_2_4_STR, "/Conventions");
         } else {
           RAVE_ERROR1("Can not select %d as RaveIO_ODIM_Version", raveio->version);
-          sprintf(raveio->error_message, "Can not select %d as RaveIO_ODIM_Version", raveio->version);
+          snprintf(raveio->error_message, 1024, "Can not select %d as RaveIO_ODIM_Version", raveio->version);
           result = 0;
         }
 

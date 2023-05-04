@@ -7,7 +7,7 @@
 lib_installed(library_name, install_path)
 }
 \arguments{
-\item{library_name}{The name of the library searched for, either 'libmistnet' or 'libtorch'}
+\item{library_name}{The name of the library searched for, either 'libmistnet' or 'LibTorch'}
 
 \item{install_path}{The location where to look for the libraries}
 }

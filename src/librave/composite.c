@@ -773,7 +773,7 @@ static int CompositeInternal_concateInt(char** ids, int* len, int value)
 {
   char buff[16];
   memset(buff, 0, sizeof(char)*16);
-  sprintf(buff, "%d", value);
+  snprintf(buff, 16, "%d", value);
   return CompositeInternal_concateStr(ids, len, buff);
 }
 /**
@@ -2198,7 +2198,7 @@ static Cartesian_t* CompositeInternal_createCompositeImage(Composite_t* self, Ar
     prodpar = RaveAttributeHelp_createDouble("what/prodpar", self->height);
   } else if (self->ptype == Rave_ProductType_PMAX) {
     char s[256];
-    sprintf(s, "%f,%f",self->height,self->range);
+    snprintf(s, 256, "%f,%f",self->height,self->range);
     prodpar = RaveAttributeHelp_createString("what/prodpar", s);
   } else {
     prodpar = RaveAttributeHelp_createDouble("what/prodpar", self->elangle * 180.0/M_PI);

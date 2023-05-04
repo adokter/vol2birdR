@@ -1,8 +1,8 @@
 if (pkgbuild::has_rtools()) {
   ver<-pkgbuild::rtools_needed()
-  LIBS<-"-lm -ldl -lws2_32 -lwsock32 -lz -lhdf5"
+  LIBS<-"-lhdf5 -lwsock32 -lz -lsz -lm -ldl -lws2_32"
   if (ver == "Rtools 4.0") {
-    LIBS<-"-lz -lhdf5"
+    LIBS<-"-lhdf5 -lz"
   }
   cat(LIBS)
   quit("no", status=0)

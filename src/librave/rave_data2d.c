@@ -1209,7 +1209,7 @@ const char* RaveData2D_str(RaveData2D_t* field)
     result = malloc(sizeof(char) * 4096);
     resultsize = 4096;
   }
-  sprintf(result, "(%ld x %ld) [\n", field->xsize, field->ysize);
+  snprintf(result, resultsize, "(%ld x %ld) [\n", field->xsize, field->ysize);
   for (y = 0; y < field->ysize; y++) {
     strcat(result, "   [");
     for (x = 0; x < field->xsize; x++) {
@@ -1228,9 +1228,9 @@ const char* RaveData2D_str(RaveData2D_t* field)
       }
       RaveData2D_getValueUnchecked(field,  x,  y,  &v);
       if (x > 0) {
-        sprintf(buff, ", %0.3f", v);
+        snprintf(buff, 1024, ", %0.3f", v);
       } else {
-        sprintf(buff, "%0.3f", v);
+        snprintf(buff, 1024, "%0.3f", v);
       }
       strcat(result, buff);
     }

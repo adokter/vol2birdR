@@ -61,35 +61,35 @@ static void HL_DefaultDebugFunction(char* filename, int lineno, HL_Debug lvl,
   if (lvl >= hlhdfDbg.dbgLevel) {
     switch (lvl) {
     case HLHDF_SPEWDEBUG:
-      sprintf(dbgtype, "SDEBUG");
+      snprintf(dbgtype, 20, "SDEBUG");
       break;
     case HLHDF_DEBUG:
-      sprintf(dbgtype, "DEBUG");
+      snprintf(dbgtype, 20, "DEBUG");
       break;
     case HLHDF_DEPRECATED:
-      sprintf(dbgtype, "DEPRECATED");
+      snprintf(dbgtype, 20, "DEPRECATED");
       break;
     case HLHDF_INFO:
-      sprintf(dbgtype, "INFO");
+      snprintf(dbgtype, 20, "INFO");
       break;
     case HLHDF_WARNING:
-      sprintf(dbgtype, "WARNING");
+      snprintf(dbgtype, 20, "WARNING");
       break;
     case HLHDF_ERROR:
-      sprintf(dbgtype, "ERROR");
+      snprintf(dbgtype, 20, "ERROR");
       break;
     case HLHDF_CRITICAL:
-      sprintf(dbgtype, "CRITICAL");
+      snprintf(dbgtype, 20, "CRITICAL");
       break;
     default:
-      sprintf(dbgtype, "UNKNOWN");
+      snprintf(dbgtype, 20, "UNKNOWN");
       break;
     }
   } else {
     return;
   }
-  sprintf(infobuff, "%20s : %11s", strtime, dbgtype);
-  vsprintf(msgbuff, fmt, alist);
+  snprintf(infobuff, 120, "%20s : %11s", strtime, dbgtype);
+  vsnprintf(msgbuff, 512, fmt, alist);
 #ifndef NO_HLHDF_PRINTF
   fprintf(stderr, "%s : %s (%s:%d)\n", infobuff, msgbuff, filename, lineno);
 #endif

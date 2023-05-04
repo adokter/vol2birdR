@@ -2,10 +2,16 @@
 % Please edit documentation in R/install.R
 \name{torch_install_path}
 \alias{torch_install_path}
-\title{Returns the 'Torch' installation path.}
+\title{Returns the 'LibTorch' installation path.}
 \usage{
 torch_install_path()
 }
+\value{
+a character path
+}
 \description{
-Returns the 'Torch' installation path.
+Returns the directory where the LibTorch library has been downloaded
+}
+\examples{
+torch_install_path()
 }

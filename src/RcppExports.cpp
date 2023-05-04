@@ -50,6 +50,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cpp_vol2bird_version
+std::string cpp_vol2bird_version();
+RcppExport SEXP _vol2birdR_cpp_vol2bird_version() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(cpp_vol2bird_version());
+    return rcpp_result_gen;
+END_RCPP
+}
 // cpp_mistnet_init
 void cpp_mistnet_init(std::string path);
 RcppExport SEXP _vol2birdR_cpp_mistnet_init(SEXP pathSEXP) {
@@ -80,6 +90,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_vol2birdR_cpp_vol2bird_initialize", (DL_FUNC) &_vol2birdR_cpp_vol2bird_initialize, 0},
     {"_vol2birdR_cpp_vol2bird_set_wsr88d_site_location", (DL_FUNC) &_vol2birdR_cpp_vol2bird_set_wsr88d_site_location, 1},
     {"_vol2birdR_cpp_vol2bird_get_wsr88d_site_location", (DL_FUNC) &_vol2birdR_cpp_vol2bird_get_wsr88d_site_location, 0},
+    {"_vol2birdR_cpp_vol2bird_version", (DL_FUNC) &_vol2birdR_cpp_vol2bird_version, 0},
     {"_vol2birdR_cpp_mistnet_init", (DL_FUNC) &_vol2birdR_cpp_mistnet_init, 1},
     {"_vol2birdR_cpp_printMemory", (DL_FUNC) &_vol2birdR_cpp_printMemory, 0},
     {"_rcpp_module_boot_PolarVolume", (DL_FUNC) &_rcpp_module_boot_PolarVolume, 0},

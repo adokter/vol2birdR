@@ -187,7 +187,7 @@ static herr_t refGroupLocationIterator(hid_t gid, const char* name,
   switch (statbuf.type) {
   case H5G_GROUP:
     if ((obj = H5Gopen(gid, name, H5P_DEFAULT)) >= 0) {
-      sprintf(tmp2, "%s/%s", lookup->tmp_name, name);
+      snprintf(tmp2, 1024, "%s/%s", lookup->tmp_name, name);
       strcpy(lookup->tmp_name, tmp2);
       if (checkIfReferenceMatch(lookup->file_id, lookup->tmp_name, lookup->ref) == 1) {
         strcpy(lookup->found_name, lookup->tmp_name);
@@ -200,7 +200,7 @@ static herr_t refGroupLocationIterator(hid_t gid, const char* name,
     break;
   case H5G_DATASET:
     if ((obj = H5Dopen(gid, name, H5P_DEFAULT)) >= 0) {
-      sprintf(tmp2, "%s/%s", lookup->tmp_name, name);
+      snprintf(tmp2, 1024, "%s/%s", lookup->tmp_name, name);
       strcpy(lookup->tmp_name, tmp2);
       if (checkIfReferenceMatch(lookup->file_id, lookup->tmp_name, lookup->ref)
           == 1) {
@@ -213,7 +213,7 @@ static herr_t refGroupLocationIterator(hid_t gid, const char* name,
     }
     break;
   case H5G_TYPE:
-    sprintf(tmp2, "%s/%s", lookup->tmp_name, name);
+    snprintf(tmp2, 1024, "%s/%s", lookup->tmp_name, name);
     strcpy(lookup->tmp_name, tmp2);
     if (checkIfReferenceMatch(lookup->file_id, lookup->tmp_name, lookup->ref) == 1) {
       strcpy(lookup->found_name, lookup->tmp_name);
@@ -793,13 +793,15 @@ static char* hlhdf_read_createPath(const char* root, const char* name)
   char* newpath = NULL;
   int status = FALSE;
   int len = 0;
+  int pathlen = 0;
 
   if (root == NULL || name == NULL) {
     HL_ERROR0("hlhdf_read_createPath: arguments NULL");
     goto fail;
   }
 
-  newpath = HLHDF_MALLOC(sizeof(char)*(strlen(root) + strlen(name) + 2));
+  pathlen = sizeof(char)*(strlen(root) + strlen(name) + 2);
+  newpath = HLHDF_MALLOC(pathlen);
   if (newpath == NULL) {
     HL_ERROR0("Failed to allocate memory\n");
     goto fail;
@@ -809,7 +811,7 @@ static char* hlhdf_read_createPath(const char* root, const char* name)
     strcpy(newpath, "");
   } else {
     int i = 0;
-    sprintf(newpath, "%s", root);
+    snprintf(newpath, pathlen, "%s", root);
     i = strlen(newpath) - 1;
     while (i>1 && newpath[i] == '/') {
       newpath[i] = '\0';
@@ -819,10 +821,10 @@ static char* hlhdf_read_createPath(const char* root, const char* name)
 
   if (strcmp(name, ".") == 0) {
     int i = strlen(newpath);
-    sprintf(&newpath[i], "/");
+    snprintf(&newpath[i], (pathlen - i), "/");
   } else {
     int i = strlen(newpath);
-    sprintf(&newpath[i], "/%s", name);
+    snprintf(&newpath[i], (pathlen - i), "/%s", name);
   }
 
   len = strlen(newpath);
