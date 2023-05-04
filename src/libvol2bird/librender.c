@@ -264,7 +264,7 @@ Cartesian_t* polarVolumeToCartesian(PolarVolume_t* pvol, long dim, long res, dou
             
             char iElevString[11];
             // copy iElev to iElevString
-            sprintf(iElevString, "%d", iScan);
+            snprintf(iElevString, 11, "%d", iScan);
 
             // create a new scan parameter name with index for the sweep
             char *parameterNameFull = malloc(strlen(scanParameterName)+strlen(iElevString)+1);

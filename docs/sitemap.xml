@@ -7,6 +7,9 @@
     <loc>/LICENSE-text.html</loc>
   </url>
   <url>
+    <loc>/LICENSE.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -59,6 +62,9 @@
   </url>
   <url>
     <loc>/reference/cpp_vol2bird_set_wsr88d_site_location.html</loc>
+  </url>
+  <url>
+    <loc>/reference/cpp_vol2bird_version.html</loc>
   </url>
   <url>
     <loc>/reference/get_install_urls.html</loc>
@@ -116,6 +122,9 @@
   </url>
   <url>
     <loc>/reference/rsl2odim.html</loc>
+  </url>
+  <url>
+    <loc>/reference/skip_if_no_temp_access.html</loc>
   </url>
   <url>
     <loc>/reference/torch_install_path.html</loc>

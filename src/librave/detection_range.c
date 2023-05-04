@@ -235,7 +235,7 @@ static int DetectionRangeInternal_createPreviousTopFilename(
     RAVE_WARNING0("Not enough memory allocated for top file name");
     goto done;
   }
-  sprintf(name, "%s/%s_oldtop.txt", DetectionRange_getLookupPath(self), source);
+  snprintf(name, len, "%s/%s_oldtop.txt", DetectionRange_getLookupPath(self), source);
 
   result = 1;
 done:
