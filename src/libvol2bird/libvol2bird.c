@@ -3059,6 +3059,14 @@ void strtrim(char* str)
 }
 */
 
+const char *get_filename(const char *path) {
+    const char *filename = strrchr(path, '/');
+    if (!filename) {
+        filename = strrchr(path, '\\');
+    }
+    return filename ? filename + 1 : path;
+}
+
 void strtrim(char* str)
 {
     char* dst = str;
@@ -3150,15 +3158,15 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_str(s_n_dbz_all, "%5.f", n_dbz_all);
   nanify_str(s_rcs, "%f", rcs); 
   nanify_str(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
-  nanify_str(s_vcp, "%d", vcp);
+  nanify_str(s_vcp, "%5.f", vcp);
   nanify_str(s_lat, "%.5f", latitude);
   nanify_str(s_lon, "%.5f", longitude);
-  nanify_str(s_height, "%d", height);
-  nanify_str(s_wavelength, "%f", wavelength);
+  nanify_str(s_height, "%5.f", height);
+  nanify_str(s_wavelength, "%5.1f", wavelength);
 
   sprintf(printbuffer, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
     radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
-    s_n_all, s_n_dbz_all, s_rcs, s_sd_vvp_thresh, s_vcp, s_lat, s_lon, s_height, s_wavelength, fileIn);
+    s_n_all, s_n_dbz_all, s_rcs, s_sd_vvp_thresh, s_vcp, s_lat, s_lon, s_height, s_wavelength, get_filename(fileIn));
 }
 
 static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_quantity, const char* quantity, RaveDataType raveType){
@@ -3310,7 +3318,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
     radar_name = alldata->misc.radarName;
     fileIn = alldata->misc.filename_pvol;
 
-    fprintf(fp,"radar,datetime,height,u,v,w,ff,dd,sd_vvp,gap,dbz,eta,dens,dbz_all,n,n_dbz,n_all,n_dbz_all,rcs,sd_vvp_threshold,vcp,radar_latitude,radar_longitude,radar_height,radar_wavelenght,source_file\n");
+    fprintf(fp,"radar,datetime,height,u,v,w,ff,dd,sd_vvp,gap,eta,dens,dbz,dbz_all,n,n_dbz,n_all,n_dbz_all,rcs,sd_vvp_threshold,vcp,radar_latitude,radar_longitude,radar_height,radar_wavelength,source_file\n");
 
     int iRowProfile;
     int iCopied = 0;
@@ -5368,7 +5376,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 #ifdef MISTNET
 #ifdef VOL2BIRD_R
     if (check_mistnet_loaded_c()) {
-#endif
+#endif    
       if(alldata->options.useMistNet){
         vol2bird_err_printf("Running segmentScansUsingMistnet.\n");
         int result = segmentScansUsingMistnet(volume, scanUse, alldata);
