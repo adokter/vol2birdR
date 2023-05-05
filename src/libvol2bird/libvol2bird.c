@@ -5094,9 +5094,11 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         return -1;
     }
  
-    get_radar_name(PolarVolume_getSource(volume), alldata->misc.radarName, sizeof(alldata->misc.radarName));
-
-    //alldata -> misc.radarName = get_radar_name(PolarVolume_getSource(volume));
+    int radar_name_result = get_radar_name(PolarVolume_getSource(volume), alldata->misc.radarName, sizeof(alldata->misc.radarName));
+    if (radar_name_result != 0) {
+        // handle error
+        Rcpp::Rcout << "Warning: unable to extract radar name from source string" << std::endl;
+    }
 
     // reading radar wavelength from polar volume attribute
     // if present, overwrite options.radarWavelength with the value found.
