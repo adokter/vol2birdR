@@ -5073,10 +5073,11 @@ int get_radar_name(const char* source, char* radarName, size_t radarNameLength) 
             if (len < radarNameLength - 1) {
                 strncpy(radarName, p, len);
                 radarName[len] = '\0';
-                return;
+                return 0;
             }
         } else {
             foundRadarName = p;
+            return 0;
         }
     }
 
