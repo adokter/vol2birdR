@@ -71,7 +71,6 @@
 #include <bzlib.h>
 
 #include "wsr88d.h"
-
 void RSL_printf(const char* fmt, ...);
 
 static int little_endian(void)
@@ -330,7 +329,7 @@ tryagain:
         goto done;
       }
       if (write(fdout, oblock, olength) != olength) {
-        RSL_printf( "Failed to write block\n");
+        RSL_printf( "Failed to write outblock\n");
         goto done;
       }
     }
