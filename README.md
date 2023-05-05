@@ -72,7 +72,7 @@ Homebrew.
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev` |
 | **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel`            |
 
-Next, you can install the released version of ‘vol2birdR’ from
+Next, you can install the released version of **vol2birdR** from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -95,7 +95,7 @@ library(vol2birdR)
 
 ## References:
 
-Citation for ‘vol2bird’ algorithm:
+Citation for vol2bird algorithm:
 
 - [**Bird migration flight altitudes studied by a network of operational
   weather radars**](https://doi.org/10.1098/rsif.2010.0116) Dokter AM,
@@ -112,7 +112,7 @@ Paper describing recent algorithm extensions and the bioRad package:
   **42**, 852-860, 2019, DOI
   [10.1111/ecog.04028](https://doi.org/10.1111/ecog.04028)
 
-‘vol2bird’ implements dealiasing using the torus mapping method by Haase
+vol2bird implements dealiasing using the torus mapping method by Haase
 and Landelius:
 
 - [**Dealiasing of Doppler radar velocities using a torus
