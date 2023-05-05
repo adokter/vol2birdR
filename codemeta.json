@@ -1,0 +1,242 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "vol2birdR",
+  "description": "'R' implementation of the 'vol2bird' software for generating vertical profiles of birds and other biological signals in weather radar data. See Dokter et al. (2011) <doi:10.1098/rsif.2010.0116> for a paper describing the methodology.",
+  "name": "vol2birdR: Vertical Profiles of Biological Signals in Weather Radar Data",
+  "relatedLink": "https://adriaandokter.com/vol2bird/",
+  "codeRepository": "https://github.com/adokter/vol2birdR/",
+  "issueTracker": "https://github.com/adokter/vol2birdR/issues",
+  "license": "https://spdx.org/licenses/LGPL-3.0",
+  "version": "0.2.2.9037",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.3.0 (2023-04-21)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Anders",
+      "familyName": "Henja",
+      "email": "anders.henja@gmail.com"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Adriaan M.",
+      "familyName": "Dokter",
+      "email": "amd427@cornell.edu",
+      "@id": "https://orcid.org/0000-0001-6573-066X"
+    }
+  ],
+  "contributor": [
+    {
+      "@type": "Person",
+      "givenName": "Alexander",
+      "familyName": "Tedeschi",
+      "email": "at744@cornell.edu"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Tsung-Yu",
+      "familyName": "Lin"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Daniel",
+      "familyName": "Sheldon",
+      "email": "sheldon@cs.umass.edu"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Bart",
+      "familyName": "Kranstauber",
+      "email": "b.kranstauber@uva.nl",
+      "@id": "https://orcid.org/0000-0001-8303-780X"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Jurriaan H.",
+      "familyName": "Spaaks"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Lourens",
+      "familyName": "Veen"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Iwan",
+      "familyName": "Holleman"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Hidde",
+      "familyName": "Leijnse"
+    },
+    {
+      "@type": "Person",
+      "givenName": "John H.",
+      "familyName": "Merritt"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Bart",
+      "familyName": "Kelley"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Mark",
+      "familyName": "Couture"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Daniel",
+      "familyName": "Falbel"
+    }
+  ],
+  "copyrightHolder": [
+    {
+      "@type": "Person",
+      "givenName": "John H.",
+      "familyName": "Merritt"
+    },
+    {
+      "@type": "Organization",
+      "name": "Swedish Meteorological and Hydrological Institute, SMHI"
+    }
+  ],
+  "funder": [
+    {
+      "@type": "Organization",
+      "name": "GloBAM"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Adriaan M.",
+      "familyName": "Dokter",
+      "email": "amd427@cornell.edu",
+      "@id": "https://orcid.org/0000-0001-6573-066X"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "assertthat",
+      "name": "assertthat",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=assertthat"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "methods",
+      "name": "methods"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "pkgbuild",
+      "name": "pkgbuild",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=pkgbuild"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "Rcpp",
+      "name": "Rcpp",
+      "version": ">= 1.0.4",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=Rcpp"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "rlang",
+      "name": "rlang",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rlang"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "utils",
+      "name": "utils"
+    },
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "withr",
+      "name": "withr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=withr"
+    },
+    "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
+  },
+  "fileSize": "15296.098KB",
+  "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
+  "readme": "https://github.com/adokter/vol2birdR/blob/main/README.md",
+  "contIntegration": "https://github.com/adokter/vol2birdR/actions"
+}

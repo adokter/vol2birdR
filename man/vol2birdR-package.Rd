@@ -39,6 +39,9 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Alexander Tedeschi \email{at744@cornell.edu} (contributor to vol2bird library) [contributor]
+  \item Tsung-Yu Lin (contributor MistNet segmentation model) [contributor]
+  \item Daniel Sheldon \email{sheldon@cs.umass.edu} (contributor MistNet segmentation model) [contributor]
   \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID}) [contributor]
   \item Jurriaan H. Spaaks (contributor to vol2bird library) [contributor]
   \item Lourens Veen (contributor to vol2bird library) [contributor]
@@ -47,9 +50,8 @@ Other contributors:
   \item John H. Merritt (author of RSL library) [contributor, copyright holder]
   \item Bart Kelley (contributor and maintainer of RSL library) [contributor]
   \item Mark Couture (author of iris2odim add-on to RAVE library) [contributor]
-  \item Daniel Falbel (Original idea on how to build with torch support) [contributor]
+  \item Daniel Falbel (contributor of original idea for building with torch support) [contributor]
   \item Swedish Meteorological and Hydrological Institute, SMHI (copyright holder of HLHDF and RAVE libraries) [copyright holder]
-  \item The Crown (i.e. Her Majesty the Queen in Right of Canada) (copyright holder of iris2odim add-on to RAVE library) [copyright holder]
   \item GloBAM (https://globam.science) [funder]
 }
 
