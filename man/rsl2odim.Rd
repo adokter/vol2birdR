@@ -20,7 +20,8 @@ files containing a single scan/sweep. The file data format should be either 1)
 format, which is the implementation of the OPERA data information model in
 the \href{https://support.hdfgroup.org/HDF5/}{HDF5} format, 2) NEXRAD format
 supported by the \href{https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/}{'RSL' library} or 3) Vaisala
-IRIS (IRIS RAW) format.}
+IRIS (IRIS RAW) format. IRIS format is not available on CRAN, see
+vol2birdR development version on Github.}
 
 \item{config}{optional configuration object of class \code{Rcpp_Vol2BirdConfig},
 typically output from \link{vol2bird_config}}
