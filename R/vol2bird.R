@@ -13,7 +13,7 @@
 #'   the [HDF5](https://support.hdfgroup.org/HDF5/) format, 2) NEXRAD format
 #'   supported by the ['RSL'
 #'   library](https://trmm-fc.gsfc.nasa.gov/trmm_gv/software/rsl/) or 3) Vaisala
-#'   IRIS (IRIS RAW) format.
+#'   IRIS (IRIS RAW) format (not available on CRAN).
 #' @param config optional configuration object of class `Rcpp_Vol2BirdConfig`,
 #' typically output from \link{vol2bird_config}
 #' @param vpfile Character. File name. When provided, writes a vertical profile
