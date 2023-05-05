@@ -478,7 +478,7 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile);
 
 int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata);
 
-void get_radar_name(char* source, char* radarName, size_t radarNameLength);
+void get_radar_name(const char* source, char* radarName, size_t radarNameLength);
 
 void vol2birdTearDown(vol2bird_t* alldata);
 

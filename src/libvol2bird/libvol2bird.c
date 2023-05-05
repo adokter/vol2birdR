@@ -5051,7 +5051,7 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
 #endif
 
-void get_radar_name(char* source, char* radarName, size_t radarNameLength) {
+void get_radar_name(const char* source, char* radarName, size_t radarNameLength) {
     const char* foundRadarName = NULL;
     char* p = strstr(source, "RAD:");
     if (p != NULL) {
