@@ -1,3 +1,6 @@
+# vol2birdR 1.0.0
+* Initial CRAN release. All issues included in this release can be found [here](https://github.com/adokter/vol2birdR/milestone/1?closed=1).
+
 # vol2birdR 0.2.2
 * New macros for locating system libraries.
 * Fixes for valgrind additional warnings
@@ -7,4 +10,4 @@
 Changes to how system libraries are located to fix failing build on M1 Mac on CRAN
 
 # vol2birdR 0.2.0
-Initial release on CRAN of new package
+Initial CRAN reviewed version of new package
