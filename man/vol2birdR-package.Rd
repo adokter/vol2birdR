@@ -40,6 +40,8 @@ Authors:
 Other contributors:
 \itemize{
   \item Alexander Tedeschi \email{at744@cornell.edu} (contributor to vol2bird library) [contributor]
+  \item Tsung-Yu Lin (contributor MistNet segmentation model) [contributor]
+  \item Daniel Sheldon \email{sheldon@cs.umass.edu} (contributor MistNet segmentation model) [contributor]
   \item Bart Kranstauber \email{b.kranstauber@uva.nl} (\href{https://orcid.org/0000-0001-8303-780X}{ORCID}) [contributor]
   \item Jurriaan H. Spaaks (contributor to vol2bird library) [contributor]
   \item Lourens Veen (contributor to vol2bird library) [contributor]
