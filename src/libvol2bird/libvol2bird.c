@@ -5051,23 +5051,24 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
 #endif
 
-char* get_radar_name(char* source) {
-    char* radarName = NULL;
+void get_radar_name(char* source, char* radarName, size_t radarNameLength) {
+    const char* foundRadarName = NULL;
     char* p = strstr(source, "RAD:");
     if (p != NULL) {
         p += strlen("RAD:");
-        radarName = p;
+        foundRadarName = p;
         char* end = strchr(p, ',');
         if (end != NULL) {
             *end = '\0';
         }
     }
 
-    if (radarName == NULL) {
-        radarName = "UNKNOWN";
+    if (foundRadarName == NULL) {
+        foundRadarName = "UNKNOWN";
     }
 
-    return radarName;
+    strncpy(radarName, foundRadarName, radarNameLength - 1);
+    radarName[radarNameLength - 1] = '\0';
 }
 
 //int vol2birdSetUp(PolarVolume_t* volume, cfg_t** cfg, vol2bird_t* alldata) {
@@ -5084,7 +5085,9 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         return -1;
     }
  
-    alldata -> misc.radarName = get_radar_name(PolarVolume_getSource(volume));
+    get_radar_name(PolarVolume_getSource(volume), alldata->misc.radarName, sizeof(alldata->misc.radarName));
+
+    //alldata -> misc.radarName = get_radar_name(PolarVolume_getSource(volume));
 
     // reading radar wavelength from polar volume attribute
     // if present, overwrite options.radarWavelength with the value found.
