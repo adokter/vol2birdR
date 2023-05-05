@@ -5051,15 +5051,22 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
 #endif
 
-void get_radar_name(const char* source, char* radarName, size_t radarNameLength) {
+int get_radar_name(const char* source, char* radarName, size_t radarNameLength) {
     const char* foundRadarName = NULL;
     char* p = strstr(source, "RAD:");
-    if (p != NULL) {
+   if (p != NULL) {
         p += strlen("RAD:");
         foundRadarName = p;
-        char* end = strchr(p, ',');
+        const char* end = strchr(p, ',');
         if (end != NULL) {
-            *end = '\0';
+            size_t len = end - p;
+            if (len < radarNameLength - 1) {
+                strncpy(radarName, p, len);
+                radarName[len] = '\0';
+                return;
+            }
+        } else {
+            foundRadarName = p;
         }
     }
 
@@ -5069,6 +5076,8 @@ void get_radar_name(const char* source, char* radarName, size_t radarNameLength)
 
     strncpy(radarName, foundRadarName, radarNameLength - 1);
     radarName[radarNameLength - 1] = '\0';
+
+    return 0;
 }
 
 //int vol2birdSetUp(PolarVolume_t* volume, cfg_t** cfg, vol2bird_t* alldata) {
