@@ -3089,6 +3089,16 @@ double nanify(double value){
 
 void nanify_str(char* buff, const char* fmt, double v) {
   if (v == NODATA) {
+    strcpy(buff, "na");
+  } else if (v == UNDETECT) {
+    strcpy(buff, "NaN");
+  } else {
+    snprintf(buff, 16, fmt, v);
+  }
+}
+
+void nanify_vpts(char* buff, const char* fmt, double v) {
+  if (v == NODATA) {
     strcpy(buff, "");
   } else if (v == UNDETECT) {
     strcpy(buff, "NaN");
@@ -3142,27 +3152,27 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   memset(printbuffer, 0, sizeof(char)*buflen);
 
   snprintf(s_HGHT, sizeof(s_HGHT), "%4.f", HGHT);
-  nanify_str(s_u, "%6.2f", u);
-  nanify_str(s_v, "%6.2f", v);
-  nanify_str(s_w, "%7.2f", w);
-  nanify_str(s_ff, "%5.2f", ff);
-  nanify_str(s_dd, "%5.1f", dd);
-  nanify_str(s_sd_vvp, "%5.2f", sd_vvp);
-  nanify_str(s_dbz, "%6.2f", dbz);
-  nanify_str(s_eta, "%6.1f", eta);
-  nanify_str(s_dens, "%6.2f", dens);
-  nanify_str(s_DBZH, "%6.2f", DBZH);
-  nanify_str(s_n, "%5.f", n);
-  nanify_str(s_n_dbz, "%5.f", n_dbz);
-  nanify_str(s_n_all, "%5.f", n_all);
-  nanify_str(s_n_dbz_all, "%5.f", n_dbz_all);
-  nanify_str(s_rcs, "%f", rcs); 
-  nanify_str(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
-  nanify_str(s_vcp, "%5.f", vcp);
-  nanify_str(s_lat, "%.5f", latitude);
-  nanify_str(s_lon, "%.5f", longitude);
-  nanify_str(s_height, "%5.f", height);
-  nanify_str(s_wavelength, "%5.1f", wavelength);
+  nanify_vpts(s_u, "%6.2f", u);
+  nanify_vpts(s_v, "%6.2f", v);
+  nanify_vpts(s_w, "%7.2f", w);
+  nanify_vpts(s_ff, "%5.2f", ff);
+  nanify_vpts(s_dd, "%5.1f", dd);
+  nanify_vpts(s_sd_vvp, "%5.2f", sd_vvp);
+  nanify_vpts(s_dbz, "%6.2f", dbz);
+  nanify_vpts(s_eta, "%6.1f", eta);
+  nanify_vpts(s_dens, "%6.2f", dens);
+  nanify_vpts(s_DBZH, "%6.2f", DBZH);
+  nanify_vpts(s_n, "%5.f", n);
+  nanify_vpts(s_n_dbz, "%5.f", n_dbz);
+  nanify_vpts(s_n_all, "%5.f", n_all);
+  nanify_vpts(s_n_dbz_all, "%5.f", n_dbz_all);
+  nanify_vpts(s_rcs, "%f", rcs); 
+  nanify_vpts(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
+  nanify_vpts(s_vcp, "%5.f", vcp);
+  nanify_vpts(s_lat, "%.5f", latitude);
+  nanify_vpts(s_lon, "%.5f", longitude);
+  nanify_vpts(s_height, "%5.f", height);
+  nanify_vpts(s_wavelength, "%5.1f", wavelength);
 
   snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
     radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
