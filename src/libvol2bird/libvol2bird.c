@@ -3159,11 +3159,10 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_str(s_rcs, "%f", rcs); 
   nanify_str(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
   nanify_str(s_vcp, "%5.f", vcp);
-  nanify_str(s_vcp, "%5.f", vcp);
   nanify_str(s_lat, "%.5f", latitude);
   nanify_str(s_lon, "%.5f", longitude);
   nanify_str(s_height, "%5.f", height);
-  nanify_str(s_wavelength, "%f", wavelength);
+  nanify_str(s_wavelength, "%5.1f", wavelength);
 
   snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
     radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
