@@ -30,7 +30,7 @@
     
     <a class="navbar-brand me-2" href="index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2.9036</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -71,15 +71,15 @@
 <div class="section level1">
 <div class="page-header"><h1 id="vol2birdr">vol2birdR<a class="anchor" aria-label="anchor" href="#vol2birdr"></a>
 </h1></div>
-<p>‘<strong>vol2birdR</strong>’ is an ‘R’ package for the ‘vol2bird’ algorithm for calculating vertical profiles of birds and other biological scatterers from weather radar data.</p>
-<p>It also provides an ‘R’ interface to the ‘MistNet’ convolutional neural network for precipitation segmentation, installing PyTorch libraries and model.</p>
-<p>‘<strong>vol2birdR</strong>’ can be used as a stand-alone package, but we recommend <a href="https://adriaandokter.com/bioRad/" class="external-link">bioRad</a> as the primary user interface, with ‘<strong>vol2birdR</strong>’ acting as a dependency of <a href="https://adriaandokter.com/bioRad/" class="external-link">bioRad</a>.</p>
+<p><strong>vol2birdR</strong> is an R package for the vol2bird algorithm for calculating vertical profiles of birds and other biological scatterers from weather radar data.</p>
+<p>It also provides an R interface to the MistNet convolutional neural network for precipitation segmentation, installing PyTorch libraries and model.</p>
+<p><strong>vol2birdR</strong> can be used as a stand-alone package, but we recommend <a href="https://adriaandokter.com/bioRad/" class="external-link">bioRad</a> as the primary user interface, with <strong>vol2birdR</strong> acting as a dependency of <a href="https://adriaandokter.com/bioRad/" class="external-link">bioRad</a>.</p>
 </div>
 <div class="section level1">
 <h1 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h1>
-<p>‘<strong>vol2birdR</strong>’ is available for all major platforms (Linux, OS X and Windows).</p>
-<p>For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 libraries need to be installed as system libraries prior to installation of ‘<strong>vol2birdR</strong>’:</p>
+<p><strong>vol2birdR</strong> is available for all major platforms (Linux, OS X and Windows).</p>
+<p>For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 libraries need to be installed as system libraries prior to installation of <strong>vol2birdR</strong>:</p>
 <details><summary>
 Additional information when installing the dependencies on macOS
 </summary><p>Since the installation process requires the <a href="https://brew.sh/" class="external-link">Homebrew</a> package manager you will have to install it. Open a terminal and issue the following command:</p>
@@ -120,7 +120,7 @@ Additional information when installing the dependencies on macOS
 </tr>
 </tbody>
 </table>
-<p>Next, you can install the released version of ‘vol2birdR’ from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
+<p>Next, you can install the released version of <strong>vol2birdR</strong> from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"vol2birdR"</span><span class="op">)</span></span></code></pre></div>
 <p>Alternatively, you can install the latest development version from <a href="https://github.com/adokter/bioRad" class="external-link">GitHub</a> with:</p>
@@ -133,7 +133,7 @@ Additional information when installing the dependencies on macOS
 <div class="section level2">
 <h2 id="references">References:<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p>Citation for ‘vol2bird’ algorithm:</p>
+<p>Citation for vol2bird algorithm:</p>
 <ul>
 <li>
 <a href="https://doi.org/10.1098/rsif.2010.0116" class="external-link"><strong>Bird migration flight altitudes studied by a network of operational weather radars</strong></a> Dokter AM, Liechti F, Stark H, Delobbe L, Tabary P, Holleman I J. R. Soc. Interface, <strong>8</strong>, 30–43, 2011, DOI <a href="https://doi.org/10.1098/rsif.2010.0116" class="external-link">10.1098/rsif.2010.0116</a>
@@ -145,7 +145,7 @@ Additional information when installing the dependencies on macOS
 <a href="https://doi.org/10.1111/ecog.04028" class="external-link"><strong>bioRad: biological analysis and visualization of weather radar data</strong></a> Dokter AM, Desmet P, Spaaks JH, van Hoey S, Veen L, Verlinden L, Nilsson C, Haase G, Leijnse H, Farnsworth A, Bouten W, Shamoun-Baranes J. Ecography, <strong>42</strong>, 852-860, 2019, DOI <a href="https://doi.org/10.1111/ecog.04028" class="external-link">10.1111/ecog.04028</a>
 </li>
 </ul>
-<p>‘vol2bird’ implements dealiasing using the torus mapping method by Haase and Landelius:</p>
+<p>vol2bird implements dealiasing using the torus mapping method by Haase and Landelius:</p>
 <ul>
 <li>
 <a href="https://doi.org/10.1175/1520-0426(2004)021%3C1566:DODRVU%3E2.0.CO;2" class="external-link"><strong>Dealiasing of Doppler radar velocities using a torus mapping</strong></a> Haase G, Landelius T. Journal of Atmospheric and Oceanic Technology <strong>21</strong>, 1566-1573, 2004, DOI <a href="https://doi.org/10.1175/1520-0426(2004)021%3C1566:DODRVU%3E2.0.CO;2" class="external-link">10.1175/1520-0426(2004)021&lt;1566:DODRVU&gt;2.0.CO;2</a>
