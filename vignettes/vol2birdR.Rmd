@@ -47,7 +47,7 @@ The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format, or NEXRAD f
 
 ## MistNet 
 ### Installation
-MistNet is a deep convolution neural net for segmentating out rain in S-band radar data, see the publication at https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280. 
+MistNet is a deep convolution neural net for segmenting out rain in S-band radar data, see the publication at https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280. 
 To use MistNet, follow the following additional installation steps:
 
 After installing and loading vol2birdR, run `install_mistnet()` from R. This will download libtorch from the download section of https://pytorch.org as well as a wrapper library from AWS that enables the mistnet functionality:
