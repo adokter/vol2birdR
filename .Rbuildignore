@@ -20,3 +20,4 @@ NOTICE
 ^LICENSE\.md$
 ^src/includes/libiris2odim/.*
 ^src/libiris2odim/.*
+^\.vscode$
