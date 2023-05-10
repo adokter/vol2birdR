@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/adokter/vol2birdR/",
   "issueTracker": "https://github.com/adokter/vol2birdR/issues",
   "license": "https://spdx.org/licenses/LGPL-3.0",
-  "version": "0.2.2.9037",
+  "version": "1.0.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.3.0 (2023-04-21)",
+  "runtimePlatform": "R version 4.2.3 RC (2023-03-07 r83950)",
   "author": [
     {
       "@type": "Person",
@@ -235,8 +235,7 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
-  "fileSize": "15296.098KB",
+  "fileSize": "12636.591KB",
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
-  "readme": "https://github.com/adokter/vol2birdR/blob/main/README.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
 }
