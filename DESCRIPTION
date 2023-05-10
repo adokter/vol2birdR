@@ -1,7 +1,7 @@
 Package: vol2birdR
 Type: Package
 Title: Vertical Profiles of Biological Signals in Weather Radar Data
-Version: 1.0.0
+Version: 0.2.2.9042
 Date: 2023-05-05
 Authors@R: c(
     person("Anders", "Henja", email = "anders.henja@gmail.com", role = "aut",
@@ -10,6 +10,7 @@ Authors@R: c(
     comment = c(ORCID = "0000-0001-6573-066X")),
     person("Alexander", "Tedeschi", email = "at744@cornell.edu", role = "ctb", comment = "contributor to vol2bird library"),
     person("Tsung-Yu", "Lin", role = "ctb", comment = "contributor MistNet segmentation model"),
+    person("Subranshu", "Maji", email = "smaji@cs.umass.edu", role = "ctb", comment = "contributor MistNet segmentation model"),
     person("Daniel", "Sheldon", email = "sheldon@cs.umass.edu", role = "ctb", comment = "contributor MistNet segmentation model"),
     person("Bart", "Kranstauber", role = "ctb", email = "b.kranstauber@uva.nl",
     comment = c(ORCID = "0000-0001-8303-780X")),

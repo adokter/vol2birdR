@@ -805,6 +805,9 @@ public:
     if (volume == NULL) {
       throw std::runtime_error("Could not read file(s)");
     }
+    
+    // copy input filename to misc.filename_pvol
+    strcpy(config.alldata()->misc.filename_pvol, fileIn[0]);
 
     config.alldata()->misc.loadConfigSuccessful = TRUE; // Config is already loaded when we come here.
 
