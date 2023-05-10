@@ -103,6 +103,7 @@ cpp_mistnet_init <- function(path) {
 
 #' The software has to be compiled with -DRAVE_MEMORY_DEBUG and without -DNO_RAVE_PRINTF.
 #' Manual handling for now.
+#' @keywords internal
 cpp_printMemory <- function() {
     invisible(.Call(`_vol2birdR_cpp_printMemory`))
 }

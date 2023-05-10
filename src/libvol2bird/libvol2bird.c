@@ -3166,7 +3166,7 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_vpts(s_n_dbz, "%5.f", n_dbz);
   nanify_vpts(s_n_all, "%5.f", n_all);
   nanify_vpts(s_n_dbz_all, "%5.f", n_dbz_all);
-  nanify_vpts(s_rcs, "%f", rcs); 
+  nanify_vpts(s_rcs, "%g", rcs); 
   nanify_vpts(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
   nanify_vpts(s_vcp, "%5.f", vcp);
   nanify_vpts(s_lat, "%.5f", latitude);
