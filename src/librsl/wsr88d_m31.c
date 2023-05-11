@@ -389,8 +389,8 @@ void wsr88d_load_ray_into_radar(Wsr88d_ray_m31 *wsr88d_ray, int isweep,
     unsigned short item;
     float value, scale, offset;
     unsigned char *data;
-    Range (*invf)(float x);
-    float (*f)(Range x);
+    Range (*invf)(float x) = DZ_INVF;
+    float (*f)(Range x) = DZ_F;
     Ray *ray;
     int vol_index, waveform;
 
