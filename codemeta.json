@@ -44,6 +44,12 @@
     },
     {
       "@type": "Person",
+      "givenName": "Subranshu",
+      "familyName": "Maji",
+      "email": "smaji@cs.umass.edu"
+    },
+    {
+      "@type": "Person",
       "givenName": "Daniel",
       "familyName": "Sheldon",
       "email": "sheldon@cs.umass.edu"
@@ -235,7 +241,7 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
-  "fileSize": "12636.591KB",
+  "fileSize": "11999.042KB",
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
 }
