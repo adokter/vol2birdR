@@ -151,6 +151,7 @@ void rave_alloc_print_statistics(void);
 
 //' The software has to be compiled with -DRAVE_MEMORY_DEBUG and without -DNO_RAVE_PRINTF.
 //' Manual handling for now.
+//' @keywords internal
 // [[Rcpp::export]]
 void cpp_printMemory() {
   RaveCoreObject_printStatistics();

@@ -34,7 +34,6 @@ ifeq ($(ENABLE_IRIS2ODIM), yes)
   PKG_CPPFLAGS+= -DIRIS_NO_EXIT_OR_STDERR -DIRIS=1 -DENABLE_IRIS2ODIM
 endif
 
-
 # RCPP
 PKG_CPPFLAGS+= $(shell "$(R_HOME)/bin${R_ARCH_BIN}/Rscript" -e "RcppGSL:::CFlags()")
 
