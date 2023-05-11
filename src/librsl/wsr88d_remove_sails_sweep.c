@@ -6,7 +6,8 @@ void wsr88d_remove_sails_sweep(Radar *radar)
 
     int i, j;
     int sails_loc[4];
-    int isails, nsails;
+    int isails = 0;
+    int nsails = 0;
 
     if (radar->h.vcp != 12 && radar->h.vcp != 212) return;
 
