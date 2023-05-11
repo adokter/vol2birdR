@@ -769,7 +769,6 @@ public:
     PolarVolume_t *volume = NULL;
     PolarVolume result;
     char *fileIn[INPUTFILESMAX];
-    int initSuccessful = 0;
 
     if (files.size() == 0) {
       throw std::invalid_argument("Must specify at least one input filename");

@@ -173,7 +173,8 @@ int rainbow_data_to_radar(Radar *radar, Rainbow_hdr rainbow_hdr, FILE *fp)
      * and sweeps continues for the remainder of sweeps in the volume scan.
      */
 
-    int iray, isweep, nread, nsweeps, nrays, nbins, vol_index;
+    int iray, isweep, nread, nsweeps, nrays, nbins;
+    int vol_index = -1;
     unsigned char *rainbow_ray;
     Volume *v;
     Sweep *sweep;
