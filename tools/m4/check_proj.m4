@@ -137,7 +137,7 @@ if [[ "$check_proj_proj_with_proj" != "no" ]]; then
     TMP=`ls -1 "$check_proj_proj_lib"/libproj.* 2>/dev/null`
     if [[ "$TMP" = "" ]]; then
       AC_MSG_RESULT([no])
-      AC_MSG_ERROR([Could not identify libproj in directory $check_proj_proj_inc, aborting!])
+      AC_MSG_ERROR([Could not identify libproj in directory $check_proj_proj_lib, aborting!])
     else
       AC_MSG_RESULT([yes])
     fi
@@ -180,9 +180,9 @@ if [[ "$check_proj_proj_with_proj" != "no" ]]; then
       fi
   
       if [[ "$check_proj_proj_homebrewprefix" != "" ]]; then
-        PROJ_LDFLAGS="-L$check_proj_proj_lib"
+        PROJ_LDFLAGS="-L$check_proj_proj_homebrewprefix/lib"
         PROJ_LIBS="-lproj"
-        PROJ_CFLAGS="-I$HOMEBREWPREFIX/include"
+        PROJ_CFLAGS="-I$check_proj_proj_homebrewprefix/include"
       fi
     fi
   fi
