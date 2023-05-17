@@ -4366,7 +4366,7 @@ printf %s "checking Checking if libproj can be found in proj-path... " >&6; }
     if [ "$TMP" = "" ]; then
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
-      as_fn_error $? "Could not identify libproj in directory $check_proj_proj_inc, aborting!" "$LINENO" 5
+      as_fn_error $? "Could not identify libproj in directory $check_proj_proj_lib, aborting!" "$LINENO" 5
     else
       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
@@ -4416,9 +4416,9 @@ printf "%s\n" "$check_proj_proj_homebrewprefix" >&6; }
       fi
 
       if [ "$check_proj_proj_homebrewprefix" != "" ]; then
-        PROJ_LDFLAGS="-L$check_proj_proj_lib"
+        PROJ_LDFLAGS="-L$check_proj_proj_homebrewprefix/lib"
         PROJ_LIBS="-lproj"
-        PROJ_CFLAGS="-I$HOMEBREWPREFIX/include"
+        PROJ_CFLAGS="-I$check_proj_proj_homebrewprefix/include"
       fi
     fi
   fi
