@@ -69,7 +69,7 @@ Homebrew.
 
 | System                                      | Command                                                                      |
 |:--------------------------------------------|:-----------------------------------------------------------------------------|
-| **OS X (using Homebrew)**                   | `brew install hdf5 proj gsl`                                                 |
+| **OS X (using Homebrew)**                   | `brew install hdf5 proj gsl pkg-config`                                      |
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config` |
 | **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel pkgconfig`             |
 
