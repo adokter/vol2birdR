@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/adokter/vol2birdR/",
   "issueTracker": "https://github.com/adokter/vol2birdR/issues",
   "license": "https://spdx.org/licenses/LGPL-3.0",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -241,7 +241,7 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
-  "fileSize": "11999.042KB",
+  "fileSize": "15094.993KB",
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
 }
