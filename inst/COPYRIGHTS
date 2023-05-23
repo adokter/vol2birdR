@@ -127,10 +127,11 @@ librsl is licensed for use as follows:
 
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Software Foundation, Inc., 675 Mass Aqve, Cambridge, MA 02139, USA.
 
 ====
-inst/libmistnet/mistnet.h
+src/includes/libmistnet/mistnet.h
+mistnet/CMakeLists.txt 
 
 Ideas and some code in this file originates from https://github.com/mlverse/torch after
 some mail exchange with Daniel Falbel (Copyright) about pros and cons. All credit should go to him.
