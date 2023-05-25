@@ -56,8 +56,7 @@ along with RAVE.  If not, see <http://www.gnu.org/licenses/>.
 
 ====
 
-libiris2odim is written Mark Couture, Environment Canada, with contributions
-from Daniel Michelson
+libiris2odim is written by Daniel Michelson and Mark Couture, Environment Canada
 
 libiris2odim is licensed for use as follows:
 
@@ -135,7 +134,6 @@ src/includes/libmistnet/mistnet.h
 mistnet/CMakeLists.txt 
 
 Ideas and some code in these files originates from https://github.com/mlverse/torch after
-email exchange with Daniel Falbel (Copyright) about pros and cons. All credit should go to him.
+some mail exchange with Daniel Falbel (Copyright) about pros and cons. All credit should go to him.
 Original licensed with MIT. https://github.com/mlverse/torch/blob/main/LICENSE.md
 ====
-

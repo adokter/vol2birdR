@@ -9,3 +9,6 @@
   a future release.
 * Carefully reviewed all files of the package and declared copyright holders and authors in
   DESCRIPTION file and inst/COPYRIGHT file
+# vol2birdR 1.0.1
+* Added pkg-config as a dependency on linux systems and M1 Mac
+* Added check_proj to m4 files which checks for the PROJ library

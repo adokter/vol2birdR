@@ -5,6 +5,9 @@
 # Session Data files
 .RData
 
+#VS-code specific files
+.vscode/
+
 output.csv
 
 # User-specific files
