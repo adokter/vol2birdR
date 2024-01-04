@@ -20,7 +20,6 @@ else
     LIBSHARPYUV = $(shell pkg-config --libs libsharpyuv)
 endif
 
-
 PKG_LIBS=-lpthread $(HDF5_LIBS) -lbz2  -lz  -ldl -lm $(PROJ_LIBS) $(LIBSHARPYUV)
 PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 
