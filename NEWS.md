@@ -1,3 +1,10 @@
+# vol2birdR 1.0.2
+* Refactored linking of lsharpyuv according to rtools43 instructions
+* Removed unused param from documentation in cpp_vol2bird_version()
+
+# vol2birdR 1.0.1
+* Minor typo corrections
+
 # vol2birdR 1.0.0
 * Initial CRAN release. All issues included in this release can be found [here](https://github.com/adokter/vol2birdR/milestone/1?closed=1).
 
