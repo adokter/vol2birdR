@@ -88,7 +88,6 @@ cpp_vol2bird_get_wsr88d_site_location <- function() {
 #' Initializes the mistnet shared library pointed to by the path
 #'
 #' @keywords internal
-#' @param path The shared library
 cpp_vol2bird_version <- function() {
     .Call(`_vol2birdR_cpp_vol2bird_version`)
 }
