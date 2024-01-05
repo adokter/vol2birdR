@@ -13,5 +13,5 @@
 * Added pkg-config as a dependency on linux systems and M1 Mac
 * Added check_proj to m4 files which checks for the PROJ library
 # vol2birdR 1.0.2
-* Added pkg-config as a dependency on linux systems and M1 Mac
-* Added check_proj to m4 files which checks for the PROJ library
+* Refactored linking of lsharpyuv according to rtools43[instructions](https://cran.r-project.org/bin/windows/Rtools/rtools43/news.html) which caused errors in old windows release builds
+* Removed unused param from Rd file of cpp_vol2bird_version()
