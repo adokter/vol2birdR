@@ -3,7 +3,9 @@
 * Removed unused param from documentation in cpp_vol2bird_version()
 
 # vol2birdR 1.0.1
-* Minor typo corrections
+* Added pkg-config as a dependency on linux systems and M1 Mac
+* Added check_proj to m4 files which checks for the PROJ library
+* Corrected minor typos
 
 # vol2birdR 1.0.0
 * Initial CRAN release. All issues included in this release can be found [here](https://github.com/adokter/vol2birdR/milestone/1?closed=1).
