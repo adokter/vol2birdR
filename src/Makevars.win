@@ -12,7 +12,15 @@ OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
 PROJ_LIBS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_proj_libraries.R")
 HDF5_LIBS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_hdf5_libraries.R")
 H5_API_CFLAGS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_h5_api_cflags.R")
-PKG_LIBS=-lpthread $(HDF5_LIBS) -lbz2  -lz  -ldl -lm $(PROJ_LIBS)
+
+# Conditional linking of libsharpyuv
+ifeq (,$(shell pkg-config --version 2>/dev/null))
+    LIBSHARPYUV = $(or $(and $(wildcard $(R_TOOLS_SOFT)/lib/libsharpyuv.a),-lsharpyuv),)
+else
+    LIBSHARPYUV = $(shell pkg-config --libs libsharpyuv)
+endif
+
+PKG_LIBS=-lpthread $(HDF5_LIBS) -lbz2  -lz  -ldl -lm $(PROJ_LIBS) $(LIBSHARPYUV)
 PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 
 PKG_CPPFLAGS+= -I. -I./includes -I./includes/libvol2bird -I./includes/libmistnet -I./includes/librave -I./includes/libhlhdf -I./includes/librsl -I./includes/libiris2odim
