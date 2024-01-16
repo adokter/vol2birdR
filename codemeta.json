@@ -246,7 +246,11 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
+<<<<<<< HEAD
   "fileSize": "14530.531KB",
+=======
+  "fileSize": "14528.368KB",
+>>>>>>> d3d5ce1 (added codemta)
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
   "readme": "https://github.com/adokter/vol2birdR/blob/main/README.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
