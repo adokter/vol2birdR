@@ -15,3 +15,5 @@
 # vol2birdR 1.0.2
 * Refactored linking of lsharpyuv according to rtools43[instructions](https://cran.r-project.org/bin/windows/Rtools/rtools43/news.html) which caused errors in old windows release builds
 * Removed unused param from Rd file of cpp_vol2bird_version()
+* Made write binary mode explicit for Windows compatibility
+* Changed package maintainer

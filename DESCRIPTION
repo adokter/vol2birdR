@@ -6,9 +6,9 @@ Date: 2024-01-04
 Authors@R: c(
     person("Anders", "Henja", , "anders.henja@gmail.com", role = "aut",
            comment = "vol2birdR package author and author of RAVE and HLHDF libraries"),
-    person("Adriaan M.", "Dokter", , "at744@cornell.edu", role = c("aut", "cre"),
+    person("Adriaan M.", "Dokter", , "at744@cornell.edu", role = c("ctb"),
            comment = c(ORCID = "0000-0001-6573-066X")),
-    person("Alexander", "Tedeschi", , "at744@cornell.edu", role = "ctb",
+    person("Alexander", "Tedeschi", , "at744@cornell.edu", role = c("aut", "cre"),
            comment = "contributor to vol2bird library"),
     person("Tsung-Yu", "Lin", role = "ctb",
            comment = "contributor MistNet segmentation model"),

@@ -164,7 +164,7 @@ mistnet_install_lib <- function(library_name, library_url,
   temp_file <- tempfile(fileext = library_extension)
   temp_path <- tempfile()
 
-  utils::download.file(library_url, temp_file)
+  utils::download.file(library_url, temp_file, mode="wb")
   on.exit(try(unlink(temp_file)))
 
   if (!is.null(md5hash) && is.character(md5hash) && length(md5hash) == 1) {
