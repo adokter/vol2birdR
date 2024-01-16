@@ -164,7 +164,7 @@ mistnet_install_lib <- function(library_name, library_url,
   temp_file <- tempfile(fileext = library_extension)
   temp_path <- tempfile()
 
-  utils::download.file(library_url, temp_file)
+  utils::download.file(library_url, temp_file, mode="wb")
   on.exit(try(unlink(temp_file)))
 
   if (!is.null(md5hash) && is.character(md5hash) && length(md5hash) == 1) {
@@ -365,50 +365,50 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #'
 #' @seealso
 #' * [install_mistnet_from_file()]
-install_mistnet <- function(version = "1.12.1", reinstall = FALSE,
-                          path = install_path(), timeout = 360, ...) {
+install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = install_path(), timeout = 360, ...) {
+  cat("Starting installation of MistNet...\n")
   assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
   assert_that(is.flag(reinstall))
   assert_that(is.number(timeout))
 
   if (reinstall) {
+    cat("Reinstall flag set. Unlinking the existing path...\n")
     unlink(path, recursive = TRUE)
   }
 
   if (!dir.exists(path)) {
+    cat("Creating directory for MistNet installation...\n")
     ok <- dir.create(path, showWarnings = FALSE, recursive = TRUE)
     if (!ok) {
-      rlang::abort(c(
-        "Failed creating directory",
-        paste("Check that you can write to: ", path)
-      ))
+      rlang::abort(c("Failed creating directory", paste("Check that you can write to: ", path)))
     }
   }
 
   # check for write permission
+  cat("Checking write permissions...\n")
   if (file.access(path, 2) < 0) {
-    rlang::abort(c(
-      "No write permissions to install mistnet.",
-      paste("Check that you can write to:", path),
-      "Or set the MISTNET_HOME env var to a path with write permissions."
-    ))
+    rlang::abort(c("No write permissions to install mistnet.",
+                   paste("Check that you can write to:", path),
+                   "Or set the MISTNET_HOME env var to a path with write permissions."))
   }
 
   if (!is.null(list(...)$install_config) && is.list(list(...)$install_config)) {
     install_config <- list(...)$install_config
   }
 
-  withr::with_options(
-    list(timeout = timeout),
-    mistnet_install_libs(version, "cpu", path, install_config)
-  )
+  cat("Installing MistNet libraries...\n")
+  withr::with_options(list(timeout = timeout), mistnet_install_libs(version, "cpu", path, install_config))
 
-  # reinitialize 'MistNet', might happen if installation fails on load and manual install is required
+  cat("Initializing MistNet...\n")
   if (!identical(list(...)$load, FALSE)) {
     mistnet_start(reload = TRUE)
+    cat("MistNet initialized successfully.\n")
   }
+
+  cat("MistNet installation complete.\n")
 }
+
 
 #' Install 'MistNet' libraries from files
 #'
