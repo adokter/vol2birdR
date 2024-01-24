@@ -18,5 +18,3 @@ cran-comments.md
 ^README\.Rmd$
 NOTICE
 ^LICENSE\.md$
-^src/includes/libiris2odim$
-^src/libiris2odim$
