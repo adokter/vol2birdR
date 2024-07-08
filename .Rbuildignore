@@ -16,6 +16,7 @@ cran-comments.md
 ^CRAN-SUBMISSION$
 ^CRAN-RELEASE$
 ^README\.Rmd$
+^README\.html$
 NOTICE
 ^LICENSE\.md$
 ^src/includes/libiris2odim$
