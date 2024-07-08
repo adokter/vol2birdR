@@ -4,23 +4,17 @@
   "identifier": "vol2birdR",
   "description": "'R' implementation of the 'vol2bird' software for generating vertical profiles of birds and other biological signals in weather radar data. See Dokter et al. (2011) <doi:10.1098/rsif.2010.0116> for a paper describing the methodology.",
   "name": "vol2birdR: Vertical Profiles of Biological Signals in Weather Radar Data",
-  "relatedLink": ["https://adriaandokter.com/vol2bird/", "https://CRAN.R-project.org/package=vol2birdR"],
+  "relatedLink": "https://adriaandokter.com/vol2bird/",
   "codeRepository": "https://github.com/adokter/vol2birdR/",
   "issueTracker": "https://github.com/adokter/vol2birdR/issues",
   "license": "https://spdx.org/licenses/LGPL-3.0",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.3.0 (2023-04-21)",
-  "provider": {
-    "@id": "https://cran.r-project.org",
-    "@type": "Organization",
-    "name": "Comprehensive R Archive Network (CRAN)",
-    "url": "https://cran.r-project.org"
-  },
+  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
   "author": [
     {
       "@type": "Person",
@@ -30,18 +24,19 @@
     },
     {
       "@type": "Person",
-      "givenName": "Alexander",
-      "familyName": "Tedeschi",
-      "email": "at744@cornell.edu"
+      "givenName": "Adriaan M.",
+      "familyName": "Dokter",
+      "email": "at744@cornell.edu",
+      "@id": "https://orcid.org/0000-0001-6573-066X"
     }
   ],
   "contributor": [
     {
       "@type": "Person",
-      "givenName": "Adriaan M.",
-      "familyName": "Dokter",
+      "givenName": "Alexander",
+      "familyName": "Tedeschi",
       "email": "at744@cornell.edu",
-      "@id": "https://orcid.org/0000-0001-6573-066X"
+      "@id": "https://orcid.org/0000-0003-0772-693X"
     },
     {
       "@type": "Person",
@@ -128,9 +123,10 @@
   "maintainer": [
     {
       "@type": "Person",
-      "givenName": "Alexander",
-      "familyName": "Tedeschi",
-      "email": "at744@cornell.edu"
+      "givenName": "Adriaan M.",
+      "familyName": "Dokter",
+      "email": "at744@cornell.edu",
+      "@id": "https://orcid.org/0000-0001-6573-066X"
     }
   ],
   "softwareSuggestions": [
@@ -246,11 +242,7 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
-<<<<<<< HEAD
-  "fileSize": "14530.531KB",
-=======
-  "fileSize": "14528.368KB",
->>>>>>> d3d5ce1 (added codemta)
+  "fileSize": "15649.884KB",
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
   "readme": "https://github.com/adokter/vol2birdR/blob/main/README.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
