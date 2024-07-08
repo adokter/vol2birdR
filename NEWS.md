@@ -1,3 +1,6 @@
+# vol2birdR 1.0.3
+* Refactored conditional linking of rtools43 dependencies
+
 # vol2birdR 1.0.2
 * Refactored linking of lsharpyuv according to rtools43 instructions
 * Removed unused param from documentation in cpp_vol2bird_version()
