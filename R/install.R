@@ -366,19 +366,19 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #' @seealso
 #' * [install_mistnet_from_file()]
 install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = install_path(), timeout = 360, ...) {
-  cat("Starting installation of MistNet...\n")
+  message("Starting installation of MistNet...\n")
   assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
   assert_that(is.flag(reinstall))
   assert_that(is.number(timeout))
 
   if (reinstall) {
-    cat("Reinstall flag set. Unlinking the existing path...\n")
+    message("Reinstall flag set. Unlinking the existing path...\n")
     unlink(path, recursive = TRUE)
   }
 
   if (!dir.exists(path)) {
-    cat("Creating directory for MistNet installation...\n")
+    message("Creating directory for MistNet installation...\n")
     ok <- dir.create(path, showWarnings = FALSE, recursive = TRUE)
     if (!ok) {
       rlang::abort(c("Failed creating directory", paste("Check that you can write to: ", path)))
@@ -386,7 +386,7 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = instal
   }
 
   # check for write permission
-  cat("Checking write permissions...\n")
+  message("Checking write permissions...\n")
   if (file.access(path, 2) < 0) {
     rlang::abort(c("No write permissions to install mistnet.",
                    paste("Check that you can write to:", path),
@@ -397,16 +397,16 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = instal
     install_config <- list(...)$install_config
   }
 
-  cat("Installing MistNet libraries...\n")
+  message("Installing MistNet libraries...\n")
   withr::with_options(list(timeout = timeout), mistnet_install_libs(version, "cpu", path, install_config))
 
-  cat("Initializing MistNet...\n")
+  message("Initializing MistNet...\n")
   if (!identical(list(...)$load, FALSE)) {
     mistnet_start(reload = TRUE)
-    cat("MistNet initialized successfully.\n")
+    message("MistNet initialized successfully.\n")
   }
 
-  cat("MistNet installation complete.\n")
+  message("MistNet installation complete.\n")
 }
 
 
