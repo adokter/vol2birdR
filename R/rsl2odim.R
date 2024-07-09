@@ -1,26 +1,3 @@
-# Function to check file existence and permissions
-check_file_access <- function(file_path) {
-  if (!file.exists(file_path)) {
-    cat("Error: File does not exist:", file_path, "\n")
-    return(FALSE)
-  }
-
-  if (!file.access(file_path, 4) == 0) {
-    cat("Error: No read permission for the file:", file_path, "\n")
-    return(FALSE)
-  }
-
-  file_info <- file.info(file_path)
-  cat("File size:", file_info$size, "bytes\n")
-
-  # Add more checks here if necessary, e.g., file checksum
-
-  return(TRUE)
-}
-
-
-
-
 #' Convert a NEXRAD polar volume file to an ODIM polar volume file
 #'
 #' @inheritParams vol2bird
@@ -30,6 +7,7 @@ check_file_access <- function(file_path) {
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
+#' @importFrom assertthat assert_that
 #'
 #' @examples
 #' \donttest{
@@ -45,6 +23,17 @@ check_file_access <- function(file_path) {
 #' file.remove(nexrad_file)
 #' file.remove(odim_file)
 #' }
+#' 
+#' Function to check file existence and permissions
+check_file_access <- function(file_path) {
+  assert_that(file.exists(file_path), msg = paste("Error: File does not exist:", file_path))
+  assert_that(file.access(file_path, 4) == 0, msg = paste("Error: No read permission for the file:", file_path))
+
+  file_info <- file.info(file_path)
+  message("File size: ", file_info$size, " bytes")
+  return(TRUE)
+}
+
 rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
     assert_that(file.exists(filename))
@@ -86,3 +75,6 @@ rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=
   processor$verbose <- verbose
   processor$rsl2odim(path.expand(file), config_instance, path.expand(pvolfile_out))
 }
+
+
+
