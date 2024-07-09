@@ -37,7 +37,6 @@ check_file_access <- function(file_path) {
 rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
     assert_that(file.exists(filename))
-    message("Checking file before processing:", filename, "\n")
     if (!file.exists(filename)) {
       stop("Error: File does not exist: ", filename)
       }
