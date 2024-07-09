@@ -17,3 +17,5 @@
 * Removed unused param from Rd file of cpp_vol2bird_version()
 * Made write binary mode explicit for Windows compatibility
 * Changed package maintainer
+# vol2birdR 1.0.3
+* Refactored linking of conditional dependencies of rtools43
