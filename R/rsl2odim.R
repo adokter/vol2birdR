@@ -1,3 +1,15 @@
+
+#' Check file read permissions
+#' 
+#' @param file_path The path to the file to check.
+#' @return TRUE if file has read permissions, otherwise throws an error.
+#' @importFrom assertthat assert_that
+#' @keywords internal
+check_file_access <- function(file_path) {
+  assert_that(file.access(file_path, 4) == 0, msg = paste("Error: No read permission for the file:", file_path))
+  return(TRUE)
+}
+
 #' Convert a NEXRAD polar volume file to an ODIM polar volume file
 #'
 #' @inheritParams vol2bird
@@ -6,9 +18,8 @@
 #'
 #' @seealso
 #' * [vol2bird_config()]
-#' @export
 #' @importFrom assertthat assert_that
-#'
+#' @export
 #' @examples
 #' \donttest{
 #' # define filenames
@@ -23,13 +34,6 @@
 #' file.remove(nexrad_file)
 #' file.remove(odim_file)
 #' }
-#' 
-#' Function to check file existence and permissions
-check_file_access <- function(file_path) {
-  assert_that(file.access(file_path, 4) == 0, msg = paste("Error: No read permission for the file:", file_path))
-  return(TRUE)
-}
-
 rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
     if (!file.exists(filename)) {
