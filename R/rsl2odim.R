@@ -26,17 +26,12 @@
 #' 
 #' Function to check file existence and permissions
 check_file_access <- function(file_path) {
-  assert_that(file.exists(file_path), msg = paste("Error: File does not exist:", file_path))
   assert_that(file.access(file_path, 4) == 0, msg = paste("Error: No read permission for the file:", file_path))
-
-  file_info <- file.info(file_path)
-  message("File size: ", file_info$size, " bytes")
   return(TRUE)
 }
 
 rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
-    assert_that(file.exists(filename))
     if (!file.exists(filename)) {
       stop("Error: File does not exist: ", filename)
       }
