@@ -33,6 +33,6 @@ mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
   }, error = function(e) {
       stop("Error during MistNet initialization: ", e$message, "\n")
   }, warning = function(w) {
-      message("Warning during MistNet initialization: ", w$message, "\n")
+      warning("Warning during MistNet initialization: ", w$message, "\n")
   })
 }
