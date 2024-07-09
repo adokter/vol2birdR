@@ -33,10 +33,10 @@ check_file_access <- function(file_path) {
 rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=FALSE){
   for (filename in file) {
     if (!file.exists(filename)) {
-      stop("Error: File does not exist: ", filename)
+      warning("Error: File does not exist: ", filename)
       }
       if (!check_file_access(filename)) {
-        stop("File access check failed for: ", filename)
+        warning("File access check failed for: ", filename)
     }
   }
   if (!are_equal(pvolfile_out, "")) {
