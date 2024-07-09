@@ -23,16 +23,16 @@ mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
 
   # Path where the DLL should be
   dll_path <- file.path(install_path(), "lib")
-  cat("Attempting to load MistNet from:", dll_path, "\n")
+  message("Attempting to load MistNet from:", dll_path, "\n")
 
   # Try-catch block to capture any errors during initialization
   tryCatch({
     cpp_mistnet_init(dll_path)
     .globals$mistnet_started <- TRUE
-    cat("MistNet successfully initialized.\n")
+      message("MistNet successfully initialized.\n")
   }, error = function(e) {
-    cat("Error during MistNet initialization: ", e$message, "\n")
+      stop("Error during MistNet initialization: ", e$message, "\n")
   }, warning = function(w) {
-    cat("Warning during MistNet initialization: ", w$message, "\n")
+      message("Warning during MistNet initialization: ", w$message, "\n")
   })
 }
