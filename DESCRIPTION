@@ -55,7 +55,7 @@ Imports:
     utils,
     withr
 LinkingTo: Rcpp, RcppGSL
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 SystemRequirements: GNU make, GSL, HDF5, PROJ
