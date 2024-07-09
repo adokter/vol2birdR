@@ -9,7 +9,7 @@ Authors@R: c(
     person("Adriaan M.", "Dokter", , "at744@cornell.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6573-066X")),
     person("Alexander", "Tedeschi", , "at744@cornell.edu", role = "ctb",
-           comment =  c(ORCID = "0000-0003-0772-693X")),
+           comment =  c(ORCID = "0000-0003-0772-6931")),
     person("Tsung-Yu", "Lin", role = "ctb",
            comment = "contributor MistNet segmentation model"),
     person("Subranshu", "Maji", , "smaji@cs.umass.edu", role = "ctb",
