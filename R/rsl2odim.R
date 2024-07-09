@@ -5,6 +5,7 @@
 #' @return TRUE if file has read permissions, otherwise throws an error.
 #' @importFrom assertthat assert_that
 #' @keywords internal
+#' @noRd
 check_file_access <- function(file_path) {
   assert_that(file.access(file_path, 4) == 0, msg = paste("Error: No read permission for the file:", file_path))
   return(TRUE)
