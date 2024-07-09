@@ -30,7 +30,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Adriaan M. Dokter \email{at744@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID})
+\strong{Maintainer}: Adriaan M. Dokter \email{vol2birdr@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID})
 
 Authors:
 \itemize{
