@@ -6,9 +6,6 @@
 \usage{
 cpp_vol2bird_version()
 }
-\arguments{
-\item{path}{The shared library}
-}
 \description{
 Initializes the mistnet shared library pointed to by the path
 }

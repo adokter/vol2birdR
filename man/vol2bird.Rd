@@ -28,8 +28,8 @@ vol2birdR development version on Github.}
 typically output from \link{vol2bird_config}}
 
 \item{vpfile}{Character. File name. When provided with .csv extension, writes a vertical profile
-time series (vpts) in the \href{https://aloftdata.eu/vpts-csv/}{standard CSV format}. Proivded with another or no exentsion,
-writes a vertical profile vertical profile file (\code{vpfile}) in the ODIM HDF5 format to disk.}
+in \href{https://aloftdata.eu/vpts-csv/}{VPTS CSV format}. Provided with another or no extension,
+writes a vertical profile in the ODIM HDF5 format to disk.}
 
 \item{pvolfile_out}{Character. File name. When provided, writes a polar
 volume (\code{pvol}) file in the ODIM HDF5 format to disk. Useful for converting
