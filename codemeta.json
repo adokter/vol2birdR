@@ -26,7 +26,7 @@
       "@type": "Person",
       "givenName": "Adriaan M.",
       "familyName": "Dokter",
-      "email": "at744@cornell.edu",
+      "email": "vol2birdr@cornell.edu",
       "@id": "https://orcid.org/0000-0001-6573-066X"
     }
   ],
@@ -125,7 +125,7 @@
       "@type": "Person",
       "givenName": "Adriaan M.",
       "familyName": "Dokter",
-      "email": "at744@cornell.edu",
+      "email": "vol2birdr@cornell.edu",
       "@id": "https://orcid.org/0000-0001-6573-066X"
     }
   ],
@@ -242,7 +242,7 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
-  "fileSize": "15293.26KB",
+  "fileSize": "14692.197KB",
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
   "readme": "https://github.com/adokter/vol2birdR/blob/main/README.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
