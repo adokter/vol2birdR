@@ -59,6 +59,6 @@ file.remove(odim_file)
 }
 \seealso{
 \itemize{
-\item \code{\link[=vol2bird_config]{vol2bird_config()}}g
+\item \code{\link[=vol2bird_config]{vol2bird_config()}}
 }
 }
