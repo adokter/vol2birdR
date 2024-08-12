@@ -8,13 +8,13 @@
   "codeRepository": "https://github.com/adokter/vol2birdR/",
   "issueTracker": "https://github.com/adokter/vol2birdR/issues",
   "license": "https://spdx.org/licenses/LGPL-3.0",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.2.3 RC (2023-03-07 r83950)",
+  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
   "author": [
     {
       "@type": "Person",
@@ -26,7 +26,7 @@
       "@type": "Person",
       "givenName": "Adriaan M.",
       "familyName": "Dokter",
-      "email": "amd427@cornell.edu",
+      "email": "vol2birdr@cornell.edu",
       "@id": "https://orcid.org/0000-0001-6573-066X"
     }
   ],
@@ -35,7 +35,8 @@
       "@type": "Person",
       "givenName": "Alexander",
       "familyName": "Tedeschi",
-      "email": "at744@cornell.edu"
+      "email": "at744@cornell.edu",
+      "@id": "https://orcid.org/0000-0003-0772-6931"
     },
     {
       "@type": "Person",
@@ -124,7 +125,7 @@
       "@type": "Person",
       "givenName": "Adriaan M.",
       "familyName": "Dokter",
-      "email": "amd427@cornell.edu",
+      "email": "vol2birdr@cornell.edu",
       "@id": "https://orcid.org/0000-0001-6573-066X"
     }
   ],
@@ -241,7 +242,8 @@
     },
     "SystemRequirements": "GNU make, GSL, HDF5, PROJ"
   },
-  "fileSize": "15094.993KB",
+  "fileSize": "14629.041KB",
   "releaseNotes": "https://github.com/adokter/vol2birdR/blob/master/NEWS.md",
+  "readme": "https://github.com/adokter/vol2birdR/blob/main/README.md",
   "contIntegration": "https://github.com/adokter/vol2birdR/actions"
 }

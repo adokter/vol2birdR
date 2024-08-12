@@ -1,30 +1,43 @@
 Package: vol2birdR
 Type: Package
 Title: Vertical Profiles of Biological Signals in Weather Radar Data
-Version: 1.0.1.9001
-Date: 2023-06-16
+Version: 1.0.3
+Date: 2024-07-10
 Authors@R: c(
-    person("Anders", "Henja", email = "anders.henja@gmail.com", role = "aut",
-    comment = "vol2birdR package author and author of RAVE and HLHDF libraries"),
-    person("Adriaan M.", "Dokter", email = "amd427@cornell.edu", role = c("aut", "cre"),
-    comment = c(ORCID = "0000-0001-6573-066X")),
-    person("Alexander", "Tedeschi", email = "at744@cornell.edu", role = "ctb", comment = "contributor to vol2bird library"),
-    person("Tsung-Yu", "Lin", role = "ctb", comment = "contributor MistNet segmentation model"),
-    person("Subranshu", "Maji", email = "smaji@cs.umass.edu", role = "ctb", comment = "contributor MistNet segmentation model"),
-    person("Daniel", "Sheldon", email = "sheldon@cs.umass.edu", role = "ctb", comment = "contributor MistNet segmentation model"),
-    person("Bart", "Kranstauber", role = "ctb", email = "b.kranstauber@uva.nl",
-    comment = c(ORCID = "0000-0001-8303-780X")),
-    person("Jurriaan H.", "Spaaks", role = "ctb", comment = "contributor to vol2bird library"),
-    person("Lourens", "Veen", role = "ctb", comment = "contributor to vol2bird library"),
-    person("Iwan", "Holleman", role = "ctb", comment = "contributor to vol2bird library"),
-    person("Hidde", "Leijnse", role = "ctb", comment = "contributor to vol2bird library"),
-    person("John H.", "Merritt", role = c("ctb","cph"), comment = "author of RSL library"),
-    person("Bart", "Kelley", role = "ctb", comment = "contributor and  maintainer of RSL library"),
-    person("Mark", "Couture", role = "ctb", comment = "author of iris2odim add-on to RAVE library"),
-    person("Daniel", "Falbel", role = "ctb", comment = "contributor of original idea for building with torch support"),
+    person("Anders", "Henja", , "anders.henja@gmail.com", role = "aut",
+           comment = "vol2birdR package author and author of RAVE and HLHDF libraries"),
+    person("Adriaan M.", "Dokter", , "vol2birdr@cornell.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-6573-066X")),
+    person("Alexander", "Tedeschi", , "at744@cornell.edu", role = "ctb",
+           comment =  c(ORCID = "0000-0003-0772-6931")),
+    person("Tsung-Yu", "Lin", role = "ctb",
+           comment = "contributor MistNet segmentation model"),
+    person("Subranshu", "Maji", , "smaji@cs.umass.edu", role = "ctb",
+           comment = "contributor MistNet segmentation model"),
+    person("Daniel", "Sheldon", , "sheldon@cs.umass.edu", role = "ctb",
+           comment = "contributor MistNet segmentation model"),
+    person("Bart", "Kranstauber", , "b.kranstauber@uva.nl", role = "ctb",
+           comment = c(ORCID = "0000-0001-8303-780X")),
+    person("Jurriaan H.", "Spaaks", role = "ctb",
+           comment = "contributor to vol2bird library"),
+    person("Lourens", "Veen", role = "ctb",
+           comment = "contributor to vol2bird library"),
+    person("Iwan", "Holleman", role = "ctb",
+           comment = "contributor to vol2bird library"),
+    person("Hidde", "Leijnse", role = "ctb",
+           comment = "contributor to vol2bird library"),
+    person("John H.", "Merritt", role = c("ctb", "cph"),
+           comment = "author of RSL library"),
+    person("Bart", "Kelley", role = "ctb",
+           comment = "contributor and  maintainer of RSL library"),
+    person("Mark", "Couture", role = "ctb",
+           comment = "author of iris2odim add-on to RAVE library"),
+    person("Daniel", "Falbel", role = "ctb",
+           comment = "contributor of original idea for building with torch support"),
     person("Swedish Meteorological and Hydrological Institute, SMHI", role = "cph",
-    comment = "copyright holder of HLHDF and RAVE libraries"),
-    person("GloBAM", role = "fnd", comment = "https://globam.science")
+           comment = "copyright holder of HLHDF and RAVE libraries"),
+    person("GloBAM", role = "fnd",
+           comment = "https://globam.science")
   )
 Description: 'R' implementation of the 'vol2bird' software for generating vertical profiles
     of birds and other biological signals in weather radar data. See Dokter et al.
@@ -42,7 +55,7 @@ Imports:
     utils,
     withr
 LinkingTo: Rcpp, RcppGSL
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 SystemRequirements: GNU make, GSL, HDF5, PROJ
