@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-latest, macos-13]
+        os: [windows-2019, ubuntu-24.04, macos-13]
         include:
           - os: windows-2019
             cuda: 0
@@ -25,7 +25,7 @@ jobs:
             flavor: Release
             artifacts: mistnet.dll
             upload: Windows        
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             library: libmistnet.so
             test: 
             make: make
@@ -54,7 +54,7 @@ jobs:
       - name: Create environment
         run: cmake -E make_directory ${{runner.workspace}}/build
       - name: Free up 24GB of disk space
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
         run: sudo rm -rf /usr/share/dotnet
       - name: Run cmake
         working-directory: ${{runner.workspace}}/build
@@ -83,7 +83,7 @@ jobs:
 
   upload:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         name:
