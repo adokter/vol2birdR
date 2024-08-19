@@ -1,3 +1,6 @@
+# vol2birdR 1.0.3.9000
+* reduce loading messages for mistnet
+
 # vol2birdR 1.0.3
 * Refactored conditional linking of rtools43 dependencies (#60)
 * Removed unused param from documentation in cpp_vol2bird_version()

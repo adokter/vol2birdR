@@ -402,7 +402,7 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = instal
 
   message("Initializing MistNet...\n")
   if (!identical(list(...)$load, FALSE)) {
-    mistnet_start(reload = TRUE)
+    mistnet_start(reload = TRUE, verbose = FALSE)
     message("MistNet initialized successfully.\n")
   }
 

@@ -24,7 +24,7 @@ globalVariables(c("..", "self", "private", "N"))
     # in case init fails we will just have disabled mistnet and run without it..
     tryCatch(
       {
-        mistnet_start()
+        mistnet_start(verbose = FALSE)
       },
       error = function(e) {
       }

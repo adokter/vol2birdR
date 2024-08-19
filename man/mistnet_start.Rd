@@ -4,12 +4,14 @@
 \alias{mistnet_start}
 \title{Initialize the 'MistNet' system if enabled.}
 \usage{
-mistnet_start(version = mistnet_default(), reload = FALSE)
+mistnet_start(version = mistnet_default(), reload = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{version}{version of 'MistNet' library}
 
 \item{reload}{if 'MistNet' library should be reloaded or not, default FALSE.}
+
+\item{verbose}{Logical, when \code{TRUE} prints text to console.}
 }
 \description{
 Initialize the 'MistNet' system if enabled.
