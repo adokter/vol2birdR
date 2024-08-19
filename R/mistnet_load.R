@@ -13,7 +13,7 @@ mistnet_default <- function() {
 #' @param reload if 'MistNet' library should be reloaded or not, default FALSE.
 #' @param verbose Logical, when `TRUE` prints text to console.
 #' @keywords internal
-mistnet_start <- function(version = mistnet_default(), reload = FALSE) {
+mistnet_start <- function(version = mistnet_default(), reload = FALSE, verbose = TRUE) {
   if (!mistnet_exists()) {
     stop("'MistNet' is disabled.")
   }

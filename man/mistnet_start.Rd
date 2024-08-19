@@ -4,7 +4,7 @@
 \alias{mistnet_start}
 \title{Initialize the 'MistNet' system if enabled.}
 \usage{
-mistnet_start(version = mistnet_default(), reload = FALSE)
+mistnet_start(version = mistnet_default(), reload = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{version}{version of 'MistNet' library}
