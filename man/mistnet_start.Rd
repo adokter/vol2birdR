@@ -10,6 +10,8 @@ mistnet_start(version = mistnet_default(), reload = FALSE)
 \item{version}{version of 'MistNet' library}
 
 \item{reload}{if 'MistNet' library should be reloaded or not, default FALSE.}
+
+\item{verbose}{Logical, when \code{TRUE} prints text to console.}
 }
 \description{
 Initialize the 'MistNet' system if enabled.
