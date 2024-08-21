@@ -1,5 +1,6 @@
-# vol2birdR 1.0.3.9000
-* reduce loading messages for mistnet
+# vol2birdR 1.0.4
+* reduce loading messages for mistnet (#72)
+* update linking for Rtools44 compatibility (#73, #74)
 
 # vol2birdR 1.0.3
 * Refactored conditional linking of rtools43 dependencies (#60)
