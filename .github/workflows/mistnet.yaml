@@ -37,7 +37,7 @@ jobs:
             flavor: Release
             artifacts: libmistnet.so
             upload: Linux
-          - os: macos-14
+          - os: macos-13
             library: libmistnet.dylib
             test: 
             make: make
