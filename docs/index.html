@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,23 +65,23 @@
 <details><summary>
 Additional information when installing the dependencies on macOS
 </summary><p>Since the installation process requires the <a href="https://brew.sh/" class="external-link">Homebrew</a> package manager you will have to install it. Open a terminal and issue the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span>bin<span class="sc">/</span>bash <span class="sc">-</span>c <span class="st">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>  <span class="sc">/</span>bin<span class="sc">/</span>bash <span class="sc">-</span>c <span class="st">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></span></code></pre></div>
 <p>When the installation has completed it will print out some additional information that is essential to follow.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">==</span><span class="er">&gt;</span> Next steps<span class="sc">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Run these two commands <span class="cf">in</span> your terminal to add Homebrew to your PATH<span class="sc">:</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Run brew help to get started</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Further documentation<span class="sc">:</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    https<span class="sc">:</span><span class="er">//</span>docs.brew.sh</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="sc">==</span><span class="er">&gt;</span> Next steps<span class="sc">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="sc">-</span> Run these two commands <span class="cf">in</span> your terminal to add Homebrew to your PATH<span class="sc">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="sc">-</span> Run brew help to get started</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="sc">-</span> Further documentation<span class="sc">:</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    https<span class="sc">:</span><span class="er">//</span>docs.brew.sh</span></code></pre></div>
 <p>You need to ensure that you follow the above two commands. The first one will add the necessary environment variables to your user</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span></code></pre></div>
 <p>The second command will ensure that you get the necessary environment variables into the terminal where you ran the installation process of Homebrew.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
 </details><table class="table">
 <colgroup>
-<col width="36%">
-<col width="63%">
+<col width="33%">
+<col width="66%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">System</th>
@@ -94,7 +94,7 @@ Additional information when installing the dependencies on macOS
 </tr>
 <tr class="even">
 <td align="left"><strong>Debian-based systems (including Ubuntu)</strong></td>
-<td align="left"><code>sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config</code></td>
+<td align="left"><code>sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config libbz2-dev</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Systems supporting yum and RPMs</strong></td>
@@ -116,15 +116,15 @@ Additional information when installing the dependencies on macOS
 <h3 id="mistnet-installation">MistNet installation<a class="anchor" aria-label="anchor" href="#mistnet-installation"></a>
 </h3>
 <p>MistNet is a deep convolution neural net for segmenting out precipitation from radar data, see Lin et al. 2019. To use MistNet, follow the following additional installation steps in R:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP 1: install additional libraries for using MistNet:</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vol2birdR)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install_mistnet</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># STEP 1: install additional libraries for using MistNet:</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">library</span>(vol2birdR)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">install_mistnet</span>()</span></code></pre></div>
 <p>After completing this step, the following command should evaluate to <code>TRUE</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mistnet_exists</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">mistnet_exists</span>()</span></code></pre></div>
 <p>Next, download the mistnet model. Note that the model file is large, over 500Mb.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP 2: download mistnet model:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install_mistnet_model</span>()</span></code></pre></div>
-<p>See <a href="https://adriaandokter.com/vol2birdR/articles/vol2birdR.html" class="external-link">vignette</a> for additional installation information</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># STEP 2: download mistnet model:</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">install_mistnet_model</span>()</span></code></pre></div>
+<p>See <a href="https://adriaandokter.com/vol2birdR/articles/vol2birdR.html">vignette</a> for additional installation information</p>
 </div>
 <div class="section level2">
 <h2 id="references">References:<a class="anchor" aria-label="anchor" href="#references"></a>
