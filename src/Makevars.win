@@ -10,27 +10,29 @@ OBJECTS_C = $(SOURCES_C:.c=.o)
 
 OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
 
-# pkg-config.exe proj --libs
-PROJ_LIBS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_proj_libraries.R")
-HDF5_LIBS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_hdf5_libraries.R")
-H5_API_CFLAGS=$(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript" "../tools/get_h5_api_cflags.R")
+H5_API_CFLAGS=-DH5_USE_110_API
 
+PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 
-# conditional linking of some dependencies needed eventually since Rtools42
+# librave needs proj
+# libhlhdf needs hdf5
+# librsl needs -lbz2 -lz
+
 ifeq (,$(shell pkg-config --version 2>/dev/null))
     LIBSHARPYUV = $(or $(and $(wildcard $(R_TOOLS_SOFT)/lib/libsharpyuv.a),-lsharpyuv),)
     LIBDEFLATE = $(or $(and $(wildcard $(R_TOOLS_SOFT)/lib/libdeflate.a),-ldeflate),)
     LIBLERC = $(or $(and $(wildcard $(R_TOOLS_SOFT)/lib/liblerc.a),-llerc),)
     LIBPSL = $(or $(and $(wildcard $(R_TOOLS_SOFT)/lib/libpsl.a),-lpsl),)
     LIBBROTLI = $(or $(and $(wildcard $(R_TOOLS_SOFT)/lib/libbrotlidec.a),-lbrotlidec -lbrotlicommon),)
+    PKG_LIBS = -lproj -lsqlite3 -lcurl -lbcrypt -ltiff -ljpeg -lrtmp -lssl -lssh2 -lgcrypt \
+               -lcrypto -lgdi32 -lz -lzstd -lwebp -llzma -lgdi32 -lcrypt32 \
+               -lidn2 $(LIBPSL) -lunistring -liconv -lgpg-error -lws2_32 -lwldap32 -lwinmm \
+               -lstdc++ $(LIBBROTLI) $(LIBLERC) $(LIBSHARPYUV) $(LIBDEFLATE) \
+               -lhdf5 -lm -ldl -lws2_32 -lwsock32 -lbz2 -lz -lsz
 else
-    # FIXME: it would make sense to rewrite all of the above to use pkg-config
-    PDEPS = $(shell pkg-config --libs libcurl libtiff-4)
+    PKG_LIBS = $(shell pkg-config --libs hdf5 proj) -lbz2 -lz
+    PKG_CPPFLAGS += $(shell pkg-config --cflags proj hdf5)
 endif
-
-PKG_LIBS=-lpthread $(HDF5_LIBS) -lbz2  -lz  -ldl -lm $(PROJ_LIBS) $(LIBBROTLI) $(LIBBROTLI) $(LIBBROTLI) $(LIBLERC) $(LIBSHARPYUV) $(LIBDEFLATE) $(PDEPS)
-
-PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 
 PKG_CPPFLAGS+= -I. -I./includes -I./includes/libvol2bird -I./includes/libmistnet -I./includes/librave -I./includes/libhlhdf -I./includes/librsl -I./includes/libiris2odim
 
