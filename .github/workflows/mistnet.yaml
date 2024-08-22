@@ -119,7 +119,7 @@ jobs:
             upload: Windows
             hw: cpu
           - name: macOS-arm64
-            artifact: macOS
+            artifact: macOS-arm64
             upload: macOS-arm64-test
             hw: cpu
     steps:
