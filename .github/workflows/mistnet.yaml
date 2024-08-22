@@ -49,7 +49,7 @@ jobs:
             flavor: Release
             artifacts: libmistnet.dylib
             upload: macOS
-         - os: macos-14
+          - os: macos-14
             library: libmistnet.dylib
             test: 
             make: make
