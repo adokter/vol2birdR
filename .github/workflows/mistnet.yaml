@@ -1,9 +1,9 @@
-name: Mistnet
-
 on:
   push:
     branches:
       - main
+
+name: Mistnet
 
 jobs:
   build:
