@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-20.04, macos-13]
+        os: [windows-2019, ubuntu-20.04, macos-13, macos-14]
         include:
           - os: windows-2019
             cuda: 0
@@ -49,6 +49,18 @@ jobs:
             flavor: Release
             artifacts: libmistnet.dylib
             upload: macOS
+         - os: macos-14
+            library: libmistnet.dylib
+            test: 
+            make: make
+            build: build
+            cmakevars:
+            libext: .dylib
+            exeext:
+            fixlib: install_name_tool -add_rpath @loader_path/. libmistnet.dylib
+            flavor: Release
+            artifacts: libmistnet.dylib
+            upload: macOS-arm64-test
     steps:
       - uses: actions/checkout@v3
       - name: Create environment
@@ -90,7 +102,8 @@ jobs:
           [
             macOS,
             Linux,
-            Windows
+            Windows,
+            macOS-arm64
           ]
         include:
           - name: macOS
@@ -104,6 +117,10 @@ jobs:
           - name: Windows
             artifact: Windows
             upload: Windows
+            hw: cpu
+          - name: macOS-arm64
+            artifact: macOS
+            upload: macOS-arm64-test
             hw: cpu
     steps:
       - name: Download artifacts
