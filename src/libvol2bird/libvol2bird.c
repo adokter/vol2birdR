@@ -40,7 +40,7 @@
 #include "libdealias.h"
 #include "librender.h"
 #include <ctype.h>
-
+#include <stdint.h>  // For SIZE_MAX
 
 #ifdef RSL
 #include "rsl.h"
@@ -3801,7 +3801,11 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
     vol2bird_err_printf("end of list\n");
     #endif
 
-
+    // Overflow check before malloc
+    if (nCells > SIZE_MAX / sizeof(CELLPROP)) {
+        vol2bird_err_printf("Requested memory size is too large in removeDroppedCells!\n");
+        return -1;
+    }
     
     cellPropCopy = (CELLPROP*) malloc(sizeof(CELLPROP) * nCells);
     if (!cellPropCopy) {
