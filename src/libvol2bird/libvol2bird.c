@@ -17,6 +17,7 @@
  *
  */
 
+#include <stdint.h>  // For SIZE_MAX
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -40,7 +41,7 @@
 #include "libdealias.h"
 #include "librender.h"
 #include <ctype.h>
-#include <stdint.h>  // For SIZE_MAX
+
 
 #ifdef RSL
 #include "rsl.h"

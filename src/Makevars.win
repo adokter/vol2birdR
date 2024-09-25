@@ -2,6 +2,8 @@ $(info The name of the shared library to be created is: $(SHLIB))
 
 ENABLE_IRIS2ODIM=yes
 
+CXX_STD = CXX17
+
 SOURCES = $(wildcard ./*.cpp )
 
 SOURCES_C = $(wildcard ./libvol2bird/*.c ./librave/*.c ./libhlhdf/*.c ./librsl/*.c ./libiris2odim/*.c)
@@ -11,6 +13,13 @@ OBJECTS_C = $(SOURCES_C:.c=.o)
 OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
 
 H5_API_CFLAGS=-DH5_USE_110_API
+
+# Override CFLAGS to include suppression flags after default flags
+override CFLAGS += -Wno-strict-prototypes
+override CXXFLAGS += -Wno-strict-prototypes
+override PKG_CFLAGS += -Wno-strict-prototypes
+override PKG_CXXFLAGS += -Wno-strict-prototypes
+override SHLIB_CFLAGS += -Wno-strict-prototypes
 
 PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 
