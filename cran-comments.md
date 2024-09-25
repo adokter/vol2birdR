@@ -2,4 +2,4 @@
 * fixed broken hdf5 info link
 * explicitly specified C++17 standard in package's source files
 * added overflow check for nCells  
-* suppressed warnings associated with Rtools43
+* suppressed warnings associated with Rtools43 for Windows builds
