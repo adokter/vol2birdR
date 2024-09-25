@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [develop, cran_release]
+    branches: [main, develop, cran_release]
   pull_request:
-    branches: [develop]
+    branches: [main]
 
 name: R-CMD-check
 
@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-11,   r: 'release'}
+          - {os: macos-13,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-20.04,   r: 'devel'}
+          - {os: ubuntu-latest,   r: 'release'}
           #- {os: ubuntu-latest,   r: 'release'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -45,16 +45,20 @@ jobs:
       - name: Install system dependencies
         if: runner.os == 'Linux'
         run: |
-          pak::local_system_requirements(execute = TRUE)
-          pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
-          pak::pkg_system_requirements("proj4", execute = TRUE) # Using same proj for now...
-          pak::pkg_system_requirements("hdf5r", execute = TRUE) # Using same hdf5 for now...
+          pak::pkg_sysreqs("local::.", dependencies = TRUE)$install_script
+          pak::pkg_sysreqs("rcmdcheck")$install_scripts
+          pak::pkg_sysreqs("proj4")$install_scripts
+          pak::pkg_sysreqs("hdf5r")$install_scripts
+          #pak::local_system_requirements(execute = TRUE)
+          #pak::pkg_system_requirements("rcmdcheck", execute = TRUE)
+          #pak::pkg_system_requirements("proj4", execute = TRUE) # Using same proj for now...
+          #pak::pkg_system_requirements("hdf5r", execute = TRUE) # Using same hdf5 for now...
         shell: Rscript {0}
 
       - name: Install macOS system dependencies
         if: runner.os == 'macOS'
         run: |
-          env HOMEBREW_NO_AUTO_UPDATE=1 brew install hdf5 proj gsl
+          env HOMEBREW_NO_AUTO_UPDATE=1 brew install hdf5 proj gsl pkg-config
 
       - name: Install dependencies
         run: |

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,8 +80,8 @@ Additional information when installing the dependencies on macOS
 <div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
 </details><table class="table">
 <colgroup>
-<col width="36%">
-<col width="63%">
+<col width="33%">
+<col width="66%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">System</th>
@@ -94,7 +94,7 @@ Additional information when installing the dependencies on macOS
 </tr>
 <tr class="even">
 <td align="left"><strong>Debian-based systems (including Ubuntu)</strong></td>
-<td align="left"><code>sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config</code></td>
+<td align="left"><code>sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config libbz2-dev</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Systems supporting yum and RPMs</strong></td>
@@ -124,7 +124,7 @@ Additional information when installing the dependencies on macOS
 <p>Next, download the mistnet model. Note that the model file is large, over 500Mb.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># STEP 2: download mistnet model:</span></span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">install_mistnet_model</span>()</span></code></pre></div>
-<p>See <a href="https://adriaandokter.com/vol2birdR/articles/vol2birdR.html" class="external-link">vignette</a> for additional installation information</p>
+<p>See <a href="https://adriaandokter.com/vol2birdR/articles/vol2birdR.html">vignette</a> for additional installation information</p>
 </div>
 <div class="section level2">
 <h2 id="references">References:<a class="anchor" aria-label="anchor" href="#references"></a>
