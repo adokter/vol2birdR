@@ -127,6 +127,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.artifact }}
+      - name: Display structure of downloaded files
+        run: ls -R
       - uses: montudor/action-zip@v1
         with:
           args: zip -j -qq -r ./${{ matrix.artifact }}.zip ./${{ matrix.artifact }}
