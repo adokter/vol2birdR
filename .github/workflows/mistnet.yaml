@@ -131,7 +131,7 @@ jobs:
         run: ls -R
       - uses: montudor/action-zip@v1
         with:
-          args: zip -j -qq -r ./${{ matrix.artifact }}.zip ./${{ matrix.artifact }}
+          args: zip -j -qq -r ./${{ matrix.artifact }}.zip *
       - name: Upload to latest
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
