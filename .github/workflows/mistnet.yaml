@@ -88,7 +88,7 @@ jobs:
           rm -r build
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: ${{matrix.upload}}
           path: ${{runner.workspace}}/artifacts
@@ -119,17 +119,16 @@ jobs:
             upload: Windows
             hw: cpu
           - name: macOS-arm64
-            artifact: macOS
+            artifact: macOS-arm64-test
             upload: macOS-arm64-test
             hw: cpu
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-      - uses: montudor/action-zip@v0.1.0
-        with:
-          args: zip -j -qq -r ./${{ matrix.artifact }}.zip ./${{ matrix.artifact }}
+      - name: Display downloaded artifacts and zip
+        run: ls -R && zip -j -qq -r ./${{ matrix.artifact }}.zip *
       - name: Upload to latest
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:

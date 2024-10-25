@@ -20,3 +20,4 @@ cran-comments.md
 NOTICE
 ^LICENSE\.md$
 ^\.vscode$
+^CITATION\.cff$
