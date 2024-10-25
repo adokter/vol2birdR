@@ -19,4 +19,5 @@ cran-comments.md
 ^README\.html$
 NOTICE
 ^LICENSE\.md$
+^\.vscode$
 ^CITATION\.cff$
