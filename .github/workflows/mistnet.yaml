@@ -127,13 +127,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-      - name: Display structure of downloaded files
-        run: ls -R && pwd && zip -h
-      - uses: montudor/action-zip@v0.1.0
-        with:
-          args: zip -j -qq -r ./${{ matrix.artifact }}.zip *
-      - name: Re-display structure of downloaded/zipped files
-        run: ls -R && pwd
+      - name: Display downloaded artifacts and zip
+        run: ls -R && zip -j -qq -r ./${{ matrix.artifact }}.zip * && ls -R
+#      - uses: montudor/action-zip@v0.1.0
+#        with:
+#          args: zip -j -qq -r ./${{ matrix.artifact }}.zip *
+#      - name: Re-display structure of downloaded/zipped files
+#        run: ls -R && pwd
       - name: Upload to latest
         uses: keithweaver/aws-s3-github-action@v1.0.0
         with:
