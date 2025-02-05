@@ -95,6 +95,42 @@ VOL2BIRD_CPPFLAGS="$PKG_CPPFLAGS $PROJ_CFLAGS $VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_CPPFLAGS=$VOL2BIRD_CPPFLAGS"
 echo "VOL2BIRD_LIBS=$VOL2BIRD_LIBS"
 
+# Optional local copy of PROJ_LIB
+# Used for making proj.db available in binaries
+# Modified after RGDAL by Adriaan Dokter on 2/5/2025
+# Note: PROJ_GDAL_DATA_COPY and PROJ_LIB are environment variables typically set by build server
+data_copy=no
+if test "${PROJ_GDAL_DATA_COPY}" ; then
+    data_copy=yes
+    AC_MSG_NOTICE([PROJ_GDAL_DATA_COPY used.])
+else
+    AC_ARG_WITH([data-copy],
+        AS_HELP_STRING([--with-data-copy=yes/no],[local copy of data directories in package, default no]),
+               [data_copy=$withval])
+fi
+if test "${data_copy}" = "yes" ; then
+AC_MSG_NOTICE([Copy data for:])
+  proj_lib0="${PROJ_LIB}"
+  AC_ARG_WITH([proj-data],
+    AS_HELP_STRING([--with-proj-data=DIR],[location of PROJ data directory]),
+    [proj_lib1=$withval])
+  if test -n "${proj_lib0}" ; then
+    proj_lib="${proj_lib0}"
+  else
+    proj_lib="${proj_lib1}"
+  fi
+  if test -n "${proj_lib}" ; then
+    if test -d "${proj_lib}" ; then
+      cp -r "${proj_lib}" "${R_PACKAGE_DIR}"
+      AC_MSG_NOTICE([  PROJ: ${proj_lib}])
+    else
+      AC_MSG_ERROR([PROJ data files not found; set environment variable PROJ_LIB=DIR or --with-proj-data=DIR.])
+    fi
+  else
+      AC_MSG_ERROR([PROJ data files not found; set environment variable PROJ_LIB=DIR or --with-proj-data=DIR.])
+  fi
+fi
+
 
 ENABLE_IRIS2ODIM=no
 AC_MSG_CHECKING([if iris2odim support can be enabled])
