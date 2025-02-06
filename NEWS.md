@@ -1,3 +1,6 @@
+# vol2birdR 1.0.5.9000
+* Fix warning message `pj_obj_create: Cannot find proj.db` (#50)
+
 # vol2birdR 1.0.5
 Addresses several build warning messages as required by CRAN
 * Fixed broken hdf5 info link (c628cae)
