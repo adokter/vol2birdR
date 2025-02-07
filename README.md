@@ -1,5 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <!-- badges: start -->
 
 [![CRAN
@@ -34,7 +35,9 @@ libraries need to be installed as system libraries prior to installation
 of ‘**vol2birdR**’:
 
 <details>
+
 <summary>
+
 Additional information when installing the dependencies on macOS
 </summary>
 
@@ -48,14 +51,17 @@ When the installation has completed it will print out some additional
 information that is essential to follow.
 
     ==> Next steps:
-
-    - Run these commands in your terminal to add Homebrew to your PATH:
+    - Run these two commands in your terminal to add Homebrew to your PATH:
         echo >> /Users/$USER/.zprofile
         echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
         eval "$(/opt/homebrew/bin/brew shellenv)"
+    - Run brew help to get started
+    - Further documentation:
+        https://docs.brew.sh
 
-You need to ensure that you follow the above two commands. The first two
-will add the necessary environment variables to your zshell user profile
+You need to ensure that you follow the above three commands. The first
+two will add the necessary environment variables to your zshell user
+profile.
 
         echo >> /Users/$USER/.zprofile
         echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/$USER/.zprofile
@@ -68,11 +74,11 @@ Homebrew.
 
 </details>
 
-| System                                      | Command                                                                                 |
-|:--------------------------------------------|:----------------------------------------------------------------------------------------|
-| **OS X (using Homebrew)**                   | `brew install hdf5 proj gsl pkg-config`                                                 |
+| System | Command |
+|:---|:---|
+| **OS X (using Homebrew)** | `brew install hdf5 proj gsl pkg-config` |
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config libbz2-dev` |
-| **Systems supporting yum and RPMs**         | `sudo yum install hdf5-devel proj-devel gsl gsl-devel pkgconfig`                        |
+| **Systems supporting yum and RPMs** | `sudo yum install hdf5-devel proj-devel gsl gsl-devel pkgconfig` |
 
 Next, you can install the released version of ‘vol2birdR’ from
 [CRAN](https://CRAN.R-project.org) with:
@@ -124,37 +130,36 @@ for additional installation information
 
 Citation for ‘vol2bird’ algorithm:
 
--   [**Bird migration flight altitudes studied by a network of
-    operational weather
-    radars**](https://doi.org/10.1098/rsif.2010.0116) Dokter AM, Liechti
-    F, Stark H, Delobbe L, Tabary P, Holleman I J. R. Soc. Interface,
-    **8**, 30–43, 2011, DOI
-    [10.1098/rsif.2010.0116](https://doi.org/10.1098/rsif.2010.0116)
+- [**Bird migration flight altitudes studied by a network of operational
+  weather radars**](https://doi.org/10.1098/rsif.2010.0116) Dokter AM,
+  Liechti F, Stark H, Delobbe L, Tabary P, Holleman I J. R. Soc.
+  Interface, **8**, 30–43, 2011, DOI
+  [10.1098/rsif.2010.0116](https://doi.org/10.1098/rsif.2010.0116)
 
 Paper describing recent algorithm extensions and the bioRad package:
 
--   [**bioRad: biological analysis and visualization of weather radar
-    data**](https://doi.org/10.1111/ecog.04028) Dokter AM, Desmet P,
-    Spaaks JH, van Hoey S, Veen L, Verlinden L, Nilsson C, Haase G,
-    Leijnse H, Farnsworth A, Bouten W, Shamoun-Baranes J. Ecography,
-    **42**, 852-860, 2019, DOI
-    [10.1111/ecog.04028](https://doi.org/10.1111/ecog.04028)
+- [**bioRad: biological analysis and visualization of weather radar
+  data**](https://doi.org/10.1111/ecog.04028) Dokter AM, Desmet P,
+  Spaaks JH, van Hoey S, Veen L, Verlinden L, Nilsson C, Haase G,
+  Leijnse H, Farnsworth A, Bouten W, Shamoun-Baranes J. Ecography,
+  **42**, 852-860, 2019, DOI
+  [10.1111/ecog.04028](https://doi.org/10.1111/ecog.04028)
 
 ‘vol2bird’ implements dealiasing using the torus mapping method by Haase
 and Landelius:
 
--   [**Dealiasing of Doppler radar velocities using a torus
-    mapping**](https://doi.org/10.1175/1520-0426(2004)021%3C1566:DODRVU%3E2.0.CO;2)
-    Haase G, Landelius T. Journal of Atmospheric and Oceanic Technology
-    **21**, 1566-1573, 2004, DOI
-    [10.1175/1520-0426(2004)021\<1566:DODRVU\>2.0.CO;2](https://doi.org/10.1175/1520-0426(2004)021%3C1566:DODRVU%3E2.0.CO;2)
+- [**Dealiasing of Doppler radar velocities using a torus
+  mapping**](https://doi.org/10.1175/1520-0426(2004)021%3C1566:DODRVU%3E2.0.CO;2)
+  Haase G, Landelius T. Journal of Atmospheric and Oceanic Technology
+  **21**, 1566-1573, 2004, DOI
+  [10.1175/1520-0426(2004)021\<1566:DODRVU\>2.0.CO;2](https://doi.org/10.1175/1520-0426(2004)021%3C1566:DODRVU%3E2.0.CO;2)
 
 Use the following citation for the ‘MistNet’ rain segmentation model:
 
--   [**MistNet: Measuring historical bird migration in the US using
-    archived weather radar data and convolutional neural
-    networks.**](https://doi.org/10.1111/2041-210X.13280) Lin T-Y,
-    Winner K, Bernstein G, Mittal A, Dokter AM, Horton KG, Nilsson C,
-    Van Doren BM, Farnsworth A, La Sorte FA, Maji S, Sheldon D. Methods
-    in Ecology and Evolution, **10**, 1908-1922, 2019, DOI
-    [10.1111/2041-210X.13280](https://doi.org/10.1111/2041-210X.13280)
+- [**MistNet: Measuring historical bird migration in the US using
+  archived weather radar data and convolutional neural
+  networks.**](https://doi.org/10.1111/2041-210X.13280) Lin T-Y, Winner
+  K, Bernstein G, Mittal A, Dokter AM, Horton KG, Nilsson C, Van Doren
+  BM, Farnsworth A, La Sorte FA, Maji S, Sheldon D. Methods in Ecology
+  and Evolution, **10**, 1908-1922, 2019, DOI
+  [10.1111/2041-210X.13280](https://doi.org/10.1111/2041-210X.13280)
