@@ -1,5 +1,6 @@
 # vol2birdR 1.0.5.9000
 * Fix warning message `pj_obj_create: Cannot find proj.db` (#50)
+* Added an automatic mistnet library build for M1 macs (#82)
 
 # vol2birdR 1.0.5
 Addresses several build warning messages as required by CRAN
