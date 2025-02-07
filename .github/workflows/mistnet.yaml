@@ -60,7 +60,7 @@ jobs:
             fixlib: install_name_tool -add_rpath @loader_path/. libmistnet.dylib
             flavor: Release
             artifacts: libmistnet.dylib
-            upload: macOS-arm64-test
+            upload: macOS-arm64
     steps:
       - uses: actions/checkout@v3
       - name: Create environment
@@ -119,8 +119,8 @@ jobs:
             upload: Windows
             hw: cpu
           - name: macOS-arm64
-            artifact: macOS-arm64-test
-            upload: macOS-arm64-test
+            artifact: macOS-arm64
+            upload: macOS-arm64
             hw: cpu
     steps:
       - name: Download artifacts

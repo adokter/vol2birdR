@@ -8,8 +8,8 @@
 <title>Vertical Profiles of Biological Signals in Weather Radar Data • vol2birdR</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Vertical Profiles of Biological Signals in Weather Radar Data">
 <meta name="description" content="R implementation of the vol2bird software for generating vertical profiles of birds and other biological signals in weather radar data. See Dokter et al. (2011) &lt;doi:10.1098/rsif.2010.0116&gt; for a paper describing the methodology.">
 <meta property="og:description" content="R implementation of the vol2bird software for generating vertical profiles of birds and other biological signals in weather radar data. See Dokter et al. (2011) &lt;doi:10.1098/rsif.2010.0116&gt; for a paper describing the methodology.">
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,38 +64,38 @@
 <details><summary>
 Additional information when installing the dependencies on macOS
 </summary><p>Since the installation process requires the <a href="https://brew.sh/" class="external-link">Homebrew</a> package manager you will have to install it. Open a terminal and issue the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  <span class="sc">/</span>bin<span class="sc">/</span>bash <span class="sc">-</span>c <span class="st">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>  <span class="sc">/</span>bin<span class="sc">/</span>bash <span class="sc">-</span>c <span class="st">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></span></code></pre></div>
 <p>When the installation has completed it will print out some additional information that is essential to follow.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="sc">==</span><span class="er">&gt;</span> Next steps<span class="sc">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Run these two commands <span class="cf">in</span> your terminal to add Homebrew to your PATH<span class="sc">:</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Run brew help to get started</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span> Further documentation<span class="sc">:</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    https<span class="sc">:</span><span class="er">//</span>docs.brew.sh</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="sc">==</span><span class="er">&gt;</span> Next steps<span class="sc">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="sc">-</span> Run these two commands <span class="cf">in</span> your terminal to add Homebrew to your PATH<span class="sc">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="sc">-</span> Run brew help to get started</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="sc">-</span> Further documentation<span class="sc">:</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>    https<span class="sc">:</span><span class="er">//</span>docs.brew.sh</span></code></pre></div>
 <p>You need to ensure that you follow the above two commands. The first one will add the necessary environment variables to your user</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span>anders<span class="sc">/</span>.zprofile</span></code></pre></div>
 <p>The second command will ensure that you get the necessary environment variables into the terminal where you ran the installation process of Homebrew.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
 </details><table class="table">
 <colgroup>
 <col width="33%">
 <col width="66%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th align="left">System</th>
 <th align="left">Command</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left"><strong>OS X (using Homebrew)</strong></td>
 <td align="left"><code>brew install hdf5 proj gsl pkg-config</code></td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"><strong>Debian-based systems (including Ubuntu)</strong></td>
 <td align="left"><code>sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config libbz2-dev</code></td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left"><strong>Systems supporting yum and RPMs</strong></td>
 <td align="left"><code>sudo yum install hdf5-devel proj-devel gsl gsl-devel pkgconfig</code></td>
 </tr>
@@ -115,14 +115,14 @@ Additional information when installing the dependencies on macOS
 <h3 id="mistnet-installation">MistNet installation<a class="anchor" aria-label="anchor" href="#mistnet-installation"></a>
 </h3>
 <p>MistNet is a deep convolution neural net for segmenting out precipitation from radar data, see Lin et al. 2019. To use MistNet, follow the following additional installation steps in R:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP 1: install additional libraries for using MistNet:</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vol2birdR)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install_mistnet</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># STEP 1: install additional libraries for using MistNet:</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">library</span>(vol2birdR)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="fu">install_mistnet</span>()</span></code></pre></div>
 <p>After completing this step, the following command should evaluate to <code>TRUE</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mistnet_exists</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">mistnet_exists</span>()</span></code></pre></div>
 <p>Next, download the mistnet model. Note that the model file is large, over 500Mb.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># STEP 2: download mistnet model:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install_mistnet_model</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># STEP 2: download mistnet model:</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">install_mistnet_model</span>()</span></code></pre></div>
 <p>See <a href="https://adriaandokter.com/vol2birdR/articles/vol2birdR.html">vignette</a> for additional installation information</p>
 </div>
 <div class="section level2">
@@ -210,7 +210,7 @@ Additional information when installing the dependencies on macOS
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
