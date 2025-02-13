@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Define paths to the files we need to check
+C_FILE="src/libiris2odim/iris2odim.c"
+H_FILE="src/includes/libiris2odim/iris2odim.h"
+MAKEVARS_FILE="src/Makevars.win"
+
+# Initialize ENABLE_IRIS2ODIM to "no"
+ENABLE_IRIS2ODIM="no"
+
+# Check if both files exist
+echo "Checking if iris2odim support can be enabled..."
+if [ -f "$C_FILE" ] && [ -f "$H_FILE" ]; then
+  echo "Result: yes"
+  ENABLE_IRIS2ODIM="yes"
+else
+  echo "Result: no"
+fi
+
+# Modify Makevars.win to set ENABLE_IRIS2ODIM
+if [ -f "$MAKEVARS_FILE" ]; then
+
+  # Update the ENABLE_IRIS2ODIM variable in Makevars.win
+  # and store original as Makevars.win.bak
+  sed -i.bak "s/^ENABLE_IRIS2ODIM=.*$/ENABLE_IRIS2ODIM=$ENABLE_IRIS2ODIM/" "$MAKEVARS_FILE"
+
+fi
+
+# Exit gracefully
+exit 0
