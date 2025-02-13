@@ -22,7 +22,7 @@ if [ -f "$MAKEVARS_FILE" ]; then
 
   # Update the ENABLE_IRIS2ODIM variable in Makevars.win
   # and store original as Makevars.win.bak
-  sed -i.bak 's/^ENABLE_IRIS2ODIM=.*$/ENABLE_IRIS2ODIM=$ENABLE_IRIS2ODIM/' "$MAKEVARS_FILE"
+  sed -i.bak "s/^ENABLE_IRIS2ODIM=.*$/ENABLE_IRIS2ODIM=$ENABLE_IRIS2ODIM/" "$MAKEVARS_FILE"
 
 fi
 

@@ -1,6 +1,6 @@
 $(info The name of the shared library to be created is: $(SHLIB))
 
-ENABLE_IRIS2ODIM=yes
+ENABLE_IRIS2ODIM=$ENABLE_IRIS2ODIM
 
 CXX_STD = CXX17
 
