@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-20.04, macos-13, macos-14]
+        os: [windows-2019, ubuntu-latest, macos-13, macos-14]
         include:
           - os: windows-2019
             cuda: 0
@@ -25,7 +25,7 @@ jobs:
             flavor: Release
             artifacts: mistnet.dll
             upload: Windows        
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             library: libmistnet.so
             test: 
             make: make
@@ -63,11 +63,20 @@ jobs:
             upload: macOS-arm64
     steps:
       - uses: actions/checkout@v3
+
       - name: Create environment
         run: cmake -E make_directory ${{runner.workspace}}/build
+
+      - name: Install chrpath
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chrpath
+
       - name: Free up 24GB of disk space
-        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        if: startsWith(matrix.os, 'ubuntu')
         run: sudo rm -rf /usr/share/dotnet
+
       - name: Run cmake
         working-directory: ${{runner.workspace}}/build
         run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} ${{ matrix.cmakevars }} ${{github.workspace}}/mistnet
@@ -95,7 +104,7 @@ jobs:
 
   upload:
     needs: build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         name:
