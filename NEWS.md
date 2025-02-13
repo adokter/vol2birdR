@@ -1,5 +1,5 @@
 # vol2birdR 1.0.6.9000
-* upgrade mistnet library builds to macos-latest and ubuntu-latest
+* upgrade mistnet library builds to macos-latest and ubuntu-latest (#66,#69)
 
 # vol2birdR 1.0.6
 * Fix warning message `pj_obj_create: Cannot find proj.db` (#50)
