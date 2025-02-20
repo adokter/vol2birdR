@@ -34,7 +34,7 @@ Installs the 'MistNet' model file in 'PyTorch' format
 }
 \details{
 Download and install the 'MistNet' model file. By default the library is downloaded to
-data/mistnet_nexrad.pt in the 'vol2birdR' package directory.
+data/mistnet_nexrad.pt in the 'tools::R_user_dir("vol2birdR", "data")' directory.
 
 Alternatively, the model file can be downloaded to a different location, which has the
 advantage that it doesn't have to be redownloaded after a reinstall of 'vol2birdR'.

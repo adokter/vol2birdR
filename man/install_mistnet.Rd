@@ -30,7 +30,7 @@ no value returned. Installs libraries into the package
 Installs libraries and dependencies for using 'MistNet'.
 }
 \details{
-By default libraries are installed in the 'vol2birdR' package directory.
+By default libraries are installed in the 'tools::R_user_dir("vol2birdR", "data")' directory.
 
 When using \code{path} to install in a specific location, make sure the \code{MISTNET_HOME} environment
 variable is set to this same path to reuse this installation.
