@@ -96,7 +96,7 @@ install_path <- function(version = "1.0") {
   if (nzchar(path)) {
     normalizePath(path, mustWork = FALSE)
   } else {
-    normalizePath(file.path(system.file("", package = "vol2birdR")), mustWork = FALSE)
+    base::normalizePath(tools::R_user_dir("vol2birdR", "data"), winslash = "/", mustWork = FALSE)
   }
 }
 
@@ -280,7 +280,7 @@ install_type <- function(version) {
 #'
 #' @details
 #' Download and install the 'MistNet' model file. By default the library is downloaded to
-#' data/mistnet_nexrad.pt in the 'vol2birdR' package directory.
+#' data/mistnet_nexrad.pt in the 'tools::R_user_dir("vol2birdR", "data")' directory.
 #'
 #' Alternatively, the model file can be downloaded to a different location, which has the
 #' advantage that it doesn't have to be redownloaded after a reinstall of 'vol2birdR'.
@@ -343,7 +343,7 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #' @return no value returned. Installs libraries into the package
 #'
 #' @details
-#' By default libraries are installed in the 'vol2birdR' package directory.
+#' By default libraries are installed in the 'tools::R_user_dir("vol2birdR", "data")' directory.
 #'
 #' When using \code{path} to install in a specific location, make sure the \code{MISTNET_HOME} environment
 #' variable is set to this same path to reuse this installation.

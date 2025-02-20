@@ -46,6 +46,8 @@ License: LGPL (>= 3)
 Language: en-US
 URL: https://github.com/adokter/vol2birdR/, https://adriaandokter.com/vol2bird/
 BugReports: https://github.com/adokter/vol2birdR/issues
+Depends:
+    R (>= 4.0.0)
 Imports: 
     assertthat,
     methods,

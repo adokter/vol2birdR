@@ -120,7 +120,7 @@
 vol2bird_config <- function(config){
   if(missing(config)){
     output=Vol2BirdConfig$new()
-    mistnet_model_path <- file.path(find.package("vol2birdR"), "data", "mistnet_nexrad.pt")
+    mistnet_model_path <- file.path(base::normalizePath(tools::R_user_dir("vol2birdR", "data"), winslash = "/", mustWork = FALSE),"data","mistnet_nexrad.pt")
     if(file.exists(mistnet_model_path)){
       output$mistNetPath <-  mistnet_model_path
     }
