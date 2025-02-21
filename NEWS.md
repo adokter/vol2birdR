@@ -1,7 +1,7 @@
-# vol2birdR 1.0.6.9000
-* upgrade mistnet library builds to macos-latest and ubuntu-latest (#66,#69)
-* reinstalls no longer require a redownload of mistnet library files by using persistant cache (#94)
+# vol2birdR 1.0.7
 * fixes a segfault that occurred for mistnet runs on data with missing parameters (#29)
+* reinstalls no longer require a redownload of mistnet library files by using persistant cache (#94)
+* upgrade mistnet library build runners to macos-latest and ubuntu-latest (#66,#69)
 
 # vol2birdR 1.0.6
 * Fix warning message `pj_obj_create: Cannot find proj.db` (#50)
