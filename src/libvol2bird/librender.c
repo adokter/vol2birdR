@@ -712,7 +712,7 @@ int polarVolumeTo3DTensor(PolarVolume_t* pvol, double ****tensor, int dim, long 
     }
 
     // initialize a 3D tensor, and fill it
-    *tensor = init3DTensor(nCartesianParam,dim,dim,MISTNET_INIT);
+    *tensor = init3DTensor(nParam,dim,dim,MISTNET_INIT);
     fill3DTensor(*tensor, list, nCartesianParam, dim, dim);
 
     // clean up
