@@ -30,9 +30,24 @@ interface, with ‘**vol2birdR**’ acting as a dependency of
 ‘**vol2birdR**’ is available for all major platforms (Linux, OS X and
 Windows).
 
-For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5
-libraries need to be installed as system libraries prior to installation
-of ‘**vol2birdR**’:
+For OS X and Windows, you can install the released version of
+‘vol2birdR’ from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("vol2birdR")
+```
+
+Alternatively, you can install the latest development version from
+[GitHub](https://github.com/adokter/bioRad) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("adokter/vol2birdR")
+```
+
+For Linux and for installation of the development version the GNU
+Scientific Library (GSL), PROJ and HDF5 libraries need to be installed
+as system libraries prior to installation of ‘**vol2birdR**’:
 
 <details>
 
@@ -80,21 +95,6 @@ Homebrew.
 | **OS X (using Homebrew)** | `brew install hdf5 proj gsl pkg-config` |
 | **Debian-based systems (including Ubuntu)** | `sudo apt-get install libhdf5-dev libproj-dev gsl-bin libgsl-dev pkg-config libbz2-dev` |
 | **Systems supporting yum and RPMs** | `sudo yum install hdf5-devel proj-devel gsl gsl-devel pkgconfig` |
-
-Next, you can install the released version of ‘vol2birdR’ from
-[CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("vol2birdR")
-```
-
-Alternatively, you can install the latest development version from
-[GitHub](https://github.com/adokter/bioRad) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("adokter/vol2birdR")
-```
 
 Then load the package with:
 
