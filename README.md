@@ -35,7 +35,6 @@ libraries need to be installed as system libraries prior to installation
 of ‘**vol2birdR**’:
 
 <details>
-
 <summary>
 
 Additional information when installing the dependencies on macOS
