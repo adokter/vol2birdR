@@ -49,8 +49,7 @@ For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5
 libraries need to be installed as system libraries prior to installation
 of '**vol2birdR**':
 
-<details>
-<summary>Additional information when installing the dependencies on
+<details><summary>Click here for additional information when installing the dependencies on
 macOS</summary>
 
 Since the installation process requires the [Homebrew](https://brew.sh/)
