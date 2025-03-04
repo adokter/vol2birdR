@@ -1,3 +1,6 @@
+# vol2birdR 1.0.7.9000
+* remove the word DEBUG from a warning message
+
 # vol2birdR 1.0.7
 * fixes a segfault that occurred for mistnet runs on data with missing parameters (#29)
 * reinstalls no longer require a redownload of mistnet library files by using persistent cache (#94)
