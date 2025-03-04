@@ -1,5 +1,5 @@
 # vol2birdR 1.0.7.9000
-* remove the word DEBUG from a warning message
+* removes a stray DEBUG warning message that isn't a true warning (#103)
 
 # vol2birdR 1.0.7
 * fixes a segfault that occurred for mistnet runs on data with missing parameters (#29)
