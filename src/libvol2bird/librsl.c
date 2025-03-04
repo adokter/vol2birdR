@@ -313,9 +313,6 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
 
     // add range scale Atribute to scan
     rscale = rslRay->h.gate_size;
-    if(ABS(rscale - (RSL_get_first_ray_of_volume(rslVol)->h.gate_size))>0.0001){
-        vol2bird_err_printf("DEBUG warning: scan %i has different range resolution (%i) than first scan of volume (%i)\n", iScan, ROUND(rscale), ROUND(RSL_get_first_ray_of_volume(rslVol)->h.gate_size));
-    }    
     PolarScan_setRscale(scan, rscale);
     
     // loop through the volume pointers
