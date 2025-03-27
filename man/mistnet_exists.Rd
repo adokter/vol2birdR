@@ -12,3 +12,9 @@ TRUE if both 'LibTorch' and 'MistNet' libraries can be found, otherwise FALSE
 \description{
 Checks if the 'LibTorch' and 'MistNet' libraries have been installed or not.
 }
+\seealso{
+\itemize{
+\item \code{\link[=mistnet_installed]{mistnet_installed()}}
+\item \code{\link[=install_mistnet]{install_mistnet()}}
+}
+}
