@@ -2,8 +2,7 @@
 % Please edit documentation in R/install.R
 \name{mistnet_installed}
 \alias{mistnet_installed}
-\title{Checks if the 'LibTorch' and 'MistNet' libraries have been installed, and
-that the mistnet model file has been downloaded.}
+\title{Check if MistNet installation is complete}
 \usage{
 mistnet_installed(path, verbose = FALSE)
 }
@@ -22,6 +21,8 @@ that the mistnet model file has been downloaded.
 }
 \seealso{
 \itemize{
-\item \link{mistnet_exists}
+\item \code{\link[=mistnet_exists]{mistnet_exists()}}
+\item \code{\link[=install_mistnet]{install_mistnet()}}
+\item \code{\link[=install_mistnet_model]{install_mistnet_model()}}
 }
 }
