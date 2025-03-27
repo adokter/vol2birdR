@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,25 +60,32 @@
 <h1 id="install">Install<a class="anchor" aria-label="anchor" href="#install"></a>
 </h1>
 <p>‘<strong>vol2birdR</strong>’ is available for all major platforms (Linux, OS X and Windows).</p>
-<p>For OS X and Linux the GNU Scientific Library (GSL), PROJ and HDF5 libraries need to be installed as system libraries prior to installation of ‘<strong>vol2birdR</strong>’:</p>
+<p>For OS X and Windows, you can install the released version of ‘vol2birdR’ from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"vol2birdR"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, you can install the latest development version from <a href="https://github.com/adokter/bioRad" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"adokter/vol2birdR"</span><span class="op">)</span></span></code></pre></div>
+<p>For Linux and for installation of the development version the GNU Scientific Library (GSL), PROJ and HDF5 libraries need to be installed as system libraries prior to installation of ‘<strong>vol2birdR</strong>’:</p>
 <details><summary>
-Additional information when installing the dependencies on macOS
+Click here for additional information when installing the dependencies on macOS
 </summary><p>Since the installation process requires the <a href="https://brew.sh/" class="external-link">Homebrew</a> package manager you will have to install it. Open a terminal and issue the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>  <span class="sc">/</span>bin<span class="sc">/</span>bash <span class="sc">-</span>c <span class="st">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>  <span class="sc">/</span>bin<span class="sc">/</span>bash <span class="sc">-</span>c <span class="st">"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span></span></code></pre></div>
 <p>When the installation has completed it will print out some additional information that is essential to follow.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="sc">==</span><span class="er">&gt;</span> Next steps<span class="sc">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="sc">-</span> Run these two commands <span class="cf">in</span> your terminal to add Homebrew to your PATH<span class="sc">:</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>    echo <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="sc">-</span> Run brew help to get started</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="sc">-</span> Further documentation<span class="sc">:</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    https<span class="sc">:</span><span class="er">//</span>docs.brew.sh</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">==</span><span class="er">&gt;</span> Next steps<span class="sc">:</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="sc">-</span> Run these two commands <span class="cf">in</span> your terminal to add Homebrew to your PATH<span class="sc">:</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    echo <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="sc">-</span> Run brew help to get started</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="sc">-</span> Further documentation<span class="sc">:</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    https<span class="sc">:</span><span class="er">//</span>docs.brew.sh</span></code></pre></div>
 <p>You need to ensure that you follow the above three commands. The first two will add the necessary environment variables to your zshell user profile.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>    echo <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>    echo <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>    echo <span class="st">'eval "$(/opt/homebrew/bin/brew shellenv)"'</span> <span class="sc">&gt;</span><span class="er">&gt;</span> <span class="er">/</span>Users<span class="sc">/</span><span class="er">$</span>USER<span class="sc">/</span>.zprofile</span></code></pre></div>
 <p>The second command will ensure that you get the necessary environment variables into the terminal where you ran the installation process of Homebrew.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>    eval <span class="st">"$(/opt/homebrew/bin/brew shellenv)"</span></span></code></pre></div>
 </details><table class="table">
 <colgroup>
 <col width="50%">
@@ -103,13 +110,6 @@ Additional information when installing the dependencies on macOS
 </tr>
 </tbody>
 </table>
-<p>Next, you can install the released version of ‘vol2birdR’ from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"vol2birdR"</span><span class="op">)</span></span></code></pre></div>
-<p>Alternatively, you can install the latest development version from <a href="https://github.com/adokter/bioRad" class="external-link">GitHub</a> with:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"adokter/vol2birdR"</span><span class="op">)</span></span></code></pre></div>
 <p>Then load the package with:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/adokter/vol2birdR/" class="external-link">vol2birdR</a></span><span class="op">)</span></span></code></pre></div>
