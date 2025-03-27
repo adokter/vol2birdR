@@ -1,6 +1,7 @@
 # vol2birdR 1.0.7.9000
 * removes a stray DEBUG warning message that isn't a true warning (#103)
 * add timestamp seconds to VPTS CSV output (#105)
+* add `mistnet_installed()` function to test if mistnet installation is complete (#109)
 
 # vol2birdR 1.0.7
 * fixes a segfault that occurred for mistnet runs on data with missing parameters (#29)

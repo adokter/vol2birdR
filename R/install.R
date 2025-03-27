@@ -132,6 +132,36 @@ mistnet_exists <- function() {
   TRUE
 }
 
+#' Checks if the 'LibTorch' and 'MistNet' libraries have been installed, and
+#' that the mistnet model file has been downloaded.
+#' @param path Optional non-default file path to check for the mistnet model file.
+#' @param verbose When TRUE print informative messages on missing library and model files.
+#' @return TRUE if the 'LibTorch' and 'MistNet' libraries can be found and the
+#' and the MistNet model file can be located, otherwise FALSE.
+#' @export
+#' @seealso
+#' * [mistnet_exists]
+mistnet_installed <- function(path, verbose = FALSE) {
+  if(missing(path)){
+     path <- file.path(vol2birdR::torch_install_path(),"data","mistnet_nexrad.pt")
+  }
+  else{
+     assert_that(is.character(path))
+  }
+
+  if(!mistnet_exists()){
+     if(verbose) message("torch and/or mistnet libraries not installed, see `install_mistnet()`")
+     return(FALSE)
+  }
+  if(!file.exists(path)){
+     if(verbose) message("mistnet model file not found, see `install_mistnet_model()`")
+     return(FALSE) 
+  }
+
+  TRUE
+}
+
+
 #' Returns the path of the 'MistNet' libraries for specified version
 #' @param library_name The name of the library searched for, either 'libmistnet' or 'LibTorch'
 #' @param install_path The location where to look for the libraries
