@@ -1,7 +1,7 @@
 Package: vol2birdR
 Type: Package
 Title: Vertical Profiles of Biological Signals in Weather Radar Data
-Version: 1.0.9
+Version: 1.0.9.9000
 Date: 2025-03-28
 Authors@R: c(
     person("Anders", "Henja", , "anders.henja@gmail.com", role = "aut",
