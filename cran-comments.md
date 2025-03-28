@@ -1,4 +1,3 @@
-# vol2birdR 1.0.6
-this release includes a bugfix and a small improvement reducing the need to redownload cached files:
-* fixes a segfault that occurred when processing certain files
-* moves the cache for downloaded files outside the package install directory
+# vol2birdR 1.0.8
+* fixes significant warning related to M_PI and M_PI_2 macro redefine
+* adds a helper function mistnet_installed() to check for installation completeness
