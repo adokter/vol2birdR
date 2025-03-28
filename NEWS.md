@@ -1,3 +1,6 @@
+# vol2birdR 1.0.9
+* bugfix for rounding error in seconds of timestamp written in VPTS CSV files for NEXRAD data (#112)
+
 # vol2birdR 1.0.8
 * removes a stray DEBUG warning message that isn't a true warning (#103)
 * add timestamp seconds to VPTS CSV output (#105)
