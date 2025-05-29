@@ -1,3 +1,6 @@
+# vol2birdR 1.0.9.9000
+* change to Rcpp messages for warnings and messages by vol2birdR, to allow message suppression in R (#115, #116)
+
 # vol2birdR 1.0.9
 * bugfix for rounding error in seconds of timestamp written in VPTS CSV files for NEXRAD data (#112)
 
