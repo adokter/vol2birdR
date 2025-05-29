@@ -56,16 +56,16 @@ void cpp_vol2bird_namespace__store_main_thread_id() {
 }
 
 void Vol2Bird_Rprintf(const char* msg) {
-  Rprintf("%s", msg);
+  warning("%s", msg);
 }
 
 void RSL_Rprintf(const char* msg) {
-  Rprintf("%s", msg);
+  warning("%s", msg);
 }
 
 #ifdef ENABLE_IRIS2ODIM
 void IRIS2ODIM_Rprintf(const char* msg) {
-  Rprintf("%s", msg);
+  warning("%s", msg);
 }
 #endif
 
