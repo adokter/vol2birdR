@@ -1049,18 +1049,23 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
 
     // set scanUse to false for scans not entering the MistNet segmentation model
     if(alldata->options.mistNetElevsOnly){
-        int printWarning = TRUE;
+        int printWarning = FALSE;
+        // buffer to accumulate warning message:
+        char buffer[1024];
+        // initialize the buffer (ensure it's empty initially)
+        buffer[0] = '\0';
         for(int iScan = 0; iScan < PolarVolume_getNumberOfScans(volume); iScan++){
             PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
             if(PolarVolume_indexOf(volume_mistnet, scan) == -1){
-                if(printWarning) vol2bird_err_printf("Warning: Ignoring scan(s) not used as MistNet input: ");
-                vol2bird_err_printf( "%i ", iScan + 1);
-                printWarning = FALSE;
+                char scanMsg[16]; // Temporary buffer to format each scan number
+                snprintf(scanMsg, sizeof(scanMsg), "%i ", iScan + 1); // Formatted scan number
+                strcat(buffer, scanMsg); // Append each scan number to the main buffer
+                printWarning = TRUE;
                 scanUse[iScan].useScan = FALSE;
             }
             RAVE_OBJECT_RELEASE(scan);
         }
-        if(!printWarning) vol2bird_err_printf( "...\n");
+        if(printWarning) vol2bird_err_printf( "Warning: Ignoring scan(s) not used as MistNet input: %s...\n", buffer);
     }
 
     // convert polar volume into 3D tensor array
