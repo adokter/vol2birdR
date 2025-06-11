@@ -3,6 +3,7 @@
 #include <librave.h>
 #include <libmistnet/mistnet.h>
 #include <libvol2bird/constants.h>
+#include <string>
 
 //  #include <thread>
 
@@ -55,17 +56,29 @@ void cpp_vol2bird_namespace__store_main_thread_id() {
   // main_thread_id();
 }
 
+// Helper function to trim the trailing newline that is part
+// of current vol2bird messages.
+std::string trim_newline(const std::string& input) {
+  if (!input.empty() && input.back() == '\n') {
+    return input.substr(0, input.size() - 1); // Remove last character
+  }
+  return input;
+}
+
 void Vol2Bird_Rprintf(const char* msg) {
-  Rprintf("%s", msg);
+  Rcpp::Function message("message");
+  message(trim_newline(msg));
 }
 
 void RSL_Rprintf(const char* msg) {
-  Rprintf("%s", msg);
+  Rcpp::Function message("message");
+  message(trim_newline(msg));
 }
 
 #ifdef ENABLE_IRIS2ODIM
 void IRIS2ODIM_Rprintf(const char* msg) {
-  Rprintf("%s", msg);
+  Rcpp::Function message("message");
+  message(trim_newline(msg));
 }
 #endif
 
@@ -86,9 +99,9 @@ void cpp_vol2bird_initialize() {
   HL_init();
   vol2bird_set_printf(Vol2Bird_Rprintf);
   vol2bird_set_err_printf(Vol2Bird_Rprintf);
-#ifdef ENABLE_IRIS2ODIM  
+#ifdef ENABLE_IRIS2ODIM
   Iris_set_printf(IRIS2ODIM_Rprintf);
-#endif  
+#endif
   RSL_set_printfun(RSL_Rprintf);
 }
 
