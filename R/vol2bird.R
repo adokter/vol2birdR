@@ -78,5 +78,10 @@ vol2bird <- function(file, config, vpfile="", pvolfile_out="", verbose=TRUE, upd
 
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
-  processor$process(path.expand(file), config_instance, path.expand(vpfile), path.expand(pvolfile_out))
+  if(verbose){
+    processor$process(path.expand(file), config_instance, path.expand(vpfile), path.expand(pvolfile_out))
+  }
+  else{
+    suppressMessages(processor$process(path.expand(file), config_instance, path.expand(vpfile), path.expand(pvolfile_out)))
+  }
 }
