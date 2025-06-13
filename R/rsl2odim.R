@@ -72,7 +72,12 @@ rsl2odim <- function(file, config, pvolfile_out="", verbose=TRUE, update_config=
 
   processor<-Vol2Bird$new()
   processor$verbose <- verbose
-  processor$rsl2odim(path.expand(file), config_instance, path.expand(pvolfile_out))
+  if(verbose){
+    processor$rsl2odim(path.expand(file), config_instance, path.expand(pvolfile_out))
+  }
+  else{
+    suppressMessages(processor$rsl2odim(path.expand(file), config_instance, path.expand(pvolfile_out)))
+  }
 }
 
 
