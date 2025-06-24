@@ -1,3 +1,6 @@
+# vol2birdR 1.1.0.9000 (development version)
+* fixes a bug in decoding of the cluttermap that shows up when the gain and offset attributes are unequal to 1 and 0, respectively (#122)
+
 # vol2birdR 1.1.0
 * change to Rcpp messages for warnings and messages by vol2birdR, to allow message suppression in R (#115, #116)
 
