@@ -1,21 +1,21 @@
-# vol2birdR 1.1.0.9000 (development version)
-* fixes a bug in decoding of the cluttermap that shows up when the gain and offset attributes are unequal to 1 and 0, respectively (#122)
+# vol2birdR 1.1.1
+* Fixes a bug when using a cluttermap in `vol2bird_config()`. Cluttermaps are now decoded by taking into account the the gain and offset attributes (#122).
 
 # vol2birdR 1.1.0
-* change to Rcpp messages for warnings and messages by vol2birdR, to allow message suppression in R (#115, #116)
+* Change to Rcpp messages for warnings and messages by vol2birdR, to allow message suppression in R (#115, #116).
 
 # vol2birdR 1.0.9
-* bugfix for rounding error in seconds of timestamp written in VPTS CSV files for NEXRAD data (#112)
+* Bugfix for rounding error in seconds of timestamp written in VPTS CSV files for NEXRAD data (#112).
 
 # vol2birdR 1.0.8
-* removes a stray DEBUG warning message that isn't a true warning (#103)
-* add timestamp seconds to VPTS CSV output (#105)
-* add `mistnet_installed()` function to test if mistnet installation is complete (#109)
+* Removes a stray DEBUG warning message that isn't a true warning (#103).
+* Add timestamp seconds to VPTS CSV output (#105).
+* Add `mistnet_installed()` function to test if mistnet installation is complete (#109).
 
 # vol2birdR 1.0.7
-* fixes a segfault that occurred for mistnet runs on data with missing parameters (#29)
-* reinstalls no longer require a redownload of mistnet library files by using persistent cache (#94)
-* upgrade mistnet library build runners to macos-latest and ubuntu-latest (#66,#69)
+* Fixes a segfault that occurred for mistnet runs on data with missing parameters (#29).
+* Reinstalls no longer require a redownload of mistnet library files by using persistent cache (#94).
+* Upgrade mistnet library build runners to macos-latest and ubuntu-latest (#66,#69).
 
 # vol2birdR 1.0.6
 * Fix warning message `pj_obj_create: Cannot find proj.db` (#50)
