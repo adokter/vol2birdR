@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,24 +34,28 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.1.0" id="vol2birdr-110">vol2birdR 1.1.0<a class="anchor" aria-label="anchor" href="#vol2birdr-110"></a></h2>
-<ul><li>change to Rcpp messages for warnings and messages by vol2birdR, to allow message suppression in R (<a href="https://github.com/adokter/vol2birdR/issues/115" class="external-link">#115</a>, <a href="https://github.com/adokter/vol2birdR/issues/116" class="external-link">#116</a>)</li>
+<h2 class="pkg-version" data-toc-text="1.1.1" id="vol2birdr-111">vol2birdR 1.1.1<a class="anchor" aria-label="anchor" href="#vol2birdr-111"></a></h2>
+<ul><li>Fixes a bug when using a cluttermap in <code><a href="../reference/vol2bird_config.html">vol2bird_config()</a></code>. Cluttermaps are now decoded by taking into account the the gain and offset attributes (<a href="https://github.com/adokter/vol2birdR/issues/122" class="external-link">#122</a>).</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="vol2birdr-110">vol2birdR 1.1.0<a class="anchor" aria-label="anchor" href="#vol2birdr-110"></a></h2><p class="text-muted">CRAN release: 2025-06-13</p>
+<ul><li>Change to Rcpp messages for warnings and messages by vol2birdR, to allow message suppression in R (<a href="https://github.com/adokter/vol2birdR/issues/115" class="external-link">#115</a>, <a href="https://github.com/adokter/vol2birdR/issues/116" class="external-link">#116</a>).</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.9" id="vol2birdr-109">vol2birdR 1.0.9<a class="anchor" aria-label="anchor" href="#vol2birdr-109"></a></h2><p class="text-muted">CRAN release: 2025-03-28</p>
-<ul><li>bugfix for rounding error in seconds of timestamp written in VPTS CSV files for NEXRAD data (<a href="https://github.com/adokter/vol2birdR/issues/112" class="external-link">#112</a>)</li>
+<ul><li>Bugfix for rounding error in seconds of timestamp written in VPTS CSV files for NEXRAD data (<a href="https://github.com/adokter/vol2birdR/issues/112" class="external-link">#112</a>).</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.8" id="vol2birdr-108">vol2birdR 1.0.8<a class="anchor" aria-label="anchor" href="#vol2birdr-108"></a></h2><p class="text-muted">CRAN release: 2025-03-27</p>
-<ul><li>removes a stray DEBUG warning message that isn’t a true warning (<a href="https://github.com/adokter/vol2birdR/issues/103" class="external-link">#103</a>)</li>
-<li>add timestamp seconds to VPTS CSV output (<a href="https://github.com/adokter/vol2birdR/issues/105" class="external-link">#105</a>)</li>
-<li>add <code><a href="../reference/mistnet_installed.html">mistnet_installed()</a></code> function to test if mistnet installation is complete (<a href="https://github.com/adokter/vol2birdR/issues/109" class="external-link">#109</a>)</li>
+<ul><li>Removes a stray DEBUG warning message that isn’t a true warning (<a href="https://github.com/adokter/vol2birdR/issues/103" class="external-link">#103</a>).</li>
+<li>Add timestamp seconds to VPTS CSV output (<a href="https://github.com/adokter/vol2birdR/issues/105" class="external-link">#105</a>).</li>
+<li>Add <code><a href="../reference/mistnet_installed.html">mistnet_installed()</a></code> function to test if mistnet installation is complete (<a href="https://github.com/adokter/vol2birdR/issues/109" class="external-link">#109</a>).</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.7" id="vol2birdr-107">vol2birdR 1.0.7<a class="anchor" aria-label="anchor" href="#vol2birdr-107"></a></h2><p class="text-muted">CRAN release: 2025-02-21</p>
-<ul><li>fixes a segfault that occurred for mistnet runs on data with missing parameters (<a href="https://github.com/adokter/vol2birdR/issues/29" class="external-link">#29</a>)</li>
-<li>reinstalls no longer require a redownload of mistnet library files by using persistent cache (<a href="https://github.com/adokter/vol2birdR/issues/94" class="external-link">#94</a>)</li>
-<li>upgrade mistnet library build runners to macos-latest and ubuntu-latest (<a href="https://github.com/adokter/vol2birdR/issues/66" class="external-link">#66</a>,#69)</li>
+<ul><li>Fixes a segfault that occurred for mistnet runs on data with missing parameters (<a href="https://github.com/adokter/vol2birdR/issues/29" class="external-link">#29</a>).</li>
+<li>Reinstalls no longer require a redownload of mistnet library files by using persistent cache (<a href="https://github.com/adokter/vol2birdR/issues/94" class="external-link">#94</a>).</li>
+<li>Upgrade mistnet library build runners to macos-latest and ubuntu-latest (<a href="https://github.com/adokter/vol2birdR/issues/66" class="external-link">#66</a>,#69).</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.6" id="vol2birdr-106">vol2birdR 1.0.6<a class="anchor" aria-label="anchor" href="#vol2birdr-106"></a></h2><p class="text-muted">CRAN release: 2025-02-07</p>
