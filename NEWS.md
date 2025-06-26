@@ -1,3 +1,5 @@
+# vol2birdR 1.1.1.9000 (development version)
+
 # vol2birdR 1.1.1
 * Fixes a bug when using a cluttermap in `vol2bird_config()`. Cluttermaps are now decoded by taking into account the the gain and offset attributes (#122).
 
