@@ -71,12 +71,15 @@ FILE* create_temporary_file(void)
     return NULL;
   }
 
-  //  Generates a temporary file name.
+  //  Generate a temporary file name, also creates the file.
   tflen = GetTempFileName(pathBuffer,
                         "rsl",
-                        1,
+                        0,
                         tempFileName);
   tempFileName[tflen] = '\0';
+  // Remove the filename, so we can reopen it with TD file modifiers
+  // for temporary files that should be automatically deleted on close.
+  remove(tempFileName);
 
   if (tflen == 0) {
     RSL_printf("Failed to generate temporary filename");
