@@ -76,15 +76,16 @@ FILE* create_temporary_file(void)
                         "rsl",
                         0,
                         tempFileName);
-  tempFileName[tflen] = '\0';
-  // Remove the file, so we can reopen it with TD file modifiers
-  // for temporary files that should be automatically deleted on close.
-  remove(tempFileName);
 
   if (tflen == 0) {
     RSL_printf("Failed to generate temporary filename");
     return NULL;
   }
+
+  // Remove the file, so we can reopen it with TD file modifiers
+  // for temporary files that should be automatically deleted on close.
+  remove(tempFileName);
+  tempFileName[tflen] = '\0';
 
   result = fopen(tempFileName, "wb+TD");
 #else
