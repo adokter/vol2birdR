@@ -74,7 +74,7 @@ FILE* create_temporary_file(void)
   //  Generate a temporary file name, also creates the file.
   tflen = GetTempFileName(pathBuffer,
                         "rsl",
-                        0,
+                        1,
                         tempFileName);
 
   if (tflen == 0) {
