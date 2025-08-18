@@ -84,7 +84,7 @@ FILE* create_temporary_file(void)
 
   // Remove the file, so we can reopen it with TD file modifiers
   // for temporary files that should be automatically deleted on close.
-  remove(tempFileName);
+  //remove(tempFileName);
   tempFileName[tflen] = '\0';
 
   result = fopen(tempFileName, "wb+TD");
