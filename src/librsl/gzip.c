@@ -116,8 +116,8 @@ FILE* create_temporary_file(void)
   // Remove the file, so we can reopen it with TD file modifiers
   // for temporary files that should be automatically deleted on close.
   RSL_printf("removing file ...");
-  RSL_printf("adding string terminator ...");
   remove(tempFileName);
+  RSL_printf("adding string terminator ...");
   tempFileName[tflen] = '\0';
 
   RSL_printf("open file ...");
