@@ -80,49 +80,15 @@ FILE* create_temporary_file(void)
 
   if (tflen == 0) {
     RSL_printf("Failed to generate temporary filename");
-    DWORD err = GetLastError();
-
-    // Buffer for the error message
-    LPVOID msgBuffer;
-    FormatMessage(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM |
-        FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL,
-        err,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &msgBuffer,
-        0,
-        NULL
-    );
-
-    #ifdef UNICODE
-        // The message is a wide string: use wprintf equivalent
-        // Here, convert to UTF-8 for Rprintf
-        int len = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)msgBuffer, -1, NULL, 0, NULL, NULL);
-        char *utf8msg = (char *) R_alloc(len, 1);
-        WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)msgBuffer, -1, utf8msg, len, NULL, NULL);
-        RSL_printf("GetTempFileName failed (error %lu): %s\n", (unsigned long)err, utf8msg);
-    #else
-        RSL_printf("GetTempFileName failed (error %lu): %s\n", (unsigned long)err, (char *)msgBuffer);
-    #endif
-    LocalFree(msgBuffer);
     return NULL;
   }
 
-  //RSL_printf("Temp file name: %s\n", tempFileName);
-
-
   // Remove the file, so we can reopen it with TD file modifiers
   // for temporary files that should be automatically deleted on close.
-  //RSL_printf("removing file ...");
   remove(tempFileName);
-  //RSL_printf("adding string terminator ...");
   tempFileName[tflen] = '\0';
 
-  //RSL_printf("open file ...");
   result = fopen(tempFileName, "wb+TD");
-  //RSL_printf("return file ...");
 #else
   result = tmpfile();
 #endif
