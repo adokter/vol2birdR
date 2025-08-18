@@ -38,7 +38,7 @@
 #' conf <- vol2bird_config()
 #'
 #' # Define output file
-#' output_file <- paste0(tempdir(), "/vp.h5")
+#' output_file <- paste0(tempdir(), "/vp.csv")
 #'
 #' # Calculate the profile:
 #' vol2bird(file = pvolfile, config = conf, vpfile = output_file)
