@@ -110,19 +110,18 @@ FILE* create_temporary_file(void)
     return NULL;
   }
 
-  //RSL_printf("Temp file name: %s\n", tempFileName);
-
+  RSL_printf("Temp file name: %s\n", tempFileName);
 
   // Remove the file, so we can reopen it with TD file modifiers
   // for temporary files that should be automatically deleted on close.
-  //RSL_printf("removing file ...");
+  RSL_printf("removing file ...");
   remove(tempFileName);
-  //RSL_printf("adding string terminator ...");
+  RSL_printf("adding string terminator ...");
   tempFileName[tflen] = '\0';
 
-  //RSL_printf("open file ...");
+  RSL_printf("open file ...");
   result = fopen(tempFileName, "wb+TD");
-  //RSL_printf("return file ...");
+  RSL_printf("return file ...");
 #else
   result = tmpfile();
 #endif
