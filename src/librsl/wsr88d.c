@@ -517,7 +517,7 @@ int wsr88d_read_file_header(Wsr88d_file *wf,
   int n;
   n = fread(&wsr88d_file_header->title,
             sizeof(wsr88d_file_header->title), 1, wf->fptr);
-  if (little_endian())
+  if (little_endian() && n>0)
     wsr88d_swap_file_header(wsr88d_file_header);
   return n;
 }
