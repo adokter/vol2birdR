@@ -31,6 +31,7 @@
 #include <zlib.h>
 #ifdef _WIN32
 #include <fileapi.h>
+#include <windows.h>
 #endif
 
 #define CHUNK 16384
