@@ -50,7 +50,7 @@
 #' vol2bird(file = pvolfile, config = conf, vpfile = output_file_h5)
 #'
 #' # clean up
-#' unlink(c(output_file_csv, output_file_h5)
+#' unlink(c(output_file_csv, output_file_h5))
 #' @seealso
 #' * [vol2bird_config()]
 #' @export

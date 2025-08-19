@@ -70,7 +70,7 @@ output_file_h5 <- paste0(tempdir(), "/vp.h5")
 vol2bird(file = pvolfile, config = conf, vpfile = output_file_h5)
 
 # clean up
-unlink(c(output_file_csv, output_file_h5)
+unlink(c(output_file_csv, output_file_h5))
 }
 \seealso{
 \itemize{
