@@ -322,7 +322,7 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
       memcpy(version, wsr88d_file_header.title.filename, 8);
       version[sizeof(version) - 1] = '\0';
       if (strncmp(version,"AR2V",4) == 0) {
-          char temp[5];/ 4 digits + null
+          char temp[5]; // 4 digits + null
           memcpy(temp, version + 4, 4);
           temp[4] = '\0';
           vnum = atoi(temp);
