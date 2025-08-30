@@ -61,7 +61,7 @@ FILE* create_temporary_file(void)
   char tempFileName[MAX_PATH];
 
   DWORD tplen;
-  UINT tflen;
+  UINT tfuniq;
 
   tplen = GetTempPath(MAX_PATH, pathBuffer);
   pathBuffer[tplen] = '\0';
@@ -72,12 +72,12 @@ FILE* create_temporary_file(void)
   }
 
   //  Generate a temporary file name, also creates the file.
-  tflen = GetTempFileName(pathBuffer,
+  tfuniq = GetTempFileName(pathBuffer,
                         "rsl",
                         0,
                         tempFileName);
 
-  if (tflen == 0) {
+  if (tfuniq == 0) {
     RSL_printf("Failed to generate temporary filename");
     return NULL;
   }
@@ -86,7 +86,6 @@ FILE* create_temporary_file(void)
   // for temporary files that should be automatically deleted on close.
   remove(tempFileName);
 
-  tempFileName[tflen] = '\0';
   result = fopen(tempFileName, "wb+TD");
 #else
   result = tmpfile();
