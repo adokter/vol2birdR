@@ -319,9 +319,14 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
    * for prior builds.
    */
   if (n > 0) {
-      strncpy(version, wsr88d_file_header.title.filename, 9);
+      memcpy(version, wsr88d_file_header.title.filename, 8);
+      version[sizeof(version) - 1] = '\0';
       if (strncmp(version,"AR2V",4) == 0) {
-          sscanf(version, "AR2V%4d", &vnum);
+          char temp[5]; // 4 digits + null
+          memcpy(temp, version + 4, 4);
+          temp[4] = '\0';
+          vnum = atoi(temp);
+          //sscanf(version, "AR2V%4d", &vnum);
           if (vnum > 1) expected_msgtype = 31;
           else expected_msgtype = 1;
       }

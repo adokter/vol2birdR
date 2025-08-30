@@ -37,12 +37,20 @@
 #' # Create a configuration instance:
 #' conf <- vol2bird_config()
 #'
-#' # Define output file
-#' output_file <- paste0(tempdir(), "/vp.h5")
+#' # Define output filename (VPTS csv format)
+#' output_file_csv <- paste0(tempdir(), "/vp.csv")
 #'
-#' # Calculate the profile:
-#' vol2bird(file = pvolfile, config = conf, vpfile = output_file)
+#' # Calculate the profile (VPTS csv output):
+#' vol2bird(file = pvolfile, config = conf, vpfile = output_file_csv)
 #'
+#' # Define output filename (ODIM h5 format)
+#' output_file_h5 <- paste0(tempdir(), "/vp.h5")
+#'
+#' # Calculate the profile (ODIM h5 output):
+#' vol2bird(file = pvolfile, config = conf, vpfile = output_file_h5)
+#'
+#' # clean up
+#' unlink(c(output_file_csv, output_file_h5))
 #' @seealso
 #' * [vol2bird_config()]
 #' @export
