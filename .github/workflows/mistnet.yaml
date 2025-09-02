@@ -10,13 +10,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2019, ubuntu-latest, macos-13, macos-latest]
+        os: [windows-2022, ubuntu-latest, macos-13, macos-latest]
         include:
-          - os: windows-2019
+          - os: windows-2022
             cuda: 0
             library: mistnet.dll
             test: 
-            make: "& 'C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin/MSBuild' mistnet.sln /t:Build /p:Configuration=Release"
+            make: "& 'C:/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild' mistnet.sln /t:Build /p:Configuration=Release"
             build: build/Release
             cmakevars:
             libext: .dll
