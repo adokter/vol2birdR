@@ -48,7 +48,7 @@ Convert a NEXRAD polar volume file to an ODIM polar volume file
 nexrad_file <- paste0(tempdir(),"/KBGM20221001_000243_V06")
 odim_file <- paste0(tempdir(),"/KBGM20221001_000243_V06.h5")
 # download NEXRAD file:
-download.file("https://noaa-nexrad-level2.s3.amazonaws.com/2022/10/01/KBGM/KBGM20221001_000243_V06",
+download.file("https://unidata-nexrad-level2.s3.amazonaws.com/2022/10/01/KBGM/KBGM20221001_000243_V06",
 destfile = nexrad_file, mode="wb")
 # convert NEXRAD file to ODIM hdf5 format:
 rsl2odim(nexrad_file, pvolfile_out = odim_file)
