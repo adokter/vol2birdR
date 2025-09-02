@@ -3,6 +3,8 @@
 
 * Update NEXRAD bucket to `unidata-nexrad-level2` (#208).
 
+* Upgrade to windows-2022 github runner to build mistnet library (#130).
+
 # vol2birdR 1.1.1
 * Fixes a bug when using a cluttermap in `vol2bird_config()`. Cluttermaps are now decoded by taking into account the the gain and offset attributes (#122).
 
