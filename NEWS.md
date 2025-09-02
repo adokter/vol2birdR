@@ -1,4 +1,7 @@
-# vol2birdR 1.1.1.9000 (development version)
+# vol2birdR 1.2.1
+* Fixes a bucket link to `unidata-nexard-level2` in the documentation (#129).
+
+# vol2birdR 1.2.0
 * Fixes a windows bug in the handling of temporary files that caused `rls2odim()` and `vol2bird()` to become unresponsive after reading a corrupted file (#114).
 
 * Update NEXRAD bucket to `unidata-nexrad-level2` (#129).
