@@ -1,3 +1,6 @@
+# vol2birdR 1.2.1.9000 (development version)
+* Fixes a rare segfault identified on Mac when reading a corrupted NEXRAD file (#102).
+
 # vol2birdR 1.2.1
 * Fixes a bucket link to `unidata-nexard-level2` in the documentation (#129).
 

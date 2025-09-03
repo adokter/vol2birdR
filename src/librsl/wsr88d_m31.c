@@ -589,10 +589,19 @@ Radar *wsr88d_load_m31_into_radar(Wsr88d_file *wf)
        * halfwords; convert it to bytes.
        */
       msg_size = (int) msghdr.msg_size * 2 - msg_hdr_size;
-
-      n = read_wsr88d_ray_m31(wf, msg_size, &wsr88d_ray);
-      if (n <= 0)
+      // FIX for vol2birdR segfaults:
+      if(msg_size < 0){
+        RSL_free_radar(radar);
         return NULL;
+      }
+      // END FIX
+      n = read_wsr88d_ray_m31(wf, msg_size, &wsr88d_ray);
+      if (n <= 0){
+        // FIX for vol2birdR segfaults:
+        RSL_free_radar(radar);
+        // END FIX
+        return NULL;
+      }
       raynum = wsr88d_ray.ray_hdr.azm_num;
       if (raynum > MAXRAYS_M31) {
         RSL_printf( "Error: raynum = %d, exceeds MAXRAYS_M31"
