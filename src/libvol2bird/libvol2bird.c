@@ -4810,9 +4810,9 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
         RaveIO_t* raveio = RaveIO_open(filenames[i], 0, NULL);
 
         if(raveio == NULL){
-            vol2bird_err_printf( "Warning: failed to read file %s in ODIM format, ignoring. "
-                                 "Check the file format and whether the types of the attributes "
-                                 "and data follow the ODIM h5 file specification.\n", filenames[i]);
+            vol2bird_err_printf( "Warning: Failed to read file %s in ODIM format, ignoring.\n         "
+                                 "Check the file structure and make sure data/attribute types "
+                                 "adhere to the ODIM hdf5 specifications.\n", filenames[i]);
             continue;
         }
         
