@@ -30,7 +30,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Adriaan M. Dokter \email{vol2birdr@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID})
+\strong{Maintainer}: Adriaan M. Dokter \email{vol2birdr@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID}) (vol2birdR maintainer and author of vol2bird library)
 
 Authors:
 \itemize{
@@ -39,7 +39,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Alexander Tedeschi \email{at744@cornell.edu} (\href{https://orcid.org/0000-0003-0772-6931}{ORCID}) [contributor]
+  \item Alexander Tedeschi \email{at744@cornell.edu} (\href{https://orcid.org/0000-0003-0772-6931}{ORCID}) (contributer to vol2birdR and vol2bird library) [contributor]
   \item Tsung-Yu Lin (contributor MistNet segmentation model) [contributor]
   \item Subranshu Maji \email{smaji@cs.umass.edu} (contributor MistNet segmentation model) [contributor]
   \item Daniel Sheldon \email{sheldon@cs.umass.edu} (contributor MistNet segmentation model) [contributor]
