@@ -148,6 +148,8 @@ private:
     alldata->options.mistNetElevsOnly = TRUE;
     alldata->options.useMistNet = FALSE;
     strcpy(alldata->options.mistNetPath, "/opt/vol2bird/etc/mistnet_nexrad.pt");
+    strcpy(alldata->options.groundHeightParam, "HGHT");
+    alldata->options.heightReference = 0;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -245,6 +247,8 @@ public:
     _alldata.options.mistNetElevsOnly = other._alldata.options.mistNetElevsOnly;
     _alldata.options.useMistNet = other._alldata.options.useMistNet;
     strcpy(_alldata.options.mistNetPath, other._alldata.options.mistNetPath);
+    strcpy(_alldata.options.groundHeightParam, other._alldata.options.groundHeightParam);
+    _alldata.options.heightReference = other._alldata.options.heightReference;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -638,6 +642,35 @@ public:
   }
   void set_mistNetPath(std::string v) {
     strcpy(_alldata.options.mistNetPath, v.c_str());
+  }
+
+  std::string get_groundHeightParam() {
+    return std::string(_alldata.options.groundHeightParam);
+  }
+  void set_groundHeightParam(std::string v) {
+    strcpy(_alldata.options.groundHeightParam, v.c_str());
+  }
+
+  std::string get_heightReference() {
+    if (_alldata.options.heightReference == 0) {
+      return std::string("sea");
+    } else if (_alldata.options.heightReference == 1) {
+      return std::string("antenna");
+    } else if (_alldata.options.heightReference == 2) {
+      return std::string("ground");
+    }
+  }
+
+  void set_heightReference(std::string v) {
+    if (v == "sea") {
+        _alldata.options.heightReference = 0;
+    } else if (v == "antenna") {
+        _alldata.options.heightReference = 1;
+    } else if (v == "ground") {
+        _alldata.options.heightReference = 2;
+    } else {
+        throw std::runtime_error("Invalid heightReference value: must be 'sea', 'antenna', or 'ground'.");
+    }
   }
 
   double get_constant_areaCellMin() {
@@ -1049,6 +1082,8 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("mistNetElevsOnly", &Vol2BirdConfig::get_mistNetElevsOnly, &Vol2BirdConfig::set_mistNetElevsOnly)
       .property("useMistNet", &Vol2BirdConfig::get_useMistNet, &Vol2BirdConfig::set_useMistNet)
       .property("mistNetPath", &Vol2BirdConfig::get_mistNetPath, &Vol2BirdConfig::set_mistNetPath)
+      .property("groundHeightParam", &Vol2BirdConfig::get_groundHeightParam, &Vol2BirdConfig::set_groundHeightParam)
+      .property("heightReference", &Vol2BirdConfig::get_heightReference, &Vol2BirdConfig::set_heightReference)
       .property("constant_areaCellMin", &Vol2BirdConfig::get_constant_areaCellMin, &Vol2BirdConfig::set_constant_areaCellMin)
       .property("constant_cellClutterFractionMax", &Vol2BirdConfig::get_constant_cellClutterFractionMax, &Vol2BirdConfig::set_constant_cellClutterFractionMax)
       .property("constant_chisqMin", &Vol2BirdConfig::get_constant_chisqMin, &Vol2BirdConfig::set_constant_chisqMin)
