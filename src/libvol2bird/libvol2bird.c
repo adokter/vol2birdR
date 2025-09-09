@@ -5374,7 +5374,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     //               information about the 'points' array            //
     // ------------------------------------------------------------- //
 
-    alldata->points.nColsPoints = 10;
+    alldata->points.nColsPoints = 11;
     alldata->points.nRowsPoints = detSvdfitArraySize(volume, scanUse, alldata);
 
     alldata->points.rangeCol = 0;
@@ -5387,6 +5387,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     alldata->points.nyquistCol = 7;
     alldata->points.vraddValueCol = 8;
     alldata->points.clutValueCol = 9;
+    alldata->points.heightValueCol = 10;
 
     // pre-allocate the 'points' array (note it has 'nColsPoints'
     // pseudo-columns)
