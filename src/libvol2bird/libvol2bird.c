@@ -2692,7 +2692,7 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
 
         switch (iProfileType) {
             case 1 :
-    doInclude = FALSE;
+                doInclude = FALSE;
                 break;
             case 2 :
                 doInclude = FALSE;
