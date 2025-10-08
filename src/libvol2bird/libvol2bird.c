@@ -713,7 +713,11 @@ static int detNumberOfGates(const int iLayer,
     float rangeScale = (float) PolarScan_getRscale(scan);
     float radarHeight = (float) PolarScan_getHeight(scan);
 
-    PolarScanParam_t* heightParam = PolarScan_getParameter(scan, quantity);
+    PolarScanParam_t* groundheightParam = NULL;
+
+    if(alldata->options.heightReference == 2){
+        groundheightParam = PolarScan_getParameter(scan,quantity);
+    }
 
     // Determine the number of gates that are within the limits set
     // by (rangeMin,rangeMax) as well as by (iLayer*layerThickness,
@@ -741,7 +745,7 @@ static int detNumberOfGates(const int iLayer,
         for (iAzim = 0; iAzim < nAzim; iAzim++) {
 
             if(alldata->options.heightReference == 2){
-                groundheightValueType = PolarScanParam_getConvertedValue(heightParam, iRang, iAzim, &groundheightValue);
+                groundheightValueType = PolarScanParam_getConvertedValue(groundheightParam, iRang, iAzim, &groundheightValue);
 
                 if (groundheightValueType != RaveValueType_DATA){
                     // the gate has no valid ground height value
@@ -948,7 +952,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
     // check that ground height is present when profiling relative to ground level
     if (scanUse[iScan].useScan & alldata->options.heightReference == 2){
       if (PolarScan_hasParameter(scan, alldata->options.groundHeightParam)){
-        snprintf(scanUse[iScan].heightName,1000,alldata->options.groundHeightParam);
+        snprintf(scanUse[iScan].heightName, 1000, alldata->options.groundHeightParam);
         scanUse[iScan].useScan = TRUE;
       }
       else{
@@ -1976,7 +1980,7 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
 
     nPointsWritten_local = 0;
 
-    RaveValueType vradValueType, dbzValueType;
+    RaveValueType vradValueType, dbzValueType, groundheightValueType;
 
     nRang = (int) PolarScan_getNbins(scan);
     nAzim = (int) PolarScan_getNrays(scan);
@@ -1994,6 +1998,17 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
     PolarScanParam_t* dbzParam = PolarScan_getParameter(scan,scanUse.dbzName);
     PolarScanParam_t* cellParam = PolarScan_getParameter(scan,scanUse.cellName);
     PolarScanParam_t* clutParam = NULL;
+    PolarScanParam_t* groundheightParam = NULL;
+
+    double groundheightValue = 0;
+    if(alldata->options.heightReference == 1){
+      groundheightValue = radarHeight;
+    }
+
+
+    if(alldata->options.heightReference == 2){
+        groundheightParam = PolarScan_getParameter(scan,scanUse.heightName);
+    }
 
     if (alldata->options.useClutterMap){
         clutParam = PolarScan_getParameter(scan,scanUse.clutName);
@@ -2004,25 +2019,34 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
         // so gateRange represents a distance along the view direction (not necessarily horizontal)
         gateRange = ((float) iRang + 0.5f) * rangeScale;
 
-        // note that "sin(elevAngle*DEG2RAD)" is equivalent to = "cos((90 - elevAngle)*DEG2RAD)":
-        gateHeight = range2height(gateRange, elevAngle) + radarHeight;
-
         if (gateRange < alldata->options.rangeMin || gateRange > alldata->options.rangeMax) {
             // the current gate is either
             // (1) too close to the radar; or
             // (2) too far away.
             continue;
         }
-        if (gateHeight < altitudeMin || gateHeight > altitudeMax) {
-            // if the height of the middle of the current gate is too far away from
-            // the requested height, continue with the next gate
-            continue;
-        }
-
-        // the gates at this range and elevation angle are within bounds,
-        // include their data in the 'points' array:
 
         for (iAzim = 0; iAzim < nAzim; iAzim++) {
+
+            if(alldata->options.heightReference == 2){
+              groundheightValueType = PolarScanParam_getConvertedValue(groundheightParam, iRang, iAzim, &groundheightValue);
+
+              if (groundheightValueType != RaveValueType_DATA){
+                // the gate has no valid ground height value
+                continue;
+              }
+            }
+
+            gateHeight = range2height(gateRange, elevAngle) + radarHeight - groundheightValue;
+
+            if (gateHeight < altitudeMin || gateHeight > altitudeMax) {
+              // if the height of the middle of the current gate is too far away from
+              // the requested height, continue with the next gate
+              continue;
+            }
+
+            // the gates at this range and elevation angle are within bounds,
+            // include their data in the 'points' array:
 
             gateAzim = ((float) iAzim + 0.5f) * azimuthScale;
             vradValueType = PolarScanParam_getConvertedValue(vradParam, iRang, iAzim, &vradValue);
