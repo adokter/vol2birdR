@@ -65,8 +65,7 @@ static void classifyGatesSimple(vol2bird_t* alldata);
 
 static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata);
 
-static int detNumberOfGates(const int iLayer, const float rangeScale, const float elevAngle,
-                            const int nRang, const int nAzim, const float radarHeight, vol2bird_t* alldata);
+static int detNumberOfGates(const int iLayer, PolarScan_t* scan, const char* quantity, vol2bird_t* alldata);
 
 static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata);
 
@@ -706,9 +705,15 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
 
 
 static int detNumberOfGates(const int iLayer,
-                     const float rangeScale, const float elevAngle,
-                     const int nRang, const int nAzim,
-                     const float radarHeight, vol2bird_t* alldata) {
+                            PolarScan_t* scan, const char* quantity, vol2bird_t* alldata) {
+
+    int nRang = (int) PolarScan_getNbins(scan);
+    int nAzim = (int) PolarScan_getNrays(scan);
+    float elevAngle = (float) PolarScan_getElangle(scan);
+    float rangeScale = (float) PolarScan_getRscale(scan);
+    float radarHeight = (float) PolarScan_getHeight(scan);
+
+    PolarScanParam_t* heightParam = PolarScan_getParameter(scan, quantity);
 
     // Determine the number of gates that are within the limits set
     // by (rangeMin,rangeMax) as well as by (iLayer*layerThickness,
@@ -716,32 +721,51 @@ static int detNumberOfGates(const int iLayer,
 
     int nGates;
     int iRang;
+    int iAzim;
 
     float layerHeight;
     float range;
     float beamHeight;
 
+    double groundheightValue = 0;
+
+    if(alldata->options.heightReference == 1){
+      groundheightValue = radarHeight;
+    }
+
+    RaveValueType groundheightValueType;
 
     nGates = 0;
     layerHeight = (iLayer + 0.5) * alldata->options.layerThickness;
     for (iRang = 0; iRang < nRang; iRang++) {
-        range = (iRang + 0.5) * rangeScale;
-        if (range < alldata->options.rangeMin || range > alldata->options.rangeMax) {
-            // the gate is too close to the radar, or too far away
-            continue;
-        }
-        beamHeight = range2height(range, elevAngle) + radarHeight;
-        if (fabs(layerHeight - beamHeight) > 0.5*alldata->options.layerThickness) {
-            // the gate is not close enough to the altitude layer of interest
-            continue;
-        }
+        for (iAzim = 0; iAzim < nAzim; iAzim++) {
 
-        #ifdef FPRINTFON
-        vol2bird_err_printf("iRang = %d; range = %f; beamHeight = %f\n",iRang,range,beamHeight);
-        #endif
+            if(alldata->options.heightReference == 2){
+                groundheightValueType = PolarScanParam_getConvertedValue(heightParam, iRang, iAzim, &groundheightValue);
 
-        nGates += nAzim;
+                if (groundheightValueType != RaveValueType_DATA){
+                    // the gate has no valid ground height value
+                    continue;
+                }
+            }
 
+            range = (iRang + 0.5) * rangeScale;
+            if (range < alldata->options.rangeMin || range > alldata->options.rangeMax) {
+                // the gate is too close to the radar, or too far away
+                continue;
+            }
+            beamHeight = range2height(range, elevAngle) + radarHeight - groundheightValue;
+            if (fabs(layerHeight - beamHeight) > 0.5*alldata->options.layerThickness) {
+                // the gate is not close enough to the altitude layer of interest
+                continue;
+            }
+
+            #ifdef FPRINTFON
+            vol2bird_err_printf("iRang = %d; range = %f; beamHeight = %f\n",iRang,range,beamHeight);
+            #endif
+
+            nGates += 1;
+        } // for iAzim
     } // for iRang
 
     return nGates;
@@ -775,15 +799,8 @@ static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t* scanUse,
 
                 PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
 
-                int nRang = (int) PolarScan_getNbins(scan);
-                int nAzim = (int) PolarScan_getNrays(scan);
-                float elevAngle = (float) PolarScan_getElangle(scan);
-                float rangeScale = (float) PolarScan_getRscale(scan);
-                float radarHeight = (float) PolarScan_getHeight(scan);
-
                 nGates[iLayer] += detNumberOfGates(iLayer,
-                    rangeScale, elevAngle, nRang,
-                    nAzim, radarHeight, alldata);
+                    scan, scanUse[iScan].heightName, alldata);
 
                 RAVE_OBJECT_RELEASE(scan);
 
@@ -929,7 +946,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
     }
 
     // check that ground height is present when profiling relative to ground level
-    if (scanUse[iScan].useScan & alldata->options.heightReference==2){
+    if (scanUse[iScan].useScan & alldata->options.heightReference == 2){
       if (PolarScan_hasParameter(scan, alldata->options.groundHeightParam)){
         snprintf(scanUse[iScan].heightName,1000,alldata->options.groundHeightParam);
         scanUse[iScan].useScan = TRUE;
