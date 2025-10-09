@@ -950,9 +950,9 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
     }
 
     // check that ground height is present when profiling relative to ground level
-    if (scanUse[iScan].useScan & alldata->options.heightReference == 2){
+    if (scanUse[iScan].useScan & (alldata->options.heightReference == 2)){
       if (PolarScan_hasParameter(scan, alldata->options.groundHeightParam)){
-        snprintf(scanUse[iScan].heightName, 1000, alldata->options.groundHeightParam);
+        snprintf(scanUse[iScan].heightName, 1000, "%s", alldata->options.groundHeightParam);
         scanUse[iScan].useScan = TRUE;
       }
       else{
