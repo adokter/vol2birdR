@@ -658,6 +658,8 @@ public:
       return std::string("antenna");
     } else if (_alldata.options.heightReference == 2) {
       return std::string("ground");
+    } else {
+      return std::string("invalid");
     }
   }
 
