@@ -1,10 +1,11 @@
-#include <torch/script.h> 
+// for mistnet:
+#include <torch/script.h>
 #include <iostream>
 
 #ifdef _WIN32
 #define MISTNET_API __declspec(dllexport)
 #else
-#define MISTNET_API 
+#define MISTNET_API
 #endif
 
 extern "C" {
@@ -15,7 +16,7 @@ MISTNET_API int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const
         // ************************* the code to use the model ***********************
         // *************************                           ***********************
         // ***************************************************************************
-        
+
         torch::jit::script::Module module;
         try {
             module = torch::jit::load(model_path);
@@ -35,14 +36,12 @@ MISTNET_API int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const
         at::Tensor output = module.forward(inputs_).toTensor();
 
         float *output_array = output.data_ptr<float>();
-        
+
         // copy result
         for (int i=0; i<3*5*608*608; i++) (*tensor_out)[i] = output_array[i];
-        
+
         return 0;
 
 }
 
 }
-
-

@@ -65,8 +65,7 @@ static void classifyGatesSimple(vol2bird_t* alldata);
 
 static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata);
 
-static int detNumberOfGates(const int iLayer, const float rangeScale, const float elevAngle,
-                            const int nRang, const int nAzim, const float radarHeight, vol2bird_t* alldata);
+static int detNumberOfGates(const int iLayer, PolarScan_t* scan, const char* quantity, vol2bird_t* alldata);
 
 static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata);
 
@@ -142,7 +141,7 @@ static int selectCellsToDrop_dualPol(CELLPROP *cellProp, int nCells, vol2bird_t*
 
 static void sortCellsByArea(CELLPROP *cellProp, const int nCells);
 
-static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitted, const int* includedIndex, 
+static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitted, const int* includedIndex,
                                           const int nPointsIncluded, float* points_local, vol2bird_t* alldata);
 
 static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vol2bird_t* alldata);
@@ -223,10 +222,10 @@ void vol2bird_set_err_printf(vol2bird_printfun fun)
 
 static int analyzeCells(PolarScan_t *scan, vol2birdScanUse_t scanUse, const int nCells, int dualpol, vol2bird_t *alldata) {
 
-    // ----------------------------------------------------------------------------------- // 
+    // ----------------------------------------------------------------------------------- //
     //  This function analyzes the cellImage array found by the 'findWeatherCells'         //
     //  procedure. Small cells are rejected and the cells are re-numbered according        //
-    //  to size. The final number of cells in cellImage is returned as an integer.         // 
+    //  to size. The final number of cells in cellImage is returned as an integer.         //
     // ----------------------------------------------------------------------------------- //
 
     CELLPROP *cellProp;
@@ -238,12 +237,12 @@ static int analyzeCells(PolarScan_t *scan, vol2birdScanUse_t scanUse, const int 
     nRang = PolarScan_getNbins(scan);
     nAzim = PolarScan_getNrays(scan);
     nCellsValid = 0;
-    
+
     if(!PolarScan_hasParameter(scan, scanUse.cellName)){
         vol2bird_err_printf("no CELL quantity in polar scan, aborting analyzeCells()\n");
         return 0;
     }
-    
+
     // first deal with the case that no weather cells were detected by findWeatherCells
     if (nCells == 0) {
         for (int iAzim = 0; iAzim < nAzim; iAzim++) {
@@ -253,14 +252,14 @@ static int analyzeCells(PolarScan_t *scan, vol2birdScanUse_t scanUse, const int 
         }
         return nCellsValid;
     }
-    
+
     cellProp = getCellProperties(scan, scanUse, nCells, alldata);
 
-    selectCellsToDrop(cellProp, nCells, dualpol, alldata);    
-    
+    selectCellsToDrop(cellProp, nCells, dualpol, alldata);
+
     // sorting cell properties according to cell area. Drop small cells from map
     nCellsValid = updateMap(scan, cellProp, nCells, alldata);
-        
+
     // printing of cell properties to stderr
     if (alldata->options.printCellProp == TRUE) {
         printCellProp(cellProp, (float) PolarScan_getElangle(scan), nCells, nCellsValid, alldata);
@@ -273,7 +272,7 @@ static int analyzeCells(PolarScan_t *scan, vol2birdScanUse_t scanUse, const int 
 
 
 
-static float calcDist(const int iRang1, const int iAzim1, const int iRang2, 
+static float calcDist(const int iRang1, const int iAzim1, const int iRang2,
     const int iAzim2, const float rangScale, const float azimScaleDeg) {
 
     // -------------------------------------------------------- //
@@ -401,13 +400,13 @@ static void calcTexture(PolarScan_t *scan, vol2birdScanUse_t scanUse, vol2bird_t
                     // iLocal less than zero are error codes
                     continue;
                 }
-                
+
                 PolarScanParam_getValue(vradImage, iRang, iAzim, &vradValGlobal);
                 PolarScanParam_getValue(vradImage, iRangLocal, iAzimLocal, &vradValLocal);
                 PolarScanParam_getValue(dbzImage, iRang, iAzim, &dbzValGlobal);
                 PolarScanParam_getValue(dbzImage, iRangLocal, iAzimLocal, &dbzValLocal);
 
-                
+
                 if (vradValLocal == vradMissingValue || dbzValLocal == dbzMissingValue ||
                     vradValLocal == vradUndetectValue || dbzValLocal == dbzUndetectValue) {
                     continue;
@@ -443,7 +442,7 @@ static void calcTexture(PolarScan_t *scan, vol2birdScanUse_t scanUse, vol2bird_t
                     vol2bird_err_printf("Error casting texture value of %f to float type at texImage[%d]. Aborting.\n",tmpTex,iGlobal);
                     goto done;
                 }
-                
+
 
                 #ifdef FPRINTFON
                 vol2bird_err_printf(
@@ -464,19 +463,19 @@ done:
 
 
 static void classifyGatesSimple(vol2bird_t* alldata) {
-    
+
     int iPoint;
-    
+
     for (iPoint = 0; iPoint < alldata->points.nRowsPoints; iPoint++) {
-    
+
         const float azimValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol];
-        const float dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];        
+        const float dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];
         const float vradValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vradValueCol];
         const int cellValue = (int) alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.cellValueCol];
         const float clutValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.clutValueCol];
 
         unsigned int gateCode = 0;
-        
+
         if (alldata->options.useClutterMap && clutValue > alldata->options.clutterValueMin) {
             // this gate is true in the static clutter map
             gateCode |= 1<<(alldata->flags.flagPositionStaticClutter);
@@ -498,7 +497,7 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
         }
 
         if (dbzValue > alldata->misc.dbzMax) {
-            // this gate's dbz value is too high to be due to birds, it must be 
+            // this gate's dbz value is too high to be due to birds, it must be
             // caused by something else
             gateCode |= 1<<(alldata->flags.flagPositionDbzTooHighForBirds);
         }
@@ -529,7 +528,7 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
         }
 
         alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol] = (float) gateCode;
-        
+
     }
 
     return;
@@ -538,11 +537,11 @@ static void classifyGatesSimple(vol2bird_t* alldata) {
 
 
 static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanUse, vol2bird_t* alldata) {
-    
+
         // iterate over the scans in 'volume'
         int iScan;
         int nScans;
-        
+
         // determine how many scan elevations the volume object contains
         nScans = PolarVolume_getNumberOfScans(volume);
 
@@ -555,7 +554,7 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
 
                 PolarScanParam_t *cellScanParam = NULL;
                 PolarScanParam_t *texScanParam = NULL;
-                
+
                 // check that CELL parameter is not present, which might be after running MistNet
                 if (!PolarScan_hasParameter(scan, CELLNAME)){
                     cellScanParam = PolarScan_newParam(scan, scanUse[iScan].cellName, RaveDataType_INT);
@@ -568,7 +567,7 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
 
                     texScanParam = PolarScan_newParam(scan, scanUse[iScan].texName, RaveDataType_DOUBLE);
 
-                    calcTexture(scan, scanUse[iScan], alldata);					
+                    calcTexture(scan, scanUse[iScan], alldata);
                 }
 
                 int nCells = -1;
@@ -576,11 +575,11 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                 // ------------------------------------------------------------- //
                 //        find (weather) cells in the reflectivity image         //
                 // ------------------------------------------------------------- //
-				
+
                 if (alldata->options.dualPol && !alldata->options.useMistNet){
-                    
+
                     if (alldata->options.singlePol){
-						
+
                         // first pass: single pol rain filtering
                         nCells = findWeatherCells(scan,scanUse[iScan].dbzName,alldata->options.dbzThresMin,TRUE,2,TRUE,alldata);
                         // first pass: single pol analysis of precipitation cells
@@ -591,21 +590,21 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                     }
                     else{
                         nCells = findWeatherCells(scan,scanUse[iScan].rhohvName,
-                                    alldata->options.rhohvThresMin,TRUE,2,TRUE,alldata);						
+                                    alldata->options.rhohvThresMin,TRUE,2,TRUE,alldata);
                     }
 
                 }
 
                 if (!alldata->options.dualPol && !alldata->options.useMistNet){
-                    
+
                     nCells = findWeatherCells(scan,scanUse[iScan].dbzName,alldata->options.dbzThresMin,TRUE,2,TRUE,alldata);
 
                 }
-                
+
                 if (alldata->options.useMistNet){
                     nCells = 2;
                 }
-                
+
                 if (nCells<0){
                     vol2bird_err_printf("Error: findWeatherCells exited with errors\n");
                     RAVE_OBJECT_RELEASE(scan);
@@ -613,11 +612,11 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                     RAVE_OBJECT_RELEASE(texScanParam);
                     return;
                 }
-                
+
                 if (alldata->options.printCellProp == TRUE) {
                     vol2bird_err_printf("(%d/%d): found %d cells.\n",iScan+1, nScans, nCells);
                 }
-                
+
                 // ------------------------------------------------------------- //
                 //                      analyze cells                            //
                 // ------------------------------------------------------------- //
@@ -627,58 +626,58 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                 // ------------------------------------------------------------- //
                 //                     calculate fringe                          //
                 // ------------------------------------------------------------- //
-    
-                fringeCells(scan, alldata); 
+
+                fringeCells(scan, alldata);
                 // ------------------------------------------------------------- //
                 //            print selected outputs to stderr                   //
                 // ------------------------------------------------------------- //
-    
+
                 if (alldata->options.printDbz == TRUE) {
-                    vol2bird_err_printf("product = dbz\n");
+                    vol2bird_printf("product = dbz\n");
                     printMeta(scan,scanUse[iScan].dbzName);
                     printImage(scan,scanUse[iScan].dbzName);
                 }
                 if (alldata->options.printVrad == TRUE) {
-                    vol2bird_err_printf("product = vrad\n");
+                    vol2bird_printf("product = vrad\n");
                     printMeta(scan,scanUse[iScan].vradName);
                     printImage(scan,scanUse[iScan].vradName);
                 }
                 if (alldata->options.printRhohv == TRUE) {
-                    vol2bird_err_printf("product = rhohv\n");
+                    vol2bird_printf("product = rhohv\n");
                     printMeta(scan,scanUse[iScan].rhohvName);
                     printImage(scan,scanUse[iScan].rhohvName);
                 }
                 if (alldata->options.printTex == TRUE) {
-                    vol2bird_err_printf("product = tex\n");
+                    vol2bird_printf("product = tex\n");
                     printMeta(scan,scanUse[iScan].texName);
                     printImage(scan,scanUse[iScan].texName);
                 }
                 if (alldata->options.printCell == TRUE) {
-                    vol2bird_err_printf("product = cell\n");
+                    vol2bird_printf("product = cell\n");
                     printMeta(scan,scanUse[iScan].cellName);
                     printImage(scan,scanUse[iScan].cellName);
                 }
-                if (alldata->options.printClut == TRUE) { 
-                    vol2bird_err_printf("product = clut\n");
+                if (alldata->options.printClut == TRUE) {
+                    vol2bird_printf("product = clut\n");
                     printMeta(scan,scanUse[iScan].clutName);
                     printImage(scan,scanUse[iScan].clutName);
                 }
-                            
+
                 // ------------------------------------------------------------- //
                 //    fill in the appropriate elements in the points array       //
                 // ------------------------------------------------------------- //
-    
+
                 int iLayer;
-                
+
                 for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
-                    
+
                     float altitudeMin = iLayer * alldata->options.layerThickness;
                     float altitudeMax = (iLayer + 1) * alldata->options.layerThickness;
                     int iRowPoints = alldata->points.indexFrom[iLayer] + alldata->points.nPointsWritten[iLayer];
-                        
-                    int n = getListOfSelectedGates(scan, scanUse[iScan], altitudeMin, altitudeMax, 
+
+                    int n = getListOfSelectedGates(scan, scanUse[iScan], altitudeMin, altitudeMax,
                         &(alldata->points.points[0]), iRowPoints, alldata->points.nColsPoints, alldata);
-                    
+
                     alldata->points.nPointsWritten[iLayer] += n;
 
                     if (alldata->points.indexFrom[iLayer] + alldata->points.nPointsWritten[iLayer] > alldata->points.indexTo[iLayer]) {
@@ -688,14 +687,14 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
                         RAVE_OBJECT_RELEASE(texScanParam);
                         return;
                     }
-    
+
                 } // endfor (iLayer = 0; iLayer < nLayers; iLayer++)
 
                 // ------------------------------------------------------------- //
                 //                         clean up                              //
                 // ------------------------------------------------------------- //
-    
-                // free previously malloc'ed arrays                
+
+                // free previously malloc'ed arrays
                 RAVE_OBJECT_RELEASE(scan);
                 RAVE_OBJECT_RELEASE(texScanParam);
                 RAVE_OBJECT_RELEASE(cellScanParam);
@@ -705,10 +704,20 @@ static void constructPointsArray(PolarVolume_t* volume, vol2birdScanUse_t* scanU
 
 
 
-static int detNumberOfGates(const int iLayer, 
-                     const float rangeScale, const float elevAngle,
-                     const int nRang, const int nAzim,
-                     const float radarHeight, vol2bird_t* alldata) {
+static int detNumberOfGates(const int iLayer,
+                            PolarScan_t* scan, const char* quantity, vol2bird_t* alldata) {
+
+    int nRang = (int) PolarScan_getNbins(scan);
+    int nAzim = (int) PolarScan_getNrays(scan);
+    float elevAngle = (float) PolarScan_getElangle(scan);
+    float rangeScale = (float) PolarScan_getRscale(scan);
+    float radarHeight = (float) PolarScan_getHeight(scan);
+
+    PolarScanParam_t* groundheightParam = NULL;
+
+    if(alldata->options.heightReference == 2){
+        groundheightParam = PolarScan_getParameter(scan,quantity);
+    }
 
     // Determine the number of gates that are within the limits set
     // by (rangeMin,rangeMax) as well as by (iLayer*layerThickness,
@@ -716,32 +725,51 @@ static int detNumberOfGates(const int iLayer,
 
     int nGates;
     int iRang;
+    int iAzim;
 
     float layerHeight;
     float range;
     float beamHeight;
 
+    double groundheightValue = 0;
+
+    if(alldata->options.heightReference == 1){
+      groundheightValue = radarHeight;
+    }
+
+    RaveValueType groundheightValueType;
 
     nGates = 0;
     layerHeight = (iLayer + 0.5) * alldata->options.layerThickness;
     for (iRang = 0; iRang < nRang; iRang++) {
-        range = (iRang + 0.5) * rangeScale;
-        if (range < alldata->options.rangeMin || range > alldata->options.rangeMax) {
-            // the gate is too close to the radar, or too far away
-            continue;
-        }
-        beamHeight = range2height(range, elevAngle) + radarHeight;
-        if (fabs(layerHeight - beamHeight) > 0.5*alldata->options.layerThickness) {
-            // the gate is not close enough to the altitude layer of interest
-            continue;
-        }
+        for (iAzim = 0; iAzim < nAzim; iAzim++) {
 
-        #ifdef FPRINTFON
-        vol2bird_err_printf("iRang = %d; range = %f; beamHeight = %f\n",iRang,range,beamHeight);
-        #endif
+            if(alldata->options.heightReference == 2){
+                groundheightValueType = PolarScanParam_getConvertedValue(groundheightParam, iRang, iAzim, &groundheightValue);
 
-        nGates += nAzim;
+                if (groundheightValueType != RaveValueType_DATA){
+                    // the gate has no valid ground height value
+                    continue;
+                }
+            }
 
+            range = (iRang + 0.5) * rangeScale;
+            if (range < alldata->options.rangeMin || range > alldata->options.rangeMax) {
+                // the gate is too close to the radar, or too far away
+                continue;
+            }
+            beamHeight = range2height(range, elevAngle) + radarHeight - groundheightValue;
+            if (fabs(layerHeight - beamHeight) > 0.5*alldata->options.layerThickness) {
+                // the gate is not close enough to the altitude layer of interest
+                continue;
+            }
+
+            #ifdef FPRINTFON
+            vol2bird_err_printf("iRang = %d; range = %f; beamHeight = %f\n",iRang,range,beamHeight);
+            #endif
+
+            nGates += 1;
+        } // for iAzim
     } // for iRang
 
     return nGates;
@@ -753,16 +781,16 @@ static int detNumberOfGates(const int iLayer,
 
 
 static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t* scanUse, vol2bird_t* alldata) {
-    
+
     int iScan;
     int nScans = PolarVolume_getNumberOfScans(volume);
 
     int iLayer;
     int nRowsPoints_local = 0;
-    
+
     int* nGates = malloc(sizeof(int) * alldata->options.nLayers);
     int* nGatesAcc = malloc(sizeof(int) * alldata->options.nLayers);
-    
+
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
         nGates[iLayer] = 0;
         nGatesAcc[iLayer] = 0;
@@ -772,19 +800,12 @@ static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t* scanUse,
         if (scanUse[iScan].useScan == 1)
         {
             for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
-    
-                PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
-                
-                int nRang = (int) PolarScan_getNbins(scan);
-                int nAzim = (int) PolarScan_getNrays(scan);
-                float elevAngle = (float) PolarScan_getElangle(scan);
-                float rangeScale = (float) PolarScan_getRscale(scan);
-                float radarHeight = (float) PolarScan_getHeight(scan);
 
-                nGates[iLayer] += detNumberOfGates(iLayer, 
-                    rangeScale, elevAngle, nRang, 
-                    nAzim, radarHeight, alldata);
-                    
+                PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
+
+                nGates[iLayer] += detNumberOfGates(iLayer,
+                    scan, scanUse[iScan].heightName, alldata);
+
                 RAVE_OBJECT_RELEASE(scan);
 
             }
@@ -817,7 +838,7 @@ static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t* scanUse,
     free((void*) nGatesAcc);
 
     return nRowsPoints_local;
-    
+
 }  // detSvdfitArraySize()
 
 
@@ -826,287 +847,297 @@ static int detSvdfitArraySize(PolarVolume_t* volume, vol2birdScanUse_t* scanUse,
 // Determine whether to use scan
 static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* alldata)
 {
-    RAVE_ASSERT((volume != NULL), "pvol == NULL");
-    
-	RaveAttribute_t *attr;
-	PolarScan_t *scan;
-	PolarScanParam_t *param = NULL;
-	int result, nScans, iScan, nScansUsed;
-	int noNyquist=0;
-	vol2birdScanUse_t *scanUse;
-	double nyquist, nyquistMin = DBL_MAX, nyquistMinUsed = DBL_MAX, nyquistMax = 0;
- 
-	
-	// Read number of scans
-	nScans = PolarVolume_getNumberOfScans(volume);
-    
-    // variable that will contain the number of scans to be used as determined by this function
-    nScansUsed = 0;
-	
-	// Allocate memory for useScan variable
-	scanUse = (vol2birdScanUse_t *) malloc(nScans * sizeof(vol2birdScanUse_t));
-	
-    // check that correlation coefficient is present
-    // if not, revert to single pol mode
-    if (alldata->options.dualPol){
-        int dualPolPresent = FALSE;
-        
-        for (iScan = 0; iScan < nScans; iScan++)
-        {
-            scan = PolarVolume_getScan(volume, iScan);
-            if (PolarScan_hasParameter(scan, "RHOHV")){
-                dualPolPresent = TRUE;
-            }
-            RAVE_OBJECT_RELEASE(scan);
-        }
-        if (!dualPolPresent){
-            vol2bird_err_printf("Warning: no dual-pol moments found, switching to SINGLE POL mode\n");
-            alldata->options.dualPol = FALSE;
-        }
-    }
-    
-	for (iScan = 0; iScan < nScans; iScan++)
-	{
-		// Initialize useScan and result
-		scanUse[iScan].useScan = FALSE;
-		result = 0;
-		
-		scan = PolarVolume_getScan(volume, iScan);
+  RAVE_ASSERT((volume != NULL), "pvol == NULL");
 
-        // check that radial velocity parameter is present
-		if (PolarScan_hasParameter(scan, "VRAD")){
-			snprintf(scanUse[iScan].vradName,10,"VRAD");
-			scanUse[iScan].useScan = TRUE;
-		}
-		else{
-			if (PolarScan_hasParameter(scan, "VRADH")){
-				snprintf(scanUse[iScan].vradName,10,"VRADH");
-				scanUse[iScan].useScan = TRUE;
-			}
-			else{
-				if (PolarScan_hasParameter(scan, "VRADV")){
-					snprintf(scanUse[iScan].vradName,10,"VRADV");
-					scanUse[iScan].useScan = TRUE;
-				}
-			}
-		}
-		if (scanUse[iScan].useScan == FALSE){
-		  vol2bird_err_printf("Warning: radial velocity missing, dropping scan %i ...\n",iScan+1);
-		}
+  RaveAttribute_t *attr;
+  PolarScan_t *scan;
+  PolarScanParam_t *param = NULL;
+  int result, nScans, iScan, nScansUsed;
+  int noNyquist=0;
+  vol2birdScanUse_t *scanUse;
+  double nyquist, nyquistMin = DBL_MAX, nyquistMinUsed = DBL_MAX, nyquistMax = 0;
 
-        // check that reflectivity parameter is present
-        if (scanUse[iScan].useScan){
-            if(PolarScan_hasParameter(scan,alldata->options.dbzType)){
-                strcpy(scanUse[iScan].dbzName,alldata->options.dbzType);	
-            }
-            else{
-                vol2bird_err_printf("Warning: requested reflectivity factor '%s' missing, searching for alternatives ...\n",alldata->options.dbzType);
-                if(PolarScan_hasParameter(scan, "DBZH")){
-                    snprintf(scanUse[iScan].dbzName,10,"DBZH");
-                }
-                else{
-                    if (PolarScan_hasParameter(scan, "DBZV")){
-                        snprintf(scanUse[iScan].dbzName,10,"DBZV");
-                    }
-                    else{	
-                        scanUse[iScan].useScan = FALSE;
-                    }
-	        }
-            }
-            if (scanUse[iScan].useScan == FALSE){
-                vol2bird_err_printf("Warning: reflectivity factor missing, dropping scan %i ...\n",iScan+1);
-            }
-        }
-        
-        // check that correlation coefficient is present in addition to radial velocity and reflectivity
-        if (scanUse[iScan].useScan & alldata->options.dualPol){
-            if (PolarScan_hasParameter(scan, "RHOHV")){
-                snprintf(scanUse[iScan].rhohvName,10,"RHOHV");
-                scanUse[iScan].useScan = TRUE;
-            }
-            else{
-                vol2bird_err_printf("Warning: correlation coefficient missing, dropping scan %i ...\n",iScan+1);
-                scanUse[iScan].useScan = FALSE;
-            }
-        }
-        
-        // check whether spectrum width parameter is present, and store its name
-        strcpy(scanUse[iScan].wradName,"");
-		if (PolarScan_hasParameter(scan, "WRAD")){
-			snprintf(scanUse[iScan].wradName,10,"WRAD");
-		}
-		else{
-			if (PolarScan_hasParameter(scan, "WRADH")){
-				snprintf(scanUse[iScan].wradName,10,"WRADH");
-			}
-			else{
-				if (PolarScan_hasParameter(scan, "WRADV")){
-					snprintf(scanUse[iScan].wradName,10,"WRADV");
+  // Read number of scans
+  nScans = PolarVolume_getNumberOfScans(volume);
 
-				}
-			}
-		}
-        
-        // check that elevation is not too high or too low
-        if (scanUse[iScan].useScan)
-        {
-            // drop scans with elevations outside the range set by user
-            double elev = 360*PolarScan_getElangle(scan) / 2 / PI;
-            if (elev < alldata->options.elevMin || elev > alldata->options.elevMax)
-            {
-                scanUse[iScan].useScan = FALSE;
-                  vol2bird_err_printf("Warning: elevation (%.1f deg) outside valid elevation range (%.1f-%.1f deg), dropping scan %i ...\n",\
-                    elev,alldata->options.elevMin,alldata->options.elevMax,iScan+1);
-            }
-        }
-        
-        // check that range bin size has correct units
-        if (scanUse[iScan].useScan)
-        {
-            // drop scans with range bin sizes below 1 meter
-            double rscale = PolarScan_getRscale(scan);
-            if (rscale < RSCALEMIN || rscale == 0)
-            {
-                scanUse[iScan].useScan = FALSE;
-                  vol2bird_err_printf("Warning: range bin size (%.2f metre) too small, dropping scan %i ...\n",\
-                    rscale,iScan+1);
-            }
-        }
-        
-        // check that Nyquist velocity is not too low
-        // retrieve Nyquist velocity if not present at scan level
-        if (scanUse[iScan].useScan)
-        {
-            // Read Nyquist interval from scan how group
-            attr = PolarScan_getAttribute(scan, "how/NI");
-            result = 0;
-            if (attr != (RaveAttribute_t *) NULL) result = RaveAttribute_getDouble(attr, &nyquist);
-            RAVE_OBJECT_RELEASE(attr);
+  // variable that will contain the number of scans to be used as determined by this function
+  nScansUsed = 0;
 
-            // Read Nyquist interval from top level how group
-            if (result == 0)
-            {	
-                // set flag that we found no nyquist interval at scan level
-                noNyquist = 1;
-                // proceed to top level how group
-                attr = PolarVolume_getAttribute(volume, "how/NI");
-                if (attr != (RaveAttribute_t *) NULL) result = RaveAttribute_getDouble(attr, &nyquist);
-                RAVE_OBJECT_RELEASE(attr);
-            }
-            
-            // Derive Nyquist interval from the offset attribute of the dataset
-            // when no NI attribute was found
-            if (result == 0)
-            {
-                // in case that we'll be using dealiased velocities, but also the original is available
-                // we want to get the offset attribute of the original
-                if(alldata->options.dealiasVrad && PolarScan_hasParameter(scan, "VRADDH") && PolarScan_hasParameter(scan, "VRADH")){
-                    param = PolarScan_getParameter(scan, "VRADH");
-                    nyquist = fabs(PolarScanParam_getOffset(param));
-                }
-                else{
-                    param = PolarScan_getParameter(scan, scanUse[iScan].vradName);
-                    nyquist = fabs(PolarScanParam_getOffset(param));
-                }
-                vol2bird_err_printf("Warning: Nyquist interval attribute not found for scan %i, using radial velocity offset (%.1f m/s) instead \n",iScan+1,nyquist);
-                RAVE_OBJECT_RELEASE(param);
-            }
-            
-            // Set useScan to 0 if no Nyquist interval is available or if it is too low
-            // only check for nyquist interval when we are NOT dealiasing the velocities
-            if (nyquist < alldata->options.minNyquist){
-                scanUse[iScan].useScan = 0;
-                vol2bird_err_printf("Warning: Nyquist velocity (%.1f m/s) too low, dropping scan %i ...\n",nyquist,iScan+1);
-            }
-            
-            // if Nyquist interval (NI) attribute was missing at scan level, add it now
-            if (noNyquist){
-                RaveAttribute_t* attr_NI = RaveAttributeHelp_createDouble("how/NI", (double) nyquist);
-                if (attr_NI == NULL && nyquist > 0){
-                    vol2bird_err_printf("warning: no valid Nyquist attribute could be added to scan\n");
-                }
-                else{    
-                    PolarScan_addAttribute(scan, attr_NI);
-                }
-                RAVE_OBJECT_RELEASE(attr_NI);
-            }
-            
-            if (nyquist < nyquistMin){
-                nyquistMin=nyquist;
-            }
-            if (nyquist < nyquistMinUsed && nyquist > alldata->options.minNyquist){
-                nyquistMinUsed=nyquist;
-            }
-            if (nyquist > nyquistMax){
-                nyquistMax=nyquist;
-            }
-            
-        }
-        
-        if (scanUse[iScan].useScan){
+  // Allocate memory for useScan variable
+  scanUse = (vol2birdScanUse_t *) malloc(nScans * sizeof(vol2birdScanUse_t));
 
-            // copy names of scans that will be generated by the program
-            snprintf(scanUse[iScan].texName,10,TEXNAME);
-            snprintf(scanUse[iScan].clutName,10,CLUTNAME);
-            snprintf(scanUse[iScan].cellName,10,CELLNAME);
+  // check that correlation coefficient is present
+  // if not, revert to single pol mode
+  if (alldata->options.dualPol){
+    int dualPolPresent = FALSE;
 
-            nScansUsed+=1;
+    for (iScan = 0; iScan < nScans; iScan++){
+        scan = PolarVolume_getScan(volume, iScan);
+        if (PolarScan_hasParameter(scan, "RHOHV")){
+            dualPolPresent = TRUE;
         }
         RAVE_OBJECT_RELEASE(scan);
     }
-        
-        
-    alldata->misc.nyquistMin = nyquistMin;
-    alldata->misc.nyquistMinUsed = nyquistMinUsed;
-    alldata->misc.nyquistMax = nyquistMax;
-    
-    // FIXME: better to make scanUse a struct that contains both the array of vol2birdScanUse_t objects
-    // and the number nScansUSed, which now is stored ad hoc under alldata->misc
-    alldata->misc.nScansUsed = nScansUsed;
-    if(nScansUsed == 0){
-        alldata->misc.vol2birdSuccessful = FALSE;
-        return (vol2birdScanUse_t*) NULL;
+    if (!dualPolPresent){
+        vol2bird_err_printf("Warning: no dual-pol moments found, switching to SINGLE POL mode\n");
+        alldata->options.dualPol = FALSE;
     }
-    
-    // Return the array scanUse
-    return scanUse;
+  }
+
+  for (iScan = 0; iScan < nScans; iScan++)
+  {
+    // Initialize useScan and result
+    scanUse[iScan].useScan = FALSE;
+    result = 0;
+
+    scan = PolarVolume_getScan(volume, iScan);
+
+    // check that radial velocity parameter is present
+    if (PolarScan_hasParameter(scan, "VRAD")){
+      snprintf(scanUse[iScan].vradName,10,"VRAD");
+      scanUse[iScan].useScan = TRUE;
+    }
+    else{
+      if (PolarScan_hasParameter(scan, "VRADH")){
+        snprintf(scanUse[iScan].vradName,10,"VRADH");
+        scanUse[iScan].useScan = TRUE;
+      }
+      else{
+        if (PolarScan_hasParameter(scan, "VRADV")){
+          snprintf(scanUse[iScan].vradName,10,"VRADV");
+          scanUse[iScan].useScan = TRUE;
+        }
+      }
+    }
+    if (scanUse[iScan].useScan == FALSE){
+      vol2bird_err_printf("Warning: radial velocity missing, dropping scan %i ...\n",iScan+1);
+    }
+
+    // check that reflectivity parameter is present
+    if (scanUse[iScan].useScan){
+        if(PolarScan_hasParameter(scan,alldata->options.dbzType)){
+            strcpy(scanUse[iScan].dbzName,alldata->options.dbzType);
+        }
+        else{
+            vol2bird_err_printf("Warning: requested reflectivity factor '%s' missing, searching for alternatives ...\n",alldata->options.dbzType);
+            if(PolarScan_hasParameter(scan, "DBZH")){
+                snprintf(scanUse[iScan].dbzName,10,"DBZH");
+            }
+            else{
+                if (PolarScan_hasParameter(scan, "DBZV")){
+                    snprintf(scanUse[iScan].dbzName,10,"DBZV");
+                }
+                else{
+                    scanUse[iScan].useScan = FALSE;
+                }
+            }
+        }
+        if (scanUse[iScan].useScan == FALSE){
+            vol2bird_err_printf("Warning: reflectivity factor missing, dropping scan %i ...\n",iScan+1);
+        }
+    }
+
+    // check that correlation coefficient is present in addition to radial velocity and reflectivity
+    if (scanUse[iScan].useScan & alldata->options.dualPol){
+        if (PolarScan_hasParameter(scan, "RHOHV")){
+            snprintf(scanUse[iScan].rhohvName,10,"RHOHV");
+            scanUse[iScan].useScan = TRUE;
+        }
+        else{
+            vol2bird_err_printf("Warning: correlation coefficient missing, dropping scan %i ...\n",iScan+1);
+            scanUse[iScan].useScan = FALSE;
+        }
+    }
+
+    // check that ground height is present when profiling relative to ground level
+    if (scanUse[iScan].useScan & (alldata->options.heightReference == 2)){
+      if (PolarScan_hasParameter(scan, alldata->options.groundHeightParam)){
+        snprintf(scanUse[iScan].heightName, 1000, "%s", alldata->options.groundHeightParam);
+        scanUse[iScan].useScan = TRUE;
+      }
+      else{
+        vol2bird_err_printf("Warning: ground height parameter %s missing, dropping scan %i ...\n",alldata->options.groundHeightParam, iScan+1);
+        scanUse[iScan].useScan = FALSE;
+      }
+    }
+
+    // check whether spectrum width parameter is present, and store its name
+    strcpy(scanUse[iScan].wradName,"");
+    if (PolarScan_hasParameter(scan, "WRAD")){
+      snprintf(scanUse[iScan].wradName,10,"WRAD");
+    }
+    else{
+      if (PolarScan_hasParameter(scan, "WRADH")){
+        snprintf(scanUse[iScan].wradName,10,"WRADH");
+      }
+      else{
+        if (PolarScan_hasParameter(scan, "WRADV")){
+          snprintf(scanUse[iScan].wradName,10,"WRADV");
+
+        }
+      }
+    }
+
+    // check that elevation is not too high or too low
+    if (scanUse[iScan].useScan)
+    {
+        // drop scans with elevations outside the range set by user
+        double elev = 360*PolarScan_getElangle(scan) / 2 / PI;
+        if (elev < alldata->options.elevMin || elev > alldata->options.elevMax)
+        {
+            scanUse[iScan].useScan = FALSE;
+              vol2bird_err_printf("Warning: elevation (%.1f deg) outside valid elevation range (%.1f-%.1f deg), dropping scan %i ...\n",\
+                elev,alldata->options.elevMin,alldata->options.elevMax,iScan+1);
+        }
+    }
+
+    // check that range bin size has correct units
+    if (scanUse[iScan].useScan)
+    {
+        // drop scans with range bin sizes below 1 meter
+        double rscale = PolarScan_getRscale(scan);
+        if (rscale < RSCALEMIN || rscale == 0)
+        {
+            scanUse[iScan].useScan = FALSE;
+              vol2bird_err_printf("Warning: range bin size (%.2f metre) too small, dropping scan %i ...\n",\
+                rscale,iScan+1);
+        }
+    }
+
+    // check that Nyquist velocity is not too low
+    // retrieve Nyquist velocity if not present at scan level
+    if (scanUse[iScan].useScan)
+    {
+        // Read Nyquist interval from scan how group
+        attr = PolarScan_getAttribute(scan, "how/NI");
+        result = 0;
+        if (attr != (RaveAttribute_t *) NULL) result = RaveAttribute_getDouble(attr, &nyquist);
+        RAVE_OBJECT_RELEASE(attr);
+
+        // Read Nyquist interval from top level how group
+        if (result == 0)
+        {
+            // set flag that we found no nyquist interval at scan level
+            noNyquist = 1;
+            // proceed to top level how group
+            attr = PolarVolume_getAttribute(volume, "how/NI");
+            if (attr != (RaveAttribute_t *) NULL) result = RaveAttribute_getDouble(attr, &nyquist);
+            RAVE_OBJECT_RELEASE(attr);
+        }
+
+        // Derive Nyquist interval from the offset attribute of the dataset
+        // when no NI attribute was found
+        if (result == 0)
+        {
+            // in case that we'll be using dealiased velocities, but also the original is available
+            // we want to get the offset attribute of the original
+            if(alldata->options.dealiasVrad && PolarScan_hasParameter(scan, "VRADDH") && PolarScan_hasParameter(scan, "VRADH")){
+                param = PolarScan_getParameter(scan, "VRADH");
+                nyquist = fabs(PolarScanParam_getOffset(param));
+            }
+            else{
+                param = PolarScan_getParameter(scan, scanUse[iScan].vradName);
+                nyquist = fabs(PolarScanParam_getOffset(param));
+            }
+            vol2bird_err_printf("Warning: Nyquist interval attribute not found for scan %i, using radial velocity offset (%.1f m/s) instead \n",iScan+1,nyquist);
+            RAVE_OBJECT_RELEASE(param);
+        }
+
+        // Set useScan to 0 if no Nyquist interval is available or if it is too low
+        // only check for nyquist interval when we are NOT dealiasing the velocities
+        if (nyquist < alldata->options.minNyquist){
+            scanUse[iScan].useScan = 0;
+            vol2bird_err_printf("Warning: Nyquist velocity (%.1f m/s) too low, dropping scan %i ...\n",nyquist,iScan+1);
+        }
+
+        // if Nyquist interval (NI) attribute was missing at scan level, add it now
+        if (noNyquist){
+            RaveAttribute_t* attr_NI = RaveAttributeHelp_createDouble("how/NI", (double) nyquist);
+            if (attr_NI == NULL && nyquist > 0){
+                vol2bird_err_printf("warning: no valid Nyquist attribute could be added to scan\n");
+            }
+            else{
+                PolarScan_addAttribute(scan, attr_NI);
+            }
+            RAVE_OBJECT_RELEASE(attr_NI);
+        }
+
+        if (nyquist < nyquistMin){
+            nyquistMin=nyquist;
+        }
+        if (nyquist < nyquistMinUsed && nyquist > alldata->options.minNyquist){
+            nyquistMinUsed=nyquist;
+        }
+        if (nyquist > nyquistMax){
+            nyquistMax=nyquist;
+        }
+
+    }
+
+    if (scanUse[iScan].useScan){
+
+        // copy names of scans that will be generated by the program
+        snprintf(scanUse[iScan].texName,10,TEXNAME);
+        snprintf(scanUse[iScan].clutName,10,CLUTNAME);
+        snprintf(scanUse[iScan].cellName,10,CELLNAME);
+
+        nScansUsed+=1;
+    }
+    RAVE_OBJECT_RELEASE(scan);
+  }
+
+
+  alldata->misc.nyquistMin = nyquistMin;
+  alldata->misc.nyquistMinUsed = nyquistMinUsed;
+  alldata->misc.nyquistMax = nyquistMax;
+
+  // FIXME: better to make scanUse a struct that contains both the array of vol2birdScanUse_t objects
+  // and the number nScansUSed, which now is stored ad hoc under alldata->misc
+  alldata->misc.nScansUsed = nScansUsed;
+  if(nScansUsed == 0){
+      alldata->misc.vol2birdSuccessful = FALSE;
+      return (vol2birdScanUse_t*) NULL;
+  }
+
+  // Return the array scanUse
+  return scanUse;
 }
 
 
 
 static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
-    
+
     // produces valid JSON according to http://jsonlint.com/
-    
+
     if (alldata->misc.initializationSuccessful==FALSE) {
         vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
-    
+
     if (alldata->profiles.iProfileTypeLast != 1) {
         vol2bird_err_printf("Export method expects profile 1, but found %d. Aborting.",alldata->profiles.iProfileTypeLast);
-        return; 
+        return;
     }
-    
+
     int iLayer;
 
 
     FILE *f = fopen("vol2bird-profile1.json", "w");
     if (f == NULL)
     {
-        vol2bird_printf("Error opening file 'vol2bird-profile1.json'!\n");
-#ifdef VOL2BIRD_R        
+        vol2bird_err_printf("Error opening file 'vol2bird-profile1.json'!\n");
+#ifdef VOL2BIRD_R
         return;
 #else
-	exit(1);
-#endif        
+  exit(1);
+#endif
     }
-    
+
     fprintf(f,"[\n");
     for (iLayer = 0;iLayer < alldata->options.nLayers; iLayer += 1) {
-        
+
         fprintf(f,"   {\n");
-        
+
         {
             char varName[] = "HGHT";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  0];
@@ -1117,7 +1148,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-        
+
         {
             char varName[] = "HGHT_max";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  1];
@@ -1128,7 +1159,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-            
+
         {
             char varName[] = "u";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  2];
@@ -1139,8 +1170,8 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-        
-        {    
+
+        {
             char varName[] = "v";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  3];
             if (isnan(val) == TRUE) {
@@ -1150,8 +1181,8 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-        
-        {    
+
+        {
             char varName[] = "w";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  4];
             if (isnan(val) == TRUE) {
@@ -1161,7 +1192,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-        
+
         {
             char varName[] = "ff";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  5];
@@ -1172,7 +1203,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-            
+
         {
             char varName[] = "dd";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  6];
@@ -1183,8 +1214,8 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-        
-        {    
+
+        {
             char varName[] = "sd_vvp";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  7];
             if (isnan(val) == TRUE) {
@@ -1194,7 +1225,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-            
+
         {
             char varName[] = "gap";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  8];
@@ -1206,7 +1237,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
             }
         }
 
-        {            
+        {
             char varName[] = "dbz";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  9];
             if (isnan(val) == TRUE) {
@@ -1216,7 +1247,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-            
+
         {
             char varName[] = "n";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  10];
@@ -1227,7 +1258,7 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%d,\n",varName,(int) val);
             }
         }
-            
+
         {
             char varName[] = "eta";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  11];
@@ -1238,8 +1269,8 @@ static void exportBirdProfileAsJSON(vol2bird_t *alldata) {
                 fprintf(f,"    \"%s\":%.2f,\n",varName,val);
             }
         }
-        
-        {    
+
+        {
             char varName[] = "dens";
             float val = alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  12];
             if (isnan(val) == TRUE) {
@@ -1316,17 +1347,17 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
     float quantityRangeScale;
 
 
-    // These next two local variables 'nAzimNeighborhood' and 
-    // 'nRangNeighborhood' shadow two static global variables of the 
+    // These next two local variables 'nAzimNeighborhood' and
+    // 'nRangNeighborhood' shadow two static global variables of the
     // same name, but that is in fact what you want. This is because the
-    // value of 'nAzimNeighborHood' (function scope) is not equal to 
-    // 'nAzimNeighborHood' (file scope) and because 'nRangNeighborHood' 
-    // (function scope) is not equal to 'nRangNeighborHood' (file 
+    // value of 'nAzimNeighborHood' (function scope) is not equal to
+    // 'nAzimNeighborHood' (file scope) and because 'nRangNeighborHood'
+    // (function scope) is not equal to 'nRangNeighborHood' (file
     // scope). The variable names are the same though, because they play
     // the same role in 'findNearbyGateIndex()'.
     int nAzimNeighborhood_local;
     int nRangNeighborhood_local;
-    
+
     int nHalfNeighborhood;
 
     int cellIdentifierGlobal;
@@ -1342,7 +1373,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
         vol2bird_err_printf("Input scan is NULL.\n");
         return -1;
     }
-    
+
     PolarScanParam_t *scanParam = PolarScan_getParameter(scan, quantity);
     PolarScanParam_t *cellParam = PolarScan_getParameter(scan, CELLNAME);
 
@@ -1355,7 +1386,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
 
     // get direct pointer to the data block
     int* cellParamData = (int*) PolarScanParam_getData(cellParam);
-    
+
     quantityMissing = PolarScanParam_getNodata(scanParam);
     quantityUndetect = PolarScanParam_getUndetect(scanParam);
     quantitynAzim = PolarScan_getNrays(scan);
@@ -1368,14 +1399,14 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
     nRang = quantitynRang;
 
     nGlobal = nAzim * nRang;
-    
+
     // We use a neighborhood of 3x3, because in this function we are
     // interested in a cell's direct neighbors. See also comment at
     // variable definitions of 'nAzimNeighborhood' and 'nRangNeighborhood'
-    // above. 
+    // above.
     nAzimNeighborhood_local = 3;
     nRangNeighborhood_local = 3;
-    
+
     nNeighborhood = nAzimNeighborhood_local * nRangNeighborhood_local;
     nHalfNeighborhood = (nNeighborhood - 1)/2;
 
@@ -1385,13 +1416,13 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
     }
 
     cellImageInitialValue = CELLINIT;
-	if(initialize){
-		for (int iAzim = 0; iAzim < nAzim; iAzim++) {
-			for (int iRang = 0; iRang < nRang; iRang++) {
-				PolarScanParam_setValue(cellParam, iRang, iAzim, cellImageInitialValue);
-			}
-		}
-	}
+  if(initialize){
+    for (int iAzim = 0; iAzim < nAzim; iAzim++) {
+      for (int iRang = 0; iRang < nRang; iRang++) {
+        PolarScanParam_setValue(cellParam, iRang, iAzim, cellImageInitialValue);
+      }
+    }
+  }
 
     // If threshold value is equal to missing value, produce a warning
     if (quantityThres == quantityMissing) {
@@ -1426,7 +1457,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
                 "dbg=%d\n",iGlobal,iRang + 1,quantityRangeScale,alldata->misc.rCellMax,
                 (iRang + 1) * quantityRangeScale,
                 ((iRang + 1) * quantityRangeScale > alldata->misc.rCellMax),dbg);
-                
+
                 dbg++;
                 #endif
             }
@@ -1434,7 +1465,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
             #ifdef FPRINTFON
             vol2bird_err_printf("iGlobal = %d\n",iGlobal);
             #endif
-            
+
             PolarScanParam_getValue(scanParam, iRang, iAzim, &quantityValueGlobal);
             PolarScanParam_getValue(cellParam, iRang, iAzim, &cellValueGlobal);
 
@@ -1447,7 +1478,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
 
                 continue;
             }
-            
+
             if (selectAboveThreshold && quantityValueGlobal < (float) quantityThres){
                 continue;
             }
@@ -1465,7 +1496,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
                     // iLocal below zero are error codes
                     continue;
                 }
-                
+
                 PolarScanParam_getValue(scanParam, iRangLocal, iAzimLocal, &quantityValueLocal);
 
                 if (quantityValueLocal > quantityThres) {
@@ -1492,7 +1523,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
                     // iLocal less than zero are error codes
                     continue;
                 }
-                
+
                 PolarScanParam_getValue(cellParam, iRangLocal, iAzimLocal, &cellValueLocal);
 
                 // no connection found, go to next pixel within neighborhood
@@ -1525,7 +1556,7 @@ static int findWeatherCells(PolarScan_t *scan, const char* quantity, float quant
                 #ifdef FPRINTFON
                 vol2bird_err_printf("new cell found...assigning number %d\n",iCellIdentifier);
                 #endif
-                
+
                 PolarScanParam_setValue(cellParam, iRang, iAzim, iCellIdentifier);
                 iCellIdentifier++;
             }
@@ -1637,9 +1668,9 @@ static int findNearbyGateIndex(const int nAzimParent, const int nRangParent, con
 
         return -5;
     }
-    
+
     return *iAzimReturn * nRangParent + *iRangReturn;
-    
+
 } // findNearbyGateIndex
 
 
@@ -1708,7 +1739,7 @@ static void fringeCells(PolarScan_t* scan, vol2bird_t* alldata) {
                 }
 
             }
-            
+
             if (isEdge == FALSE) {
                 continue; // with the next iGlobal
             }
@@ -1749,7 +1780,7 @@ static void fringeCells(PolarScan_t* scan, vol2bird_t* alldata) {
                 }
                 // include pixel (iRangLocal,iAzimLocal) in fringe
                 cellImage[iLocal] = 1;
-                
+
             } // (iNeighborhood = 0; iNeighborhood < nNeighborhood; iNeighborhood++)
         } // (iRang = 0; iRang < nRang; iRang++)
     } // (iAzim = 0; iAzim < nAzim; iAzim++)
@@ -1760,7 +1791,7 @@ static void fringeCells(PolarScan_t* scan, vol2bird_t* alldata) {
 } // fringeCells
 
 
-CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const int nCells, vol2bird_t* alldata){    
+CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const int nCells, vol2bird_t* alldata){
     int iCell;
     int iGlobal;
     int iRang;
@@ -1775,7 +1806,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
     double vradValue;
     double clutterValue = alldata->options.clutterValueMin;
     double cellValue;
-    
+
     PolarScanParam_t *dbzParam = PolarScan_getParameter(scan,scanUse.dbzName);
     PolarScanParam_t *vradParam = PolarScan_getParameter(scan,scanUse.vradName);
     PolarScanParam_t *texParam = PolarScan_getParameter(scan,scanUse.texName);
@@ -1786,16 +1817,16 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
     nAzim = PolarScan_getNrays(scan);
     rScale = PolarScan_getRscale(scan);
     aScale = (360.0/nAzim)*PI/180; // in radials
-    
+
     // Allocating and initializing memory for cell properties.
     CELLPROP* cellProp;
     cellProp = (CELLPROP *)malloc(nCells*sizeof(CELLPROP));
-    
+
     if (!cellProp) {
         vol2bird_err_printf("Requested memory could not be allocated in getCellProperties!\n");
         return cellProp;
     }
-    
+
     for (iCell = 0; iCell < nCells; iCell++) {
         cellProp[iCell].iRangOfMax = -1;
         cellProp[iCell].iAzimOfMax = -1;
@@ -1823,7 +1854,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
             if (clutParam != NULL) PolarScanParam_getConvertedValue(clutParam, iRang, iAzim, &clutterValue);
             if (texParam != NULL) typeTex=PolarScanParam_getConvertedValue(texParam, iRang, iAzim, &texValue);
             typeCell = PolarScanParam_getConvertedValue(cellParam, iRang, iAzim, &cellValue);
-	    
+
             iCell = (int) cellValue;
 
             // Note: this also throws out all nodata/undetect values for dbzValue
@@ -1881,7 +1912,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
 
             if (isnan(cellProp[iCell].dbzAvg)) {
                 cellProp[iCell].dbzAvg = dbzValue;
-            } 
+            }
             else {
                 // note that we average logarithmic values - done like this
                 // to limit the contribution of high reflectivity outliers to the average
@@ -1890,11 +1921,11 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
 
             if (isnan(cellProp[iCell].texAvg)) {
                 cellProp[iCell].texAvg = texValue;
-            } 
+            }
             else {
                 cellProp[iCell].texAvg += texValue;
             }
-            
+
         } // for (iRang = 0; iRang < nRang; iRang++)
     } // for (iAzim = 0; iAzim < nAzim; iAzim++)
 
@@ -1907,7 +1938,7 @@ CELLPROP* getCellProperties(PolarScan_t* scan, vol2birdScanUse_t scanUse, const 
             cellProp[iCell].cv = cellProp[iCell].texAvg / cellProp[iCell].dbzAvg;
         }
     }
-    
+
     RAVE_OBJECT_RELEASE(dbzParam);
     RAVE_OBJECT_RELEASE(vradParam);
     RAVE_OBJECT_RELEASE(texParam);
@@ -1923,7 +1954,7 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
                            float* points_local, int iRowPoints, int nColsPoints_local, vol2bird_t* alldata) {
 
     // ------------------------------------------------------------------- //
-    // Write combinations of an azimuth angle, an elevation angle, an      // 
+    // Write combinations of an azimuth angle, an elevation angle, an      //
     // observed vrad value, an observed dbz value, and a cell identifier   //
     // value into an external larger list.                                 //
     // ------------------------------------------------------------------- //
@@ -1946,11 +1977,11 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
     double cellValue;
     double clutValue = NAN;
     double nyquist = 0;
-    
+
     nPointsWritten_local = 0;
-    
-    RaveValueType vradValueType, dbzValueType;
-    
+
+    RaveValueType vradValueType, dbzValueType, groundheightValueType;
+
     nRang = (int) PolarScan_getNbins(scan);
     nAzim = (int) PolarScan_getNrays(scan);
     rangeScale = (float) PolarScan_getRscale(scan);
@@ -1958,15 +1989,26 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
     elevAngle = (float) PolarScan_getElangle(scan);
     radarHeight = (float) PolarScan_getHeight(scan);
     RaveAttribute_t* attr = PolarScan_getAttribute(scan, "how/NI");
-    if (attr != (RaveAttribute_t *) NULL){ 
+    if (attr != (RaveAttribute_t *) NULL){
         RaveAttribute_getDouble(attr, &nyquist);
     }
     RAVE_OBJECT_RELEASE(attr);
-    
+
     PolarScanParam_t* vradParam = PolarScan_getParameter(scan,scanUse.vradName);
     PolarScanParam_t* dbzParam = PolarScan_getParameter(scan,scanUse.dbzName);
     PolarScanParam_t* cellParam = PolarScan_getParameter(scan,scanUse.cellName);
     PolarScanParam_t* clutParam = NULL;
+    PolarScanParam_t* groundheightParam = NULL;
+
+    double groundheightValue = 0;
+    if(alldata->options.heightReference == 1){
+      groundheightValue = radarHeight;
+    }
+
+
+    if(alldata->options.heightReference == 2){
+        groundheightParam = PolarScan_getParameter(scan,scanUse.heightName);
+    }
 
     if (alldata->options.useClutterMap){
         clutParam = PolarScan_getParameter(scan,scanUse.clutName);
@@ -1977,25 +2019,34 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
         // so gateRange represents a distance along the view direction (not necessarily horizontal)
         gateRange = ((float) iRang + 0.5f) * rangeScale;
 
-        // note that "sin(elevAngle*DEG2RAD)" is equivalent to = "cos((90 - elevAngle)*DEG2RAD)":
-        gateHeight = range2height(gateRange, elevAngle) + radarHeight;
-
         if (gateRange < alldata->options.rangeMin || gateRange > alldata->options.rangeMax) {
-            // the current gate is either 
+            // the current gate is either
             // (1) too close to the radar; or
             // (2) too far away.
             continue;
         }
-        if (gateHeight < altitudeMin || gateHeight > altitudeMax) {
-            // if the height of the middle of the current gate is too far away from
-            // the requested height, continue with the next gate
-            continue;
-        }
-
-        // the gates at this range and elevation angle are within bounds,
-        // include their data in the 'points' array:
 
         for (iAzim = 0; iAzim < nAzim; iAzim++) {
+
+            if(alldata->options.heightReference == 2){
+              groundheightValueType = PolarScanParam_getConvertedValue(groundheightParam, iRang, iAzim, &groundheightValue);
+
+              if (groundheightValueType != RaveValueType_DATA){
+                // the gate has no valid ground height value
+                continue;
+              }
+            }
+
+            gateHeight = range2height(gateRange, elevAngle) + radarHeight - groundheightValue;
+
+            if (gateHeight < altitudeMin || gateHeight > altitudeMax) {
+              // if the height of the middle of the current gate is too far away from
+              // the requested height, continue with the next gate
+              continue;
+            }
+
+            // the gates at this range and elevation angle are within bounds,
+            // include their data in the 'points' array:
 
             gateAzim = ((float) iAzim + 0.5f) * azimuthScale;
             vradValueType = PolarScanParam_getConvertedValue(vradParam, iRang, iAzim, &vradValue);
@@ -2024,7 +2075,7 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
 
             // also store the dbz value --useful when estimating the bird density
             points_local[iRowPoints * nColsPoints_local + alldata->points.dbzValueCol] = (float) dbzValue;
-            
+
             // store the corresponding observed vrad value
             points_local[iRowPoints * nColsPoints_local + alldata->points.vradValueCol] = (float) vradValue;
 
@@ -2045,7 +2096,7 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
 
             // raise the row counter by 1
             iRowPoints += 1;
-            
+
             // raise number of points written by 1
             nPointsWritten_local += 1;
 
@@ -2065,12 +2116,12 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
     PolarVolume_t* clutVol = NULL;
 
     clutVol = vol2birdGetVolume(&file, 1, rangeMax,1);
-            
+
     if(clutVol == NULL){
         vol2bird_err_printf( "Error: function loadClutterMap: failed to load file '%s'\n",file);
         return -1;
     }
-    
+
     int nClutScans = PolarVolume_getNumberOfScans(clutVol);
 
     if(nClutScans < 1){
@@ -2082,7 +2133,7 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
     // iterate over the scans in 'volume'
     int iScan;
     int nScans;
-    
+
     // determine how many scan elevations the volume object contains
     nScans = PolarVolume_getNumberOfScans(volume);
 
@@ -2092,13 +2143,13 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
         PolarScan_t* clutScan = NULL;
         PolarScanParam_t* param = NULL;
         PolarScanParam_t* param_proj = NULL;
-        
+
         int result;
         double elev, rscale;
-        
+
         // extract the scan object from the volume object
         scan = PolarVolume_getScan(volume, iScan);
-        
+
         // extract the cluttermap scan parameter closest in elevation
         elev = PolarScan_getElangle(scan);
 
@@ -2108,7 +2159,7 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
         clutScan = PolarVolume_getScanClosestToElevation(clutVol,elev,0);
 
         param = PolarScan_getParameter(clutScan,CLUTNAME);
-        
+
         if(param == NULL){
             vol2bird_err_printf( "Error in loadClutterMap: no scan parameter %s found in file %s\n", CLUTNAME,file);
             RAVE_OBJECT_RELEASE(scan);
@@ -2116,26 +2167,26 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
             RAVE_OBJECT_RELEASE(clutVol);
             return -1;
         }
-        
+
         // project the clutter map scan parameter to the correct dimensions
         rscale = PolarScan_getRscale(clutScan);
         param_proj = PolarScanParam_project_on_scan(param, scan, rscale);
-        
+
         // add the clutter map scan parameter to the polar volume
         result = PolarScan_addParameter(scan, param_proj);
 
         if(result == 0){
             vol2bird_err_printf( "Warning in loadClutterMap: failed to add cluttermap for scan %i\n",iScan+1);
         }
-        
+
         RAVE_OBJECT_RELEASE(scan);
         RAVE_OBJECT_RELEASE(clutScan);
         RAVE_OBJECT_RELEASE(param);
         RAVE_OBJECT_RELEASE(param_proj);
     }
-    
+
     RAVE_OBJECT_RELEASE(clutVol);
-    
+
     return 0;
 }
 
@@ -2144,9 +2195,9 @@ int vol2birdLoadClutterMap(PolarVolume_t* volume, char* file, float rangeMax){
 PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, RaveDataType type){
     if (scan == NULL){
         vol2bird_err_printf( "error in PolarScan_newParam(): cannat create a new polar scan parameter for scan NULL pointer\n");
-        return NULL;        
+        return NULL;
     }
-    
+
     if (PolarScan_hasParameter(scan, quantity)){
         vol2bird_err_printf( "Parameter %s already exists in polar scan\n", quantity);
         return NULL;
@@ -2159,30 +2210,30 @@ PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, Ra
         RAVE_OBJECT_RELEASE(scanParam);
         return NULL;
     }
-    
+
     PolarScanParam_createData(scanParam, PolarScan_getNbins(scan), PolarScan_getNrays(scan), type);
     PolarScanParam_setQuantity(scanParam,quantity);
     PolarScanParam_setNodata(scanParam,NODATA);
     PolarScanParam_setUndetect(scanParam,UNDETECT);
     PolarScanParam_setOffset(scanParam,0);
     PolarScanParam_setGain(scanParam,1);
-    
+
     // initialize all values to NODATA
     // (NOTE: this fails for negative values when type == RaveDataType_FLOAT, results in 0 being set. RAVE bug?)
     double nodata = PolarScanParam_getNodata(scanParam);
     for(int iRang = 0; iRang < PolarScan_getNbins(scan); iRang++){
         for(int iAzim = 0; iAzim < PolarScan_getNrays(scan); iAzim++){
-            
+
             PolarScanParam_setValue(scanParam, iRang, iAzim, nodata);
         }
     }
-        
+
     PolarScan_addParameter(scan, scanParam);
-    
+
  //   RAVE_OBJECT_RELEASE(scanParam);
-    
+
  //   scanParam = PolarScan_getParameter(scan, quantity);
-    
+
     return scanParam;
 }
 
@@ -2210,9 +2261,9 @@ long datetime2long(char* date, char* time){
     else{
         result = ldatetime;
     }
-    
+
     free(datetime);
-    
+
     return(result);
 }
 
@@ -2224,7 +2275,7 @@ const char* PolarVolume_getStartDate(PolarVolume_t* pvol){
     if(PolarVolume_getStartDateTime(pvol, &date, &time)==0){
         result = date;
     }
-    return(result);  
+    return(result);
 }
 
 const char* PolarVolume_getStartTime(PolarVolume_t* pvol){
@@ -2235,7 +2286,7 @@ const char* PolarVolume_getStartTime(PolarVolume_t* pvol){
     if(PolarVolume_getStartDateTime(pvol, &date, &time)==0){
         result = time;
     }
-    return(result);  
+    return(result);
 }
 
 const char* PolarVolume_getEndDate(PolarVolume_t* pvol){
@@ -2246,7 +2297,7 @@ const char* PolarVolume_getEndDate(PolarVolume_t* pvol){
     if(PolarVolume_getEndDateTime(pvol, &date, &time)==0){
         result = date;
     }
-    return(result);  
+    return(result);
 }
 
 const char* PolarVolume_getEndTime(PolarVolume_t* pvol){
@@ -2257,25 +2308,25 @@ const char* PolarVolume_getEndTime(PolarVolume_t* pvol){
     if(PolarVolume_getEndDateTime(pvol, &date, &time)==0){
         result = time;
     }
-    return(result);  
+    return(result);
 }
 
 int PolarVolume_getStartDateTime(PolarVolume_t* pvol, char** StartDate, char** StartTime)
 {
     RAVE_ASSERT((pvol != NULL), "pvol == NULL");
-    
+
     int result = -1;
-    
+
     // Initialize datetimes
     long StartDateTime = (long) 99999999999999;
-    
+
     int nScans;
     char* date;
     char* time;
 
     // Read number of scans
     nScans = PolarVolume_getNumberOfScans(pvol);
-    
+
     // find the start date and time
     for (int iScan = 0; iScan < nScans; iScan++)
     {
@@ -2286,13 +2337,13 @@ int PolarVolume_getStartDateTime(PolarVolume_t* pvol, char** StartDate, char** S
             time = (char *) PolarScan_getStartTime(scan);
 
             long datetime = datetime2long(date, time);
-            
+
             //continue if no valid datetime can be constructed
             if (datetime == 0){
                 RAVE_OBJECT_RELEASE(scan);
                 continue;
             }
-            
+
             if (datetime < StartDateTime){
                 StartDateTime = datetime;
                 *StartDate = date;
@@ -2303,7 +2354,7 @@ int PolarVolume_getStartDateTime(PolarVolume_t* pvol, char** StartDate, char** S
         }
         RAVE_OBJECT_RELEASE(scan);
     }
-    
+
     return result;
 }
 
@@ -2315,14 +2366,14 @@ int PolarVolume_getEndDateTime(PolarVolume_t* pvol, char** EndDate, char** EndTi
 
     // Initialize datetimes
     long EndDateTime = 00000000000000;
-    
+
     int nScans;
     char* date;
     char* time;
 
     // Read number of scans
     nScans = PolarVolume_getNumberOfScans(pvol);
-    
+
      // find the end date and time
     for (int iScan = 0; iScan < nScans; iScan++)
     {
@@ -2333,13 +2384,13 @@ int PolarVolume_getEndDateTime(PolarVolume_t* pvol, char** EndDate, char** EndTi
             time = (char *) PolarScan_getEndTime(scan);
 
             long datetime = datetime2long(date, time);
-            
+
             //continue if no valid datetime can be constructed
             if ((date == NULL || time == NULL || datetime == 0)){
                 RAVE_OBJECT_RELEASE(scan);
                 continue;
             }
-            
+
             if (datetime > EndDateTime){
                 EndDateTime = datetime;
                 *EndDate = date;
@@ -2357,7 +2408,7 @@ int PolarVolume_getEndDateTime(PolarVolume_t* pvol, char** EndDate, char** EndTi
 double PolarVolume_getWavelength(PolarVolume_t* pvol)
 {
     RAVE_ASSERT((pvol != NULL), "pvol == NULL");
-    
+
     double value = 0;
     int speed_of_light = 299792458;
 
@@ -2374,7 +2425,7 @@ double PolarVolume_getWavelength(PolarVolume_t* pvol)
         }
         else{
             // wavelength attribute was not found in the root /how attribute
-            // check whether we can find it under /dataset1/how 
+            // check whether we can find it under /dataset1/how
             PolarScan_t* scan = PolarVolume_getScan(pvol, 1);
             if (scan != (PolarScan_t *) NULL){
                 attr = PolarScan_getAttribute(scan, "how/wavelength");
@@ -2402,7 +2453,7 @@ double PolarVolume_getWavelength(PolarVolume_t* pvol)
 double PolarVolume_setWavelength(PolarVolume_t* pvol, double wavelength)
 {
     RAVE_ASSERT((pvol != NULL), "pvol == NULL");
-    
+
     double value = 0;
 
     RaveAttribute_t* attr = PolarVolume_getAttribute(pvol, "how/wavelength");
@@ -2411,7 +2462,7 @@ double PolarVolume_setWavelength(PolarVolume_t* pvol, double wavelength)
     }
     else{
         // wavelength attribute was not found in the root /how attribute
-        // check whether we can find it under /dataset1/how 
+        // check whether we can find it under /dataset1/how
         PolarScan_t* scan = PolarVolume_getScan(pvol, 1);
         if (scan != (PolarScan_t *) NULL){
             attr = PolarScan_getAttribute(scan, "how/wavelength");
@@ -2428,33 +2479,33 @@ double PolarVolume_setWavelength(PolarVolume_t* pvol, double wavelength)
 
 PolarScanParam_t* PolarScanParam_project_on_scan(PolarScanParam_t* param, PolarScan_t* scan, double rscale){
     PolarScanParam_t* param_proj = NULL;
-    
+
     double rscale_proj = PolarScan_getRscale(scan);
     long nbins_proj = PolarScan_getNbins(scan);
     long nrays_proj = PolarScan_getNrays(scan);
-    
+
     param_proj = PolarScanParam_resample(param, rscale, rscale_proj, nbins_proj, nrays_proj);
-    
+
     return param_proj;
 }
 
 PolarVolume_t* PolarVolume_resample(PolarVolume_t* volume, double rscale_proj, long nbins_proj, long nrays_proj){
     int iScan;
     int nScans;
-    
+
     nScans = PolarVolume_getNumberOfScans(volume);
-    
+
     PolarScan_t* scan = NULL;
     PolarScan_t* scan_proj = NULL;
 
     // copy the volume
     PolarVolume_t* volume_proj = RAVE_OBJECT_CLONE(volume);
-        
+
     // empty the scans in the copied volume
-    for (iScan = nScans-1; iScan>=0 ; iScan--) { 
+    for (iScan = nScans-1; iScan>=0 ; iScan--) {
         PolarVolume_removeScan(volume_proj, iScan);
     }
-   
+
     // iterate over the scans in source volume
     for (iScan = 0; iScan < nScans; iScan++) {
         scan = PolarVolume_getScan(volume, iScan);
@@ -2463,13 +2514,13 @@ PolarVolume_t* PolarVolume_resample(PolarVolume_t* volume, double rscale_proj, l
         RAVE_OBJECT_RELEASE(scan_proj);
         RAVE_OBJECT_RELEASE(scan);
     }
-    
+
     return volume_proj;
 }
 
 PolarScan_t* PolarScan_resample(PolarScan_t* scan, double rscale_proj, long nbins_proj, long nrays_proj){
     int iParam;
-    
+
     // determine how many parameters the scan contains
     RaveList_t* ParamNames = PolarScan_getParameterNames(scan);
     int nParams = RaveList_size(ParamNames);
@@ -2481,12 +2532,12 @@ PolarScan_t* PolarScan_resample(PolarScan_t* scan, double rscale_proj, long nbin
 
     scan_proj = RAVE_OBJECT_CLONE(scan);
     PolarScan_removeAllParameters(scan_proj);
-        
+
     double rscale = PolarScan_getRscale(scan);
     long nbins = PolarScan_getNbins(scan);
     long nrays = PolarScan_getNrays(scan);
     double elev = PolarScan_getElangle(scan)*180/PI;
-    
+
     if (rscale > rscale_proj){
         vol2bird_err_printf( "Warning: requested range gate size (rscale=%3.1f m) too small for %2.1f degree scan, using %4.1f m\n", rscale_proj, elev, rscale);
         rscale_proj = rscale;
@@ -2501,10 +2552,10 @@ PolarScan_t* PolarScan_resample(PolarScan_t* scan, double rscale_proj, long nbin
         vol2bird_err_printf( "Warning: requested number of azimuth rays (Nrays=%li) too large for %3.1f degree scan, using %li rays\n", nrays_proj, elev, nrays);
         nrays_proj = nrays;
     }
-    
+
     // update scan object with new rscale
     PolarScan_setRscale(scan_proj, rscale_proj);
-    
+
     // iterate over the parameters in scan
     for (iParam = 0; iParam < nParams; iParam++) {
         // extract the scan object from the volume object
@@ -2521,35 +2572,35 @@ PolarScan_t* PolarScan_resample(PolarScan_t* scan, double rscale_proj, long nbin
     RAVE_OBJECT_RELEASE(param_proj);
 
     RaveList_freeAndDestroy(&ParamNames);
-    
+
     return scan_proj;
 }
 
 PolarScanParam_t* PolarScanParam_resample(PolarScanParam_t* param, double rscale, double rscale_proj, long nbins_proj, long nrays_proj){
     PolarScanParam_t* param_proj = NULL;
-    
+
     long nrays = PolarScanParam_getNrays(param);
-    
+
     double bin_scaling = rscale_proj/rscale;
     double ray_scaling = (double) nrays/nrays_proj;
-    
+
     param_proj = RAVE_OBJECT_NEW(&PolarScanParam_TYPE);
-    
+
     if (param_proj == NULL || !PolarScanParam_createData(param_proj, nbins_proj, nrays_proj, RaveDataType_DOUBLE)) {
         RAVE_ERROR0("Failed to create resampled polar scan parameter");
         goto error;
     }
-    
+
     // copy the metadata
     PolarScanParam_setQuantity(param_proj, PolarScanParam_getQuantity(param));
     PolarScanParam_setOffset(param_proj,PolarScanParam_getOffset(param));
     PolarScanParam_setGain(param_proj,PolarScanParam_getGain(param));
     PolarScanParam_setNodata(param_proj,PolarScanParam_getNodata(param));
     PolarScanParam_setUndetect(param_proj,PolarScanParam_getUndetect(param));
-    
+
     double value;
     RaveValueType valueType;
-    
+
     // project onto new grid
     for(int iRay=0; iRay<nrays_proj; iRay++){
         for(int iBin=0; iBin<nbins_proj; iBin++){
@@ -2592,19 +2643,19 @@ static int hasAzimuthGap(const float* points_local, const int nPoints, vol2bird_
         nObs[iBinGap]++;
     }
 
-    // Detect adjacent bins in which the number of azimuth observations 
+    // Detect adjacent bins in which the number of azimuth observations
     // is less than the minimum required number
     for (iBinGap = 0; iBinGap < alldata->constants.nBinsGap; iBinGap++) {
-        
+
         iBinGapNext = (iBinGap + 1) % alldata->constants.nBinsGap;
-        
+
         if (nObs[iBinGap] < alldata->constants.nObsGapMin && nObs[iBinGapNext] < alldata->constants.nObsGapMin) {
             hasGap = TRUE;
         }
     }
 
     return hasGap;
-    
+
 } // hasAzimuthGap
 
 
@@ -2614,80 +2665,80 @@ const char* libvol2bird_version(void){
 
 
 static int includeGate(const int iProfileType, const int iQuantityType, const unsigned int gateCode, vol2bird_t* alldata) {
-    
+
     int doInclude = TRUE;
-    
+
     if (gateCode & 1<<(alldata->flags.flagPositionStaticClutter)) {
-        
+
         // i.e. flag 0 in gateCode is true
         // this gate is true in the static clutter map
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 3 :
                 doInclude = FALSE;
                 break;
             default :
                 vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
-    
+
     if (gateCode & 1<<(alldata->flags.flagPositionDynamicClutter)) {
-        
+
         // i.e. flag 1 in gateCode is true
         // this gate is part of the cluttermap (without fringe)
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 break;
-            case 3 : 
+            case 3 :
                 break;
             default :
                 vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
-        
+
     if (gateCode & 1<<(alldata->flags.flagPositionDynamicClutterFringe)) {
-        
+
         // i.e. flag 2 in gateCode is true
         // this gate is part of the fringe of the cluttermap
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 3 :
                 break;
             default :
                 vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
-    
+
     if (iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionVradMissing))) {
-        
+
         // i.e. flag 3 in gateCode is true
         // this gate has reflectivity data but no corresponding radial velocity data
         // and iQuantityType != 0, i.e. we are not dealing with reflectivity quantities
-        
+
         switch (iProfileType) {
-            case 1 : 
-		doInclude = FALSE;
-                break;
-            case 2 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 2 :
+                doInclude = FALSE;
+                break;
+            case 3 :
                 doInclude = FALSE;
                 break;
             default :
@@ -2696,83 +2747,83 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
     }
 
     if (!iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionVradMissing)) && alldata->options.requireVrad) {
-        
+
         // i.e. flag 3 in gateCode is true
         // this gate has reflectivity data but no corresponding radial velocity data
         // and iQuantityType == 0, i.e. we are dealing with reflectivity quantities
         // and requireVrad is true, i.e. we exclude gates without radial velocity data
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 3 :
                 doInclude = FALSE;
                 break;
             default :
                 vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
-    
+
     if (gateCode & 1<<(alldata->flags.flagPositionDbzTooHighForBirds)) {
-        
+
         // i.e. flag 4 in gateCode is true
-        // this gate's dbz value is too high to be due to birds, it must be 
+        // this gate's dbz value is too high to be due to birds, it must be
         // caused by something else
 
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 break;
-            case 3 : 
+            case 3 :
                 break;
             default :
                 vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
-    
+
     if (gateCode & 1<<(alldata->flags.flagPositionVradTooLow)) {
-        
+
         // i.e. flag 5 in gateCode is true
         // this gate's radial velocity is very low, and therefore excluded as potential clutter.
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 3 :
                 doInclude = FALSE;
                 break;
             default :
                 vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
         }
     }
-    
+
     if (iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionVDifMax))) {
 
         // i.e. iQuantityType !=0, we are dealing with a selection for svdfit.
         // i.e. flag 6 in gateCode is true
-        // after the first svdfit, this gate's fitted vRad was more than 
+        // after the first svdfit, this gate's fitted vRad was more than
         // VDIFMAX away from the observed vRad for that gate. It is therefore
         // considered an outlier
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 3 :
                 doInclude = FALSE;
                 break;
             default :
@@ -2785,19 +2836,19 @@ static int includeGate(const int iProfileType, const int iQuantityType, const un
     if (!iQuantityType && (gateCode & 1<<(alldata->flags.flagPositionAzimOutOfRange))) {
 
         // i.e. iQuantityType == 0, we are NOT dealing with a selection for svdfit, but with a selection of reflectivities.
-	// Azimuth selection does not apply to svdfit, because svdfit requires data at all azimuths
+  // Azimuth selection does not apply to svdfit, because svdfit requires data at all azimuths
         // i.e. flag 7 in gateCode is true
         // the user can specify to exclude gates based on their azimuth;
         // this clause is for gates that have too low azimuth
-        
+
         switch (iProfileType) {
-            case 1 : 
+            case 1 :
                 doInclude = FALSE;
                 break;
-            case 2 : 
+            case 2 :
                 doInclude = FALSE;
                 break;
-            case 3 : 
+            case 3 :
                 doInclude = FALSE;
                 break;
             default :
@@ -2875,9 +2926,11 @@ static int readUserConfigOptions(cfg_t** cfg, const char * optsConfFilename) {
         CFG_BOOL("MISTNET_ELEVS_ONLY", MISTNET_ELEVS_ONLY, CFGF_NONE),
         CFG_BOOL("USE_MISTNET", USE_MISTNET, CFGF_NONE),
         CFG_STR("MISTNET_PATH",MISTNET_PATH,CFGF_NONE),
+        CFG_INT("HEIGHT_REFERENCE",HEIGHT_REFERENCE,CFGF_NONE),
+        CFG_STR("GROUND_HEIGHT_PARAM",GROUND_HEIGHT_PARAM,CFGF_NONE),
         CFG_END()
     };
-    
+
     (*cfg) = cfg_init(opts, CFGF_NONE);
     int result = cfg_parse((*cfg), optsConfFilename);
 
@@ -2891,11 +2944,11 @@ static int readUserConfigOptions(cfg_t** cfg, const char * optsConfFilename) {
     if (result == CFG_PARSE_ERROR) {
         return 1;
     }
-   
+
     return 0;
 
 } // readUserConfigOptions
-    
+
 #endif
 
 
@@ -2904,7 +2957,7 @@ static int mapVolumeToProfile(VerticalProfile_t* vp, PolarVolume_t* volume){
     //assert that the volume and vertical profile are defined
     RAVE_ASSERT((vp != NULL), "vp == NULL");
     RAVE_ASSERT((volume != NULL), "volume == NULL");
-    
+
     //copy the metadata
     VerticalProfile_setTime(vp,PolarVolume_getTime(volume));
     VerticalProfile_setDate(vp,PolarVolume_getDate(volume));
@@ -2912,7 +2965,7 @@ static int mapVolumeToProfile(VerticalProfile_t* vp, PolarVolume_t* volume){
     VerticalProfile_setLongitude(vp,PolarVolume_getLongitude(volume));
     VerticalProfile_setLatitude(vp,PolarVolume_getLatitude(volume));
     VerticalProfile_setHeight(vp,PolarVolume_getHeight(volume));
-   
+
     return 0;
 }
 
@@ -2920,7 +2973,7 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     int result = 0;
     //assert that the vertical profile is defined
     RAVE_ASSERT((alldata->vp != NULL), "vp == NULL");
-    
+
     // copy shared metadata from volume to profile
     mapVolumeToProfile(alldata->vp, volume);
 
@@ -2929,7 +2982,7 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     VerticalProfile_setInterval(alldata->vp,alldata->options.layerThickness);
     VerticalProfile_setMinheight(alldata->vp, 0);
     VerticalProfile_setMaxheight(alldata->vp, alldata->options.nLayers * alldata->options.layerThickness);
-    
+
     //intialize attributes for /how and /what
     RaveAttribute_t* attr_beamwidth = RaveAttributeHelp_createDouble("how/beamwidth", PolarVolume_getBeamwidth(volume)*180/PI);
     RaveAttribute_t* attr_wavelength = RaveAttributeHelp_createDouble("how/wavelength", alldata->options.radarWavelength);
@@ -2967,11 +3020,11 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     VerticalProfile_addAttribute(alldata->vp, attr_filename_pvol);
     VerticalProfile_addAttribute(alldata->vp, attr_filename_vp);
     VerticalProfile_addAttribute(alldata->vp, attr_vcp);
-      
+
     //-------------------------------------------//
     //   map the profile data to rave fields     //
     //-------------------------------------------//
-    
+
     //layer specification:
     profileArray2RaveField(alldata, 1, 0, "HGHT", RaveDataType_DOUBLE);
 
@@ -2982,17 +3035,17 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     profileArray2RaveField(alldata, 1, 3, "v", RaveDataType_DOUBLE);
     profileArray2RaveField(alldata, 1, 4, "w", RaveDataType_DOUBLE);
     profileArray2RaveField(alldata, 1, 8, "gap", RaveDataType_INT);
-    profileArray2RaveField(alldata, 1, 9, "dbz", RaveDataType_DOUBLE);    
+    profileArray2RaveField(alldata, 1, 9, "dbz", RaveDataType_DOUBLE);
     profileArray2RaveField(alldata, 1, 11, "eta", RaveDataType_DOUBLE);
-    profileArray2RaveField(alldata, 1, 12, "dens", RaveDataType_DOUBLE);        
+    profileArray2RaveField(alldata, 1, 12, "dens", RaveDataType_DOUBLE);
     profileArray2RaveField(alldata, 1, 10, "n", RaveDataType_LONG);
-    profileArray2RaveField(alldata, 1, 13, "n_dbz", RaveDataType_LONG);    
+    profileArray2RaveField(alldata, 1, 13, "n_dbz", RaveDataType_LONG);
 
     //quantities calculated from all scatterers:
-    profileArray2RaveField(alldata, 3, 7, "sd_vvp", RaveDataType_DOUBLE);    
-    profileArray2RaveField(alldata, 3, 9, alldata->options.dbzType, RaveDataType_DOUBLE);    
-    profileArray2RaveField(alldata, 3, 10, "n_all", RaveDataType_LONG);    
-    profileArray2RaveField(alldata, 3, 13, "n_dbz_all", RaveDataType_LONG);        
+    profileArray2RaveField(alldata, 3, 7, "sd_vvp", RaveDataType_DOUBLE);
+    profileArray2RaveField(alldata, 3, 9, alldata->options.dbzType, RaveDataType_DOUBLE);
+    profileArray2RaveField(alldata, 3, 10, "n_all", RaveDataType_LONG);
+    profileArray2RaveField(alldata, 3, 13, "n_dbz_all", RaveDataType_LONG);
 
     //some unused quantities for later reference:
     //profileArray2RaveField(alldata, 1, 2, "u", RaveDataType_DOUBLE);
@@ -3035,7 +3088,7 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     result=1;
 
     return result;
-    
+
 }
 
 /*  /trim whitespace at beginnging and end
@@ -3137,14 +3190,14 @@ void create_profile_printout_str(char* printbuffer, int buflen, const char* date
 }
 
 
-void write_line_vpts_profile(char* printbuffer, int buflen, 
-    char* radar_name, char* datetime, float HGHT, float u, float v, 
-    float w, float ff, float dd, float sd_vvp, char* gap, float dbz, 
-    float eta, float dens, float DBZH, float n, float n_dbz, float n_all, 
+void write_line_vpts_profile(char* printbuffer, int buflen,
+    char* radar_name, char* datetime, float HGHT, float u, float v,
+    float w, float ff, float dd, float sd_vvp, char* gap, float dbz,
+    float eta, float dens, float DBZH, float n, float n_dbz, float n_all,
     float n_dbz_all, float rcs, float sd_vvp_thresh, int vcp, float latitude,
     float longitude, int height, float wavelength, const char* fileIn)
 {
-  
+
   char s_HGHT[16], s_u[16], s_v[16], s_w[16], s_ff[16], s_dd[16];
   char s_sd_vvp[16], s_dbz[16], s_eta[16], s_dens[16], s_DBZH[16];
   char s_n[16], s_n_dbz[16], s_n_all[16], s_n_dbz_all[16], s_rcs[16];
@@ -3167,7 +3220,7 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_vpts(s_n_dbz, "%5.f", n_dbz);
   nanify_vpts(s_n_all, "%5.f", n_all);
   nanify_vpts(s_n_dbz_all, "%5.f", n_dbz_all);
-  nanify_vpts(s_rcs, "%g", rcs); 
+  nanify_vpts(s_rcs, "%g", rcs);
   nanify_vpts(s_sd_vvp_thresh, "%3.f", sd_vvp_thresh);
   nanify_vpts(s_vcp, "%5.f", vcp);
   nanify_vpts(s_lat, "%.5f", latitude);
@@ -3175,7 +3228,7 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_vpts(s_height, "%5.f", height);
   nanify_vpts(s_wavelength, "%5.1f", wavelength);
 
-  snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"", 
+  snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"",
     radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
     s_n_all, s_n_dbz_all, s_rcs, s_sd_vvp_thresh, s_vcp, s_lat, s_lon, s_height, s_wavelength, get_filename(fileIn));
 }
@@ -3183,20 +3236,20 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
 static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_quantity, const char* quantity, RaveDataType raveType){
     int result = 0;
     float* profile;
-    
+
     RaveField_t* field = RAVE_OBJECT_NEW(&RaveField_TYPE);
     if (RaveField_createData(field, 1, alldata->options.nLayers, raveType) == 0){
         vol2bird_err_printf("Error pre-allocating field '%s'.\n", quantity);
         return -1;
     }
-    
+
     switch (idx_profile) {
         case 1 :
             profile=alldata->profiles.profile1;
-            break; 
+            break;
         case 2 :
             profile=alldata->profiles.profile2;
-            break; 
+            break;
         case 3 :
             profile=alldata->profiles.profile3;
             break;
@@ -3204,18 +3257,18 @@ static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_
             vol2bird_err_printf( "Something is wrong this should not happen.\n");
             goto done;
     }
-    
+
     int iRowProfile;
     int nColProfile = alldata->profiles.nColsProfile;
     for (iRowProfile = 0; iRowProfile < alldata->profiles.nRowsProfile; iRowProfile++) {
         RaveField_setValue(field, 0, iRowProfile, profile[idx_quantity +iRowProfile * nColProfile]);
     }
-    
+
     result = verticalProfile_AddCustomField(alldata->vp, field, quantity);
-    
+
     done:
         RAVE_OBJECT_RELEASE(field);
-    
+
         return result;
 }
 
@@ -3251,7 +3304,7 @@ static int verticalProfile_AddCustomField(VerticalProfile_t* self, RaveField_t* 
         goto done;
     }
     result = VerticalProfile_addField(self, field);
-    
+
     done:
         RAVE_OBJECT_RELEASE(attr);
         RAVE_OBJECT_RELEASE(attr_gain);
@@ -3263,7 +3316,7 @@ static int verticalProfile_AddCustomField(VerticalProfile_t* self, RaveField_t* 
 
 
 int saveToODIM(RaveCoreObject* object, const char* filename){
-    
+
     //define new Rave IO instance
     RaveIO_t* raveio = RAVE_OBJECT_NEW(&RaveIO_TYPE);
     //VpOdimIO_t* raveio = RAVE_OBJECT_NEW(&VpOdimIO_TYPE);
@@ -3274,19 +3327,19 @@ int saveToODIM(RaveCoreObject* object, const char* filename){
 
     //set the object to be saved
     RaveIO_setObject(raveio, object);
-    
+
     //save the object
     int result;
     result = RaveIO_save(raveio, filename);
-    
+
     RAVE_OBJECT_RELEASE(raveio);
 
-    return result;    
+    return result;
 }
 
 
 int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
-    
+
     // ----------------------------------------------------------------------------------------- //
     // this function writes the vertical profile to CSV format https://aloftdata.eu/vpts-csv     //
     // ---------------------------------------------------------------------------------------- //
@@ -3301,12 +3354,12 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
     height = (int)PolarVolume_getHeight(pvol);
     source = PolarVolume_getSource(pvol);
     date= PolarVolume_getDate(pvol);
-    time = PolarVolume_getTime(pvol);    
+    time = PolarVolume_getTime(pvol);
 
     FILE *fp;
     fp = fopen(filename, "w");
     if (fp == NULL) {
-        vol2bird_printf("Failed to open file %s for writing.\n", filename);
+        vol2bird_err_printf("Failed to open file %s for writing.\n", filename);
         return 0;
     }
 
@@ -3328,7 +3381,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
     wavelength = &alldata->options.radarWavelength;
     radar_name = alldata->misc.radarName;
     fileIn = alldata->misc.filename_pvol;
-    
+
     fprintf(fp,"radar,datetime,height,u,v,w,ff,dd,sd_vvp,gap,eta,dens,dbz,dbz_all,n,n_dbz,n_all,n_dbz_all,rcs,sd_vvp_threshold,vcp,radar_latitude,radar_longitude,radar_height,radar_wavelength,source_file\n");
 
     int iRowProfile;
@@ -3345,7 +3398,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
         printbuffer,
         1024,
         radar_name,                                                             //radar*
-        datetime,                                                               //datetime*    
+        datetime,                                                               //datetime*
         profileBio[0 + iCopied],                                                //height*
         profileBio[2 + iCopied],                                                //u
         profileBio[3 + iCopied],                                                //v
@@ -3372,12 +3425,12 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
     profileBio = NULL;
     free((void*) profileAll);
     free((void*) profileBio);
-    
+
     if (fclose(fp) != 0) {
-        vol2bird_printf("Failed to close file %s.\n", filename);
+        vol2bird_err_printf("Failed to close file %s.\n", filename);
         return 0;
     }
-    
+
     // If everything succeeds, return 1
     return 1;
 
@@ -3393,22 +3446,22 @@ int isCSV(const char *filename) {
 }
 
 static void printCellProp(CELLPROP* cellProp, float elev, int nCells, int nCellsValid, vol2bird_t *alldata){
-    
+
     // ---------------------------------------------------------- //
     // this function prints the cell properties struct to stderr  //
     // ---------------------------------------------------------- //
-    
-    vol2bird_err_printf("#Cell analysis for elevation %f:\n",elev*RAD2DEG);
-    vol2bird_err_printf("#Minimum cell area in km^2     : %f\n",alldata->constants.areaCellMin);
-    vol2bird_err_printf("#Threshold for mean dBZ cell   : %g dBZ\n",alldata->misc.cellDbzMin);
-    vol2bird_err_printf("#Threshold for mean stdev cell : %g m/s\n",alldata->options.cellStdDevMax);
-    vol2bird_err_printf("#Valid cells                   : %i/%i\n#\n",nCellsValid,nCells);
-    vol2bird_err_printf("cellProp: .index .nGates .nGatesClutter   .Area .dbzAvg .texAvg .cv   .dbzMax .iRangOfMax .iAzimOfMax .drop\n");
+
+    vol2bird_printf("#Cell analysis for elevation %f:\n",elev*RAD2DEG);
+    vol2bird_printf("#Minimum cell area in km^2     : %f\n",alldata->constants.areaCellMin);
+    vol2bird_printf("#Threshold for mean dBZ cell   : %g dBZ\n",alldata->misc.cellDbzMin);
+    vol2bird_printf("#Threshold for mean stdev cell : %g m/s\n",alldata->options.cellStdDevMax);
+    vol2bird_printf("#Valid cells                   : %i/%i\n#\n",nCellsValid,nCells);
+    vol2bird_printf("cellProp: .index .nGates .nGatesClutter   .Area .dbzAvg .texAvg .cv   .dbzMax .iRangOfMax .iAzimOfMax .drop\n");
     for (int iCell = 0; iCell < nCells; iCell++) {
         if (cellProp[iCell].drop == TRUE) {
             continue;
         }
-        vol2bird_err_printf("cellProp: %6d %7d %14d %7.2f %7.2f %7.2f %5.2f %7.2f %11d %11d %5c\n",
+        vol2bird_printf("cellProp: %6d %7d %14d %7.2f %7.2f %7.2f %5.2f %7.2f %11d %11d %5c\n",
             cellProp[iCell].index,
             cellProp[iCell].nGates,
             cellProp[iCell].nGatesClutter,
@@ -3425,7 +3478,7 @@ static void printCellProp(CELLPROP* cellProp, float elev, int nCells, int nCells
 
 
 static void printGateCode(char* flags, const unsigned int gateCode) {
-    
+
     // --------------------------------------------------- //
     // this function prints the integer value gateCode as  //
     // the equivalent sequence of bits                     //
@@ -3435,27 +3488,27 @@ static void printGateCode(char* flags, const unsigned int gateCode) {
     int nFlagsNeeded;
     int nFlags;
     int nFlagsMax;
-    
-    
+
+
     if (gateCode <= 0) {
         nFlagsNeeded = 0;
     }
     else {
         nFlagsNeeded = (int) ceil(log(gateCode + 1)/log(2));
     }
-    
+
     nFlagsMax = 9;
     if (nFlagsNeeded > nFlagsMax) {
         vol2bird_err_printf("There's only space for %d flags\n. Aborting",nFlagsMax);
         return;
     }
-    
+
     nFlags = nFlagsMax;
 
     for (iFlag = nFlags-1; iFlag >= 0; iFlag--) {
-    
+
         int iFlagIsEnabled = (gateCode & (1 << iFlag)) >> iFlag;
-        
+
         if (iFlagIsEnabled == TRUE) {
             flags[nFlags-iFlag-1] = '1';
         }
@@ -3463,9 +3516,9 @@ static void printGateCode(char* flags, const unsigned int gateCode) {
             flags[nFlags-iFlag-1] = '0';
         };
     }
-    
+
     flags[nFlags] = '\0';
-    
+
     return;
 
 } // printGateCode
@@ -3479,9 +3532,9 @@ void printImage(PolarScan_t* scan, const char* quantity) {
     int needsSignChar;
     int needsFloat;
     int maxValue;
-    
+
     PolarScanParam_t* scanParam = PolarScan_getParameter(scan, quantity);
-    
+
     if(scanParam == (PolarScanParam_t *) NULL){
         vol2bird_err_printf("warning::printImage: quantity %s not found in scan\n",quantity);
         return;
@@ -3491,23 +3544,23 @@ void printImage(PolarScan_t* scan, const char* quantity) {
     int nChars;
     char* formatStr;
     char* naStr;
-    
+
     maxValue = 0;
     needsSignChar = FALSE;
     needsFloat = FALSE;
-    
+
     RaveValueType type;
-    
+
     // first, determine how many characters are needed to print array 'imageInt'
-    for (iAzim = 0; iAzim < nAzim; iAzim++) { 
-        
+    for (iAzim = 0; iAzim < nAzim; iAzim++) {
+
         for (iRang = 0; iRang < nRang; iRang++) {
-            
+
             type = PolarScanParam_getValue(scanParam,iRang,iAzim,&thisValue);
             if (thisValue < 0) {
                 needsSignChar = TRUE;
             }
-            
+
             if (XABS(thisValue - (long) thisValue) >= 0.01) {
                 needsFloat = TRUE;
             }
@@ -3526,104 +3579,104 @@ void printImage(PolarScan_t* scan, const char* quantity) {
     if (needsSignChar) {
         nChars += 1;
     }
-    
+
     if (!needsFloat){
         switch (nChars) {
             case 0 :
                 formatStr = "  %1f";
                 naStr=" NA";
-                break; 
+                break;
             case 1 :
                 formatStr = "  %1f";
                 naStr=" NA";
-                break; 
+                break;
             case 2 :
-                formatStr = " %2f"; 
+                formatStr = " %2f";
                 naStr=" NA";
                 break;
             case 3 :
-                formatStr = " %3f"; 
+                formatStr = " %3f";
                 naStr=" NA ";
                 break;
             case 4 :
-                formatStr = " %4f"; 
+                formatStr = " %4f";
                 naStr=" NA  ";
                 break;
             default :
-                formatStr = " %8f"; 
+                formatStr = " %8f";
                 naStr=" NA      ";
-                
-        }        
+
+        }
     }
     else{
         switch (nChars) {
             case 0 :
                 formatStr = " %1.2f";
                 naStr=" NA  ";
-                break; 
+                break;
             case 1 :
                 formatStr = " %1.2f";
                 naStr=" NA  ";
-                break; 
+                break;
             case 2 :
-                formatStr = " %2.2f"; 
+                formatStr = " %2.2f";
                 naStr=" NA   ";
                 break;
             case 3 :
-                formatStr = " %3.2f"; 
+                formatStr = " %3.2f";
                 naStr=" NA    ";
                 break;
             case 4 :
-                formatStr = " %4.2f"; 
+                formatStr = " %4.2f";
                 naStr=" NA     ";
                 break;
             default :
-                formatStr = " %8.2f"; 
+                formatStr = " %8.2f";
                 naStr=" NA         ";
 
         }
     }
 
-    
-    for (iAzim = 0; iAzim < nAzim; iAzim++) { 
-        
+
+    for (iAzim = 0; iAzim < nAzim; iAzim++) {
+
         for (iRang = 0; iRang < nRang; iRang++) {
-                
+
             type = PolarScanParam_getValue(scanParam,iRang,iAzim,&thisValue);
-            
+
             if (type == RaveValueType_DATA){
-                vol2bird_err_printf(formatStr,thisValue);
+                vol2bird_printf(formatStr,thisValue);
             }
             else{
-                vol2bird_err_printf(naStr,thisValue);
+                vol2bird_printf(naStr,thisValue);
 
             }
         }
-        vol2bird_err_printf("\n");
+        vol2bird_printf("\n");
     }
-        
+
 } // printImageInt
 
 
 
 static int printMeta(PolarScan_t* scan, const char* quantity) {
-    
-    vol2bird_err_printf("scan->heig = %f\n",PolarScan_getHeight(scan));
-    vol2bird_err_printf("scan->elev = %f\n",PolarScan_getElangle(scan));
-    vol2bird_err_printf("scan->nRang = %ld\n",PolarScan_getNbins(scan));
-    vol2bird_err_printf("scan->nAzim = %ld\n",PolarScan_getNrays(scan));
-    vol2bird_err_printf("scan->rangeScale = %f\n",PolarScan_getRscale(scan));
-    vol2bird_err_printf("scan->azimScale = %f\n",360.0f/PolarScan_getNrays(scan));
-    
+
+    vol2bird_printf("scan->heig = %f\n",PolarScan_getHeight(scan));
+    vol2bird_printf("scan->elev = %f\n",PolarScan_getElangle(scan));
+    vol2bird_printf("scan->nRang = %ld\n",PolarScan_getNbins(scan));
+    vol2bird_printf("scan->nAzim = %ld\n",PolarScan_getNrays(scan));
+    vol2bird_printf("scan->rangeScale = %f\n",PolarScan_getRscale(scan));
+    vol2bird_printf("scan->azimScale = %f\n",360.0f/PolarScan_getNrays(scan));
+
     PolarScanParam_t* scanParam = PolarScan_getParameter(scan,quantity);
-    
+
     if(scanParam != (PolarScanParam_t*) NULL){
-        vol2bird_err_printf("scan->%s->valueOffset = %f\n",quantity,PolarScanParam_getOffset(scanParam));
-        vol2bird_err_printf("scan->%s->valueScale = %f\n",quantity,PolarScanParam_getGain(scanParam));
-        vol2bird_err_printf("scan->%s->nodata = %f\n",quantity,PolarScanParam_getNodata(scanParam));
-        vol2bird_err_printf("scan->%s->undetect = %f\n",quantity,PolarScanParam_getUndetect(scanParam));
+        vol2bird_printf("scan->%s->valueOffset = %f\n",quantity,PolarScanParam_getOffset(scanParam));
+        vol2bird_printf("scan->%s->valueScale = %f\n",quantity,PolarScanParam_getGain(scanParam));
+        vol2bird_printf("scan->%s->nodata = %f\n",quantity,PolarScanParam_getNodata(scanParam));
+        vol2bird_printf("scan->%s->undetect = %f\n",quantity,PolarScanParam_getUndetect(scanParam));
     }
-    
+
     return 0;
 
 } // printMeta
@@ -3652,41 +3705,41 @@ static int selectCellsToDrop_singlePol(CELLPROP *cellProp, int nCells, vol2bird_
         int dbzTooLow = cellProp[iCell].dbzAvg < alldata->misc.cellDbzMin;
         int texTooHigh = cellProp[iCell].texAvg > alldata->options.cellStdDevMax;
         int tooMuchClutter = ((float) cellProp[iCell].nGatesClutter / cellProp[iCell].nGates) > alldata->constants.cellClutterFractionMax;
-        
+
         if (notEnoughGates) {
-            
-            // this blob is too small too be a weather cell, more likely 
-            // that these are birds. So, drop the blob from the record of 
-            // weather cells 
+
+            // this blob is too small too be a weather cell, more likely
+            // that these are birds. So, drop the blob from the record of
+            // weather cells
 
             cellProp[iCell].drop = TRUE;
-            
+
             continue;
         }
 
         if (dbzTooLow && texTooHigh) {
 
             // apparently, we are dealing a blob that is fairly large (it
-            // passes the 'notEnoughGates' condition above, but it has both 
+            // passes the 'notEnoughGates' condition above, but it has both
             // a low dbz and a high vrad texture. In contrast, weather cells
             // have high dbz and low vrad texture. It is therefore unlikely
             // that the blob is a weather cell.
-            
+
             if (tooMuchClutter) {
                 // pass
             }
             else {
-                
-                // So at this point we have established that we are 
+
+                // So at this point we have established that we are
                 // dealing with a blob that is:
                 //     1. fairly large
                 //     2. has too low dbz to be precipitation
                 //     3. has too high vrad texture to be precipitation
                 //     4. has too little clutter to be attributed to clutter
                 // Therefore we drop it from the record of known weather cells
-                
+
                 cellProp[iCell].drop = TRUE;
-                
+
             }
         }
     }
@@ -3700,10 +3753,10 @@ static int selectCellsToDrop_dualPol(CELLPROP *cellProp, int nCells, vol2bird_t*
         int notEnoughGates = cellProp[iCell].area < alldata->constants.areaCellMin;
 
         if (notEnoughGates) {
-            
-            // this blob is too small too be a weather cell, more likely 
-            // that these are birds. So, drop the blob from the record of 
-            // weather cells 
+
+            // this blob is too small too be a weather cell, more likely
+            // that these are birds. So, drop the blob from the record of
+            // weather cells
 
             cellProp[iCell].drop = TRUE;
             continue;
@@ -3717,7 +3770,7 @@ static void sortCellsByArea(CELLPROP *cellProp, const int nCells) {
 
     // ---------------------------------------------------------------- //
     // Sorting of the cell properties based on cell area.               //
-    // ---------------------------------------------------------------- // 
+    // ---------------------------------------------------------------- //
 
     int iCell;
     int iCellOther;
@@ -3747,7 +3800,7 @@ static void sortCellsByArea(CELLPROP *cellProp, const int nCells) {
 
 
 radarDataFormat determineRadarFormat(char* filename){
-    
+
 #ifdef IRIS
     if (isIRIS(filename)==0){
         return radarDataFormat_ODIM;
@@ -3770,7 +3823,7 @@ radarDataFormat determineRadarFormat(char* filename){
         RAVE_OBJECT_RELEASE(raveio);
         return radarDataFormat_ODIM;
     }
-    
+
     return radarDataFormat_UNKNOWN;
 }
 
@@ -3781,7 +3834,7 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
     int nCopied;
     CELLPROP* cellPropCopy;
     CELLPROP cellPropEmpty;
-    
+
     cellPropEmpty.iRangOfMax = -1;
     cellPropEmpty.iAzimOfMax = -1;
     cellPropEmpty.nGates = -1;
@@ -3807,28 +3860,28 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
         vol2bird_err_printf("Requested memory size is too large in removeDroppedCells!\n");
         return -1;
     }
-    
+
     cellPropCopy = (CELLPROP*) malloc(sizeof(CELLPROP) * nCells);
     if (!cellPropCopy) {
         vol2bird_err_printf("Requested memory could not be allocated in removeDroppedCells!\n");
         return -1;
-    }    
+    }
 
     iCopy = 0;
-    
-    for (iCell = 0; iCell < nCells; iCell++) {    
-        
+
+    for (iCell = 0; iCell < nCells; iCell++) {
+
         if (cellProp[iCell].drop == TRUE) {
             // pass
-        }  
+        }
         else {
             cellPropCopy[iCopy] = cellProp[iCell];
             iCopy += 1;
         }
     }
-    
+
     nCopied = iCopy;
-    
+
     for (iCopy = 0; iCopy < nCopied; iCopy++) {
         cellProp[iCopy] = cellPropCopy[iCopy];
     }
@@ -3841,20 +3894,20 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
     for (iCell = 0; iCell < nCells; iCell++) {
         vol2bird_err_printf("(%d/%d): copied = %c, index = %d, nGates = %d\n",iCell,nCells,iCell < nCopied ? 'T':'F',cellProp[iCell].index,cellProp[iCell].nGates);
     }
-    #endif 
-    
+    #endif
+
     free(cellPropCopy);
-       
+
     return nCopied;
-   
+
 }
 
 
 
 
-static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitted, const int* includedIndex, 
+static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitted, const int* includedIndex,
                                    const int nPointsIncluded, float* points_local, vol2bird_t* alldata) {
-                                       
+
     // ----------------------------------------------------------------------------------- //
     // after the first svdfit to the selection of points, we want to identify gates that   //
     // deviate strongly from the fitted vrad value (we assume that they are outliers). So, //
@@ -3870,15 +3923,15 @@ static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitte
     for (iPointIncluded = 0; iPointIncluded < nPointsIncluded; iPointIncluded++) {
 
         float absVDif = fabs(yObs[iPointIncluded]-yFitted[iPointIncluded]);
-        
+
         if (absVDif > alldata->constants.absVDifMax) {
-            
+
             iPoint = includedIndex[iPointIncluded];
             gateCode = (unsigned int) points_local[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol];
             points_local[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol] = (float) (gateCode |= 1<<(alldata->flags.flagPositionVDifMax));
 
         }
-    } 
+    }
 
 } // updateFlagFieldsInPointsArray
 
@@ -4423,7 +4476,7 @@ int vol2birdGetNColsProfile(vol2bird_t *alldata) {
 } // vol2birdGetNColsProfile
 
 
-int vol2birdGetNRowsProfile(vol2bird_t *alldata) {   
+int vol2birdGetNRowsProfile(vol2bird_t *alldata) {
 
     if (alldata->misc.initializationSuccessful==FALSE) {
         vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
@@ -4440,11 +4493,11 @@ float* vol2birdGetProfile(int iProfileType, vol2bird_t *alldata) {
     }
 
     switch (iProfileType) {
-        case 1 : 
+        case 1 :
             return &(alldata->profiles.profile1[0]);
-        case 2 : 
+        case 2 :
             return &(alldata->profiles.profile2[0]);
-        case 3 : 
+        case 3 :
             return &(alldata->profiles.profile3[0]);
         default :
             vol2bird_err_printf( "Something went wrong; behavior not implemented for given iProfileType.\n");
@@ -4455,21 +4508,21 @@ float* vol2birdGetProfile(int iProfileType, vol2bird_t *alldata) {
 
 
 void vol2birdPrintIndexArrays(vol2bird_t* alldata) {
-    
+
     if (alldata->misc.initializationSuccessful==FALSE) {
         vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
-    
+
     int iLayer;
 
-    vol2bird_err_printf( "iLayer  iFrom   iTo     iTo-iFrom nWritten\n");
+    vol2bird_printf( "iLayer  iFrom   iTo     iTo-iFrom nWritten\n");
     for (iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
-        vol2bird_err_printf( "%7d %7d %7d %10d %8d\n",
-            iLayer, 
-            alldata->points.indexFrom[iLayer], 
-            alldata->points.indexTo[iLayer], 
-            alldata->points.indexTo[iLayer] - alldata->points.indexFrom[iLayer], 
+        vol2bird_printf( "%7d %7d %7d %10d %8d\n",
+            iLayer,
+            alldata->points.indexFrom[iLayer],
+            alldata->points.indexTo[iLayer],
+            alldata->points.indexTo[iLayer] - alldata->points.indexFrom[iLayer],
             alldata->points.nPointsWritten[iLayer]);
     }
 } // vol2birdPrintIndexArrays
@@ -4477,55 +4530,55 @@ void vol2birdPrintIndexArrays(vol2bird_t* alldata) {
 
 
 void vol2birdPrintOptions(vol2bird_t* alldata) {
-    
+
     // ------------------------------------------------------- //
     // this function prints vol2bird's configuration to stderr //
     // ------------------------------------------------------- //
-    
+
     if (alldata->misc.initializationSuccessful==FALSE) {
         vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 
-    vol2bird_err_printf("\n\nvol2bird configuration:\n\n");
+    vol2bird_printf("\n\nvol2bird configuration:\n\n");
 
-    vol2bird_err_printf("%-25s = %f\n","absVDifMax",alldata->constants.absVDifMax);
-    vol2bird_err_printf("%-25s = %f\n","azimMax",alldata->options.azimMax);
-    vol2bird_err_printf("%-25s = %f\n","azimMin",alldata->options.azimMin);
-    vol2bird_err_printf("%-25s = %f\n","birdRadarCrossSection",alldata->options.birdRadarCrossSection);
-    vol2bird_err_printf("%-25s = %f\n","cellClutterFractionMax",alldata->constants.cellClutterFractionMax);
-    vol2bird_err_printf("%-25s = %f\n","cellEtaMin",alldata->options.cellEtaMin);
-    vol2bird_err_printf("%-25s = %f\n","cellStdDevMax",alldata->options.cellStdDevMax);
-    vol2bird_err_printf("%-25s = %f\n","chisqMin",alldata->constants.chisqMin);
-    vol2bird_err_printf("%-25s = %f\n","clutterValueMin",alldata->options.clutterValueMin);
-    vol2bird_err_printf("%-25s = %f\n","etaMax",alldata->options.etaMax);
-    vol2bird_err_printf("%-25s = %f\n","dbzThresMin",alldata->options.dbzThresMin);
-    vol2bird_err_printf("%-25s = %s\n","dbzType",alldata->options.dbzType);
-    vol2bird_err_printf("%-25s = %f\n","elevMax",alldata->options.elevMax);
-    vol2bird_err_printf("%-25s = %f\n","elevMin",alldata->options.elevMin);
-    vol2bird_err_printf("%-25s = %d\n","fitVrad",alldata->options.fitVrad);
-    vol2bird_err_printf("%-25s = %f\n","fringeDist",alldata->constants.fringeDist);
-    vol2bird_err_printf("%-25s = %f\n","layerThickness",alldata->options.layerThickness);
-    vol2bird_err_printf("%-25s = %f\n","minNyquist",alldata->options.minNyquist);
-    vol2bird_err_printf("%-25s = %f\n","areaCellMin",alldata->constants.areaCellMin);
-    vol2bird_err_printf("%-25s = %d\n","nAzimNeighborhood",alldata->constants.nAzimNeighborhood);
-    vol2bird_err_printf("%-25s = %d\n","nBinsGap",alldata->constants.nBinsGap);
-    vol2bird_err_printf("%-25s = %d\n","nCountMin",alldata->constants.nCountMin);
-    vol2bird_err_printf("%-25s = %d\n","nLayers",alldata->options.nLayers);
-    vol2bird_err_printf("%-25s = %d\n","nObsGapMin",alldata->constants.nObsGapMin);
-    vol2bird_err_printf("%-25s = %d\n","nPointsIncludedMin",alldata->constants.nPointsIncludedMin);
-    vol2bird_err_printf("%-25s = %d\n","nRangNeighborhood",alldata->constants.nRangNeighborhood);
-    vol2bird_err_printf("%-25s = %f\n","radarWavelength",alldata->options.radarWavelength);
-    vol2bird_err_printf("%-25s = %f\n","rangeMax",alldata->options.rangeMax);
-    vol2bird_err_printf("%-25s = %f\n","rangeMin",alldata->options.rangeMin);
-    vol2bird_err_printf("%-25s = %f\n","rCellMax",alldata->misc.rCellMax);
-    vol2bird_err_printf("%-25s = %f\n","refracIndex",alldata->constants.refracIndex);
-    vol2bird_err_printf("%-25s = %d\n","requireVrad",alldata->options.requireVrad);
-    vol2bird_err_printf("%-25s = %f\n","stdDevMinBird",alldata->options.stdDevMinBird);
-    vol2bird_err_printf("%-25s = %c\n","useClutterMap",alldata->options.useClutterMap == TRUE ? 'T' : 'F');
-    vol2bird_err_printf("%-25s = %f\n","vradMin",alldata->constants.vradMin);
-    
-    vol2bird_err_printf("\n\n");
+    vol2bird_printf("%-25s = %f\n","absVDifMax",alldata->constants.absVDifMax);
+    vol2bird_printf("%-25s = %f\n","azimMax",alldata->options.azimMax);
+    vol2bird_printf("%-25s = %f\n","azimMin",alldata->options.azimMin);
+    vol2bird_printf("%-25s = %f\n","birdRadarCrossSection",alldata->options.birdRadarCrossSection);
+    vol2bird_printf("%-25s = %f\n","cellClutterFractionMax",alldata->constants.cellClutterFractionMax);
+    vol2bird_printf("%-25s = %f\n","cellEtaMin",alldata->options.cellEtaMin);
+    vol2bird_printf("%-25s = %f\n","cellStdDevMax",alldata->options.cellStdDevMax);
+    vol2bird_printf("%-25s = %f\n","chisqMin",alldata->constants.chisqMin);
+    vol2bird_printf("%-25s = %f\n","clutterValueMin",alldata->options.clutterValueMin);
+    vol2bird_printf("%-25s = %f\n","etaMax",alldata->options.etaMax);
+    vol2bird_printf("%-25s = %f\n","dbzThresMin",alldata->options.dbzThresMin);
+    vol2bird_printf("%-25s = %s\n","dbzType",alldata->options.dbzType);
+    vol2bird_printf("%-25s = %f\n","elevMax",alldata->options.elevMax);
+    vol2bird_printf("%-25s = %f\n","elevMin",alldata->options.elevMin);
+    vol2bird_printf("%-25s = %d\n","fitVrad",alldata->options.fitVrad);
+    vol2bird_printf("%-25s = %f\n","fringeDist",alldata->constants.fringeDist);
+    vol2bird_printf("%-25s = %f\n","layerThickness",alldata->options.layerThickness);
+    vol2bird_printf("%-25s = %f\n","minNyquist",alldata->options.minNyquist);
+    vol2bird_printf("%-25s = %f\n","areaCellMin",alldata->constants.areaCellMin);
+    vol2bird_printf("%-25s = %d\n","nAzimNeighborhood",alldata->constants.nAzimNeighborhood);
+    vol2bird_printf("%-25s = %d\n","nBinsGap",alldata->constants.nBinsGap);
+    vol2bird_printf("%-25s = %d\n","nCountMin",alldata->constants.nCountMin);
+    vol2bird_printf("%-25s = %d\n","nLayers",alldata->options.nLayers);
+    vol2bird_printf("%-25s = %d\n","nObsGapMin",alldata->constants.nObsGapMin);
+    vol2bird_printf("%-25s = %d\n","nPointsIncludedMin",alldata->constants.nPointsIncludedMin);
+    vol2bird_printf("%-25s = %d\n","nRangNeighborhood",alldata->constants.nRangNeighborhood);
+    vol2bird_printf("%-25s = %f\n","radarWavelength",alldata->options.radarWavelength);
+    vol2bird_printf("%-25s = %f\n","rangeMax",alldata->options.rangeMax);
+    vol2bird_printf("%-25s = %f\n","rangeMin",alldata->options.rangeMin);
+    vol2bird_printf("%-25s = %f\n","rCellMax",alldata->misc.rCellMax);
+    vol2bird_printf("%-25s = %f\n","refracIndex",alldata->constants.refracIndex);
+    vol2bird_printf("%-25s = %d\n","requireVrad",alldata->options.requireVrad);
+    vol2bird_printf("%-25s = %f\n","stdDevMinBird",alldata->options.stdDevMinBird);
+    vol2bird_printf("%-25s = %c\n","useClutterMap",alldata->options.useClutterMap == TRUE ? 'T' : 'F');
+    vol2bird_printf("%-25s = %f\n","vradMin",alldata->constants.vradMin);
+
+    vol2bird_printf("\n\n");
 
 }  // vol2birdPrintOptions
 
@@ -4534,57 +4587,57 @@ void vol2birdPrintOptions(vol2bird_t* alldata) {
 
 
 void vol2birdPrintPointsArray(vol2bird_t* alldata) {
-    
+
     // ------------------------------------------------- //
     // this function prints the 'points' array to stderr //
     // ------------------------------------------------- //
-    
+
     if (alldata->misc.initializationSuccessful==FALSE) {
         vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 
     int iPoint;
-    
-    vol2bird_err_printf( "iPoint    range     azim    elev         dbz        vrad    cell    gateCode   flags           nyquist     vradd        clut\n");
-    
+
+    vol2bird_printf( "iPoint    range     azim    elev         dbz        vrad    cell    gateCode   flags           nyquist     vradd        clut\n");
+
     for (iPoint = 0; iPoint < alldata->points.nRowsPoints * alldata->points.nColsPoints; iPoint+=alldata->points.nColsPoints) {
-        
+
             char gateCodeStr[10];  // 9 bits plus 1 position for the null character '\0'
-            
+
             printGateCode(&gateCodeStr[0], (int) alldata->points.points[iPoint + alldata->points.gateCodeCol]);
-        
-            vol2bird_err_printf( "  %6d",    iPoint/alldata->points.nColsPoints);
-            vol2bird_err_printf( "  %6.1f",  alldata->points.points[iPoint + alldata->points.rangeCol]);
-            vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
-            vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
-            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.dbzValueCol]);
-            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vradValueCol]);
-            vol2bird_err_printf( "  %6.0f",  alldata->points.points[iPoint + alldata->points.cellValueCol]);
-            vol2bird_err_printf( "  %8.0f",  alldata->points.points[iPoint + alldata->points.gateCodeCol]);
-            vol2bird_err_printf( "  %12s",   gateCodeStr);
-            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
-            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
-            vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.clutValueCol]);
-            vol2bird_err_printf( "\n");
-    }    
+
+            vol2bird_printf( "  %6d",    iPoint/alldata->points.nColsPoints);
+            vol2bird_printf( "  %6.1f",  alldata->points.points[iPoint + alldata->points.rangeCol]);
+            vol2bird_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
+            vol2bird_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
+            vol2bird_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.dbzValueCol]);
+            vol2bird_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vradValueCol]);
+            vol2bird_printf( "  %6.0f",  alldata->points.points[iPoint + alldata->points.cellValueCol]);
+            vol2bird_printf( "  %8.0f",  alldata->points.points[iPoint + alldata->points.gateCodeCol]);
+            vol2bird_printf( "  %12s",   gateCodeStr);
+            vol2bird_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
+            vol2bird_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
+            vol2bird_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.clutValueCol]);
+            vol2bird_printf( "\n");
+    }
 } // vol2birdPrintPointsArray
 
 
 
 
 void vol2birdPrintPointsArraySimple(vol2bird_t* alldata) {
-    
+
     // ------------------------------------------------- //
     // this function prints the 'points' array to stderr //
     // ------------------------------------------------- //
-    
+
     int iPoint;
-    
+
     vol2bird_err_printf( "iPoint  azim    elev    dbz         vrad        cell     flags     nyquist vradd\n");
-    
+
     for (iPoint = 0; iPoint < alldata->points.nRowsPoints * alldata->points.nColsPoints; iPoint+=alldata->points.nColsPoints) {
-                
+
             vol2bird_err_printf( "  %6d",    iPoint/alldata->points.nColsPoints);
             vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.azimAngleCol]);
             vol2bird_err_printf( "  %6.2f",  alldata->points.points[iPoint + alldata->points.elevAngleCol]);
@@ -4595,28 +4648,28 @@ void vol2birdPrintPointsArraySimple(vol2bird_t* alldata) {
             vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.nyquistCol]);
             vol2bird_err_printf( "  %10.2f", alldata->points.points[iPoint + alldata->points.vraddValueCol]);
             vol2bird_err_printf( "\n");
-    }    
+    }
 } // vol2birdPrintPointsArray
 
 
 void printProfile(vol2bird_t* alldata) {
-    
+
     if (alldata->misc.initializationSuccessful==FALSE) {
         vol2bird_err_printf("You need to initialize vol2bird before you can use it. Aborting.\n");
         return;
     }
 
-    vol2bird_err_printf("\n\nProfile type: %d\n",alldata->profiles.iProfileTypeLast);
+    vol2bird_printf("\n\nProfile type: %d\n",alldata->profiles.iProfileTypeLast);
 
-    vol2bird_err_printf("altmin-altmax: [u         ,v         ,w         ]; "
+    vol2bird_printf("altmin-altmax: [u         ,v         ,w         ]; "
                    "hSpeed  , hDir    , chi     , hasGap  , dbzAvg  ,"
                    " nPoints, eta         , rhobird nPointsZ \n");
 
     int iLayer;
-    
+
     for (iLayer = alldata->options.nLayers - 1; iLayer >= 0; iLayer--) {
-        
-        vol2bird_err_printf("%6.0f-%-6.0f: [%10.2f,%10.2f,%10.2f]; %8.2f, "
+
+        vol2bird_printf("%6.0f-%-6.0f: [%10.2f,%10.2f,%10.2f]; %8.2f, "
         "%8.1f, %8.1f, %8c, %8.2f, %7.0f, %12.2f, %8.2f %5.f\n",
         alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  0],
         alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile +  1],
@@ -4634,15 +4687,15 @@ void printProfile(vol2bird_t* alldata) {
         alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 13]);
     }
 
-    
+
 } // printProfile()
 
 // reads a polar volume from file and returns it as a RAVE polar volume object
 // remember to release the polar volume object when done with it
 PolarVolume_t* vol2birdGetVolume(char* filenames[], int nInputFiles, float rangeMax, int small){
-    
+
     PolarVolume_t* volume = NULL;
-    
+
     #ifdef IRIS
     // test whether the file is in IRIS format
     if (isIRIS(filenames[0])==0){
@@ -4661,7 +4714,7 @@ PolarVolume_t* vol2birdGetVolume(char* filenames[], int nInputFiles, float range
         goto done;
     }
     #endif
-    
+
     volume = vol2birdGetODIMVolume(filenames, nInputFiles);
 
     if (volume != NULL) {
@@ -4678,14 +4731,14 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
     // initialize helper volume and scan to store intermediate file reads
     PolarVolume_t* volume = NULL;
     PolarScan_t* scan = NULL;
-    
+
     int outputInitialised = FALSE;
-    
+
     // initialize the rave object type of filename
     int rot = Rave_ObjectType_UNDEFINED;
 
     int ret = 0;
-    
+
     file_element_s* file_element_p = NULL;
 
     for (int i=0; i<nInputFiles; i++){
@@ -4698,13 +4751,13 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
         }
 
         rot = objectTypeFromIRIS(file_element_p);
-        
+
         if (rot == Rave_ObjectType_UNDEFINED){
             vol2bird_err_printf( "Warning: unknown object type while reading file %s in IRIS format, ignoring.\n", filenames[i]);
             free_IRIS(&file_element_p);
             continue;
         }
-        
+
         // start a new output volume object if we do not have one yet
         if (output == NULL){
             output = RAVE_OBJECT_NEW(&PolarVolume_TYPE);
@@ -4713,14 +4766,14 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
                 goto done;
             }
         }
-        
+
         if (rot == Rave_ObjectType_PVOL) {
             volume = RAVE_OBJECT_NEW(&PolarVolume_TYPE);
             if (volume == NULL) {
                 RAVE_CRITICAL0("Error: failed to create polarvolume instance");
                 goto done;
             }
-            
+
             // read iris data into rave polar volume object
             ret = populateObject((RaveCoreObject*) volume, file_element_p);
 
@@ -4728,7 +4781,7 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
                 vol2bird_err_printf( "Error: could not populate IRIS data into a polar volume object\n");
                 goto done;
             }
-            
+
             if (!outputInitialised){
                 RAVE_OBJECT_RELEASE(output); //may have been initialized earlier above
                 output = RAVE_OBJECT_CLONE(volume);
@@ -4736,24 +4789,24 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
                 outputInitialised = TRUE;
                 continue;
             }
-            
+
             for (int j=0; j<PolarVolume_getNumberOfScans(volume); j++){
                 scan = PolarVolume_getScan(volume, j);
                 PolarVolume_addScan(output, scan);
                 RAVE_OBJECT_RELEASE(scan);
             }
-            
+
             free_IRIS(&file_element_p);
             RAVE_OBJECT_RELEASE(volume);
         }
-    
+
         if (rot == Rave_ObjectType_SCAN) {
             scan = RAVE_OBJECT_NEW(&PolarScan_TYPE);
             if (scan == NULL) {
                 RAVE_CRITICAL0("Error: failed to create polarscan instance");
                 goto done;
             }
-            
+
             // read iris data into rave polar volume object
             ret = populateObject((RaveCoreObject*) scan, file_element_p);
 
@@ -4761,7 +4814,7 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
                 vol2bird_err_printf( "Error: could not populate IRIS data into a polar scan object\n");
                 goto done;
             }
-            
+
             if (!outputInitialised){
                 // copy essential root metadata to volume
                 PolarVolume_setDate(output, PolarScan_getDate(scan));
@@ -4772,23 +4825,23 @@ PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles) {
                 PolarVolume_setSource(output, PolarScan_getSource(scan));
                 outputInitialised = TRUE;
             }
-            
+
             PolarVolume_addScan(output, scan);
             free_IRIS(&file_element_p);
             RAVE_OBJECT_RELEASE(scan);
         }
-    
+
     }
 
     done:
-    
+
         // clean up
         if(file_element_p != NULL) {
             free_IRIS(&file_element_p);
         }
-        RAVE_OBJECT_RELEASE(volume);            
+        RAVE_OBJECT_RELEASE(volume);
         RAVE_OBJECT_RELEASE(scan);
-        
+
         return output;
 }
 #endif
@@ -4799,9 +4852,9 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
     // initialize helper volume and scan to store intermediate file reads
     PolarVolume_t* volume = NULL;
     PolarScan_t* scan = NULL;
-    
+
     int outputInitialised = FALSE;
-        
+
     // initialize the rave object type of filename
     int rot = Rave_ObjectType_UNDEFINED;
 
@@ -4815,7 +4868,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
                                  "adhere to the ODIM hdf5 specifications.\n", filenames[i]);
             continue;
         }
-        
+
         rot = RaveIO_getObjectType(raveio);
 
         if (!(rot == Rave_ObjectType_PVOL || rot == Rave_ObjectType_SCAN)) {
@@ -4823,7 +4876,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
             RAVE_OBJECT_RELEASE(raveio);
             continue;
         }
-        
+
         // start a new output volume object if we do not have one yet
         if (output == NULL){
             output = RAVE_OBJECT_NEW(&PolarVolume_TYPE);
@@ -4832,7 +4885,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
                 goto done;
             }
         }
-        
+
         if (rot == Rave_ObjectType_PVOL) {
             // REMOVED BY AHE. Will be overwritten when getting object from raveio
             // volume = RAVE_OBJECT_NEW(&PolarVolume_TYPE);
@@ -4840,7 +4893,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
             //    RAVE_CRITICAL0("Error: failed to create polarvolume instance");
             //    goto done;
             //}
-            
+
             // read ODIM data into rave polar volume object
             volume = (PolarVolume_t*) RaveIO_getObject(raveio);
 
@@ -4849,7 +4902,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
                 RAVE_CRITICAL0("Error: could not populate ODIM data into a polarvolume object");
                 goto done;
             }
-            
+
             if (!outputInitialised){
                 RAVE_OBJECT_RELEASE(output); // Added by AHE. Otherwise will loose output
                 output = RAVE_OBJECT_CLONE(volume);
@@ -4858,17 +4911,17 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
                 outputInitialised = TRUE;
                 continue;
             }
-            
+
             for (int j=0; j<PolarVolume_getNumberOfScans(volume); j++){
                 scan = PolarVolume_getScan(volume, j);
                 PolarVolume_addScan(output, scan);
                 RAVE_OBJECT_RELEASE(scan);
             }
-            
+
             RAVE_OBJECT_RELEASE(raveio);
             RAVE_OBJECT_RELEASE(volume);
         }
-    
+
         if (rot == Rave_ObjectType_SCAN) {
             // Removed by AHE. Overwritten when getting object from raveio
             //scan = RAVE_OBJECT_NEW(&PolarScan_TYPE);
@@ -4876,7 +4929,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
             //    RAVE_CRITICAL0("Error: failed to create polarscan instance");
             //    goto done;
             //}
-            
+
             // read iris data into rave polar volume object
             scan = (PolarScan_t*) RaveIO_getObject(raveio);
 
@@ -4885,7 +4938,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
                 RAVE_OBJECT_RELEASE(raveio)
                 goto done;
             }
-            
+
             if (!outputInitialised){
                 // copy essential root metadata to volume
                 PolarVolume_setDate(output, PolarScan_getDate(scan));
@@ -4896,7 +4949,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
                 PolarVolume_setSource(output, PolarScan_getSource(scan));
                 outputInitialised = TRUE;
             }
-            
+
             PolarVolume_addScan(output, scan);
             RAVE_OBJECT_RELEASE(raveio);
             RAVE_OBJECT_RELEASE(scan);
@@ -4906,7 +4959,7 @@ PolarVolume_t* vol2birdGetODIMVolume(char* filenames[], int nInputFiles) {
 
     done:
         // clean up
-        RAVE_OBJECT_RELEASE(volume);            
+        RAVE_OBJECT_RELEASE(volume);
         RAVE_OBJECT_RELEASE(scan);
 
         return output;
@@ -4966,9 +5019,9 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
     if (readUserConfigOptions(&(alldata->cfg), optsConfFilename) != 0) {
         vol2bird_err_printf( "An error occurred while reading the user configuration file '%s'.\n", optsConfFilename);
-        return -1; 
+        return -1;
     }
-   
+
     cfg_t** cfg = &(alldata->cfg);
 
     // ------------------------------------------------------------- //
@@ -4999,7 +5052,7 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
     alldata->options.printProfileVar = cfg_getbool(*cfg,"PRINT_PROFILE");
     alldata->options.printPointsArray = cfg_getbool(*cfg,"PRINT_POINTS_ARRAY");
     alldata->options.fitVrad = cfg_getbool(*cfg,"FIT_VRAD");
-    alldata->options.exportBirdProfileAsJSONVar = cfg_getbool(*cfg,"EXPORT_BIRD_PROFILE_AS_JSON"); 
+    alldata->options.exportBirdProfileAsJSONVar = cfg_getbool(*cfg,"EXPORT_BIRD_PROFILE_AS_JSON");
     alldata->options.minNyquist = cfg_getfloat(*cfg,"MIN_NYQUIST_VELOCITY");
     alldata->options.maxNyquistDealias = cfg_getfloat(*cfg,"MAX_NYQUIST_DEALIAS");
     alldata->options.birdRadarCrossSection = cfg_getfloat(*cfg,"SIGMA_BIRD");
@@ -5042,7 +5095,7 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
     alldata->constants.nObsGapMin = NOBSGAPMIN;
     alldata->constants.nAzimNeighborhood = NTEXBINAZIM;
     alldata->constants.nRangNeighborhood = NTEXBINRANG;
-    alldata->constants.nCountMin = NTEXMIN; 
+    alldata->constants.nCountMin = NTEXMIN;
     alldata->constants.refracIndex = REFRACTIVE_INDEX_OF_WATER;
     alldata->constants.absVDifMax = VDIFMAX;
     alldata->constants.vradMin = VRADMIN;
@@ -5100,18 +5153,18 @@ int get_radar_name(const char* source, char* radarName, size_t radarNameLength) 
 
 //int vol2birdSetUp(PolarVolume_t* volume, cfg_t** cfg, vol2bird_t* alldata) {
 int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
-    
+
     alldata->misc.initializationSuccessful = FALSE;
-    
+
     alldata->misc.vol2birdSuccessful = TRUE;
 
-    vol2bird_printf("Running vol2birdSetUp\n");
+    vol2bird_err_printf("Running vol2birdSetUp\n");
 
     if (alldata->misc.loadConfigSuccessful == FALSE){
         vol2bird_err_printf("Vol2bird configuration not loaded. Run vol2birdLoadConfig prior to vol2birdSetup\n");
         return -1;
     }
- 
+
     int radar_name_result = get_radar_name(PolarVolume_getSource(volume), alldata->misc.radarName, sizeof(alldata->misc.radarName));
     if (radar_name_result != 0) {
         // handle error
@@ -5127,7 +5180,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     else{
         vol2bird_err_printf("Warning: radar wavelength not stored in polar volume. Using user-defined value of %f cm ...\n", alldata->options.radarWavelength);
     }
-    
+
     // Now that we have the wavelength, calculate its derived quantities:
     // dbzFactor is the proportionality constant between reflectivity factor Z in mm^6/m^3
     // and reflectivity eta in cm^2/km^3, when radarWavelength in cm:
@@ -5162,14 +5215,14 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // ------------------------------------------------------------- //
     //                 determine which scans to use                  //
     // ------------------------------------------------------------- //
-    
+
     vol2birdScanUse_t* scanUse=NULL;
 
     scanUse = determineScanUse(volume, alldata);
 
-    if (!alldata->options.dealiasVrad && alldata->misc.nyquistMinUsed < alldata->options.maxNyquistDealias){   
+    if (!alldata->options.dealiasVrad && alldata->misc.nyquistMinUsed < alldata->options.maxNyquistDealias){
        vol2bird_err_printf("Warning: Nyquist velocity below maxNyquistDealias threshold was found (%f<%f), consider dealiasing.\n",alldata->misc.nyquistMinUsed,alldata->options.maxNyquistDealias);
-    }    
+    }
     if (alldata->options.dealiasVrad && alldata->misc.nyquistMinUsed > alldata->options.maxNyquistDealias){
        alldata->options.dealiasVrad=FALSE;
        //Maybe you want to give a warning here, but that generates a lot of warnings as this situation is common ...
@@ -5184,8 +5237,8 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 
     // the radar wavelength setting is read from taken from the volume object
     // if a wavelength attribute is present. Therefore the task_args string is
-    // set here and not in vol2birdLoadConfig(), which has no access to the volume    
-    
+    // set here and not in vol2birdLoadConfig(), which has no access to the volume
+
     //FIXME: add mistNetNElevs (mistnet elevations) to the task_args string
     snprintf(alldata->misc.task_args,3000,
         "azimMax=%f,azimMin=%f,layerThickness=%f,nLayers=%i,rangeMax=%f,"
@@ -5196,7 +5249,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         "dealiasVrad=%i,dealiasRecycle=%i,dualPol=%i,singlePol=%i,rhohvThresMin=%f,"
         "resample=%i,resampleRscale=%f,resampleNbins=%i,resampleNrays=%i,"
         "mistNetNElevs=%i,mistNetElevsOnly=%i,useMistNet=%i,mistNetPath=%s,"
-    
+
         "areaCellMin=%f,cellClutterFractionMax=%f,"
         "chisqMin=%f,clutterValueMin=%f,dbzThresMin=%f,"
         "fringeDist=%f,nBinsGap=%i,nPointsIncludedMin=%i,nNeighborsMin=%i,"
@@ -5227,7 +5280,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->options.dealiasVrad,
         alldata->options.dealiasRecycle,
         alldata->options.dualPol,
-	    alldata->options.singlePol,
+      alldata->options.singlePol,
         alldata->options.rhohvThresMin,
         alldata->options.resample,
         alldata->options.resampleRscale,
@@ -5256,7 +5309,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->constants.absVDifMax,
         alldata->constants.vradMin
     );
-   
+
     if (scanUse == (vol2birdScanUse_t*) NULL){
         vol2bird_err_printf( "Error: no valid scans found in polar volume, aborting ...\n");
         return -1;
@@ -5265,13 +5318,13 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // Print warning missing rain specification
     if(!alldata->options.singlePol && !alldata->options.dualPol){
         vol2bird_err_printf("Warning: neither single- nor dual-polarization precipitation filter selected by user, continuing in SINGLE polarization mode\n");
-		alldata->options.singlePol = TRUE;
+    alldata->options.singlePol = TRUE;
     }
 
     // Disable single pol rain filtering for S-band data when dual-pol moments are available
     if(alldata->options.radarWavelength > 7.5 && alldata->options.singlePol && alldata->options.dualPol){
         vol2bird_err_printf("Warning: disabling single-polarization precipitation filter for S-band data, continuing in DUAL polarization mode\n");
-		alldata->options.singlePol = FALSE;
+    alldata->options.singlePol = FALSE;
     }
 
     // Print warning for S-band in single pol mode
@@ -5291,7 +5344,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         vol2bird_err_printf( "Error: MistNet segmentation model expects %i elevations, but %i are specified.\n", MISTNET_N_ELEV, alldata->options.mistNetNElevs);
         return -1;
     }
-    
+
     // check that MistNet segmentation model can be found on disk
     if(alldata->options.useMistNet && !isRegularFile(alldata->options.mistNetPath)){
         vol2bird_err_printf( "Error: MistNet segmentation model '%s' not found.\n", alldata->options.mistNetPath);
@@ -5302,15 +5355,15 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     if(alldata->options.useMistNet && alldata->options.radarWavelength < 7.5){
         vol2bird_err_printf("Warning: MistNet segmentation model has been trained on S-band data, results at other radar wavelengths may be unreliable!\n");
     }
-	
+
     // ------------------------------------------------------------- //
     //             lists of indices into the 'points' array:         //
     //          where each altitude layer's data starts and ends     //
     // ------------------------------------------------------------- //
 
     int iLayer;
-    
-    // pre-allocate the list with start-from indexes for each 
+
+    // pre-allocate the list with start-from indexes for each
     // altitude bin in the profile
     alldata->points.indexFrom = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->points.indexFrom == NULL) {
@@ -5321,7 +5374,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->points.indexFrom[iLayer] = 0;
     }
 
-    // pre-allocate the list with end-before indexes for each 
+    // pre-allocate the list with end-before indexes for each
     // altitude bin in the profile
     alldata->points.indexTo = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->points.indexTo == NULL) {
@@ -5332,7 +5385,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->points.indexTo[iLayer] = 0;
     }
 
-    // pre-allocate the list containing TRUE or FALSE depending on the 
+    // pre-allocate the list containing TRUE or FALSE depending on the
     // results of calculating iProfileType == 3, which are needed when
     // calculating iProfileType == 1
     alldata->misc.scatterersAreNotBirds = (int*) malloc(sizeof(int) * alldata->options.nLayers);
@@ -5345,8 +5398,8 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     }
 
 
-    // for each altitude layer, you need to remember how many points 
-    // were already written. This information is stored in the 
+    // for each altitude layer, you need to remember how many points
+    // were already written. This information is stored in the
     // 'nPointsWritten' array
     alldata->points.nPointsWritten = (int*) malloc(sizeof(int) * alldata->options.nLayers);
     if (alldata->points.nPointsWritten == NULL) {
@@ -5362,7 +5415,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     //               information about the 'points' array            //
     // ------------------------------------------------------------- //
 
-    alldata->points.nColsPoints = 10;
+    alldata->points.nColsPoints = 11;
     alldata->points.nRowsPoints = detSvdfitArraySize(volume, scanUse, alldata);
 
     alldata->points.rangeCol = 0;
@@ -5375,6 +5428,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     alldata->points.nyquistCol = 7;
     alldata->points.vraddValueCol = 8;
     alldata->points.clutValueCol = 9;
+    alldata->points.heightValueCol = 10;
 
     // pre-allocate the 'points' array (note it has 'nColsPoints'
     // pseudo-columns)
@@ -5386,7 +5440,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 
     int iRowPoints;
     int iColPoints;
-        
+
     for (iRowPoints = 0; iRowPoints < alldata->points.nRowsPoints; iRowPoints++) {
         for (iColPoints = 0; iColPoints < alldata->points.nColsPoints; iColPoints++) {
             alldata->points.points[iRowPoints*alldata->points.nColsPoints + iColPoints] = NAN;
@@ -5394,7 +5448,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     }
 
     // information about the flagfields of 'gateCode'
-    
+
     alldata->flags.flagPositionStaticClutter = 0;
     alldata->flags.flagPositionDynamicClutter = 1;
     alldata->flags.flagPositionDynamicClutterFringe = 2;
@@ -5408,15 +5462,15 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 #ifdef MISTNET
 #ifdef VOL2BIRD_R
     if (check_mistnet_loaded_c()) {
-#endif    
+#endif
       if(alldata->options.useMistNet){
         vol2bird_err_printf("Running segmentScansUsingMistnet.\n");
         int result = segmentScansUsingMistnet(volume, scanUse, alldata);
         if (result < 0) return -1;
       }
-#ifdef VOL2BIRD_R      
+#ifdef VOL2BIRD_R
     }
-#endif    
+#endif
 #endif
 
     // construct the 'points' array
@@ -5432,9 +5486,9 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 
     alldata->profiles.nProfileTypes = 3;
     alldata->profiles.nRowsProfile = alldata->options.nLayers;
-    alldata->profiles.nColsProfile = 14; 
-    
-    // pre-allocate the array holding any profiled data (note it has 
+    alldata->profiles.nColsProfile = 14;
+
+    // pre-allocate the array holding any profiled data (note it has
     // 'nColsProfile' pseudocolumns):
     alldata->profiles.profile = (float*) malloc(sizeof(float) * alldata->profiles.nRowsProfile * alldata->profiles.nColsProfile);
     if (alldata->profiles.profile == NULL) {
@@ -5461,7 +5515,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 
     int iRowProfile;
     int iColProfile;
-        
+
     for (iRowProfile = 0; iRowProfile < alldata->profiles.nRowsProfile; iRowProfile++) {
         for (iColProfile = 0; iColProfile < alldata->profiles.nColsProfile; iColProfile++) {
             alldata->profiles.profile[iRowProfile*alldata->profiles.nColsProfile + iColProfile] = NODATA;
@@ -5474,19 +5528,19 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     alldata->profiles.iProfileTypeLast = -1;
 
 
- 
+
     // ------------------------------------------------------------- //
     //              initialising rave profile fields                 //
     // ------------------------------------------------------------- //
 
     alldata->vp = RAVE_OBJECT_NEW(&VerticalProfile_TYPE);
-        
+
     alldata->misc.initializationSuccessful = TRUE;
 
     if (alldata->options.printOptions == TRUE) {
         vol2birdPrintOptions(alldata);
     }
-    
+
     if (alldata->options.printPointsArray == TRUE) {
 
         vol2birdPrintIndexArrays(alldata);
@@ -5502,7 +5556,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
 
 
 void vol2birdTearDown(vol2bird_t* alldata) {
-    
+
     // ---------------------------------------------------------- //
     // free the memory that was previously allocated for vol2bird //
     // ---------------------------------------------------------- //
@@ -5523,14 +5577,14 @@ void vol2birdTearDown(vol2bird_t* alldata) {
     free((void*) alldata->points.indexTo);
     free((void*) alldata->points.nPointsWritten);
     free((void*) alldata->misc.scatterersAreNotBirds);
-   
+
     // free all rave fields
     RAVE_OBJECT_RELEASE(alldata->vp);
- 
+
     // free the memory that holds the user configurable options
-#ifndef NOCONFUSE    
+#ifndef NOCONFUSE
     cfg_free(alldata->cfg);
-#endif    
+#endif
     // reset this variable to its initial value
     alldata->misc.initializationSuccessful = FALSE;
     alldata->misc.loadConfigSuccessful = FALSE;

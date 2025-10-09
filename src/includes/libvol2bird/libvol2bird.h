@@ -145,6 +145,8 @@ struct vol2birdOptions {
                                     /* otherwise, use all available elevation scans*/
     int useMistNet;                 /* whether to use MistNet segmentation model */
     char mistNetPath[1000];         /* path and filename of the MistNet segmentation model to use, expects libtorch format */
+    char groundHeightParam[1000];   /* Scan parameter name containing ground elevation height */
+    int heightReference;      ;     /* Categorical indicating whether to profile relative to sea (0), antenna (1) or ground (2) level */
 
 };
 typedef struct vol2birdOptions vol2birdOptions_t;
@@ -241,6 +243,8 @@ struct vol2birdPoints {
     int vraddValueCol;
     // the psuedo-column in 'points' that holds the static clutter map value
     int clutValueCol;
+    // the psuedo-column in 'points' that holds the ground height value
+    int heightValueCol;
     // the 'points' array itself
     float* points; // Is allocated in vol2birdSetUp() and freed in vol2birdTearDown()
     // for a given altitude layer in the profile, only part of the 'points'
@@ -379,6 +383,8 @@ struct vol2birdScanUse {
     char cellName[10];
     // the static clutter map quantity used for this scan
     char clutName[10];
+    // the ground height quantity used for this scan
+    char heightName[1000];
 };
 typedef struct vol2birdScanUse vol2birdScanUse_t;
 
