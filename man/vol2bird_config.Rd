@@ -50,6 +50,9 @@ this threshold will be considered clutter-contaminated. Default 0.1
 \item \code{dualPol}: Logical. Whether to use dual-pol moments for filtering meteorological echoes. Default \code{TRUE}
 \item \code{elevMax}: Numeric. The minimum scan elevation in degrees used for constructing the bird density profile
 \item \code{elevMin}: Numeric. The maximum scan elevation in degrees used for constructing the bird density profile
+\item \code{groundHeightParam}: Character. The scan parameter name of the polar volume containing ground height information. Default \code{HGHT}.
+\item \code{heightReference}: Character. One of \code{sea}, \code{antenna} or \code{ground} for specifying the reference height for
+the profile altitude bins. Default \code{sea} level.
 \item \code{layerThickness}: Numeric. The width/thickness of an altitude layer in m. Default 200
 \item \code{mistNetPath}: Character. Path of 'MistNet' segmentation model in pytorch (.pt) format
 \item \code{nLayers}: Integer. The number of layers in an altitude profile. Default 25

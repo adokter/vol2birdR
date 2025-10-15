@@ -1,9 +1,6 @@
 // for mistnet:
 #include <torch/script.h>
 #include <iostream>
-// for inversion solver:
-#include <torch/torch.h>
-#include <cstring> // for std::memcpy
 
 #ifdef _WIN32
 #define MISTNET_API __declspec(dllexport)
@@ -48,7 +45,6 @@ MISTNET_API int _mistnet_run_mistnet(float* tensor_in, float** tensor_out, const
 }
 
 }
-
 
 // C callable interface to solve (A^T A + λ D) x = b
 //
