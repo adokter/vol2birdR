@@ -5,7 +5,7 @@
 \title{Install 'MistNet' libraries}
 \usage{
 install_mistnet(
-  version = "1.12.1",
+  version = "2.7.1",
   reinstall = FALSE,
   path = install_path(),
   timeout = 360,

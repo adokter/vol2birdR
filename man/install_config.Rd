@@ -5,7 +5,7 @@
 \alias{install_config}
 \title{Contains a list of 'MistNet' libraries for the various OS's}
 \format{
-An object of class \code{list} of length 2.
+An object of class \code{list} of length 3.
 }
 \usage{
 install_config
