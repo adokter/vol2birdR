@@ -1,11 +1,50 @@
 #' The default branch
 #' @keywords internal
 branch <- "main"
-supported_pytorch_versions=c("1.10.2", "1.12.1")
+supported_pytorch_versions=c("1.10.2", "1.12.1", "2.7.1")
 
 #' Contains a list of 'MistNet' libraries for the various OS's
 #' @keywords internal
 install_config <- list(
+  "2.7.1" = list(
+    "cpu" = list(
+      "darwin" = list(
+        "libtorch" = list(
+          url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-x86_64-2.2.2.zip",
+          path = "libtorch/",
+          filter = ".dylib",
+          md5hash = "7140418e5b07d5c411e74ce0534f56ae"
+        ),
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-cpu.zip", branch)
+      ),
+      "darwin-arm64" = list(
+        "libtorch" = list(
+          url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-2.7.1.zip",
+          path = "libtorch/",
+          filter = ".dylib",
+          md5hash = "72f80b597834b246b908d0b7596765a7"
+        ),
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-arm64-cpu.zip", branch)
+      ),
+      "windows" = list(
+        "libtorch" = list(
+          url = "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-2.7.1%2Bcpu.zip",
+          path = "libtorch/",
+          filter = ".dll",
+          md5hash = "432920e866def2e847f292e0ab4a4915"
+        ),
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Windows-cpu.zip", branch)
+      ),
+      "linux" = list(
+        "libtorch" = list(
+          path = "libtorch/",
+          url = "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.7.1%2Bcpu.zip",
+          md5hash = "a669a71089723513152cf405e3400bed"
+        ),
+        "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Linux-cpu.zip", branch)
+      )
+    )
+  ),
   "1.12.1" = list(
     # Future version is 1.12.1. Need it to build for macOS ARM
     "cpu" = list(
@@ -402,7 +441,7 @@ install_mistnet_model <- function(reinstall=FALSE, path = file.path(torch_instal
 #'
 #' @seealso
 #' * [install_mistnet_from_file()]
-install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = install_path(), timeout = 360, ...) {
+install_mistnet <- function(version = "2.7.1", reinstall = FALSE, path = install_path(), timeout = 360, ...) {
   message("Starting installation of MistNet...\n")
   assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
@@ -508,7 +547,7 @@ install_mistnet <- function(version = "1.12.1", reinstall = FALSE, path = instal
 #'
 #' @seealso
 #' * [install_mistnet()]
-install_mistnet_from_file <- function(version = "1.12.1", libtorch, libmistnet, mistnet_model=NULL, ...) {
+install_mistnet_from_file <- function(version = "2.7.1", libtorch, libmistnet, mistnet_model=NULL, ...) {
   assert_that(version %in% supported_pytorch_versions,
               msg = paste("version should be",paste(supported_pytorch_versions, collapse = " or ")))
 
