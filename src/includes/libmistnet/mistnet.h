@@ -56,12 +56,13 @@ extern "C"
 #endif
 MISTNET_API int (MISTNET_PTR _mistnet_run_mistnet)(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
 MISTNET_API void (MISTNET_PTR _mistnet_inversion_solver_cholesky)(
-  double* A_data,    // m×n, row-major
-  int64_t m, int64_t n,
-  double* b_data,    // length n
-  double lambda,     // regularisation weight
-  double dx,         // grid spacing
-  double* x_out
+  int64_t m, int64_t n, // mxn, row-major
+  int64_t nnz,
+  const int64_t* rows, const int64_t* cols, const double* vals, // COO data
+  const double* b_data,   // length n
+  double lambda,          // regularisation weight
+  double dx,              // grid spacing
+  double* x_out           // output length n
 );
 
 HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
