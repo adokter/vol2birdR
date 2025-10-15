@@ -55,7 +55,16 @@ extern "C"
 {
 #endif
 MISTNET_API int (MISTNET_PTR _mistnet_run_mistnet)(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
-HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size) 
+MISTNET_API void (MISTNET_PTR _mistnet_inversion_solver_cholesky)(
+  double* A_data,    // m×n, row-major
+  int64_t m, int64_t n,
+  double* b_data,    // length n
+  double lambda,     // regularisation weight
+  double dx,         // grid spacing
+  double* x_out
+);
+
+HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
 {
   MISTNET_CHECK_LOADED
   return _mistnet_run_mistnet(tensor_in, tensor_out, model_path, tensor_size);
@@ -235,6 +244,7 @@ bool mistnetInit(const std::string &libPath, std::string *pError)
     return false;
   mistnet_loaded = true;
   LOAD_SYMBOL(_mistnet_run_mistnet);
+  LOAD_SYMBOL(_mistnet_inversion_solver_cholesky);
 
   return true;
 }
