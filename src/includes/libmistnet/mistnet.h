@@ -1,5 +1,3 @@
-/*
- * Original idea and part of the code originates from https://github.com/mlverse/torch after some mail exchange
  * with Daniel Falbel (Copyright).
  * Original licensed with MIT. https://github.com/mlverse/torch/blob/main/LICENSE.md
 */
@@ -55,15 +53,6 @@ extern "C"
 {
 #endif
 MISTNET_API int (MISTNET_PTR _mistnet_run_mistnet)(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
-MISTNET_API void (MISTNET_PTR _mistnet_inversion_solver_cholesky)(
-  int64_t m, int64_t n, // mxn, row-major
-  int64_t nnz,
-  const int64_t* rows, const int64_t* cols, const double* vals, // COO data
-  const double* b_data,   // length n
-  double lambda,          // regularisation weight
-  double dx,              // grid spacing
-  double* x_out           // output length n
-);
 
 HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
 {
@@ -245,7 +234,6 @@ bool mistnetInit(const std::string &libPath, std::string *pError)
     return false;
   mistnet_loaded = true;
   LOAD_SYMBOL(_mistnet_run_mistnet);
-  LOAD_SYMBOL(_mistnet_inversion_solver_cholesky);
 
   return true;
 }
