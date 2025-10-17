@@ -36,7 +36,7 @@
 #define INV_ERR_INVALID_ARG      1  /**< Function argument invalid */
 #define INV_ERR_ALLOC_FAIL       2  /**< Memory allocation failure */
 #define INV_ERR_SOLVER_FAIL      3  /**< Solver failure */
-
+#define INV_ERR_F_MATRIX_DIM     4  /**< Projection F-matrix does not fit dimension of data */
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,7 +163,7 @@ int CSR_finish_build(CSRMatrix *F);
  *  - For velocity inversion, factorArrays contain UFactor,VFactor,WFactor
  *  - For reflectivity inversion, factorArrays=NULL and k_vec=NULL
  */
-void solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
+int solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
                                         const float *points,
                                         size_t nPoints,
                                         size_t nColsPoints,

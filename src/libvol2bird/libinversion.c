@@ -1,4 +1,5 @@
 #include "libinversion.h"
+#include "libvol2bird.h"
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_linalg.h>
@@ -245,7 +246,7 @@ static double dot_CSR_row(const CSRMatrix *F, size_t row, const double *comp)
 /*                          GENERAL SOLVER                                 */
 /* ======================================================================= */
 
-void solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
+int solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
                                         const float *points,
                                         size_t nPoints,
                                         size_t nColsPoints,
@@ -264,7 +265,7 @@ void solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
      ------------------------- */
     if (F->nrows != nPoints || F->ncols != m) {
         vol2bird_err_printf("Dimension mismatch between CSR matrix and problem sizes\n");
-        exit(EXIT_FAILURE);
+        return(INV_ERR_F_MATRIX_DIM);
     }
 
     /* Extract measured data into array (in velocity case, it's VRAD) */
@@ -353,6 +354,7 @@ void solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
     gsl_vector_free(x);
     free(data_work);
     free(dataArr);
+    return(INV_SUCCESS);
 }
 
 /* ======================================================================= */
