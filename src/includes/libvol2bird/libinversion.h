@@ -1,5 +1,5 @@
-#ifndef RADAR_SOLVER_H
-#define RADAR_SOLVER_H
+#ifndef LIBINVERSION_H
+#define LIBINVERSION_H
 
 #include <stddef.h> /* for size_t */
 
@@ -27,6 +27,16 @@
       - GSL (GNU Scientific Library) for linear algebra
 ================================================================================
 */
+
+
+/* ============================= */
+/* Return code API               */
+/* ============================= */
+#define INV_SUCCESS              0  /**< Operation completed successfully */
+#define INV_ERR_INVALID_ARG      1  /**< Function argument invalid */
+#define INV_ERR_ALLOC_FAIL       2  /**< Memory allocation failure */
+#define INV_ERR_SOLVER_FAIL      3  /**< Solver failure */
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,7 +80,7 @@ typedef struct {
  *
  * Allocates row_ptr (length nrows+1), col_idx (length nnz), values (length nnz).
  */
-void CSR_init(CSRMatrix *F, size_t nrows, size_t ncols, size_t nnz);
+int CSR_init(CSRMatrix *F, size_t nrows, size_t ncols, size_t nnz);
 
 /**
  * @brief Free CSR matrix arrays.
@@ -79,7 +89,7 @@ void CSR_init(CSRMatrix *F, size_t nrows, size_t ncols, size_t nnz);
  *
  * Resets struct fields to zero/null.
  */
-void CSR_free(CSRMatrix *F);
+int CSR_free(CSRMatrix *F);
 
 /**
  * @brief Begin CSR build process.
@@ -89,7 +99,7 @@ void CSR_free(CSRMatrix *F);
  * Sets first entry of row_ptr[] to zero, indicating that
  * the first row’s nonzeros begin at index zero.
  */
-void CSR_begin_build(CSRMatrix *F);
+int CSR_begin_build(CSRMatrix *F);
 
 /**
  * @brief Add one row's nonzeros to CSR matrix.
@@ -103,7 +113,7 @@ void CSR_begin_build(CSRMatrix *F);
  * Writes nonzeros contiguously into col_idx[] and values[] arrays
  * at position row_ptr[row_index], sets row_ptr[row_index+1] appropriately.
  */
-void CSR_add_row(CSRMatrix *F, size_t row_index,
+int CSR_add_row(CSRMatrix *F, size_t row_index,
                  const size_t *col_idx_row,
                  const double *val_row,
                  size_t row_nnz);
@@ -115,7 +125,7 @@ void CSR_add_row(CSRMatrix *F, size_t row_index,
  *
  * Provided for completeness; can check consistency if desired.
  */
-void CSR_finish_build(CSRMatrix *F);
+int CSR_finish_build(CSRMatrix *F);
 
 /* -------------------------------------------------------------------------
    General solver for arbitrary number of "blocks" (component vectors)
@@ -243,4 +253,4 @@ void solve_reflectivity_CSR(const CSRMatrix *F,
 }
 #endif
 
-#endif /* RADAR_SOLVER_H */
+#endif /* LIBINVERSION_H */
