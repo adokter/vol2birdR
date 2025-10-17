@@ -28,7 +28,7 @@ void CSR_init(CSRMatrix *F, size_t nrows, size_t ncols, size_t nnz) {
     F->col_idx = malloc(nnz * sizeof(size_t));
     F->values  = malloc(nnz * sizeof(double));
     if (!F->row_ptr || !F->col_idx || !F->values) {
-        fprintf(stderr,"CSR_init: alloc failed\n");
+        vol2bird_err_printf("CSR_init: alloc failed\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -236,7 +236,7 @@ void solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
                                         RegularizationType regtype)
 {
     if (F->nrows != nPoints || F->ncols != m) {
-        fprintf(stderr,"Dimension mismatch between CSR matrix and problem sizes\n");
+        vol2bird_err_printf("Dimension mismatch between CSR matrix and problem sizes\n");
         exit(EXIT_FAILURE);
     }
 
@@ -296,7 +296,7 @@ void solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
                 int newk = (int)round((dataArr[row] - vmodel) / (2.0 * nyq));
                 if (newk != k_vec[row]) { changed = 1; k_vec[row] = newk; }
             }
-            printf("[Iter %zu] k changed: %s\n", iter, changed ? "yes" : "no");
+            vol2bird_printf("[Iter %zu] k changed: %s\n", iter, changed ? "yes" : "no");
             if (!changed) break;
         }
     }
