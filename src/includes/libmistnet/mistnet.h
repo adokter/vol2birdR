@@ -1,3 +1,5 @@
+/*
+ * Original idea and part of the code originates from https://github.com/mlverse/torch after some mail exchange
  * with Daniel Falbel (Copyright).
  * Original licensed with MIT. https://github.com/mlverse/torch/blob/main/LICENSE.md
 */
@@ -53,7 +55,6 @@ extern "C"
 {
 #endif
 MISTNET_API int (MISTNET_PTR _mistnet_run_mistnet)(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
-
 HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
 {
   MISTNET_CHECK_LOADED
