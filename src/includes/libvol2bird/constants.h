@@ -9,7 +9,7 @@
 #define AREACELL 0.5
 // initialization value of rain segmentation field (CELL)
 #define CELLINIT -1
-// minimum standard deviation of the fit
+// minimum standard deviation of the velocity fit
 #define CHISQMIN 1e-5
 // cells with clutter fractions above this value are likely not birds
 #define CLUTPERCCELL 0.5
