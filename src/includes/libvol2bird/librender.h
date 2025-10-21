@@ -11,6 +11,8 @@ double range2distance(double range,double elev);
 
 double range2height(double range,double elev);
 
+double beamProfile(double height, double elev, double range, double antenna, double beamAngle);
+
 double*** init3DTensor(int dim1, int dim2, int dim3, double init);
 
 float**** create4DTensor(float *array, int dim1, int dim2, int dim3, int dim4);
