@@ -1,256 +1,159 @@
+/**
+ * @file libinversion.h
+ * @brief Sparse inversion utilities for weather radar data problems.
+ *
+ * This header declares functions for:
+ *  - CSR format sparse matrix storage and multiplication
+ *  - Building normal equations for least-squares inversion
+ *  - Robust "effective sample size" (N_eff) calculation
+ *  - Iterative fold-aware inversion for velocity components (U,V,W)
+ *  - Simple inversion for reflectivity profiles (ETA = F x)
+ *
+ * The code uses GSL (GNU Scientific Library) for dense matrix algebra,
+ * and expects F to be given in Compressed Sparse Row format for efficiency.
+ */
+
 #ifndef LIBINVERSION_H
 #define LIBINVERSION_H
 
-#include <stddef.h> /* for size_t */
-
-/*
-================================================================================
-    Radar Wind / Reflectivity Profile Inversion Library (GSL-based)
-    ---------------------------------------------------------------
-
-    This library implements inversion algorithms for estimating vertical
-    profiles of atmospheric quantities from weather radar data using
-    Compressed Sparse Row (CSR) projection matrices.
-
-    Two common inversion problems supported:
-      1. Radial velocity inversion (U, V, W components) with Nyquist folding
-      2. Reflectivity inversion (η profile) without folding
-
-    Common features:
-      - CSR sparse matrix format for projection weights
-      - Least squares solution using precomputed G^T G normal matrix
-      - Optional regularization: L2 or curvature
-      - Designed for large N (observations) but small m (vertical layers)
-      - Efficient: avoids forming huge dense design matrices
-
-    Dependencies:
-      - GSL (GNU Scientific Library) for linear algebra
-================================================================================
-*/
+#include <stddef.h>
+#include <gsl/gsl_matrix.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_permutation.h>
+#include <gsl/gsl_linalg.h>
 
 
-/* ============================= */
-/* Return code API               */
-/* ============================= */
-#define INV_SUCCESS              0  /**< Operation completed successfully */
-#define INV_ERR_INVALID_ARG      1  /**< Function argument invalid */
-#define INV_ERR_ALLOC_FAIL       2  /**< Memory allocation failure */
-#define INV_ERR_SOLVER_FAIL      3  /**< Solver failure */
-#define INV_ERR_F_MATRIX_DIM     4  /**< Projection F-matrix does not fit dimension of data */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* -------------------------------------------------------------------------
-   Regularization options for inversion problems.
-   ------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* Supported regularization types                                             */
+/* -------------------------------------------------------------------------- */
 typedef enum {
-    REG_NONE,      /**< No regularization */
-    REG_L2,        /**< Ridge regularization: λ * I */
-    REG_CURVATURE  /**< Penalize curvature: λ * (D^T D), where D is second-difference */
-} RegularizationType;
+    REG_NONE = 0,        // no regularization term
+    REG_L2 = 1,          // L2 regularization / ridge regression
+    REG_SMOOTHNESS = 2   // smoothness regularization with 2nd difference matrix
+} regularization_type;
 
-/* -------------------------------------------------------------------------
-   Compressed Sparse Row (CSR) matrix structure for projection weights.
-   F represents an nrows x ncols sparse matrix.
-   - row_ptr: length nrows+1; row_ptr[i] is index in col_idx/values where row i starts
-   - col_idx: column indices for each nonzero element
-   - values:   numerical values for each nonzero element
-   ------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/* Sparse CSR matrix definition and helpers                                   */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * @brief Sparse matrix in Compressed Sparse Row (CSR) format.
+ *
+ * - `row_ptr` has length nrows+1.  row_ptr[i] gives index of first nonzero of row i in `values`.
+ * - `col_idx` has length nnz.  Column indices for each nonzero value.
+ * - `values` has length nnz.  Nonzero values.
+ */
 typedef struct {
-    size_t nrows;     /**< number of rows (observations) */
-    size_t ncols;     /**< number of columns (vertical layers) */
-    size_t *row_ptr;  /**< length nrows+1; row start pointers */
-    size_t *col_idx;  /**< length nnz; column index for each nonzero */
-    double *values;   /**< length nnz; value for each nonzero */
-} CSRMatrix;
+    size_t nrows;   /**< Number of rows */
+    size_t ncols;   /**< Number of columns */
+    size_t nnz;     /**< Number of nonzero entries */
+    double *values; /**< Nonzero values */
+    size_t *col_idx;/**< Column indices of nonzero entries */
+    size_t *row_ptr;/**< Row pointer array (length nrows+1) */
+} csr_matrix;
 
-/* -------------------------------------------------------------------------
-   CSR Utility functions: building and freeing matrices.
-   ------------------------------------------------------------------------- */
+/* CSR allocation and free */
+csr_matrix *csr_alloc(size_t nrows, size_t ncols, size_t nnz);
+void csr_free(csr_matrix *mat);
 
-/**
- * @brief Allocate CSR matrix arrays.
- *
- * @param F         Pointer to CSRMatrix struct
- * @param nrows     Number of rows
- * @param ncols     Number of columns
- * @param nnz       Number of nonzero entries to allocate space for
- *
- * Allocates row_ptr (length nrows+1), col_idx (length nnz), values (length nnz).
- */
-int CSR_init(CSRMatrix *F, size_t nrows, size_t ncols, size_t nnz);
+/* Multiply CSR matrix by dense vector */
+void csr_matvec(const csr_matrix *mat, const double *x, double *y);
 
-/**
- * @brief Free CSR matrix arrays.
- *
- * @param F Pointer to CSRMatrix struct
- *
- * Resets struct fields to zero/null.
- */
-int CSR_free(CSRMatrix *F);
+/* -------------------------------------------------------------------------- */
+/* Utility: Build F^T F and compute N_eff                                     */
+/* -------------------------------------------------------------------------- */
 
-/**
- * @brief Begin CSR build process.
- *
- * @param F Pointer to CSRMatrix
- *
- * Sets first entry of row_ptr[] to zero, indicating that
- * the first row’s nonzeros begin at index zero.
- */
-int CSR_begin_build(CSRMatrix *F);
+/* Compute dense (m x m) Gram matrix F^T F from sparse F */
+void compute_FtF(const csr_matrix *F, gsl_matrix *FtF);
 
-/**
- * @brief Add one row's nonzeros to CSR matrix.
- *
- * @param F            Pointer to CSRMatrix
- * @param row_index    Row index (0-based)
- * @param col_idx_row  Array of column indices for this row’s nonzeros
- * @param val_row      Array of values for this row’s nonzeros
- * @param row_nnz      Number of nonzeros in this row
- *
- * Writes nonzeros contiguously into col_idx[] and values[] arrays
- * at position row_ptr[row_index], sets row_ptr[row_index+1] appropriately.
- */
-int CSR_add_row(CSRMatrix *F, size_t row_index,
-                 const size_t *col_idx_row,
-                 const double *val_row,
-                 size_t row_nnz);
+/* Compute robust N_eff = 1 / ((F^T F)^-1)_{jj} for each altitude bin */
+void compute_Neff(const gsl_matrix *FtF, double *Neff);
 
-/**
- * @brief Finish CSR build.
- *
- * @param F Pointer to CSRMatrix
- *
- * Provided for completeness; can check consistency if desired.
- */
-int CSR_finish_build(CSRMatrix *F);
+/* -------------------------------------------------------------------------- */
+/* Normal equations for velocity inversion                                    */
+/* -------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------
-   General solver for arbitrary number of "blocks" (component vectors)
-   ------------------------------------------------------------------------- */
+/* Build 3m x 3m normal matrix ATA and vector ATb for velocity inversion */
+void compute_normal_eqs(const csr_matrix *F,
+                        const double *A1, const double *A2, const double *A3,
+                        const double *VRAD_prime,
+                        gsl_matrix *ATA, gsl_vector *ATb);
+
+/* Solve dense normal equations ATA * X = ATb */
+int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X);
+
+/* -------------------------------------------------------------------------- */
+/* Folding update and residual statistics                                     */
+/* -------------------------------------------------------------------------- */
+
+/* Update folding counts k[i] to keep prediction within [-M3[i], M3[i]] */
+void update_k(const csr_matrix *F,
+              const double *A1, const double *A2, const double *A3,
+              const double *U, const double *V, const double *W,
+              const double *M3, int *k);
+
+/* Compute per-measurement residuals */
+void compute_residuals(const csr_matrix *F,
+                       const double *A1,const double *A2,const double *A3,
+                       const double *U,const double *V,const double *W,
+                       const int *k,const double *M3,
+                       const double *VRAD,double *residuals);
+
+/* Compute stddev of residuals per altitude */
+void compute_stddev_per_altitude(const csr_matrix *F,
+                                 const double *residuals,
+                                 double *stddev);
+
+/* -------------------------------------------------------------------------- */
+/* velocity inversion                                       */
+/* -------------------------------------------------------------------------- */
 
 /**
- * @brief General inversion solver (velocity, reflectivity, etc.)
+ * @brief Iterative fold-aware inversion for wind components.
  *
- * Can solve for nBlocks unknown m-length profile vectors simultaneously:
- *    e.g., U,V,W (nBlocks=3), η (nBlocks=1)
+ * Inputs:
+ *  - F: projection matrix (nxm)
+ *  - M1: azimuth
+ *  - M2: elevation angle
+ *  - M3: Nyquist velocity
+ *  - VRAD: Radial velocity
+ *  - regularization_type: one of REG_NONE, REG_L2, REG_SMOOTHNESS
+ *  - lambda: regularization strength
  *
- * @param F             CSR projection matrix (nPoints x m)
- * @param points        Flat pseudo-matrix of input data (nPoints x nColsPoints)
- * @param nPoints       Number of observations (rows in points and F)
- * @param nColsPoints   Number of columns in points[]
- * @param dataCols      Array of column indices in points[]:
- *                       - dataCols[0] = measurement data column (e.g., VRAD or η)
- *                       - dataCols[1] = Nyquist velocity column (velocity inversion only)
- * @param factorArrays  Array of length nBlocks of pointers to geometry factor arrays:
- *                       - factorArrays[bi][row] = scaling factor for block bi at observation row
- *                       - Set pointer to NULL for factor=1 everywhere
- * @param outputs       Array of length nBlocks of pointers to double[m] arrays for solutions
- * @param k_vec         Folding counts per observation (nPoints length):
- *                       - Non-NULL => enable Nyquist folding update loop
- *                       - NULL     => disable folding (reflectivity)
- * @param m             Number of vertical layers
- * @param nBlocks       Number of profile blocks (1 for reflectivity, 3 for velocity, etc.)
- * @param max_iters     Max folding iterations (ignored if k_vec==NULL)
- * @param lambda        Regularization strength
- * @param regtype       Regularization type (REG_NONE, REG_L2, REG_CURVATURE)
+ * Outputs:
+ *  - U,V,W: velocity components per altitude bin
+ *  - N: robust effective sample size per altitude bin
+ *  - sigma: stddev of residuals per altitude bin
  *
- * Notes:
- *  - Geometry factors and measurement data are extracted from points[] using dataCols
- *  - F is fixed during iteration; GTG is precomputed once
- *  - For velocity inversion, factorArrays contain UFactor,VFactor,WFactor
- *  - For reflectivity inversion, factorArrays=NULL and k_vec=NULL
+ * @param vel_tol  early-stop tolerance for ||delta velocity||_inf
+ * @return stop_reason: 0=k stable, 1=vel tol reached, 2=max_iter reached
  */
-int solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
-                                        const float *points,
-                                        size_t nPoints,
-                                        size_t nColsPoints,
-                                        const size_t *dataCols,
-                                        const double **factorArrays,
-                                        double **outputs,
-                                        int *k_vec,
-                                        size_t m,
-                                        size_t nBlocks,
-                                        size_t max_iters,
-                                        double lambda,
-                                        RegularizationType regtype);
+int radar_inversion_full_reg(const csr_matrix *F,
+                         const double *M1, const double *M2,
+                         const double *M3, const double *VRAD,
+                         double *U_out, double *V_out, double *W_out,
+                         double *N_out, double *sigma_out,
+                         double vel_tol,
+                         regularization_type regtype,
+                         double lambda);
 
-/* -------------------------------------------------------------------------
-   Convenience wrapper: Velocity inversion with Nyquist folding
-   ------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/* reflectivity inversion                                              */
+/* -------------------------------------------------------------------------- */
 
 /**
- * @brief Velocity inversion wrapper for estimating U, V, W profiles.
+ * @brief Solve ETA = F x in least-squares sense for reflectivity x.
  *
- * @param F             CSR projection matrix (nPoints x m)
- * @param points        Flat pseudo-matrix of observations
- * @param nPoints       Number of observations
- * @param nColsPoints   Number of columns in points[]
- * @param colVRAD       Column index of measured radial velocity
- * @param colAzim       Column index of azimuth angle [radians]
- * @param colElev       Column index of elevation angle [radians]
- * @param colNyquist    Column index of Nyquist velocity
- * @param U             Output profile vector U (double[m])
- * @param V             Output profile vector V (double[m])
- * @param W             Output profile vector W (double[m])
- * @param k_vec         Output folding counts per observation (int[nPoints])
- * @param m             Number of vertical layers
- * @param max_iters     Max folding iterations
- * @param lambda        Regularization strength
- * @param regtype       Regularization type
- *
- * Computes geometry scaling factors from azimuth/elevation, enables
- * Nyquist folding correction loop.
+ * Outputs reflectivity x, robust N_eff, residual stddev per altitude.
  */
-void solve_velocity_with_nyquist_reg_CSR(const CSRMatrix *F,
-                                         const float *points,
-                                         size_t nPoints,
-                                         size_t nColsPoints,
-                                         size_t colVRAD,
-                                         size_t colAzim,
-                                         size_t colElev,
-                                         size_t colNyquist,
-                                         double *U, double *V, double *W,
-                                         int *k_vec,
-                                         size_t m,
-                                         size_t max_iters,
-                                         double lambda,
-                                         RegularizationType regtype);
+int reflectivity_inversion_reg(const csr_matrix *F,
+                           const double *ETA,
+                           double *x_out,
+                           double *N_out,
+                           double *sigma_out,
+                           regularization_type regtype,
+                           double lambda);
 
-/* -------------------------------------------------------------------------
-   Convenience wrapper: Reflectivity inversion (no folding)
-   ------------------------------------------------------------------------- */
-
-/**
- * @brief Reflectivity inversion wrapper for estimating η profile.
- *
- * @param F             CSR projection matrix (nPoints x m)
- * @param points        Flat pseudo-matrix of observations
- * @param nPoints       Number of observations
- * @param nColsPoints   Number of columns in points[]
- * @param colEta        Column index of measured reflectivity η
- * @param etaOut        Output profile vector η (double[m])
- * @param m             Number of vertical layers
- * @param lambda        Regularization strength
- * @param regtype       Regularization type
- *
- * Solves F * η ≈ measured_eta in least squares sense.
- * No geometry factors, no folding loop.
- */
-void solve_reflectivity_CSR(const CSRMatrix *F,
-                            const float *points,
-                            size_t nPoints,
-                            size_t nColsPoints,
-                            size_t colEta,
-                            double *etaOut,
-                            size_t m,
-                            double lambda,
-                            RegularizationType regtype);
-
-#ifdef __cplusplus
-}
 #endif
-
-#endif /* LIBINVERSION_H */

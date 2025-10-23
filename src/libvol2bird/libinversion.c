@@ -1,427 +1,405 @@
 #include "libinversion.h"
-#include "libvol2bird.h"
-#include <gsl/gsl_matrix.h>
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_linalg.h>
-#include <math.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include <stdio.h>
 
-/* ======================================================================= */
-/*                     CSR MATRIX UTILITIES                                */
-/* ======================================================================= */
+/* ============================================================================
+ * CSR helpers
+ * ==========================================================================*/
 
-/**
- * Allocate memory for CSR matrix arrays.
- *  - nrows: number of rows in matrix
- *  - ncols: number of columns
- *  - nnz: total nonzero entries anticipated
- *
- * Memory layout:
- *   row_ptr[nrows+1] : start index of each row in col_idx/values arrays
- *   col_idx[nnz]     : column index for each nonzero
- *   values[nnz]      : corresponding value
+/* Allocate CSR matrix with given dimensions and nnz count.
+ * Arrays are zeroed initially.
  */
-int CSR_init(CSRMatrix *F, size_t nrows, size_t ncols, size_t nnz) {
-    F->nrows = nrows;
-    F->ncols = ncols;
-    F->row_ptr = malloc((nrows+1) * sizeof(size_t));
-    F->col_idx = malloc(nnz * sizeof(size_t));
-    F->values  = malloc(nnz * sizeof(double));
-
-    if (!F->row_ptr || !F->col_idx || !F->values) {
-        CSR_free(F);
-        return INV_ERR_ALLOC_FAIL;
-    }
-    return INV_SUCCESS;
+csr_matrix *csr_alloc(size_t nrows, size_t ncols, size_t nnz) {
+    csr_matrix *mat = malloc(sizeof(csr_matrix));
+    mat->nrows = nrows;
+    mat->ncols = ncols;
+    mat->nnz   = nnz;
+    mat->values  = calloc(nnz, sizeof(double));
+    mat->col_idx = calloc(nnz, sizeof(size_t));
+    mat->row_ptr = calloc(nrows+1, sizeof(size_t));
+    return mat;
 }
 
-/**
- * Free all arrays inside CSR matrix struct.
- */
-int CSR_free(CSRMatrix *F) {
-    if (!F) return INV_ERR_INVALID_ARG;
-    free(F->row_ptr);
-    free(F->col_idx);
-    free(F->values);
-    F->nrows = F->ncols = 0;
-    F->row_ptr = NULL;
-    F->col_idx = NULL;
-    F->values = NULL;
-    return INV_SUCCESS;
+/* Free all arrays inside CSR matrix */
+void csr_free(csr_matrix *mat) {
+    if (!mat) return;
+    free(mat->values);
+    free(mat->col_idx);
+    free(mat->row_ptr);
+    free(mat);
 }
 
-/**
- * Begin building CSR matrix: initializes first row_ptr entry to 0.
- */
-int CSR_begin_build(CSRMatrix *F) {
-    if (!F || !F->row_ptr) return INV_ERR_INVALID_ARG;
-    F->row_ptr[0] = 0;
-    return INV_SUCCESS;
-}
-
-/**
- * Add a single row's nonzero entries to CSR matrix.
- *  - row_index: 0-based row index
- *  - col_idx_row: pointer to array of column indices for this row's nonzeros
- *  - val_row: pointer to array of values corresponding to col_idx_row
- *  - row_nnz: number of nonzeros in this row
- *
- * This writes the nonzeros contiguously into col_idx[] and values[] at the
- * position given by row_ptr[row_index], and then sets row_ptr[row_index+1]
- * to mark the end of this row's data.
- */
-int CSR_add_row(CSRMatrix *F, size_t row_index,
-                const size_t *col_idx_row,
-                const double *val_row,
-                size_t row_nnz) {
-    if (!F || !col_idx_row || !val_row) return INV_ERR_INVALID_ARG;
-    size_t start = F->row_ptr[row_index];
-    for (size_t k = 0; k < row_nnz; ++k) {
-        F->col_idx[start + k] = col_idx_row[k];
-        F->values[start + k]  = val_row[k];
-    }
-    F->row_ptr[row_index+1] = start + row_nnz;
-    return INV_SUCCESS;
-}
-
-
-/**
- * Finalize CSR matrix building. Provided for completeness; nothing special here.
- */
-int CSR_finish_build(CSRMatrix *F) {
-    /* Optional: check consistency */
-    return INV_SUCCESS;
-}
-
-/* ======================================================================= */
-/*             INTERNAL HELPER FUNCTIONS FOR GENERAL SOLVER                */
-/* ======================================================================= */
-
-/**
- * Compute G^T * G (the normal equations matrix) without forming G explicitly:
- * For radial velocity problem:
- *  - G = [diag(UFactor)F, diag(VFactor)F, diag(WFactor)F]
- *  - GTG is size (3*m) x (3*m), where m = number of vertical layers
- *
- * This loops over each observation (row), scales the row of F by each geometry
- * factor (UFactor, VFactor, WFactor), and accumulates contributions into GTG.
- */
-/**
- * Compute GTG (normal equations matrix) for arbitrary nBlocks.
- *
- * Each block corresponds to one physical component vector (e.g., U, V, W, or η).
- * factorArrays[bi][row] = scaling factor for block bi at observation row.
- * If factorArrays[bi] == NULL => scaling factor = 1 for all rows.
- *
- * Matrix G is built as:
- *   columns 0..m-1        -> block 0 (scaled F rows)
- *   columns m..2m-1       -> block 1
- *   ...
- */
-static void compute_GTG_CSR_blocks(const CSRMatrix *F,
-                                   const double **factorArrays,
-                                   size_t nBlocks,
-                                   gsl_matrix *GTG)
-{
-    size_t n = F->nrows;
-    size_t m = F->ncols;
-    gsl_matrix_set_zero(GTG);
-
-    for (size_t row = 0; row < n; ++row) {
-        size_t start = F->row_ptr[row];
-        size_t end   = F->row_ptr[row+1];
-        for (size_t bi = 0; bi < nBlocks; ++bi) {
-            double ai = (factorArrays && factorArrays[bi]) ? factorArrays[bi][row] : 1.0;
-            for (size_t bj = 0; bj < nBlocks; ++bj) {
-                double aj = (factorArrays && factorArrays[bj]) ? factorArrays[bj][row] : 1.0;
-                for (size_t nz_i = start; nz_i < end; ++nz_i) {
-                    size_t col_i = F->col_idx[nz_i];
-                    double vi = ai * F->values[nz_i];
-                    for (size_t nz_j = start; nz_j < end; ++nz_j) {
-                        size_t col_j = F->col_idx[nz_j];
-                        double vj = aj * F->values[nz_j];
-                        double prev = gsl_matrix_get(GTG, bi*m + col_i, bj*m + col_j);
-                        gsl_matrix_set(GTG, bi*m + col_i, bj*m + col_j, prev + vi*vj);
-                    }
-                }
-            }
+/* Multiply CSR matrix (n x m) by dense vector x (length m) -> y (length n) */
+void csr_matvec(const csr_matrix *mat, const double *x, double *y) {
+    for (size_t i = 0; i < mat->nrows; i++) {
+        double sum = 0.0;
+        for (size_t jj = mat->row_ptr[i]; jj < mat->row_ptr[i+1]; jj++) {
+            sum += mat->values[jj] * x[mat->col_idx[jj]];
         }
+        y[i] = sum;
     }
 }
-/**
- * Apply chosen regularization to GTG.
- * REG_L2: adds lambda*I (ridge)
- * REG_CURVATURE: adds lambda*(D^T D) block-diagonally, where D is second-difference matrix
- */
-static void add_regularization(gsl_matrix* M, size_t m, double lambda, RegularizationType regtype)
-{
-    if (regtype == REG_NONE || lambda == 0.0) return;
-    size_t dim = M->size1;
 
+/* ============================================================================
+ * Adding regularization terms
+ * ==========================================================================*/
+
+/* Add regularization to ATA in-place */
+static void add_regularization(gsl_matrix *ATA, regularization_type regtype, double lambda) {
+    if (lambda <= 0.0 || regtype == REG_NONE) return;
+    size_t m = ATA->size1;
     if (regtype == REG_L2) {
-        // Simple ridge: add lambda along diagonal
-        for (size_t i = 0; i < dim; ++i)
-            gsl_matrix_set(M, i, i, gsl_matrix_get(M, i, i) + lambda);
-    }
-    else if (regtype == REG_CURVATURE) {
-        gsl_matrix *DTD = gsl_matrix_calloc(m, m);
-        /* Build second-difference penalty matrix */
-        for (size_t i = 0; i < m; ++i) {
-            for (size_t j = 0; j < m; ++j) {
-                double val = 0.0;
-                for (size_t r = 0; r < m-2; ++r) {
-                    double Di_r = 0.0, Dj_r = 0.0;
-                    if (i == r)   Di_r = 1.0;
-                    if (i == r+1) Di_r = -2.0;
-                    if (i == r+2) Di_r = 1.0;
-                    if (j == r)   Dj_r = 1.0;
-                    if (j == r+1) Dj_r = -2.0;
-                    if (j == r+2) Dj_r = 1.0;
-                    val += Di_r * Dj_r;
+        for (size_t i=0; i<m; i++)
+            gsl_matrix_set(ATA, i, i, gsl_matrix_get(ATA, i, i) + lambda);
+    } else if (regtype == REG_SMOOTHNESS) {
+        for (size_t i=0; i<m; i++) {
+            for (size_t j=0; j<m; j++) {
+                double reg = 0;
+                int d = (int)j - (int)i;
+                if (i==j) {
+                    if (i==0 || i==m-1) reg=1.0;
+                    else if (i==1 || i==m-2) reg=5.0;
+                    else reg=6.0;
+                } else if (abs(d) == 1) {
+                    if (i==0 || i==m-1 || j==0 || j==m-1) reg=-2.0;
+                    else reg=-4.0;
+                } else if (abs(d) == 2) {
+                    reg=1.0;
                 }
-                gsl_matrix_set(DTD, i, j, val);
-            }
-        }
-        /* Add λ DTD for each block separately */
-        // for radial velocity blocks are U,V,W
-        for (size_t block = 0; block < dim/m; ++block) {
-            for (size_t i = 0; i < m; ++i) {
-                for (size_t j = 0; j < m; ++j) {
-                    gsl_matrix_set(M, block*m + i, block*m + j,
-                                   gsl_matrix_get(M, block*m + i, block*m + j) +
-                                   lambda * gsl_matrix_get(DTD, i, j));
+                if (reg != 0.0) {
+                    gsl_matrix_set(ATA, i, j, gsl_matrix_get(ATA,i,j) + lambda*reg);
                 }
             }
         }
-        gsl_matrix_free(DTD);
     }
 }
 
-/**
- * Compute GTy = G^T * data for arbitrary nBlocks.
- * data[row] = measurement for this row (already unfolded if velocity).
- * Uses same geometry factors and CSR structure to avoid forming full G.
+/* For velocity, apply blockwise on 3m x 3m ATA */
+static void add_regularization_velocity(gsl_matrix *ATA, size_t m,
+                                        regularization_type regtype, double lambda) {
+    if (lambda <= 0.0 || regtype == REG_NONE) return;
+    for (int block=0; block<3; block++) {
+        gsl_matrix_view sub = gsl_matrix_submatrix(ATA, block*m, block*m, m, m);
+        add_regularization(&sub.matrix, regtype, lambda);
+    }
+}
 
- */
-static void compute_GTy_CSR_blocks(const CSRMatrix *F,
-                                   const double **factorArrays,
-                                   const double *data,
-                                   size_t nBlocks,
-                                   gsl_vector *GTy)
-{
-    size_t n = F->nrows;
-    size_t m = F->ncols;
-    gsl_vector_set_zero(GTy);
 
-    for (size_t row = 0; row < n; ++row) {
-        size_t start = F->row_ptr[row];
-        size_t end   = F->row_ptr[row+1];
-        for (size_t bi = 0; bi < nBlocks; ++bi) {
-            double ai = (factorArrays && factorArrays[bi]) ? factorArrays[bi][row] : 1.0;
-            for (size_t nz_i = start; nz_i < end; ++nz_i) {
-                size_t col_i = F->col_idx[nz_i];
-                double vi = ai * F->values[nz_i];
-                gsl_vector_set(GTy, bi*m + col_i,
-                               gsl_vector_get(GTy, bi*m + col_i) + vi * data[row]);
+/* ============================================================================
+ * Build F^T F (dense) and compute robust N_eff
+ * ==========================================================================*/
+
+/* Loop over rows of F, accumulating contributions to dense m x m FtF */
+void compute_FtF(const csr_matrix *F, gsl_matrix *FtF) {
+    gsl_matrix_set_zero(FtF);
+    for (size_t i = 0; i < F->nrows; i++) {
+        size_t start = F->row_ptr[i];
+        size_t end   = F->row_ptr[i+1];
+        for (size_t p = start; p < end; p++) {
+            size_t col_p = F->col_idx[p];
+            double val_p = F->values[p];
+            for (size_t q = start; q < end; q++) {
+                size_t col_q = F->col_idx[q];
+                double val_q = F->values[q];
+                double old = gsl_matrix_get(FtF, col_p, col_q);
+                gsl_matrix_set(FtF, col_p, col_q, old + val_p * val_q);
             }
         }
     }
 }
 
-/**
- * Sparse dot product between CSR row and dense vector.
- */
-static double dot_CSR_row(const CSRMatrix *F, size_t row, const double *comp)
-{
-    double sum = 0.0;
-    size_t start = F->row_ptr[row];
-    size_t end   = F->row_ptr[row+1];
-    for (size_t nz = start; nz < end; ++nz)
-        sum += F->values[nz] * comp[F->col_idx[nz]];
-    return sum;
-}
+/* Invert FtF to get diagonal of (FtF)^-1, then N_eff[j] = 1 / inv_diag */
+void compute_Neff(const gsl_matrix *FtF, double *Neff) {
+    size_t m = FtF->size1;
+    gsl_matrix *copy = gsl_matrix_alloc(m, m);
+    gsl_matrix_memcpy(copy, FtF);
 
-/* ======================================================================= */
-/*                          GENERAL SOLVER                                 */
-/* ======================================================================= */
-
-int solve_with_nyquist_reg_CSR_general(const CSRMatrix *F,
-                                        const float *points,
-                                        size_t nPoints,
-                                        size_t nColsPoints,
-                                        const size_t *dataCols,
-                                        const double **factorArrays,
-                                        double **outputs,
-                                        int *k_vec,
-                                        size_t m,
-                                        size_t nBlocks,
-                                        size_t max_iters,
-                                        double lambda,
-                                        RegularizationType regtype)
-{
-    /* -------------------------
-     Step 1: Precompute geometry factors and data arrays
-     ------------------------- */
-    if (F->nrows != nPoints || F->ncols != m) {
-        vol2bird_err_printf("Dimension mismatch between CSR matrix and problem sizes\n");
-        return(INV_ERR_F_MATRIX_DIM);
-    }
-
-    /* Extract measured data into array (in velocity case, it's VRAD) */
-    double *dataArr = malloc(nPoints * sizeof(double));
-    for (size_t i = 0; i < nPoints; ++i)
-        dataArr[i] = points[i*nColsPoints + dataCols[0]];
-
-    /* -------------------------
-     Step 2: Compute GTG once and apply regularization
-     ------------------------- */
-    gsl_matrix *GTG = gsl_matrix_alloc(nBlocks*m, nBlocks*m);
-    compute_GTG_CSR_blocks(F, factorArrays, nBlocks, GTG);
-    add_regularization(GTG, m, lambda, regtype);
-
-    // Pre-factorize GTG for repeated solves
-    gsl_permutation *perm = gsl_permutation_alloc(nBlocks*m);
+    gsl_permutation *perm = gsl_permutation_alloc(m);
     int signum;
-    gsl_linalg_LU_decomp(GTG, perm, &signum);
+    gsl_linalg_LU_decomp(copy, perm, &signum);
 
-    /* -------------------------
-     Step 3: Allocate vectors for solves
-     ------------------------- */
-    gsl_vector *GTy = gsl_vector_alloc(nBlocks*m);
-    gsl_vector *x   = gsl_vector_alloc(nBlocks*m);
+    gsl_matrix *inv = gsl_matrix_alloc(m, m);
+    gsl_linalg_LU_invert(copy, perm, inv);
 
-    /* -------------------------
-     Step 4: Iterative Nyquist folding solution
-     ------------------------- */
-
-    double *data_work = malloc(nPoints * sizeof(double));
-
-    size_t iters = (k_vec != NULL) ? max_iters : 1;
-    for (size_t iter = 0; iter < iters; ++iter) {
-        // "Unfold" VRAD by subtracting multiples of 2*nyquist depending on k_vec
-        if (k_vec) {
-            for (size_t i = 0; i < nPoints; ++i)
-                data_work[i] = dataArr[i] - 2.0 *
-                               points[i*nColsPoints + dataCols[1]] * k_vec[i];
-        } else {
-            /* Reflectivity inversion: no unfolding */
-            for (size_t i = 0; i < nPoints; ++i)
-                data_work[i] = dataArr[i];
-        }
-
-        // Compute GT * VRAD_unfold
-        /* Assemble GTy for this (possibly unfolded) data */
-        compute_GTy_CSR_blocks(F, factorArrays, data_work, nBlocks, GTy);
-
-        // Solve GTG * x = GTy for stacked [U; V; W]
-        /* Solve for x (stacked profile vectors) */
-        gsl_linalg_LU_solve(GTG, perm, GTy, x);
-
-        // Extract U, V, W blocks from x
-        /* Split solution x into outputs arrays */
-        for (size_t bi = 0; bi < nBlocks; ++bi)
-            for (size_t j = 0; j < m; ++j)
-                outputs[bi][j] = gsl_vector_get(x, bi*m + j);
-
-        if (k_vec) {
-            // Update folding counts k based on new model predictions
-            int changed = 0;
-            for (size_t row = 0; row < nPoints; ++row) {
-                double vmodel = 0.0;
-                for (size_t bi = 0; bi < nBlocks; ++bi)
-                  // Model radial velocity for this observation
-                  // If factorArrays[bi] is NULL use 1.0 as multiplier,
-                  // otherwise factorArrays[bi][row]
-                    vmodel += (factorArrays[bi] ? factorArrays[bi][row] : 1.0) *
-                              dot_CSR_row(F, row, outputs[bi]);
-                double nyq = points[row*nColsPoints + dataCols[1]];
-                // Required fold count to match VRAD to vmodel
-                int newk = (int)round((dataArr[row] - vmodel) / (2.0 * nyq));
-                if (newk != k_vec[row]) { changed = 1; k_vec[row] = newk; }
-            }
-            vol2bird_printf("[Iter %zu] k changed: %s\n", iter, changed ? "yes" : "no");
-            if (!changed) break;
-        }
+    for (size_t j = 0; j < m; j++) {
+        double inv_diag = gsl_matrix_get(inv, j, j);
+        Neff[j] = (inv_diag > 0.0) ? (1.0 / inv_diag) : NAN;
     }
-
-    /* -------------------------
-     Step 5: Cleanup
-     ------------------------- */
+    gsl_matrix_free(inv);
     gsl_permutation_free(perm);
-    gsl_matrix_free(GTG);
-    gsl_vector_free(GTy);
-    gsl_vector_free(x);
-    free(data_work);
-    free(dataArr);
-    return(INV_SUCCESS);
+    gsl_matrix_free(copy);
 }
 
-/* ======================================================================= */
-/*                      WRAPPER: VELOCITY INVERSION                        */
-/* ======================================================================= */
+/* ============================================================================
+ * Normal equations for velocity inversion
+ * ==========================================================================*/
 
-void solve_velocity_with_nyquist_reg_CSR(const CSRMatrix *F,
-                                         const float *points,
-                                         size_t nPoints,
-                                         size_t nColsPoints,
-                                         size_t colVRAD,
-                                         size_t colAzim,
-                                         size_t colElev,
-                                         size_t colNyquist,
-                                         double *U, double *V, double *W,
-                                         int *k_vec,
-                                         size_t m,
-                                         size_t max_iters,
-                                         double lambda,
-                                         RegularizationType regtype)
-{
-    /* Precompute geometry scaling factors for U, V, W blocks */
-    double *UFactor = malloc(nPoints * sizeof(double));
-    double *VFactor = malloc(nPoints * sizeof(double));
-    double *WFactor = malloc(nPoints * sizeof(double));
-    for (size_t i = 0; i < nPoints; ++i) {
-        double az = points[i*nColsPoints + colAzim];
-        double el = points[i*nColsPoints + colElev];
-        UFactor[i] = sin(az) * cos(el);
-        VFactor[i] = cos(az) * cos(el);
-        WFactor[i] = sin(el);
-        k_vec[i]   = 0; /* initialise folding counts */
+/* Construct normal equations for stacked [D1F | D2F | D3F] system */
+void compute_normal_eqs(const csr_matrix *F,
+                        const double *A1, const double *A2, const double *A3,
+                        const double *VRAD_prime,
+                        gsl_matrix *ATA, gsl_vector *ATb) {
+    size_t m = F->ncols;
+    gsl_matrix_set_zero(ATA);
+    gsl_vector_set_zero(ATb);
+
+    double *fi_vals = malloc(m*sizeof(double));
+    size_t *fi_idx  = malloc(m*sizeof(size_t));
+
+    for (size_t i = 0; i < F->nrows; i++) {
+        double a1 = A1[i], a2 = A2[i], a3 = A3[i];
+        double v  = VRAD_prime[i];
+        size_t start = F->row_ptr[i];
+        size_t end = F->row_ptr[i+1];
+        size_t count = end - start;
+        for (size_t jj = start; jj < end; jj++) {
+            fi_idx[jj-start] = F->col_idx[jj];
+            fi_vals[jj-start] = F->values[jj];
+        }
+        /* ATb contributions */
+        for (size_t p=0; p<count; p++) {
+            size_t col = fi_idx[p]; double fval = fi_vals[p];
+            gsl_vector_set(ATb, col, gsl_vector_get(ATb, col) + a1*fval*v);
+            gsl_vector_set(ATb, m+col, gsl_vector_get(ATb, m+col) + a2*fval*v);
+            gsl_vector_set(ATb, 2*m+col, gsl_vector_get(ATb, 2*m+col) + a3*fval*v);
+        }
+        /* ATA contributions */
+        for (size_t p=0; p<count; p++) {
+            size_t ip = fi_idx[p]; double fv_p = fi_vals[p];
+            for (size_t q=0; q<count; q++) {
+                size_t iq = fi_idx[q]; double fv_q = fi_vals[q];
+                /* 3x3 block */
+                gsl_matrix_set(ATA, ip, iq, gsl_matrix_get(ATA, ip, iq) + a1*a1*fv_p*fv_q);
+                gsl_matrix_set(ATA, ip, m+iq, gsl_matrix_get(ATA, ip, m+iq) + a1*a2*fv_p*fv_q);
+                gsl_matrix_set(ATA, ip, 2*m+iq, gsl_matrix_get(ATA, ip, 2*m+iq) + a1*a3*fv_p*fv_q);
+                gsl_matrix_set(ATA, m+ip, m+iq, gsl_matrix_get(ATA, m+ip, m+iq) + a2*a2*fv_p*fv_q);
+                gsl_matrix_set(ATA, m+ip, 2*m+iq, gsl_matrix_get(ATA, m+ip, 2*m+iq) + a2*a3*fv_p*fv_q);
+                gsl_matrix_set(ATA, 2*m+ip, 2*m+iq, gsl_matrix_get(ATA, 2*m+ip, 2*m+iq) + a3*a3*fv_p*fv_q);
+            }
+        }
     }
-    /* Data columns: 0 -> VRAD, 1 -> Nyquist (for folding calc) */
-    size_t dataCols[2] = { colVRAD, colNyquist };
-
-    double *outputs[3]    = { U, V, W };
-    const double *factors[3] = { UFactor, VFactor, WFactor };
-
-    solve_with_nyquist_reg_CSR_general(F, points, nPoints, nColsPoints,
-                                       dataCols, factors, outputs,
-                                       k_vec, m, 3, max_iters,
-                                       lambda, regtype);
-
-    free(UFactor); free(VFactor); free(WFactor);
+    free(fi_vals); free(fi_idx);
 }
 
-/* ======================================================================= */
-/*                      WRAPPER: REFLECTIVITY INVERSION                    */
-/* ======================================================================= */
+/* Solve ATA * X = ATb using LU decomposition */
+int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X) {
+    gsl_permutation *perm = gsl_permutation_alloc(X->size);
+    int signum;
+    gsl_linalg_LU_decomp(ATA, perm, &signum);
+    gsl_linalg_LU_solve(ATA, perm, ATb, X);
+    gsl_permutation_free(perm);
+    return 0;
+}
 
-void solve_reflectivity_CSR(const CSRMatrix *F,
-                            const float *points,
-                            size_t nPoints,
-                            size_t nColsPoints,
-                            size_t colEta,
-                            double *etaOut,
-                            size_t m,
-                            double lambda,
-                            RegularizationType regtype)
+/* ============================================================================
+ * Folding update and residual stats
+ * ==========================================================================*/
+
+/* Update folding counts */
+void update_k(const csr_matrix *F,
+              const double *A1, const double *A2, const double *A3,
+              const double *U, const double *V, const double *W,
+              const double *M3, int *k) {
+    size_t n = F->nrows;
+    double *tmpU = malloc(n*sizeof(double));
+    double *tmpV = malloc(n*sizeof(double));
+    double *tmpW = malloc(n*sizeof(double));
+    csr_matvec(F, U, tmpU);
+    csr_matvec(F, V, tmpV);
+    csr_matvec(F, W, tmpW);
+    for (size_t i=0; i<n; i++) {
+        double pred = A1[i]*tmpU[i] + A2[i]*tmpV[i] + A3[i]*tmpW[i];
+        if (pred > M3[i]) k[i] = (int)floor((pred+M3[i])/(2*M3[i]));
+        else if (pred < -M3[i]) k[i] = (int)ceil((pred-M3[i])/(2*M3[i]));
+        else k[i] = 0;
+    }
+    free(tmpU); free(tmpV); free(tmpW);
+}
+
+/* Residuals */
+void compute_residuals(const csr_matrix *F,
+                       const double *A1,const double *A2,const double *A3,
+                       const double *U,const double *V,const double *W,
+                       const int *k,const double *M3,
+                       const double *VRAD,double *residuals) {
+    size_t n = F->nrows;
+    double *tmpU = malloc(n*sizeof(double));
+    double *tmpV = malloc(n*sizeof(double));
+    double *tmpW = malloc(n*sizeof(double));
+    csr_matvec(F,U,tmpU);
+    csr_matvec(F,V,tmpV);
+    csr_matvec(F,W,tmpW);
+    for (size_t i=0;i<n;i++) {
+        double pred = A1[i]*tmpU[i]+A2[i]*tmpV[i]+A3[i]*tmpW[i]+2.0*k[i]*M3[i];
+        residuals[i] = VRAD[i] - pred;
+    }
+    free(tmpU); free(tmpV); free(tmpW);
+}
+
+/* Stddev per altitude bin */
+void compute_stddev_per_altitude(const csr_matrix *F,
+                                 const double *residuals,
+                                 double *stddev) {
+    size_t m = F->ncols;
+    double *sum = calloc(m,sizeof(double));
+    double *sum_sq = calloc(m,sizeof(double));
+    size_t *count = calloc(m,sizeof(size_t));
+    for (size_t i=0;i<F->nrows;i++) {
+        for (size_t jj=F->row_ptr[i]; jj<F->row_ptr[i+1]; jj++) {
+            size_t col=F->col_idx[jj];
+            sum[col]+=residuals[i];
+            sum_sq[col]+=residuals[i]*residuals[i];
+            count[col]++;
+        }
+    }
+    for (size_t j=0;j<m;j++) {
+        if (count[j]>1) {
+            double mean = sum[j]/count[j];
+            stddev[j] = sqrt((sum_sq[j]/count[j]) - mean*mean);
+        } else stddev[j] = NAN;
+    }
+    free(sum); free(sum_sq); free(count);
+}
+
+/* ============================================================================
+ * High-level velocity inversion driver
+ * ==========================================================================*/
+int radar_inversion_full_reg(const csr_matrix *F,
+                         const double *M1, const double *M2,
+                         const double *M3, const double *VRAD,
+                         double *U_out, double *V_out, double *W_out,
+                         double *N_out, double *sigma_out,
+                         double vel_tol,
+                         regularization_type regtype,
+                         double lambda)
 {
-    /* Data column index for reflectivity */
-    size_t dataCols[1] = { colEta };
-    double *outputs[1] = { etaOut };
-    /* No geometry factors, no folding => factorArrays=NULL, k_vec=NULL */
-    solve_with_nyquist_reg_CSR_general(F, points, nPoints, nColsPoints,
-                                       dataCols, NULL, outputs,
-                                       NULL, m, 1, 1,
-                                       lambda, regtype);
+    size_t n=F->nrows, m=F->ncols;
+    double *A1=malloc(n*sizeof(double)), *A2=malloc(n*sizeof(double)), *A3=malloc(n*sizeof(double));
+    for (size_t i=0;i<n;i++) {
+        A1[i]=sin(M1[i])*cos(M2[i]);
+        A2[i]=cos(M1[i])*cos(M2[i]);
+        A3[i]=sin(M2[i]);
+    }
+    gsl_matrix *ATA=gsl_matrix_alloc(3*m,3*m);
+    gsl_vector *ATb=gsl_vector_alloc(3*m);
+    gsl_vector *X=gsl_vector_alloc(3*m);
+    int *k=calloc(n,sizeof(int));
+    double *VRAD_prime=malloc(n*sizeof(double));
+    double *U_prev=calloc(m,sizeof(double));
+    double *V_prev=calloc(m,sizeof(double));
+    double *W_prev=calloc(m,sizeof(double));
+
+    int stop_reason=2;
+    int max_iter=20;
+    for (int iter=0;iter<max_iter;iter++) {
+        for (size_t i=0;i<n;i++)
+            VRAD_prime[i] = VRAD[i] - 2.0*k[i]*M3[i];
+        compute_normal_eqs(F,A1,A2,A3,VRAD_prime,ATA,ATb);
+        add_regularization_velocity(ATA, m, regtype, lambda);
+        solve_normal_eqs(ATA,ATb,X);
+        for (size_t j=0;j<m;j++) {
+            U_out[j]=gsl_vector_get(X,j);
+            V_out[j]=gsl_vector_get(X,m+j);
+            W_out[j]=gsl_vector_get(X,2*m+j);
+        }
+        /* vel change */
+        double max_vel_change=0.0;
+        for (size_t j=0;j<m;j++) {
+            double dU=fabs(U_out[j]-U_prev[j]);
+            double dV=fabs(V_out[j]-V_prev[j]);
+            double dW=fabs(W_out[j]-W_prev[j]);
+            if (dU>max_vel_change) max_vel_change=dU;
+            if (dV>max_vel_change) max_vel_change=dV;
+            if (dW>max_vel_change) max_vel_change=dW;
+        }
+        memcpy(U_prev,U_out,m*sizeof(double));
+        memcpy(V_prev,V_out,m*sizeof(double));
+        memcpy(W_prev,W_out,m*sizeof(double));
+        /* k change */
+        int changed_k=0;
+        int *k_old=malloc(n*sizeof(int));
+        memcpy(k_old,k,n*sizeof(int));
+        update_k(F,A1,A2,A3,U_out,V_out,W_out,M3,k);
+        for (size_t i=0;i<n;i++) {
+            if (k[i]!=k_old[i]) changed_k=1;
+        }
+        free(k_old);
+        if (!changed_k) {stop_reason=0; break;}
+        if (max_vel_change <= vel_tol) {stop_reason=1; break;}
+    }
+    /* outputs */
+    gsl_matrix *FtF=gsl_matrix_alloc(m,m);
+    compute_FtF(F,FtF);
+    compute_Neff(FtF,N_out);
+    gsl_matrix_free(FtF);
+    double *residuals=malloc(n*sizeof(double));
+    compute_residuals(F,A1,A2,A3,U_out,V_out,W_out,k,M3,VRAD,residuals);
+    compute_stddev_per_altitude(F,residuals,sigma_out);
+    free(residuals);
+    /* clean */
+    free(A1); free(A2); free(A3);
+    free(k); free(VRAD_prime);
+    free(U_prev); free(V_prev); free(W_prev);
+    gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
+    return stop_reason;
+}
+
+/* ============================================================================
+ * Simple reflectivity inversion
+ * ==========================================================================*/
+static void compute_normal_eqs_simple(const csr_matrix *F,
+                                      const double *ETA,
+                                      gsl_matrix *ATA,
+                                      gsl_vector *ATb) {
+    size_t m=F->ncols;
+    gsl_matrix_set_zero(ATA);
+    gsl_vector_set_zero(ATb);
+    for (size_t i=0;i<F->nrows;i++) {
+        size_t start=F->row_ptr[i];
+        size_t end=F->row_ptr[i+1];
+        for (size_t p=start; p<end; p++) {
+            size_t cp=F->col_idx[p];
+            double vp=F->values[p];
+            gsl_vector_set(ATb, cp, gsl_vector_get(ATb,cp) + vp*ETA[i]);
+            for (size_t q=start;q<end;q++) {
+                size_t cq=F->col_idx[q];
+                double vq=F->values[q];
+                double old=gsl_matrix_get(ATA,cp,cq);
+                gsl_matrix_set(ATA,cp,cq, old + vp*vq);
+            }
+        }
+    }
+}
+
+/* Main wrapper for reflectivity inversion */
+int reflectivity_inversion_reg(const csr_matrix *F,
+                           const double *ETA,
+                           double *x_out,
+                           double *N_out,
+                           double *sigma_out,
+                           regularization_type regtype,
+                           double lambda)
+{
+    size_t m=F->ncols, n=F->nrows;
+    gsl_matrix *ATA=gsl_matrix_alloc(m,m);
+    gsl_vector *ATb=gsl_vector_alloc(m);
+    gsl_vector *X=gsl_vector_alloc(m);
+    compute_normal_eqs_simple(F,ETA,ATA,ATb);
+    add_regularization(ATA, regtype, lambda);
+    solve_normal_eqs(ATA,ATb,X);
+    for (size_t j=0;j<m;j++) x_out[j]=gsl_vector_get(X,j);
+    gsl_matrix *FtF=gsl_matrix_alloc(m,m);
+    compute_FtF(F,FtF);
+    compute_Neff(FtF,N_out);
+    gsl_matrix_free(FtF);
+    double *residuals=malloc(n*sizeof(double));
+    csr_matvec(F,x_out,residuals);
+    for (size_t i=0;i<n;i++)
+        residuals[i]=ETA[i]-residuals[i];
+    compute_stddev_per_altitude(F,residuals,sigma_out);
+    free(residuals);
+    gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
+    return 0;
 }
