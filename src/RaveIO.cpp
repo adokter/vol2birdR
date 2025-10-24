@@ -693,7 +693,7 @@ public:
     } else if (v == "inverse") {
         _alldata.options.profileMethod = 1;
     } else {
-        throw std::runtime_error("Invalid heightReference value: must be 'sea', 'antenna', or 'ground'.");
+        throw std::runtime_error("Invalid profileMethod value: must be 'direct' or 'inverse'.");
     }
   }
 
