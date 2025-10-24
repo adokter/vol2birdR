@@ -17,6 +17,9 @@
  *
  */
 
+#ifndef LIBVOL2BIRD_H
+#define LIBVOL2BIRD_H
+
 #include <stdint.h>  // For SIZE_MAX
 #include <stdio.h>
 #include <string.h>
@@ -2621,7 +2624,110 @@ PolarScanParam_t* PolarScanParam_resample(PolarScanParam_t* param, double rscale
         return param_proj;
 }
 
+/**
+ * Return a polar volume containing a selection of scans by elevation
+ *
+ * @param volume - a polar volume
+ * @param elevs - array with elevation angles of scans to be selected
+ * @param nElevs - length of the elevation angle array
+ * @return a polar volume containing only the selected scans. Note:
+ * the returned volume is NOT a copy of the input volume, both objects
+ * reference the same scan objects.
+ */
+PolarVolume_t* PolarVolume_selectScansByElevation(PolarVolume_t* volume, float elevs[], int nElevs){
+    int iScan;
+    int nScans;
 
+    PolarScan_t* scan = NULL;
+    PolarVolume_t* volume_select = NULL;
+
+    // copy the volume
+    volume_select = RAVE_OBJECT_CLONE(volume);
+
+    nScans = PolarVolume_getNumberOfScans(volume_select);
+
+    if(nScans<=0){
+        vol2bird_err_printf("Error: polar volume contains no scans\n");
+        return volume_select;
+    }
+
+    // get the number of elevations.
+    if(nElevs>nScans){
+        vol2bird_err_printf("Warning: requesting %i elevations scans, but only %i available\n", nElevs, nScans);
+    }
+
+    // empty the scans in the copied volume
+    for (iScan = nScans-1; iScan>=0 ; iScan--) {
+        PolarVolume_removeScan(volume_select,iScan);
+    }
+
+    // iterate over the selected scans in 'volume' and add them to 'volume_select'
+    for (int iElev = 0; iElev < nElevs; iElev++) {
+        // extract the scan object from the volume object
+        scan = PolarVolume_getScanClosestToElevation_vol2bird(volume,DEG2RAD*elevs[iElev]);
+        if (ABS(RAD2DEG*PolarScan_getElangle(scan)-elevs[iElev]) > 0.1){
+            vol2bird_err_printf("Warning: Requested elevation scan at %f degrees but selected scan at %f degrees\n",
+                elevs[iElev],RAD2DEG*PolarScan_getElangle(scan));
+        }
+
+        // add it to the selected volume
+        PolarVolume_addScan(volume_select, scan);
+        RAVE_OBJECT_RELEASE(scan);
+    }
+
+    // sort polar volume by ascending elevation
+    PolarVolume_sortByElevations(volume_select, 1);
+
+    return(volume_select);
+}
+
+/**
+ * Return a polar volume containing a scans selected by scanUse object.
+ *
+ * @param volume - a polar volume
+ * @param scanUse - a scanUse object
+ * @return a polar volume containing only the selected scans. Note:
+ * the returned volume is NOT a copy of the input volume, both objects
+ * reference the same scan objects.
+ */
+PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, int nScansUsed){
+    int iScan;
+    int nScans;
+
+    PolarScan_t* scan = NULL;
+    PolarVolume_t* volume_select = NULL;
+
+    // copy the volume
+    volume_select = RAVE_OBJECT_CLONE(volume);
+
+    nScans = PolarVolume_getNumberOfScans(volume_select);
+
+    if(nScans<=0){
+        vol2bird_err_printf("Error: polar volume contains no scans\n");
+        return volume;
+    }
+
+    // empty the scans in the cloned volume
+    for (iScan = nScans-1; iScan>=0 ; iScan--) {
+            PolarVolume_removeScan(volume_select,iScan);
+    }
+
+    // iterate over the selected scans in 'volume' and add them to 'volume_select'
+    for (int iScan = 0; iScan < nScans; iScan++) {
+        // extract the scan object from the volume object
+        scan = PolarVolume_getScan(volume,iScan);
+        // add it to the selected volume
+        if (scanUse[iScan].useScan){
+            PolarVolume_addScan(volume_select, scan);
+        }
+        RAVE_OBJECT_RELEASE(scan);
+    }
+
+    // sort polar volume by ascending elevation
+    PolarVolume_sortByElevations(volume_select, 1);
+
+    return(volume_select);
+}
 
 static int hasAzimuthGap(const float* points_local, const int nPoints, vol2bird_t* alldata) {
 
@@ -3906,6 +4012,97 @@ static int removeDroppedCells(CELLPROP *cellProp, const int nCells) {
 }
 
 
+#if defined(MISTNET)
+// segments biology from precipitation using mistnet deep convolution net.
+int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata){
+    // volume with only the 5 selected elevations
+    PolarVolume_t* volume_mistnet = NULL;
+    PolarVolume_t* volume_select = NULL;
+    int result = 0;
+
+    volume_select = PolarVolume_selectScansByScanUse(volume, scanUse, alldata->misc.nScansUsed);
+    volume_mistnet = PolarVolume_selectScansByElevation(volume_select, alldata->options.mistNetElevs, alldata->options.mistNetNElevs);
+
+    if (PolarVolume_getNumberOfScans(volume_mistnet) != alldata->options.mistNetNElevs){
+        vol2bird_err_printf("Error: found only %i/%i scans required by mistnet segmentation model\n",
+            PolarVolume_getNumberOfScans(volume_mistnet),alldata->options.mistNetNElevs);
+            RAVE_OBJECT_RELEASE(volume_select);
+            RAVE_OBJECT_RELEASE(volume_mistnet);
+            return -1;
+    }
+
+    // set scanUse to false for scans not entering the MistNet segmentation model
+    if(alldata->options.mistNetElevsOnly){
+        int printWarning = FALSE;
+        // buffer to accumulate warning message:
+        char buffer[1024];
+        // initialize the buffer (ensure it's empty initially)
+        buffer[0] = '\0';
+        for(int iScan = 0; iScan < PolarVolume_getNumberOfScans(volume); iScan++){
+            PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
+            if(PolarVolume_indexOf(volume_mistnet, scan) == -1){
+                char scanMsg[16]; // Temporary buffer to format each scan number
+                snprintf(scanMsg, sizeof(scanMsg), "%i ", iScan + 1); // Formatted scan number
+                strcat(buffer, scanMsg); // Append each scan number to the main buffer
+                printWarning = TRUE;
+                scanUse[iScan].useScan = FALSE;
+            }
+            RAVE_OBJECT_RELEASE(scan);
+        }
+        if(printWarning) vol2bird_err_printf( "Warning: Ignoring scan(s) not used as MistNet input: %s...\n", buffer);
+    }
+
+    // convert polar volume into 3D tensor array
+    double ***mistnetTensorInput3D = NULL;
+    int nCartesianParam = polarVolumeTo3DTensor(volume_mistnet,&mistnetTensorInput3D,MISTNET_DIMENSION,MISTNET_RESOLUTION,3*alldata->options.mistNetNElevs);
+
+    // flatten 3D tensor into a 1D array
+    float *mistnetTensorInput;
+    mistnetTensorInput = flatten3DTensor(mistnetTensorInput3D,3*alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION);
+    // run mistnet, which outputs a 1D array
+    int mistnetTensorSize=3*alldata->options.mistNetNElevs*MISTNET_DIMENSION*MISTNET_DIMENSION;
+    float *mistnetTensorOutput = (float *) malloc(mistnetTensorSize*sizeof(float));
+
+    vol2bird_err_printf( "Running MistNet...");
+
+    result = run_mistnet(mistnetTensorInput, &mistnetTensorOutput, alldata->options.mistNetPath, mistnetTensorSize);
+
+    // if mistnet run failed, clean up and exit
+    if(result < 0){
+        if(nCartesianParam > 0){
+            free(mistnetTensorInput);
+            free3DTensor(mistnetTensorInput3D,nCartesianParam,MISTNET_RESOLUTION);
+        }
+        RAVE_OBJECT_RELEASE(volume_select);
+        RAVE_OBJECT_RELEASE(volume_mistnet);
+        vol2bird_err_printf( "failed\n");
+        return -1;
+    }
+
+    vol2bird_err_printf( "done\n");
+    // convert mistnet 1D array into a 4D tensor
+    float ****mistnetTensorOutput4D = create4DTensor(mistnetTensorOutput,3,alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION);
+    // add segmentation to polar volume
+    addTensorToPolarVolume(volume_mistnet, mistnetTensorOutput4D,3,alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION,MISTNET_RESOLUTION);
+
+    // add segmentation for scans that weren't input to the segmentation model to polar volume
+    // note: all scans in 'volume_mistnet' are also contained in 'volume', i.e. its scan pointers point to the same objects
+    addClassificationToPolarVolume(volume, mistnetTensorOutput4D,3,alldata->options.mistNetNElevs,MISTNET_DIMENSION,MISTNET_DIMENSION,MISTNET_RESOLUTION);
+
+    //clean up 3D array
+    if(nCartesianParam > 0){
+        free(mistnetTensorInput);
+        free(mistnetTensorOutput);
+        free3DTensor(mistnetTensorInput3D,nCartesianParam,MISTNET_RESOLUTION);
+        free4DTensor(mistnetTensorOutput4D, 3, alldata->options.mistNetNElevs, MISTNET_RESOLUTION);
+    }
+
+    RAVE_OBJECT_RELEASE(volume_select);
+    RAVE_OBJECT_RELEASE(volume_mistnet);
+
+    return result;
+}   // segmentScansUsingMistnet
+#endif
 
 
 static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitted, const int* includedIndex,
@@ -5594,6 +5791,6 @@ void vol2birdTearDown(vol2bird_t* alldata) {
 
 } // vol2birdTearDown
 
-
+#endif // LIBVOL2BIRD_H
 
 

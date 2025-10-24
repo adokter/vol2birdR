@@ -466,6 +466,14 @@ PolarScanParam_t* PolarScanParam_project_on_scan(PolarScanParam_t* param, PolarS
 
 PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, RaveDataType type);
 
+PolarVolume_t* PolarVolume_selectScansByElevation(PolarVolume_t* volume, float elevs[], int nElevs);
+
+PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, int nScansUsed);
+
+#ifdef MISTNET
+int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata);
+#endif
+
 int vol2birdGetNColsProfile(vol2bird_t* alldata);
 
 int vol2birdGetNRowsProfile(vol2bird_t* alldata);
