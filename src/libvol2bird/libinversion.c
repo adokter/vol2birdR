@@ -1,4 +1,5 @@
 #include "libinversion.h"
+#include "librender.h"
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -41,6 +42,69 @@ void csr_matvec(const csr_matrix *mat, const double *x, double *y) {
         y[i] = sum;
     }
 }
+
+/**
+ * Build the CSR matrix F from points/layers using threshold
+ */
+csr_matrix *build_F_csr(const float *points,
+                        size_t nPoints,
+                        size_t nColsPoints,
+                        size_t heightValueCol,
+                        size_t rangeCol,
+                        size_t elevAngleCol,
+                        const float layerThickness,
+                        size_t nLayer,
+                        const double antennaHeight,
+                        const double beamWidth,
+                        double cutoff)
+{
+    size_t i, j;
+    size_t nnz_count = 0;
+
+    /* First pass: count nnz above cutoff */
+    for (i = 0; i < nPoints; i++) {
+        double refHeight = points[i * nColsPoints + heightValueCol];
+        double range  = points[i * nColsPoints + rangeCol];
+        double elev   = points[i * nColsPoints + elevAngleCol];
+
+        for (j = 0; j < nLayer; j++) {
+            double height = j*layerThickness+layerThickness/2;
+            double val = beamProfile(height+refHeight, elev, range,
+                                     antennaHeight, beamWidth);
+            if (val > cutoff) {
+                nnz_count++;
+            }
+        }
+    }
+
+    /* Allocate matrix with counted nnz */
+    csr_matrix *F = csr_alloc(nPoints, nLayer, nnz_count);
+
+    /* Second pass: fill CSR arrays */
+    size_t pos = 0;
+    F->row_ptr[0] = 0;
+
+    for (i = 0; i < nPoints; i++) {
+        double refHeight = points[i * nColsPoints + heightValueCol];
+        double range  = points[i * nColsPoints + rangeCol];
+        double elev   = points[i * nColsPoints + elevAngleCol];
+
+        for (j = 0; j < nLayer; j++) {
+            double height = j*layerThickness+layerThickness/2;
+            double val = beamProfile(height+refHeight, elev, range,
+                                     antennaHeight, beamWidth);
+            if (val > cutoff) {
+                F->values[pos] = val;
+                F->col_idx[pos] = j;
+                pos++;
+            }
+        }
+        F->row_ptr[i+1] = pos;  // cumulative count
+    }
+
+    return F;
+}
+
 
 /* ============================================================================
  * Adding regularization terms
@@ -353,7 +417,6 @@ static void compute_normal_eqs_simple(const csr_matrix *F,
                                       const double *ETA,
                                       gsl_matrix *ATA,
                                       gsl_vector *ATb) {
-    size_t m=F->ncols;
     gsl_matrix_set_zero(ATA);
     gsl_vector_set_zero(ATb);
     for (size_t i=0;i<F->nrows;i++) {
