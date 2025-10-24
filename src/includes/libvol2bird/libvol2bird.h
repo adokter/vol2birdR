@@ -257,6 +257,8 @@ struct vol2birdPoints {
     // of the scan elevations to the 'points' array; it should therefore
     // never exceed indexTo[i]-indexFrom[i]
     int* nPointsWritten; // Is allocated in vol2birdSetUp() and freed in vol2birdTearDown()
+    // stores the sum of the elements of nPointsWritten
+    int nPointsWrittenTotal;
 };
 typedef struct vol2birdPoints vol2birdPoints_t;
 
