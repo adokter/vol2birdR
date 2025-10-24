@@ -2094,6 +2094,9 @@ static int getListOfSelectedGates(PolarScan_t* scan, vol2birdScanUse_t scanUse, 
             // store the corresponding observed clutter value
             points_local[iRowPoints * nColsPoints_local + alldata->points.clutValueCol] = (float) clutValue;
 
+            // store the reference height value (either 0 for sea, antenna height, or ground height)
+            points_local[iRowPoints * nColsPoints_local + alldata->points.heightValueCol] = (float) groundheightValue;
+
             // raise the row counter by 1
             iRowPoints += 1;
 
