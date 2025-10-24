@@ -150,6 +150,7 @@ private:
     strcpy(alldata->options.mistNetPath, "/opt/vol2bird/etc/mistnet_nexrad.pt");
     strcpy(alldata->options.groundHeightParam, "HGHT");
     alldata->options.heightReference = 0;
+    alldata->options.profileMethod = 0;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -249,6 +250,7 @@ public:
     strcpy(_alldata.options.mistNetPath, other._alldata.options.mistNetPath);
     strcpy(_alldata.options.groundHeightParam, other._alldata.options.groundHeightParam);
     _alldata.options.heightReference = other._alldata.options.heightReference;
+    _alldata.options.profileMethod = other._alldata.options.profileMethod;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -675,6 +677,26 @@ public:
     }
   }
 
+  std::string get_profileMethod() {
+    if (_alldata.options.profileMethod == 0) {
+      return std::string("direct");
+    } else if (_alldata.options.profileMethod == 1) {
+      return std::string("inverse");
+    } else {
+      return std::string("invalid");
+    }
+  }
+
+  void set_profileMethod(std::string v) {
+    if (v == "direct") {
+        _alldata.options.profileMethod = 0;
+    } else if (v == "inverse") {
+        _alldata.options.profileMethod = 1;
+    } else {
+        throw std::runtime_error("Invalid heightReference value: must be 'sea', 'antenna', or 'ground'.");
+    }
+  }
+
   double get_constant_areaCellMin() {
     return _alldata.constants.areaCellMin;
   }
@@ -1086,6 +1108,7 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("mistNetPath", &Vol2BirdConfig::get_mistNetPath, &Vol2BirdConfig::set_mistNetPath)
       .property("groundHeightParam", &Vol2BirdConfig::get_groundHeightParam, &Vol2BirdConfig::set_groundHeightParam)
       .property("heightReference", &Vol2BirdConfig::get_heightReference, &Vol2BirdConfig::set_heightReference)
+      .property("profileMethod", &Vol2BirdConfig::get_profileMethod, &Vol2BirdConfig::set_profileMethod)
       .property("constant_areaCellMin", &Vol2BirdConfig::get_constant_areaCellMin, &Vol2BirdConfig::set_constant_areaCellMin)
       .property("constant_cellClutterFractionMax", &Vol2BirdConfig::get_constant_cellClutterFractionMax, &Vol2BirdConfig::set_constant_cellClutterFractionMax)
       .property("constant_chisqMin", &Vol2BirdConfig::get_constant_chisqMin, &Vol2BirdConfig::set_constant_chisqMin)

@@ -147,6 +147,7 @@ struct vol2birdOptions {
     char mistNetPath[1000];         /* path and filename of the MistNet segmentation model to use, expects libtorch format */
     char groundHeightParam[1000];   /* Scan parameter name containing ground elevation height */
     int heightReference;            /* Categorical indicating whether to profile relative to sea (0), antenna (1) or ground (2) level */
+    int profileMethod;              /* Categorical indicating whether to use direct (0) or inverse (1) profiling method */
 
 };
 typedef struct vol2birdOptions vol2birdOptions_t;
