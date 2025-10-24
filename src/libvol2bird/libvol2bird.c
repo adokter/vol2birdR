@@ -55,6 +55,9 @@
 #include "iris2odim.h"
 #endif
 
+#ifndef ABS
+#define ABS(x) (((x) < 0) ? (-(x)) : (x))
+#endif
 
 // non-public function prototypes (local to this file/translation unit)
 

@@ -26,3 +26,13 @@ float* flatten3DTensor(double ***tensor, int dim1, int dim2, int dim3);
 void free3DTensor(double ***tensor, int dim1, int dim2);
 
 void free4DTensor(float ****tensor, int dim1, int dim2, int dim3);
+
+#ifdef MISTNET
+int run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
+#endif
+
+PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volume, double elev);
+
+int addTensorToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int dim2, int dim3, int dim4, long res);
+
+int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int dim2, int dim3, int dim4, long res);

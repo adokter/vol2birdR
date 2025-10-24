@@ -22,16 +22,6 @@ RaveObjectList_t* polarVolumeToCartesianList(PolarVolume_t* pvol, long dim, long
 
 Cartesian_t* polarScanToCartesian(PolarScan_t* scan, long dim, long res, double init);
 
-int addTensorToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int dim2, int dim3, int dim4, long res);
-
-int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int dim2, int dim3, int dim4, long res);
-
-PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volume, double elev);
-
-#ifdef MISTNET
-int run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
-#endif
-
 #ifndef MIN
 #define MIN(x,y) (((x) < (y)) ? (x) : (y))
 #endif
