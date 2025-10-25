@@ -46,12 +46,10 @@ void csr_matvec(const csr_matrix *mat, const double *x, double *y) {
 /**
  * Build the CSR matrix F from points/layers using threshold
  */
-csr_matrix *build_F_csr(const float *points,
-                        size_t nPoints,
-                        size_t nColsPoints,
-                        size_t heightValueCol,
-                        size_t rangeCol,
-                        size_t elevAngleCol,
+csr_matrix *build_F_csr(size_t nPoints,
+                        float* refHeight,
+                        float* range,
+                        float* elev,
                         const float layerThickness,
                         size_t nLayer,
                         const double antennaHeight,
@@ -63,13 +61,9 @@ csr_matrix *build_F_csr(const float *points,
 
     /* First pass: count nnz above cutoff */
     for (i = 0; i < nPoints; i++) {
-        double refHeight = points[i * nColsPoints + heightValueCol];
-        double range  = points[i * nColsPoints + rangeCol];
-        double elev   = points[i * nColsPoints + elevAngleCol];
-
         for (j = 0; j < nLayer; j++) {
             double height = j*layerThickness+layerThickness/2;
-            double val = beamProfile(height+refHeight, elev, range,
+            double val = beamProfile(height+refHeight[i], elev[i], range[i],
                                      antennaHeight, beamWidth);
             if (val > cutoff) {
                 nnz_count++;
@@ -85,13 +79,9 @@ csr_matrix *build_F_csr(const float *points,
     F->row_ptr[0] = 0;
 
     for (i = 0; i < nPoints; i++) {
-        double refHeight = points[i * nColsPoints + heightValueCol];
-        double range  = points[i * nColsPoints + rangeCol];
-        double elev   = points[i * nColsPoints + elevAngleCol];
-
         for (j = 0; j < nLayer; j++) {
             double height = j*layerThickness+layerThickness/2;
-            double val = beamProfile(height+refHeight, elev, range,
+            double val = beamProfile(height+refHeight[i], elev[i], range[i],
                                      antennaHeight, beamWidth);
             if (val > cutoff) {
                 F->values[pos] = val;
