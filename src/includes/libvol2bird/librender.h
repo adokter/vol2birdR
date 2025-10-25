@@ -9,7 +9,9 @@ double distance2range(double distance,double elev);
 
 double range2distance(double range,double elev);
 
-double range2height(double range,double elev);
+double range2height(double range, double elev);
+
+double beamWidth(double range, double beamAngle);
 
 double beamProfile(double height, double elev, double range, double antenna, double beamAngle);
 

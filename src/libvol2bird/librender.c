@@ -159,6 +159,19 @@ double range2height(double range,double elev){
 }
 
 /**
+ * Beam width as a function of range
+ *
+ * @param range - slant range along radar line of sight in meter
+ * @param beamAngle - 3dB antenna beam width in radians (equal to FWHM)
+ */
+double beamWidth(double range, double beamAngle){
+    double effective_beam_angle = beamAngle/sqrt(2);
+    // beam width expressed as the standard deviation of a gaussian
+    output = 2 * range * sin(effective_beam_angle/2);
+    return(output);
+}
+
+/**
  * Vertical beam profile for a given slant elevation and range, antenna height and 3dB beam angle.
  *
  * Uses spherical earth
@@ -167,14 +180,14 @@ double range2height(double range,double elev){
  * @param elev - beam elevation in radians
  * @param range - slant range along radar line of sight in meter
  * @param antennaHeight - antenna height in m above sea level
- * @param beamAnble - 3dB antenna beam width in radians
+ * @param beamAngle - 3dB antenna beam width in radians
  * @return height above ground in meter
  */
 double beamProfile(double height, double elev, double range, double antennaHeight, double beamAngle){
     double output;
     double effective_beam_angle = beamAngle/sqrt(2);
     // beam width expressed as the standard deviation of a gaussian
-    double beam_sd = range * 2 * sin(effective_beam_angle/2) * cos(elev) / (2 * sqrt(2 * log(2)));
+    double beam_sd = beamWidth(range, beamAngle) * cos(elev) / (2 * sqrt(log(2)));
     // beam center
     double beam_mu =  antennaHeight + range2height(range, elev);
     // normalized gaussian:
