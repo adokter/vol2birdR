@@ -365,6 +365,10 @@ struct vol2birdMisc {
     int vcp;
     // the radar name extracted from the source string
     char radarName[100];
+    // the radar height above sea level in m
+    double radarHeight;
+    // the beam width in radians
+    double beamWidth;
 };
 typedef struct vol2birdMisc vol2birdMisc_t;
 

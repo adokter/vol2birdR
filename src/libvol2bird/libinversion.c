@@ -47,10 +47,10 @@ void csr_matvec(const csr_matrix *mat, const double *x, double *y) {
  * Build the CSR matrix F from points/layers using threshold
  */
 csr_matrix *build_F_csr(size_t nPoints,
-                        float* refHeight,
-                        float* range,
-                        float* elev,
-                        const float layerThickness,
+                        double* refHeight,
+                        double* range,
+                        double* elev,
+                        const double layerThickness,
                         size_t nLayer,
                         const double antennaHeight,
                         const double beamWidth,

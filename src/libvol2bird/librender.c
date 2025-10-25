@@ -167,7 +167,7 @@ double range2height(double range,double elev){
 double beamWidth(double range, double beamAngle){
     double effective_beam_angle = beamAngle/sqrt(2);
     // beam width expressed as the standard deviation of a gaussian
-    output = 2 * range * sin(effective_beam_angle/2);
+    double output = 2 * range * sin(effective_beam_angle/2);
     return(output);
 }
 
@@ -187,7 +187,7 @@ double beamProfile(double height, double elev, double range, double antennaHeigh
     double output;
     double effective_beam_angle = beamAngle/sqrt(2);
     // beam width expressed as the standard deviation of a gaussian
-    double beam_sd = beamWidth(range, beamAngle) * cos(elev) / (2 * sqrt(log(2)));
+    double beam_sd = beamWidth(range, effective_beam_angle) * cos(elev) / (2 * sqrt(log(2)));
     // beam center
     double beam_mu =  antennaHeight + range2height(range, elev);
     // normalized gaussian:

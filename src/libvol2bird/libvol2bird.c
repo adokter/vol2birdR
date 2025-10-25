@@ -38,6 +38,7 @@
 #include "polarscan.h"
 #include "libvol2bird.h"
 #include "libsvdfit.h"
+#include "libinversion.h"
 #include "constants.h"
 #undef RAD2DEG // to suppress redefine warning, also defined in dealias.h
 #undef DEG2RAD // to suppress redefine warning, also defined in dealias.h
@@ -152,9 +153,9 @@ static void updateFlagFieldsInPointsArray(const float* yObs, const float* yFitte
 
 static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vol2bird_t* alldata);
 
-void vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType);
+int vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType);
 
-void vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType);
+int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType);
 
 #ifdef IRIS
 PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles);
@@ -4277,7 +4278,7 @@ static int updateMap(PolarScan_t* scan, CELLPROP *cellProp, const int nCells, vo
 } // updateMap
 
 
-void vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType) {
+int vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType) {
   for (int iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
 
     // if the user does not require fitting a model to the observed
@@ -4587,11 +4588,150 @@ void vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType) {
     }
 
   } // endfor (iLayer = 0; iLayer < nLayers; iLayer++)
+
+  return(0);
 }
 
-void vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
+int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   // NOTE: do not forget to convert dbz to z and convert NaN to zero.
+  int nPoints = alldata->points.nPointsWrittenTotal;
 
+  // allocate input data arrays and initialize with zeros:
+  double *range = calloc(nPoints, sizeof(double));
+  double *azim = calloc(nPoints, sizeof(double));
+  double *elev = calloc(nPoints, sizeof(double));
+  double *refHeight = calloc(nPoints, sizeof(double));
+  double *nyquist = calloc(nPoints, sizeof(double));
+  int *k = calloc(nPoints, sizeof(int));
+  double *eta = calloc(nPoints, sizeof(double));
+  double *vrad = calloc(nPoints, sizeof(double));
+  int *includedIndex = calloc(nPoints, sizeof(int));
+
+  // allocate output data arrays and initialize with zeros:
+  double *U = calloc(alldata->options.nLayers, sizeof(double));
+  double *V = calloc(alldata->options.nLayers, sizeof(double));
+  double *W = calloc(alldata->options.nLayers, sizeof(double));
+  double *eta_out = calloc(alldata->options.nLayers, sizeof(double));
+  double *N = calloc(alldata->options.nLayers, sizeof(double));
+  double *N_eta = calloc(alldata->options.nLayers, sizeof(double));
+  double *sigma = calloc(alldata->options.nLayers, sizeof(double));
+  double *sigma_eta = calloc(alldata->options.nLayers, sizeof(double));
+
+  if (range == NULL || azim == NULL || elev == NULL || refHeight == NULL ||
+      nyquist == NULL || k == NULL || vrad == NULL || includedIndex == NULL ||
+      U == NULL || V == NULL || W == NULL || N == NULL || N_eta == NULL ||
+      sigma == NULL || sigma_eta == NULL){
+    vol2bird_err_printf("vol2birdCalcProfilesInverse: memory allocation failed\n");
+    return(1);
+  }
+
+  int iPointIncluded = 0;
+  double dbzValue = NAN;
+
+  // build up data vectors from points array
+  for (int iPoint = 0; iPoint < nPoints; iPoint++) {
+
+    unsigned int gateCode = (unsigned int) alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol];
+
+    if (includeGate(iProfileType, 1, gateCode, alldata) == TRUE) {
+      // copy azimuth angle from the 'points' array
+      range[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.rangeCol];
+      // copy azimuth angle from the 'points' array
+      azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol];
+      // copy elevation angle from the 'points' array
+      elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol];
+      // copy nyquist interval from the 'points' array
+      nyquist[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.nyquistCol];
+      // copy reflectivity factor from the 'points' array and convert to linear Z
+      dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];
+      if (isnan(dbzValue) == TRUE) {
+        eta[iPointIncluded] = 0;
+      } else {
+        eta[iPointIncluded] = (double) alldata->misc.dbzFactor * exp(0.1 * log(10) * dbzValue);
+      }
+      // copy the observed vrad value at this [azimuth, elevation]
+      vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vradValueCol];
+      // keep a record of which index was just included
+      includedIndex[iPointIncluded] = iPoint;
+      // raise the counter
+      iPointIncluded += 1;
+    }
+  } // endfor (iPoint = 0; iPoint < nPoints; iPoint++) {
+
+  //resetting nPoints to the number of included points
+  nPoints = iPointIncluded;
+
+  csr_matrix *F = build_F_csr(nPoints, refHeight, range, elev,
+                              alldata->options.layerThickness,
+                              alldata->options.nLayers,
+                              alldata->misc.radarHeight,
+                              alldata->misc.beamWidth,
+                              exp(-2) // ~0.13, equal to the 2 sigma points
+  );
+
+  int result = 1;
+//  result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
+//                           U, V, W, N, sigma,
+//                           1e-3, REG_SMOOTHNESS, 0.1);
+
+  result = reflectivity_inversion_reg(F,
+                             eta, eta_out, N_eta, sigma_eta,
+                             REG_L2, 0.1);
+
+
+
+
+  //---------------------------------------------//
+  //         Fill the profile arrays             //
+  //---------------------------------------------//
+
+  int hasGap=0;
+  // always fill below profile fields, these never have a NODATA or UNDETECT value.
+  for (int iLayer = 0; iLayer < alldata->options.nLayers; iLayer++) {
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 0] = iLayer * alldata->options.layerThickness;
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 1] = (iLayer + 1) * alldata->options.layerThickness;
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 8] = (float) hasGap;
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 10] = N[iLayer];
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 13] = N_eta[iLayer];
+
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 2] = U[iLayer];
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 3] = V[iLayer];
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 4] = W[iLayer];
+    float hSpeed = sqrt(pow(U[iLayer], 2) + pow(V[iLayer], 2));
+    float hDir = atan2(U[iLayer], V[iLayer]) * RAD2DEG;
+    if (hDir < 0) {
+      hDir += 360.0f;
+    }
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 5] = hSpeed;
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 6] = hDir;
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 7] = sigma[iLayer];
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 9] = eta_out[iLayer]; //FIXME
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 11] = eta_out[iLayer];
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 12] = eta_out[iLayer]; //FIXME
+  }
+
+  // free data input arrays
+  free(range);
+  free(azim);
+  free(elev);
+  free(refHeight);
+  free(nyquist);
+  free(k);
+  free(eta);
+  free(vrad);
+  free(includedIndex);
+
+  // free output arrays
+  free(U);
+  free(V);
+  free(W);
+  free(eta_out);
+  free(N);
+  free(N_eta);
+  free(sigma);
+  free(sigma_eta);
+
+  return(0);
 }
 
 
@@ -5434,6 +5574,11 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->misc.vcp = 0;
     }
     RAVE_OBJECT_RELEASE(attr);
+
+    // Store the radar height and beam width from the polar volume
+    alldata->misc.radarHeight = PolarVolume_getHeight(volume);
+    alldata->misc.beamWidth = PolarVolume_getBeamwidth(volume);
+
     // ------------------------------------------------------------- //
     //                 determine which scans to use                  //
     // ------------------------------------------------------------- //

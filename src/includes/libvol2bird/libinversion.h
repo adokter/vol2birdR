@@ -62,10 +62,10 @@ void csr_matvec(const csr_matrix *mat, const double *x, double *y);
 
 /* Build csr matrix from vol2bird points array */
 csr_matrix *build_F_csr(size_t nPoints,
-                        float* refHeight,
-                        float* range,
-                        float* elev,
-                        const float layerThickness,
+                        double* refHeight,
+                        double* range,
+                        double* elev,
+                        const double layerThickness,
                         size_t nLayer,
                         const double antennaHeight,
                         const double beamWidth,
