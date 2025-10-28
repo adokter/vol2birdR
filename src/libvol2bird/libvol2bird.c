@@ -4658,6 +4658,8 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
     }
   } // endfor (iPoint = 0; iPoint < nPoints; iPoint++) {
 
+  vol2bird_printf("CSR matrix contains %i/%i points\n",iPointIncluded,nPoints);
+
   //resetting nPoints to the number of included points
   nPoints = iPointIncluded;
 
@@ -4668,15 +4670,15 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
                               alldata->misc.beamWidth,
                               exp(-2) // ~0.13, equal to the 2 sigma points
   );
-
   int result = 1;
-//  result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
-//                           U, V, W, N, sigma,
-//                           1e-3, REG_SMOOTHNESS, 0.1);
+  result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
+                           U, V, W, N, sigma,
+                           1e-3, alldata->options.regularization, 0.1);
 
+  result = 1;
   result = reflectivity_inversion_reg(F,
                              eta, eta_out, N_eta, sigma_eta,
-                             REG_L2, 0.1);
+                             alldata->options.regularization, 0.1);
 
 
 

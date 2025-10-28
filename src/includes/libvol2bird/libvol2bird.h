@@ -148,6 +148,8 @@ struct vol2birdOptions {
     char groundHeightParam[1000];   /* Scan parameter name containing ground elevation height */
     int heightReference;            /* Categorical indicating whether to profile relative to sea (0), antenna (1) or ground (2) level */
     int profileMethod;              /* Categorical indicating whether to use direct (0) or inverse (1) profiling method */
+    float lambda;                   /* Regularization constant for the inverse profiling method */
+    int regularization;             /* Regularization type for the inverse profiling method */
 
 };
 typedef struct vol2birdOptions vol2birdOptions_t;

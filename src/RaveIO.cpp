@@ -151,6 +151,8 @@ private:
     strcpy(alldata->options.groundHeightParam, "HGHT");
     alldata->options.heightReference = 0;
     alldata->options.profileMethod = 0;
+    alldata->options.lambda = 0.1;
+    alldata->options.regularization = 2;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -251,6 +253,8 @@ public:
     strcpy(_alldata.options.groundHeightParam, other._alldata.options.groundHeightParam);
     _alldata.options.heightReference = other._alldata.options.heightReference;
     _alldata.options.profileMethod = other._alldata.options.profileMethod;
+    _alldata.options.lambda = other._alldata.options.lambda;
+    _alldata.options.regularization = other._alldata.options.regularization;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -697,6 +701,35 @@ public:
     }
   }
 
+  double get_lambda() {
+    return _alldata.options.lambda;
+  }
+  void set_lambda(double v) {
+    if(v<0) throw std::runtime_error("Invalide lambda value: must be a positive number.");
+    _alldata.options.lambda = v;
+  }
+
+  std::string get_regularization() {
+    if (_alldata.options.regularization == 1) {
+      return std::string("L2");
+    } else if (_alldata.options.regularization == 2) {
+      return std::string("smoothness");
+    } else {
+      return std::string("invalid");
+    }
+  }
+
+  void set_regularization(std::string v) {
+    if (v == "L2") {
+        _alldata.options.regularization = 0;
+    } else if (v == "smoothness") {
+        _alldata.options.regularization = 1;
+    } else {
+        throw std::runtime_error("Invalid regularization type: must be 'L2' or 'smoothness'.");
+    }
+  }
+
+
   double get_constant_areaCellMin() {
     return _alldata.constants.areaCellMin;
   }
@@ -861,7 +894,7 @@ public:
     if (volume == NULL) {
       throw std::runtime_error("Could not read file(s)");
     }
-    
+
     // copy input filename to misc.filename_pvol
     strcpy(config.alldata()->misc.filename_pvol, fileIn[0]);
 
@@ -973,7 +1006,7 @@ public:
       } else {
           result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
       }
-      
+
       if (result == FALSE) {
         RAVE_OBJECT_RELEASE(volume);
         throw std::runtime_error(std::string("Can not write : ") + vpOutName);
@@ -1109,6 +1142,8 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("groundHeightParam", &Vol2BirdConfig::get_groundHeightParam, &Vol2BirdConfig::set_groundHeightParam)
       .property("heightReference", &Vol2BirdConfig::get_heightReference, &Vol2BirdConfig::set_heightReference)
       .property("profileMethod", &Vol2BirdConfig::get_profileMethod, &Vol2BirdConfig::set_profileMethod)
+      .property("lambda", &Vol2BirdConfig::get_lambda, &Vol2BirdConfig::set_lambda)
+      .property("lambda", &Vol2BirdConfig::get_regularization, &Vol2BirdConfig::set_regularization)
       .property("constant_areaCellMin", &Vol2BirdConfig::get_constant_areaCellMin, &Vol2BirdConfig::set_constant_areaCellMin)
       .property("constant_cellClutterFractionMax", &Vol2BirdConfig::get_constant_cellClutterFractionMax, &Vol2BirdConfig::set_constant_cellClutterFractionMax)
       .property("constant_chisqMin", &Vol2BirdConfig::get_constant_chisqMin, &Vol2BirdConfig::set_constant_chisqMin)
