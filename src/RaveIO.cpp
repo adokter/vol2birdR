@@ -705,8 +705,11 @@ public:
     return _alldata.options.lambda;
   }
   void set_lambda(double v) {
-    if(v<0) throw std::runtime_error("Invalide lambda value: must be a positive number.");
-    _alldata.options.lambda = v;
+    if (v > 0){
+        _alldata.options.lambda = v;
+    } else{
+        throw std::runtime_error("Invalid lambda value: the regularization parameter must be a positive number.");
+    }
   }
 
   std::string get_regularization() {
@@ -721,9 +724,9 @@ public:
 
   void set_regularization(std::string v) {
     if (v == "L2") {
-        _alldata.options.regularization = 0;
-    } else if (v == "smoothness") {
         _alldata.options.regularization = 1;
+    } else if (v == "smoothness") {
+        _alldata.options.regularization = 2;
     } else {
         throw std::runtime_error("Invalid regularization type: must be 'L2' or 'smoothness'.");
     }
@@ -1143,7 +1146,7 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("heightReference", &Vol2BirdConfig::get_heightReference, &Vol2BirdConfig::set_heightReference)
       .property("profileMethod", &Vol2BirdConfig::get_profileMethod, &Vol2BirdConfig::set_profileMethod)
       .property("lambda", &Vol2BirdConfig::get_lambda, &Vol2BirdConfig::set_lambda)
-      .property("lambda", &Vol2BirdConfig::get_regularization, &Vol2BirdConfig::set_regularization)
+      .property("regularization", &Vol2BirdConfig::get_regularization, &Vol2BirdConfig::set_regularization)
       .property("constant_areaCellMin", &Vol2BirdConfig::get_constant_areaCellMin, &Vol2BirdConfig::set_constant_areaCellMin)
       .property("constant_cellClutterFractionMax", &Vol2BirdConfig::get_constant_cellClutterFractionMax, &Vol2BirdConfig::set_constant_cellClutterFractionMax)
       .property("constant_chisqMin", &Vol2BirdConfig::get_constant_chisqMin, &Vol2BirdConfig::set_constant_chisqMin)
