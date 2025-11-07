@@ -4603,7 +4603,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   double *refHeight = calloc(nPoints, sizeof(double));
   double *nyquist = calloc(nPoints, sizeof(double));
   int *k = calloc(nPoints, sizeof(int));
-  double *eta = calloc(nPoints, sizeof(double));
+  double *z = calloc(nPoints, sizeof(double));
   double *vrad = calloc(nPoints, sizeof(double));
   int *includedIndex = calloc(nPoints, sizeof(int));
 
@@ -4611,7 +4611,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   double *U = calloc(alldata->options.nLayers, sizeof(double));
   double *V = calloc(alldata->options.nLayers, sizeof(double));
   double *W = calloc(alldata->options.nLayers, sizeof(double));
-  double *eta_out = calloc(alldata->options.nLayers, sizeof(double));
+  double *z_out = calloc(alldata->options.nLayers, sizeof(double));
   double *N = calloc(alldata->options.nLayers, sizeof(double));
   double *N_eta = calloc(alldata->options.nLayers, sizeof(double));
   double *sigma = calloc(alldata->options.nLayers, sizeof(double));
@@ -4638,16 +4638,16 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
       range[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.rangeCol];
       // copy azimuth angle from the 'points' array
       azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol];
-      // copy elevation angle from the 'points' array
-      elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol];
+      // copy elevation angle from the 'points' array, convert to radians
+      elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol] * PI/180;
       // copy nyquist interval from the 'points' array
       nyquist[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.nyquistCol];
       // copy reflectivity factor from the 'points' array and convert to linear Z
       dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];
       if (isnan(dbzValue) == TRUE) {
-        eta[iPointIncluded] = 0;
+        z[iPointIncluded] = 0;
       } else {
-        eta[iPointIncluded] = (double) alldata->misc.dbzFactor * exp(0.1 * log(10) * dbzValue);
+        z[iPointIncluded] = exp(0.1 * log(10) * dbzValue);
       }
       // copy the observed vrad value at this [azimuth, elevation]
       vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vradValueCol];
@@ -4658,7 +4658,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
     }
   } // endfor (iPoint = 0; iPoint < nPoints; iPoint++) {
 
-  vol2bird_printf("CSR matrix contains %i/%i points\n",iPointIncluded,nPoints);
+  vol2bird_printf("CSR matrix contains %i/%i points for iProfileType=%i\n",iPointIncluded,nPoints,iProfileType);
 
   //resetting nPoints to the number of included points
   nPoints = iPointIncluded;
@@ -4671,14 +4671,16 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
                               exp(-2) // ~0.13, equal to the 2 sigma points
   );
   int result = 1;
+  // ensure lambda scales with grid spacing
+  double lambda_eff = alldata->options.lambda * alldata->options.layerThickness;
   result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
                            U, V, W, N, sigma,
-                           1e-3, alldata->options.regularization, 0.1);
+                           1e-3, alldata->options.regularization, lambda_eff);
 
   result = 1;
   result = reflectivity_inversion_reg(F,
-                             eta, eta_out, N_eta, sigma_eta,
-                             alldata->options.regularization, 0.1);
+                             z, z_out, N_eta, sigma_eta,
+                             alldata->options.regularization, lambda_eff);
 
 
 
@@ -4707,9 +4709,9 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
     alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 5] = hSpeed;
     alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 6] = hDir;
     alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 7] = sigma[iLayer];
-    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 9] = eta_out[iLayer]; //FIXME
-    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 11] = eta_out[iLayer];
-    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 12] = eta_out[iLayer]; //FIXME
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 9] = (10 * log(z_out[iLayer])) / log(10);
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 11] = alldata->misc.dbzFactor * z_out[iLayer];
+    alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 12] = alldata->misc.dbzFactor * z_out[iLayer]/alldata->options.birdRadarCrossSection;
   }
 
   // free data input arrays
@@ -4719,7 +4721,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   free(refHeight);
   free(nyquist);
   free(k);
-  free(eta);
+  free(z);
   free(vrad);
   free(includedIndex);
 
@@ -4727,7 +4729,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   free(U);
   free(V);
   free(W);
-  free(eta_out);
+  free(z_out);
   free(N);
   free(N_eta);
   free(sigma);
@@ -4739,10 +4741,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
 
 void vol2birdCalcProfiles(vol2bird_t *alldata) {
 
-  int nPasses;
   int iPoint;
-  int iLayer;
-  int iPass;
   int iProfileType;
 
   if (alldata->misc.initializationSuccessful == FALSE) {

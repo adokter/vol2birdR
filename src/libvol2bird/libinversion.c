@@ -1,5 +1,6 @@
 #include "libinversion.h"
 #include "librender.h"
+#include "libvol2bird.h" // FOR DEBUGGING, vol2bird_printf
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -53,7 +54,7 @@ csr_matrix *build_F_csr(size_t nPoints,
                         const double layerThickness,
                         size_t nLayer,
                         const double antennaHeight,
-                        const double beamWidth,
+                        const double beamAngle,
                         double cutoff)
 {
     size_t i, j;
@@ -64,8 +65,12 @@ csr_matrix *build_F_csr(size_t nPoints,
         for (j = 0; j < nLayer; j++) {
             double height = j*layerThickness+layerThickness/2;
             double val = beamProfile(height+refHeight[i], elev[i], range[i],
-                                     antennaHeight, beamWidth);
-            if (val > cutoff) {
+                                     antennaHeight, beamAngle);
+            // calculate beam_sd to account for normalization
+            // cutoff is defined for a gaussian that has amplitude 1 at peak
+            // so need to account for ('undo') the normalization constant:
+            double beam_sd = beamWidth(range[i], beamAngle) * cos(elev[i]) / (2 * sqrt(log(2)));
+            if (val > cutoff/(beam_sd*sqrt(2*PI))) {
                 nnz_count++;
             }
         }
@@ -79,18 +84,32 @@ csr_matrix *build_F_csr(size_t nPoints,
     F->row_ptr[0] = 0;
 
     for (i = 0; i < nPoints; i++) {
+        double norm = 0;
         for (j = 0; j < nLayer; j++) {
             double height = j*layerThickness+layerThickness/2;
             double val = beamProfile(height+refHeight[i], elev[i], range[i],
-                                     antennaHeight, beamWidth);
-            if (val > cutoff) {
+                                     antennaHeight, beamAngle);
+            double beam_sd = beamWidth(range[i], beamAngle) * cos(elev[i]) / (2 * sqrt(log(2)));
+            if (val > cutoff/(beam_sd*sqrt(2*PI))) {
                 F->values[pos] = val;
+                norm += val;
                 F->col_idx[pos] = j;
                 pos++;
             }
+            if(i==1000){
+              double gateheight = range2height(range[i], elev[i]);
+              //vol2bird_printf("hght = %f | gateheight = %f | range = %f | val = %f | beam_sd = %f | elev = %f | keep = %i\n", height, gateheight, range[i], val, beam_sd, elev[i], val > cutoff/(beam_sd*sqrt(2*PI)));
+            }
         }
+        // renormalize
+        for (j = F->row_ptr[i]; j < pos; j++) {
+          F->values[j] /= norm;
+        }
+
         F->row_ptr[i+1] = pos;  // cumulative count
     }
+
+    vol2bird_printf("CSR matrix has nnz_count=%i out of max %i\n",pos,nLayer*nPoints);
 
     return F;
 }
@@ -142,48 +161,17 @@ static void add_regularization_velocity(gsl_matrix *ATA, size_t m,
 
 
 /* ============================================================================
- * Build F^T F (dense) and compute robust N_eff
+ * Compute effective sample size, simple sum over columns F
  * ==========================================================================*/
-
-/* Loop over rows of F, accumulating contributions to dense m x m FtF */
-void compute_FtF(const csr_matrix *F, gsl_matrix *FtF) {
-    gsl_matrix_set_zero(FtF);
-    for (size_t i = 0; i < F->nrows; i++) {
-        size_t start = F->row_ptr[i];
-        size_t end   = F->row_ptr[i+1];
-        for (size_t p = start; p < end; p++) {
-            size_t col_p = F->col_idx[p];
-            double val_p = F->values[p];
-            for (size_t q = start; q < end; q++) {
-                size_t col_q = F->col_idx[q];
-                double val_q = F->values[q];
-                double old = gsl_matrix_get(FtF, col_p, col_q);
-                gsl_matrix_set(FtF, col_p, col_q, old + val_p * val_q);
-            }
-        }
+void compute_Neff(const csr_matrix *F, double *Neff) {
+  size_t m = F->ncols;
+  for(size_t j=0; j<m; j++) Neff[j] = 0.0;
+  for (size_t i = 0; i < F->nrows; i++) {
+    for (size_t jj = F->row_ptr[i]; jj < F->row_ptr[i+1]; jj++) {
+      size_t col = F->col_idx[jj];
+      Neff[col] += F->values[jj];
     }
-}
-
-/* Invert FtF to get diagonal of (FtF)^-1, then N_eff[j] = 1 / inv_diag */
-void compute_Neff(const gsl_matrix *FtF, double *Neff) {
-    size_t m = FtF->size1;
-    gsl_matrix *copy = gsl_matrix_alloc(m, m);
-    gsl_matrix_memcpy(copy, FtF);
-
-    gsl_permutation *perm = gsl_permutation_alloc(m);
-    int signum;
-    gsl_linalg_LU_decomp(copy, perm, &signum);
-
-    gsl_matrix *inv = gsl_matrix_alloc(m, m);
-    gsl_linalg_LU_invert(copy, perm, inv);
-
-    for (size_t j = 0; j < m; j++) {
-        double inv_diag = gsl_matrix_get(inv, j, j);
-        Neff[j] = (inv_diag > 0.0) ? (1.0 / inv_diag) : NAN;
-    }
-    gsl_matrix_free(inv);
-    gsl_permutation_free(perm);
-    gsl_matrix_free(copy);
+  }
 }
 
 /* ============================================================================
@@ -348,6 +336,7 @@ int radar_inversion_full_reg(const csr_matrix *F,
     int stop_reason=2;
     int max_iter=20;
     for (int iter=0;iter<max_iter;iter++) {
+        vol2bird_printf("dealiasing iter=%i\n",iter);
         for (size_t i=0;i<n;i++)
             VRAD_prime[i] = VRAD[i] - 2.0*k[i]*M3[i];
         compute_normal_eqs(F,A1,A2,A3,VRAD_prime,ATA,ATb);
@@ -384,10 +373,7 @@ int radar_inversion_full_reg(const csr_matrix *F,
         if (max_vel_change <= vel_tol) {stop_reason=1; break;}
     }
     /* outputs */
-    gsl_matrix *FtF=gsl_matrix_alloc(m,m);
-    compute_FtF(F,FtF);
-    compute_Neff(FtF,N_out);
-    gsl_matrix_free(FtF);
+    compute_Neff(F,N_out);
     double *residuals=malloc(n*sizeof(double));
     compute_residuals(F,A1,A2,A3,U_out,V_out,W_out,k,M3,VRAD,residuals);
     compute_stddev_per_altitude(F,residuals,sigma_out);
@@ -443,10 +429,7 @@ int reflectivity_inversion_reg(const csr_matrix *F,
     add_regularization(ATA, regtype, lambda);
     solve_normal_eqs(ATA,ATb,X);
     for (size_t j=0;j<m;j++) x_out[j]=gsl_vector_get(X,j);
-    gsl_matrix *FtF=gsl_matrix_alloc(m,m);
-    compute_FtF(F,FtF);
-    compute_Neff(FtF,N_out);
-    gsl_matrix_free(FtF);
+    compute_Neff(F,N_out);
     double *residuals=malloc(n*sizeof(double));
     csr_matvec(F,x_out,residuals);
     for (size_t i=0;i<n;i++)

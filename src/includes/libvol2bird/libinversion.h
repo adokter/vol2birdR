@@ -75,11 +75,8 @@ csr_matrix *build_F_csr(size_t nPoints,
 /* Utility: Build F^T F and compute N_eff                                     */
 /* -------------------------------------------------------------------------- */
 
-/* Compute dense (m x m) Gram matrix F^T F from sparse F */
-void compute_FtF(const csr_matrix *F, gsl_matrix *FtF);
-
 /* Compute robust N_eff = 1 / ((F^T F)^-1)_{jj} for each altitude bin */
-void compute_Neff(const gsl_matrix *FtF, double *Neff);
+void compute_Neff(const csr_matrix *F, double *Neff);
 
 /* -------------------------------------------------------------------------- */
 /* Normal equations for velocity inversion                                    */

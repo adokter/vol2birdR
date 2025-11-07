@@ -166,7 +166,6 @@ double range2height(double range,double elev){
  */
 double beamWidth(double range, double beamAngle){
     double effective_beam_angle = beamAngle/sqrt(2);
-    // beam width expressed as the standard deviation of a gaussian
     double output = 2 * range * sin(effective_beam_angle/2);
     return(output);
 }
@@ -192,6 +191,7 @@ double beamProfile(double height, double elev, double range, double antennaHeigh
     double beam_mu =  antennaHeight + range2height(range, elev);
     // normalized gaussian:
     output = exp(-SQUARE(height-beam_mu) / (2 * SQUARE(beam_sd)))/(beam_sd * sqrt(2*PI));
+    //vol2bird_printf("(beam_mu=%f,beam_sd=%f, output=%f, beamAngle=%f, antenna=%f)\n",beam_mu,beam_sd, beamAngle,antennaHeight);
     return(output);
 }
 
