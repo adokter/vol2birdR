@@ -4651,6 +4651,8 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
       }
       // copy the observed vrad value at this [azimuth, elevation]
       vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vradValueCol];
+      // copy the reference height value at this [azimuth, elevation]
+      refHeight[iPointIncluded = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.heightValueCol];
       // keep a record of which index was just included
       includedIndex[iPointIncluded] = iPoint;
       // raise the counter
@@ -4672,15 +4674,16 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   );
   int result = 1;
   // ensure lambda scales with grid spacing
-  double lambda_eff = alldata->options.lambda * alldata->options.layerThickness;
+  double lambda_L2_eff = alldata->options.lambda_L2 * alldata->options.layerThickness;
+  double lambda_smoothness_eff = alldata->options.lambda_smoothness * alldata->options.layerThickness;
   result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
                            U, V, W, N, sigma,
-                           1e-3, alldata->options.regularization, lambda_eff);
+                           1e-3, alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
 
   result = 1;
   result = reflectivity_inversion_reg(F,
                              z, z_out, N_eta, sigma_eta,
-                             alldata->options.regularization, lambda_eff);
+                             alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
 
 
 

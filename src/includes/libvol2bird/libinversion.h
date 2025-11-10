@@ -29,7 +29,8 @@
 typedef enum {
     REG_NONE = 0,        // no regularization term
     REG_L2 = 1,          // L2 regularization / ridge regression
-    REG_SMOOTHNESS = 2   // smoothness regularization with 2nd difference matrix
+    REG_SMOOTHNESS = 2,  // smoothness regularization with 2nd difference matrix
+    REG_MIXED = 3        // mixed L2 + smoothness regularization
 } regularization_type;
 
 
@@ -144,7 +145,8 @@ int radar_inversion_full_reg(const csr_matrix *F,
                          double *N_out, double *sigma_out,
                          double vel_tol,
                          regularization_type regtype,
-                         double lambda);
+                         double lambda_L2,
+                         double lambda_smoothness);
 
 
 /* -------------------------------------------------------------------------- */
@@ -162,6 +164,7 @@ int reflectivity_inversion_reg(const csr_matrix *F,
                            double *N_out,
                            double *sigma_out,
                            regularization_type regtype,
-                           double lambda);
+                           double lambda_L2,
+                           double lambda_smoothness);
 
 #endif

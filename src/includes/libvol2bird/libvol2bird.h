@@ -125,7 +125,7 @@ struct vol2birdOptions {
     float cellEtaMin;               /* Maximum mean reflectivity [cm^2/km^3] of cells of birds */
     float cellStdDevMax;            /* When analyzing cells, only cells for which the stddev of vrad */
                                     /* (aka the texture) is less than cellStdDevMax are considered in the */
-                                    /* rest of the analysis*/    
+                                    /* rest of the analysis*/
     float stdDevMinBird;            /* Minimum VVP radial velocity standard deviation for layer containing birds*/
     char dbzType[10];               /* Preferred dBZ quantity to use */
     int requireVrad;                /* require range gates to have a valid radial velocity measurement */
@@ -148,7 +148,8 @@ struct vol2birdOptions {
     char groundHeightParam[1000];   /* Scan parameter name containing ground elevation height */
     int heightReference;            /* Categorical indicating whether to profile relative to sea (0), antenna (1) or ground (2) level */
     int profileMethod;              /* Categorical indicating whether to use direct (0) or inverse (1) profiling method */
-    float lambda;                   /* Regularization constant for the inverse profiling method */
+    float lambda_L2;                /* Regularization constant for the inverse profiling method */
+    float lambda_smoothness;        /* Regularization constant for the inverse profiling method */
     int regularization;             /* Regularization type for the inverse profiling method */
 
 };
@@ -336,10 +337,10 @@ struct vol2birdMisc {
     // the factor that is used when converting from Z to eta, calculated from radar wavelength
     float dbzFactor;
     //Maximum mean reflectivity factor of cells of birds (conversion of cellEtaMin)
-    float cellDbzMin;                   
+    float cellDbzMin;
     //Maximum reflectivity factor of reflectivity factor gates containing birds (conversion of cellEtaMax)
     float dbzMax;
-    // whether the vol2bird module has been initialized    
+    // whether the vol2bird module has been initialized
     int initializationSuccessful;
     // whether vol2bird calculated a valid bird profile
     int vol2birdSuccessful;
@@ -360,9 +361,9 @@ struct vol2birdMisc {
     // this string contains all the user options and constants, for storage in ODIM task_args attribute
     char task_args[3000];
     // the polar volume input file name
-    char filename_pvol[1000]; 
+    char filename_pvol[1000];
     // the vertical profile output file name
-    char filename_vp[1000]; 
+    char filename_vp[1000];
     // the volume coverage pattern of the polar volume input file (NEXRAD specific)
     int vcp;
     // the radar name extracted from the source string
@@ -517,10 +518,10 @@ void create_profile_printout_str(char* printbuffer, int buflen, const char* date
     float HGHT, float u, float v, float w, float ff, float dd, float sd_vvp, char gap, float dbz,
     float eta, float dens, float DBZH, float n, float n_dbz, float n_all, float n_dbz_all);
 
-void write_line_vpts_profile(char* printbuffer, int buflen, 
-    char* radar_name, char* datetime, float HGHT, float u, float v, 
-    float w, float ff, float dd, float sd_vvp, char* gap, float dbz, 
-    float eta, float dens, float DBZH, float n, float n_dbz, float n_all, 
+void write_line_vpts_profile(char* printbuffer, int buflen,
+    char* radar_name, char* datetime, float HGHT, float u, float v,
+    float w, float ff, float dd, float sd_vvp, char* gap, float dbz,
+    float eta, float dens, float DBZH, float n, float n_dbz, float n_all,
     float n_dbz_all, float rcs, float sd_vvp_thresh, int vcp, float latitude,
     float longitude, int height, float wavelength, const char* fileIn);
 

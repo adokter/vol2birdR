@@ -151,8 +151,9 @@ private:
     strcpy(alldata->options.groundHeightParam, "HGHT");
     alldata->options.heightReference = 0;
     alldata->options.profileMethod = 0;
-    alldata->options.lambda = 0.1;
-    alldata->options.regularization = 2;
+    alldata->options.lambda_L2 = 0.1;
+    alldata->options.lambda_smoothness = 0.1;
+    alldata->options.regularization = 3;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -253,7 +254,8 @@ public:
     strcpy(_alldata.options.groundHeightParam, other._alldata.options.groundHeightParam);
     _alldata.options.heightReference = other._alldata.options.heightReference;
     _alldata.options.profileMethod = other._alldata.options.profileMethod;
-    _alldata.options.lambda = other._alldata.options.lambda;
+    _alldata.options.lambda_L2 = other._alldata.options.lambda_L2;
+    _alldata.options.lambda_smoothness = other._alldata.options.lambda_smoothness;
     _alldata.options.regularization = other._alldata.options.regularization;
 
     // ------------------------------------------------------------- //
@@ -701,14 +703,25 @@ public:
     }
   }
 
-  double get_lambda() {
-    return _alldata.options.lambda;
+  double get_lambda_L2() {
+    return _alldata.options.lambda_L2;
   }
-  void set_lambda(double v) {
+  void set_lambda_L2(double v) {
     if (v > 0){
-        _alldata.options.lambda = v;
+        _alldata.options.lambda_L2 = v;
     } else{
-        throw std::runtime_error("Invalid lambda value: the regularization parameter must be a positive number.");
+        throw std::runtime_error("Invalid lambda_L2 value: the regularization parameter must be a positive number.");
+    }
+  }
+
+  double get_lambda_smoothness() {
+    return _alldata.options.lambda_smoothness;
+  }
+  void set_lambda_smoothness(double v) {
+    if (v > 0){
+      _alldata.options.lambda_smoothness = v;
+    } else{
+      throw std::runtime_error("Invalid lambda_smoothness value: the regularization parameter must be a positive number.");
     }
   }
 
@@ -717,6 +730,8 @@ public:
       return std::string("L2");
     } else if (_alldata.options.regularization == 2) {
       return std::string("smoothness");
+    } else if (_alldata.options.regularization == 3) {
+      return std::string("mixed");
     } else {
       return std::string("invalid");
     }
@@ -727,8 +742,10 @@ public:
         _alldata.options.regularization = 1;
     } else if (v == "smoothness") {
         _alldata.options.regularization = 2;
+    } else if (v == "mixed") {
+      _alldata.options.regularization = 3;
     } else {
-        throw std::runtime_error("Invalid regularization type: must be 'L2' or 'smoothness'.");
+        throw std::runtime_error("Invalid regularization type: must be 'L2', 'smoothness' or 'mixed'.");
     }
   }
 
@@ -1145,7 +1162,8 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("groundHeightParam", &Vol2BirdConfig::get_groundHeightParam, &Vol2BirdConfig::set_groundHeightParam)
       .property("heightReference", &Vol2BirdConfig::get_heightReference, &Vol2BirdConfig::set_heightReference)
       .property("profileMethod", &Vol2BirdConfig::get_profileMethod, &Vol2BirdConfig::set_profileMethod)
-      .property("lambda", &Vol2BirdConfig::get_lambda, &Vol2BirdConfig::set_lambda)
+      .property("lambda_L2", &Vol2BirdConfig::get_lambda_L2, &Vol2BirdConfig::set_lambda_L2)
+      .property("lambda_smoothness", &Vol2BirdConfig::get_lambda_smoothness, &Vol2BirdConfig::set_lambda_smoothness)
       .property("regularization", &Vol2BirdConfig::get_regularization, &Vol2BirdConfig::set_regularization)
       .property("constant_areaCellMin", &Vol2BirdConfig::get_constant_areaCellMin, &Vol2BirdConfig::set_constant_areaCellMin)
       .property("constant_cellClutterFractionMax", &Vol2BirdConfig::get_constant_cellClutterFractionMax, &Vol2BirdConfig::set_constant_cellClutterFractionMax)

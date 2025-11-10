@@ -96,10 +96,10 @@ csr_matrix *build_F_csr(size_t nPoints,
                 F->col_idx[pos] = j;
                 pos++;
             }
-            if(i==1000){
-              double gateheight = range2height(range[i], elev[i]);
-              //vol2bird_printf("hght = %f | gateheight = %f | range = %f | val = %f | beam_sd = %f | elev = %f | keep = %i\n", height, gateheight, range[i], val, beam_sd, elev[i], val > cutoff/(beam_sd*sqrt(2*PI)));
-            }
+            //if(i==1000){
+            //  double gateheight = range2height(range[i], elev[i]);
+            //  vol2bird_printf("hght = %f | gateheight = %f | range = %f | val = %f | beam_sd = %f | elev = %f | keep = %i\n", height, gateheight, range[i], val, beam_sd, elev[i], val > cutoff/(beam_sd*sqrt(2*PI)));
+            //}
         }
         // renormalize
         for (j = F->row_ptr[i]; j < pos; j++) {
@@ -120,13 +120,14 @@ csr_matrix *build_F_csr(size_t nPoints,
  * ==========================================================================*/
 
 /* Add regularization to ATA in-place */
-static void add_regularization(gsl_matrix *ATA, regularization_type regtype, double lambda) {
-    if (lambda <= 0.0 || regtype == REG_NONE) return;
+static void add_regularization(gsl_matrix *ATA, regularization_type regtype, double lambda_L2, double lambda_smoothness) {
+    if (regtype == REG_NONE) return;
     size_t m = ATA->size1;
-    if (regtype == REG_L2) {
+    if ((regtype == REG_L2 || regtype == REG_MIXED) && lambda_L2 > 0.0) {
         for (size_t i=0; i<m; i++)
-            gsl_matrix_set(ATA, i, i, gsl_matrix_get(ATA, i, i) + lambda);
-    } else if (regtype == REG_SMOOTHNESS) {
+            gsl_matrix_set(ATA, i, i, gsl_matrix_get(ATA, i, i) + lambda_L2);
+    }
+    if ((regtype == REG_SMOOTHNESS || regtype == REG_MIXED) && lambda_smoothness > 0.0) {
         for (size_t i=0; i<m; i++) {
             for (size_t j=0; j<m; j++) {
                 double reg = 0;
@@ -142,7 +143,7 @@ static void add_regularization(gsl_matrix *ATA, regularization_type regtype, dou
                     reg=1.0;
                 }
                 if (reg != 0.0) {
-                    gsl_matrix_set(ATA, i, j, gsl_matrix_get(ATA,i,j) + lambda*reg);
+                    gsl_matrix_set(ATA, i, j, gsl_matrix_get(ATA,i,j) + lambda_smoothness*reg);
                 }
             }
         }
@@ -151,11 +152,11 @@ static void add_regularization(gsl_matrix *ATA, regularization_type regtype, dou
 
 /* For velocity, apply blockwise on 3m x 3m ATA */
 static void add_regularization_velocity(gsl_matrix *ATA, size_t m,
-                                        regularization_type regtype, double lambda) {
-    if (lambda <= 0.0 || regtype == REG_NONE) return;
+                                        regularization_type regtype, double lambda_L2, double lambda_smoothness) {
+    if (regtype == REG_NONE) return;
     for (int block=0; block<3; block++) {
         gsl_matrix_view sub = gsl_matrix_submatrix(ATA, block*m, block*m, m, m);
-        add_regularization(&sub.matrix, regtype, lambda);
+        add_regularization(&sub.matrix, regtype, lambda_L2, lambda_smoothness);
     }
 }
 
@@ -315,7 +316,8 @@ int radar_inversion_full_reg(const csr_matrix *F,
                          double *N_out, double *sigma_out,
                          double vel_tol,
                          regularization_type regtype,
-                         double lambda)
+                         double lambda_L2,
+                         double lambda_smoothness)
 {
     size_t n=F->nrows, m=F->ncols;
     double *A1=malloc(n*sizeof(double)), *A2=malloc(n*sizeof(double)), *A3=malloc(n*sizeof(double));
@@ -340,7 +342,7 @@ int radar_inversion_full_reg(const csr_matrix *F,
         for (size_t i=0;i<n;i++)
             VRAD_prime[i] = VRAD[i] - 2.0*k[i]*M3[i];
         compute_normal_eqs(F,A1,A2,A3,VRAD_prime,ATA,ATb);
-        add_regularization_velocity(ATA, m, regtype, lambda);
+        add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
         solve_normal_eqs(ATA,ATb,X);
         for (size_t j=0;j<m;j++) {
             U_out[j]=gsl_vector_get(X,j);
@@ -419,14 +421,15 @@ int reflectivity_inversion_reg(const csr_matrix *F,
                            double *N_out,
                            double *sigma_out,
                            regularization_type regtype,
-                           double lambda)
+                           double lambda_L2,
+                           double lambda_smoothness)
 {
     size_t m=F->ncols, n=F->nrows;
     gsl_matrix *ATA=gsl_matrix_alloc(m,m);
     gsl_vector *ATb=gsl_vector_alloc(m);
     gsl_vector *X=gsl_vector_alloc(m);
     compute_normal_eqs_simple(F,ETA,ATA,ATb);
-    add_regularization(ATA, regtype, lambda);
+    add_regularization(ATA, regtype, lambda_L2, lambda_smoothness);
     solve_normal_eqs(ATA,ATb,X);
     for (size_t j=0;j<m;j++) x_out[j]=gsl_vector_get(X,j);
     compute_Neff(F,N_out);
