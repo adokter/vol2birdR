@@ -4652,7 +4652,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
       // copy the observed vrad value at this [azimuth, elevation]
       vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vradValueCol];
       // copy the reference height value at this [azimuth, elevation]
-      refHeight[iPointIncluded = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.heightValueCol];
+      refHeight[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.heightValueCol];
       // keep a record of which index was just included
       includedIndex[iPointIncluded] = iPoint;
       // raise the counter
