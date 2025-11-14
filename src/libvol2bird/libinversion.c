@@ -308,6 +308,10 @@ void compute_stddev_per_altitude(const csr_matrix *F,
 
 /* ============================================================================
  * High-level velocity inversion driver
+ * Returns stop reason for dealiasing:
+ * 2 = reached max iterations
+ * 1 = velocity changes below tolearnce
+ * 0 = no velocity changes
  * ==========================================================================*/
 int radar_inversion_full_reg(const csr_matrix *F,
                          const double *M1, const double *M2,
@@ -337,10 +341,29 @@ int radar_inversion_full_reg(const csr_matrix *F,
 
     int stop_reason=2;
     int max_iter=20;
+
+    // update k to match initialized U,V,W
+    update_k(F,A1,A2,A3,U_out,V_out,W_out,M3,k);
+
     for (int iter=0;iter<max_iter;iter++) {
-        vol2bird_printf("dealiasing iter=%i\n",iter);
-        for (size_t i=0;i<n;i++)
+        int min_k=0;
+        int max_k=0;
+        int n_k_neg1=0;
+        int n_k_pos1=0;
+        int n_k_zero=0;
+        for (size_t i=0;i<n;i++) {
+            if (k[i] == 0) n_k_zero++;
+            if (k[i] == 1) n_k_pos1++;
+            if (k[i] == -1) n_k_neg1++;
+            if (k[i]< min_k) min_k=k[i];
+            if (k[i]> max_k) max_k=k[i];
+        }
+        vol2bird_printf("dealiasing iter i=%i || min k=%i || max k=%i || n_0=%i || n_1=%i, n_-1=%i \n",iter, min_k, max_k, n_k_zero, n_k_pos1, n_k_neg1);
+
+        for (size_t i=0;i<n;i++){
             VRAD_prime[i] = VRAD[i] - 2.0*k[i]*M3[i];
+        }
+
         compute_normal_eqs(F,A1,A2,A3,VRAD_prime,ATA,ATb);
         add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
         solve_normal_eqs(ATA,ATb,X);
@@ -368,7 +391,9 @@ int radar_inversion_full_reg(const csr_matrix *F,
         memcpy(k_old,k,n*sizeof(int));
         update_k(F,A1,A2,A3,U_out,V_out,W_out,M3,k);
         for (size_t i=0;i<n;i++) {
-            if (k[i]!=k_old[i]) changed_k=1;
+            if (k[i]!=k_old[i]){
+              changed_k=1;
+            }
         }
         free(k_old);
         if (!changed_k) {stop_reason=0; break;}

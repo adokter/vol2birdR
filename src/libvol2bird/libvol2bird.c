@@ -5,8 +5,8 @@
  */
 
 /*
- * Copyright 2015 Adriaan Dokter & Netherlands eScience Centre
- * If you want to use this software, please contact me at a.m.dokter@uva.nl
+ * Copyright 2015-2025 Adriaan Dokter & Netherlands eScience Centre
+ * For questions/bug reports regarding this software, please contact me at amd427@cornell.edu
  *
  * This program calculates Vertical Profiles of Birds (VPBs) as described in
  *
@@ -4463,6 +4463,7 @@ int vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType) {
           // removed by dealiasing routine)
           // The condition nyquistMinUsed<maxNyquistDealias enforces that if all scans
           // have a higher Nyquist velocity than maxNyquistDealias, dealiasing is suppressed
+
           if (alldata->options.dealiasVrad && iPass == 0 && !recycleDealias) {
 #ifdef FPRINTFON
             vol2bird_err_printf("dealiasing %i points for profile %i, layer %i ...\n",nPointsIncluded,iProfileType,iLayer+1);
@@ -4474,7 +4475,7 @@ int vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType) {
               alldata->points.points[includedIndex[i] * alldata->points.nColsPoints + alldata->points.vraddValueCol] = yDealias[i];
             }
 
-            if (result == 0) {
+            if (result > 0) {
               vol2bird_err_printf( "Warning, failed to dealias radial velocities");
             }
           }
@@ -4611,6 +4612,33 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   double *U = calloc(alldata->options.nLayers, sizeof(double));
   double *V = calloc(alldata->options.nLayers, sizeof(double));
   double *W = calloc(alldata->options.nLayers, sizeof(double));
+
+  // initialize speed field with the direct estimate:
+  vol2birdCalcProfilesDirect(alldata, iProfileType);
+
+  for (size_t i = 0; i < alldata->options.nLayers; i++) {
+    U[i] = alldata->profiles.profile[i * alldata->profiles.nColsProfile + 2];
+    V[i] = alldata->profiles.profile[i * alldata->profiles.nColsProfile + 3];
+    W[i] = alldata->profiles.profile[i * alldata->profiles.nColsProfile + 4];
+    if(U[i]==NODATA || U[i] == UNDETECT) U[i]=0;
+    if(V[i]==NODATA || V[i] == UNDETECT) V[i]=0;
+    if(W[i]==NODATA || W[i] == UNDETECT) W[i]=0;
+  }
+
+  // reset the flagPositionVDifMax bit set by the direct fit above
+  for (int iPoint = 0; iPoint < alldata->points.nRowsPoints; iPoint++) {
+    unsigned int gateCode = (unsigned int) alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol];
+    alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol] = (float) (gateCode &= ~(1 << (alldata->flags.flagPositionVDifMax)));
+  }
+
+
+  // clear direct profile data initialization
+  for (int iRowProfile = 0; iRowProfile < alldata->profiles.nRowsProfile; iRowProfile++) {
+    for (int iColProfile = 0; iColProfile < alldata->profiles.nColsProfile; iColProfile++) {
+      alldata->profiles.profile[iRowProfile*alldata->profiles.nColsProfile + iColProfile] = NODATA;
+    }
+  }
+
   double *z_out = calloc(alldata->options.nLayers, sizeof(double));
   double *N = calloc(alldata->options.nLayers, sizeof(double));
   double *N_eta = calloc(alldata->options.nLayers, sizeof(double));
@@ -4637,7 +4665,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
       // copy azimuth angle from the 'points' array
       range[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.rangeCol];
       // copy azimuth angle from the 'points' array
-      azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol];
+      azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol] * PI/180;
       // copy elevation angle from the 'points' array, convert to radians
       elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol] * PI/180;
       // copy nyquist interval from the 'points' array
@@ -4679,12 +4707,12 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
                            U, V, W, N, sigma,
                            1e-3, alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
-
+  vol2bird_err_printf("Stop reason speed inversion: %i\n", result);
   result = 1;
   result = reflectivity_inversion_reg(F,
                              z, z_out, N_eta, sigma_eta,
                              alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
-
+  vol2bird_err_printf("Stop reason reflectivity inversion: %i\n", result);
 
 
 
@@ -5372,7 +5400,7 @@ int vol2birdLoadConfig(vol2bird_t* alldata, const char* optionsFile) {
 
     const char * optsConfFilename = getenv(OPTIONS_CONF);
     if (optsConfFilename == NULL) {
-         if(optionsFile == NULL){
+        if(optionsFile == NULL){
             optsConfFilename = OPTIONS_FILE;
         }
         else{
