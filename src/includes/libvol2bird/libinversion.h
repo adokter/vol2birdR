@@ -106,7 +106,6 @@ void update_k(const csr_matrix *F,
 void compute_residuals(const csr_matrix *F,
                        const double *A1,const double *A2,const double *A3,
                        const double *U,const double *V,const double *W,
-                       const int *k,const double *M3,
                        const double *VRAD,double *residuals);
 
 /* Compute stddev of residuals per altitude */
@@ -140,7 +139,7 @@ void compute_stddev_per_altitude(const csr_matrix *F,
  */
 int radar_inversion_full_reg(const csr_matrix *F,
                          const double *M1, const double *M2,
-                         const double *M3, const double *VRAD,
+                         const double *VRAD,
                          double *U_out, double *V_out, double *W_out,
                          double *N_out, double *sigma_out,
                          double vel_tol,

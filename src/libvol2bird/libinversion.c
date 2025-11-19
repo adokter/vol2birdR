@@ -240,32 +240,10 @@ int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X) {
  * Folding update and residual stats
  * ==========================================================================*/
 
-/* Update folding counts */
-void update_k(const csr_matrix *F,
-              const double *A1, const double *A2, const double *A3,
-              const double *U, const double *V, const double *W,
-              const double *M3, int *k) {
-    size_t n = F->nrows;
-    double *tmpU = malloc(n*sizeof(double));
-    double *tmpV = malloc(n*sizeof(double));
-    double *tmpW = malloc(n*sizeof(double));
-    csr_matvec(F, U, tmpU);
-    csr_matvec(F, V, tmpV);
-    csr_matvec(F, W, tmpW);
-    for (size_t i=0; i<n; i++) {
-        double pred = A1[i]*tmpU[i] + A2[i]*tmpV[i] + A3[i]*tmpW[i];
-        if (pred > M3[i]) k[i] = (int)floor((pred+M3[i])/(2*M3[i]));
-        else if (pred < -M3[i]) k[i] = (int)ceil((pred-M3[i])/(2*M3[i]));
-        else k[i] = 0;
-    }
-    free(tmpU); free(tmpV); free(tmpW);
-}
-
 /* Residuals */
 void compute_residuals(const csr_matrix *F,
                        const double *A1,const double *A2,const double *A3,
                        const double *U,const double *V,const double *W,
-                       const int *k,const double *M3,
                        const double *VRAD,double *residuals) {
     size_t n = F->nrows;
     double *tmpU = malloc(n*sizeof(double));
@@ -275,7 +253,7 @@ void compute_residuals(const csr_matrix *F,
     csr_matvec(F,V,tmpV);
     csr_matvec(F,W,tmpW);
     for (size_t i=0;i<n;i++) {
-        double pred = A1[i]*tmpU[i]+A2[i]*tmpV[i]+A3[i]*tmpW[i]+2.0*k[i]*M3[i];
+        double pred = A1[i]*tmpU[i]+A2[i]*tmpV[i]+A3[i]*tmpW[i];
         residuals[i] = VRAD[i] - pred;
     }
     free(tmpU); free(tmpV); free(tmpW);
@@ -315,7 +293,7 @@ void compute_stddev_per_altitude(const csr_matrix *F,
  * ==========================================================================*/
 int radar_inversion_full_reg(const csr_matrix *F,
                          const double *M1, const double *M2,
-                         const double *M3, const double *VRAD,
+                         const double *VRAD,
                          double *U_out, double *V_out, double *W_out,
                          double *N_out, double *sigma_out,
                          double vel_tol,
@@ -333,82 +311,26 @@ int radar_inversion_full_reg(const csr_matrix *F,
     gsl_matrix *ATA=gsl_matrix_alloc(3*m,3*m);
     gsl_vector *ATb=gsl_vector_alloc(3*m);
     gsl_vector *X=gsl_vector_alloc(3*m);
-    int *k=calloc(n,sizeof(int));
-    double *VRAD_prime=malloc(n*sizeof(double));
-    double *U_prev=calloc(m,sizeof(double));
-    double *V_prev=calloc(m,sizeof(double));
-    double *W_prev=calloc(m,sizeof(double));
 
     int stop_reason=2;
-    int max_iter=20;
 
-    // update k to match initialized U,V,W
-    update_k(F,A1,A2,A3,U_out,V_out,W_out,M3,k);
-
-    for (int iter=0;iter<max_iter;iter++) {
-        int min_k=0;
-        int max_k=0;
-        int n_k_neg1=0;
-        int n_k_pos1=0;
-        int n_k_zero=0;
-        for (size_t i=0;i<n;i++) {
-            if (k[i] == 0) n_k_zero++;
-            if (k[i] == 1) n_k_pos1++;
-            if (k[i] == -1) n_k_neg1++;
-            if (k[i]< min_k) min_k=k[i];
-            if (k[i]> max_k) max_k=k[i];
-        }
-        vol2bird_printf("dealiasing iter i=%i || min k=%i || max k=%i || n_0=%i || n_1=%i, n_-1=%i \n",iter, min_k, max_k, n_k_zero, n_k_pos1, n_k_neg1);
-
-        for (size_t i=0;i<n;i++){
-            VRAD_prime[i] = VRAD[i] - 2.0*k[i]*M3[i];
-        }
-
-        compute_normal_eqs(F,A1,A2,A3,VRAD_prime,ATA,ATb);
-        add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
-        solve_normal_eqs(ATA,ATb,X);
-        for (size_t j=0;j<m;j++) {
-            U_out[j]=gsl_vector_get(X,j);
-            V_out[j]=gsl_vector_get(X,m+j);
-            W_out[j]=gsl_vector_get(X,2*m+j);
-        }
-        /* vel change */
-        double max_vel_change=0.0;
-        for (size_t j=0;j<m;j++) {
-            double dU=fabs(U_out[j]-U_prev[j]);
-            double dV=fabs(V_out[j]-V_prev[j]);
-            double dW=fabs(W_out[j]-W_prev[j]);
-            if (dU>max_vel_change) max_vel_change=dU;
-            if (dV>max_vel_change) max_vel_change=dV;
-            if (dW>max_vel_change) max_vel_change=dW;
-        }
-        memcpy(U_prev,U_out,m*sizeof(double));
-        memcpy(V_prev,V_out,m*sizeof(double));
-        memcpy(W_prev,W_out,m*sizeof(double));
-        /* k change */
-        int changed_k=0;
-        int *k_old=malloc(n*sizeof(int));
-        memcpy(k_old,k,n*sizeof(int));
-        update_k(F,A1,A2,A3,U_out,V_out,W_out,M3,k);
-        for (size_t i=0;i<n;i++) {
-            if (k[i]!=k_old[i]){
-              changed_k=1;
-            }
-        }
-        free(k_old);
-        if (!changed_k) {stop_reason=0; break;}
-        if (max_vel_change <= vel_tol) {stop_reason=1; break;}
+    compute_normal_eqs(F,A1,A2,A3,VRAD,ATA,ATb);
+    add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
+    solve_normal_eqs(ATA,ATb,X);
+    for (size_t j=0;j<m;j++) {
+        U_out[j]=gsl_vector_get(X,j);
+        V_out[j]=gsl_vector_get(X,m+j);
+        W_out[j]=gsl_vector_get(X,2*m+j);
     }
+
     /* outputs */
     compute_Neff(F,N_out);
     double *residuals=malloc(n*sizeof(double));
-    compute_residuals(F,A1,A2,A3,U_out,V_out,W_out,k,M3,VRAD,residuals);
+    compute_residuals(F,A1,A2,A3,U_out,V_out,W_out,VRAD,residuals);
     compute_stddev_per_altitude(F,residuals,sigma_out);
     free(residuals);
     /* clean */
     free(A1); free(A2); free(A3);
-    free(k); free(VRAD_prime);
-    free(U_prev); free(V_prev); free(W_prev);
     gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
     return stop_reason;
 }

@@ -4631,8 +4631,8 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
     alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol] = (float) (gateCode &= ~(1 << (alldata->flags.flagPositionVDifMax)));
   }
 
-
   // clear direct profile data initialization
+  // we retain the dealiased radial velocity (vradd) of the direct fit in the points array.
   for (int iRowProfile = 0; iRowProfile < alldata->profiles.nRowsProfile; iRowProfile++) {
     for (int iColProfile = 0; iColProfile < alldata->profiles.nColsProfile; iColProfile++) {
       alldata->profiles.profile[iRowProfile*alldata->profiles.nColsProfile + iColProfile] = NODATA;
@@ -4668,8 +4668,6 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
       azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol] * PI/180;
       // copy elevation angle from the 'points' array, convert to radians
       elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol] * PI/180;
-      // copy nyquist interval from the 'points' array
-      nyquist[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.nyquistCol];
       // copy reflectivity factor from the 'points' array and convert to linear Z
       dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];
       if (isnan(dbzValue) == TRUE) {
@@ -4677,8 +4675,9 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
       } else {
         z[iPointIncluded] = exp(0.1 * log(10) * dbzValue);
       }
-      // copy the observed vrad value at this [azimuth, elevation]
-      vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vradValueCol];
+      // copy the observed vrad value at this [azimuth, elevation] - NOTE: we use the dealiased value obtained from the
+      // previous direct fit.
+      vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vraddValueCol];
       // copy the reference height value at this [azimuth, elevation]
       refHeight[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.heightValueCol];
       // keep a record of which index was just included
@@ -4704,7 +4703,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   // ensure lambda scales with grid spacing
   double lambda_L2_eff = alldata->options.lambda_L2 * alldata->options.layerThickness;
   double lambda_smoothness_eff = alldata->options.lambda_smoothness * alldata->options.layerThickness;
-  result = radar_inversion_full_reg(F, azim, elev, nyquist, vrad,
+  result = radar_inversion_full_reg(F, azim, elev, vrad,
                            U, V, W, N, sigma,
                            1e-3, alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
   vol2bird_err_printf("Stop reason speed inversion: %i\n", result);
