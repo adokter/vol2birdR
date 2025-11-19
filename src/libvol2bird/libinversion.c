@@ -236,6 +236,103 @@ int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X) {
     return 0;
 }
 
+/*
+ Solve: min_x 0.5 x^T Q x - c^T x   s.t. x >= 0
+ Non-negative least-squares solver
+ Q: m×m symmetric positive definite (includes regularization)
+ c: length m
+ Returns solution in x.
+*/
+int solve_normal_eqs_nonneg_qp(const gsl_matrix *Q,
+                               const gsl_vector *c,
+                               gsl_vector *x)
+{
+    size_t m = Q->size1;
+    gsl_vector_set_zero(x);
+
+    // 1 = in active set (fixed at 0), 0 = free
+    int *active = (int *) malloc(m * sizeof(int));
+    for (size_t i = 0; i < m; ++i) active[i] = 1;
+
+    int changed = 1;
+    const double tol_grad = 1e-8;
+    const double tol_zero = 1e-12;
+
+    while (changed) {
+        changed = 0;
+
+        // gradient g = Q x - c
+        gsl_vector *g = gsl_vector_alloc(m);
+        gsl_blas_dgemv(CblasNoTrans, 1.0, Q, x, -1.0, g);
+        gsl_vector_add_constant(g, 0.0); // no-op, here to match pattern
+
+        // Release any active variable with negative gradient
+        for (size_t i = 0; i < m; ++i) {
+            if (active[i] && gsl_vector_get(g, i) < -tol_grad) {
+                active[i] = 0;
+                changed = 1;
+            }
+        }
+        gsl_vector_free(g);
+
+        // If no free variables, done
+        size_t free_count = 0;
+        for (size_t i = 0; i < m; ++i) if (!active[i]) free_count++;
+
+        if (free_count == 0) break;
+
+        // Map from free index to original index
+        size_t *fmap = (size_t *) malloc(free_count * sizeof(size_t));
+        {
+            size_t fi = 0;
+            for (size_t i = 0; i < m; ++i) {
+                if (!active[i]) {
+                    fmap[fi++] = i;
+                }
+            }
+        }
+
+        // Build Qf and cf for the free set
+        gsl_matrix *Qf = gsl_matrix_alloc(free_count, free_count);
+        gsl_vector *cf = gsl_vector_alloc(free_count);
+
+        for (size_t i = 0; i < free_count; ++i) {
+            gsl_vector_set(cf, i, gsl_vector_get(c, fmap[i]));
+            for (size_t j = 0; j < free_count; ++j) {
+                gsl_matrix_set(Qf, i, j, gsl_matrix_get(Q, fmap[i], fmap[j]));
+            }
+        }
+
+        // Solve Qf * xf = cf
+        gsl_permutation *perm = gsl_permutation_alloc(free_count);
+        int signum;
+        gsl_linalg_LU_decomp(Qf, perm, &signum);
+        gsl_vector *xf = gsl_vector_alloc(free_count);
+        gsl_linalg_LU_solve(Qf, perm, cf, xf);
+        gsl_permutation_free(perm);
+
+        // Assign back, clamp negatives
+        for (size_t i = 0; i < free_count; ++i) {
+            double val = gsl_vector_get(xf, i);
+            if (val <= tol_zero) {
+                gsl_vector_set(x, fmap[i], 0.0);
+                active[fmap[i]] = 1;
+                changed = 1;
+            } else {
+                gsl_vector_set(x, fmap[i], val);
+            }
+        }
+
+        gsl_vector_free(xf);
+        gsl_matrix_free(Qf);
+        gsl_vector_free(cf);
+        free(fmap);
+    }
+
+    free(active);
+    return 0;
+}
+
 /* ============================================================================
  * Folding update and residual stats
  * ==========================================================================*/
@@ -310,7 +407,7 @@ int radar_inversion_full_reg(const csr_matrix *F,
 
     compute_normal_eqs(F,A1,A2,A3,VRAD,ATA,ATb);
     add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
-    solve_normal_eqs(ATA,ATb,X);
+    solve_normal_eqs_nonneg_qp(ATA,ATb,X);
     for (size_t j=0;j<m;j++) {
         U_out[j]=gsl_vector_get(X,j);
         V_out[j]=gsl_vector_get(X,m+j);
