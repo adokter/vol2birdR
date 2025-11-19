@@ -407,7 +407,7 @@ int radar_inversion_full_reg(const csr_matrix *F,
 
     compute_normal_eqs(F,A1,A2,A3,VRAD,ATA,ATb);
     add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
-    solve_normal_eqs_nonneg_qp(ATA,ATb,X);
+    solve_normal_eqs(ATA,ATb,X);
     for (size_t j=0;j<m;j++) {
         U_out[j]=gsl_vector_get(X,j);
         V_out[j]=gsl_vector_get(X,m+j);
@@ -468,7 +468,7 @@ int reflectivity_inversion_reg(const csr_matrix *F,
     gsl_vector *X=gsl_vector_alloc(m);
     compute_normal_eqs_simple(F,ETA,ATA,ATb);
     add_regularization(ATA, regtype, lambda_L2, lambda_smoothness);
-    solve_normal_eqs(ATA,ATb,X);
+    solve_normal_eqs_nonneg_qp(ATA,ATb,X);
     for (size_t j=0;j<m;j++) x_out[j]=gsl_vector_get(X,j);
     compute_Neff(F,N_out);
     double *residuals=malloc(n*sizeof(double));
