@@ -286,10 +286,6 @@ void compute_stddev_per_altitude(const csr_matrix *F,
 
 /* ============================================================================
  * High-level velocity inversion driver
- * Returns stop reason for dealiasing:
- * 2 = reached max iterations
- * 1 = velocity changes below tolearnce
- * 0 = no velocity changes
  * ==========================================================================*/
 int radar_inversion_full_reg(const csr_matrix *F,
                          const double *M1, const double *M2,
@@ -312,8 +308,6 @@ int radar_inversion_full_reg(const csr_matrix *F,
     gsl_vector *ATb=gsl_vector_alloc(3*m);
     gsl_vector *X=gsl_vector_alloc(3*m);
 
-    int stop_reason=2;
-
     compute_normal_eqs(F,A1,A2,A3,VRAD,ATA,ATb);
     add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
     solve_normal_eqs(ATA,ATb,X);
@@ -332,7 +326,7 @@ int radar_inversion_full_reg(const csr_matrix *F,
     /* clean */
     free(A1); free(A2); free(A3);
     gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
-    return stop_reason;
+    return 0;
 }
 
 /* ============================================================================
