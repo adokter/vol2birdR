@@ -237,100 +237,176 @@ int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X) {
 }
 
 /*
- Solve: min_x 0.5 x^T Q x - c^T x   s.t. x >= 0
  Non-negative least-squares solver
+ Solve: min_x 0.5 x^T Q x - c^T x   s.t. x >= 0
  Q: m×m symmetric positive definite (includes regularization)
  c: length m
- Returns solution in x.
-*/
-int solve_normal_eqs_nonneg_qp(const gsl_matrix *Q,
-                               const gsl_vector *c,
-                               gsl_vector *x)
+ Result in x. Returns 0 for success.
+ Includes:
+ - Warm start from unconstrained ridge LS
+ - Forced release of at least one var if first iteration has no release
+ - Diagnostic printing if verbose!=0
+ */
+int solve_normal_eqs_nonneg_qp(
+    const gsl_matrix *Q,
+    const gsl_vector *c,
+    gsl_vector *x,
+    double tol_grad,
+    double tol_zero,
+    int max_iter,
+    int verbose)
 {
-    size_t m = Q->size1;
-    gsl_vector_set_zero(x);
+  size_t m = Q->size1;
+  gsl_vector_set_zero(x);
 
-    // 1 = in active set (fixed at 0), 0 = free
-    int *active = (int *) malloc(m * sizeof(int));
-    for (size_t i = 0; i < m; ++i) active[i] = 1;
+  // --- Warm start: unconstrained solve Q x_ls = c ---
+  {
+    gsl_permutation *perm = gsl_permutation_alloc(m);
+    gsl_matrix *Qcopy = gsl_matrix_alloc(m, m);
+    gsl_matrix_memcpy(Qcopy, Q);
+    gsl_vector *x_ls = gsl_vector_alloc(m);
+    int signum;
+    gsl_linalg_LU_decomp(Qcopy, perm, &signum);
+    gsl_linalg_LU_solve(Qcopy, perm, c, x_ls);
+    // Clip negatives to zero
+    for (size_t i = 0; i < m; ++i) {
+      double val = gsl_vector_get(x_ls, i);
+      gsl_vector_set(x, i, (val > 0.0) ? val : 0.0);
+    }
+    gsl_vector_free(x_ls);
+    gsl_permutation_free(perm);
+    gsl_matrix_free(Qcopy);
+    if (verbose) {
+      printf("Warm start from unconstrained ridge LS.\n");
+    }
+  }
 
-    int changed = 1;
-    const double tol_grad = 1e-8;
-    const double tol_zero = 1e-12;
+  // Active set mask: 1 = fixed at 0, 0 = free
+  int *active = (int *) malloc(m * sizeof(int));
+  for (size_t i = 0; i < m; ++i)
+    active[i] = (gsl_vector_get(x, i) <= tol_zero) ? 1 : 0;
 
-    while (changed) {
-        changed = 0;
+  size_t iter = 0;
+  int changed = 1;
 
-        // gradient g = Q x - c
-        gsl_vector *g = gsl_vector_alloc(m);
-        gsl_blas_dgemv(CblasNoTrans, 1.0, Q, x, -1.0, g);
-        gsl_vector_add_constant(g, 0.0); // no-op, here to match pattern
+  while (changed && iter <= max_iter-1) {
+    iter++;
+    changed = 0;
 
-        // Release any active variable with negative gradient
-        for (size_t i = 0; i < m; ++i) {
-            if (active[i] && gsl_vector_get(g, i) < -tol_grad) {
-                active[i] = 0;
-                changed = 1;
-            }
-        }
-        gsl_vector_free(g);
+    // Compute gradient g = Q x - c
+    gsl_vector *g = gsl_vector_alloc(m);
+    gsl_blas_dgemv(CblasNoTrans, 1.0, Q, x, -1.0, g);
 
-        // If no free variables, done
-        size_t free_count = 0;
-        for (size_t i = 0; i < m; ++i) if (!active[i]) free_count++;
-
-        if (free_count == 0) break;
-
-        // Map from free index to original index
-        size_t *fmap = (size_t *) malloc(free_count * sizeof(size_t));
-        {
-            size_t fi = 0;
-            for (size_t i = 0; i < m; ++i) {
-                if (!active[i]) {
-                    fmap[fi++] = i;
-                }
-            }
-        }
-
-        // Build Qf and cf for the free set
-        gsl_matrix *Qf = gsl_matrix_alloc(free_count, free_count);
-        gsl_vector *cf = gsl_vector_alloc(free_count);
-
-        for (size_t i = 0; i < free_count; ++i) {
-            gsl_vector_set(cf, i, gsl_vector_get(c, fmap[i]));
-            for (size_t j = 0; j < free_count; ++j) {
-                gsl_matrix_set(Qf, i, j, gsl_matrix_get(Q, fmap[i], fmap[j]));
-            }
-        }
-
-        // Solve Qf * xf = cf
-        gsl_permutation *perm = gsl_permutation_alloc(free_count);
-        int signum;
-        gsl_linalg_LU_decomp(Qf, perm, &signum);
-        gsl_vector *xf = gsl_vector_alloc(free_count);
-        gsl_linalg_LU_solve(Qf, perm, cf, xf);
-        gsl_permutation_free(perm);
-
-        // Assign back, clamp negatives
-        for (size_t i = 0; i < free_count; ++i) {
-            double val = gsl_vector_get(xf, i);
-            if (val <= tol_zero) {
-                gsl_vector_set(x, fmap[i], 0.0);
-                active[fmap[i]] = 1;
-                changed = 1;
-            } else {
-                gsl_vector_set(x, fmap[i], val);
-            }
-        }
-
-        gsl_vector_free(xf);
-        gsl_matrix_free(Qf);
-        gsl_vector_free(cf);
-        free(fmap);
+    // Release rule
+    size_t released_this_iter = 0;
+    for (size_t i = 0; i < m; ++i) {
+      if (active[i] && gsl_vector_get(g, i) < -tol_grad) {
+        active[i] = 0;
+        changed = 1;
+        released_this_iter++;
+      }
     }
 
-    free(active);
-    return 0;
+    // Force release at least one var if first iteration has no release
+    if (released_this_iter == 0 && iter == 1) {
+      double min_g = 0.0;
+      size_t min_idx = m;
+      for (size_t i = 0; i < m; ++i) {
+        if (active[i]) {
+          double gi = gsl_vector_get(g, i);
+          if (min_idx == m || gi < min_g) {
+            min_g = gi;
+            min_idx = i;
+          }
+        }
+      }
+      if (min_idx < m) {
+        active[min_idx] = 0;
+        changed = 1;
+        released_this_iter++;
+        if (verbose) {
+          printf("Forced release of var %zu at iter 1 (g=%g)\n", min_idx, min_g);
+        }
+      }
+    }
+
+    gsl_vector_free(g);
+
+    // Count free vars
+    size_t free_count = 0;
+    for (size_t i = 0; i < m; ++i)
+      if (!active[i]) free_count++;
+
+      if (verbose) {
+        size_t active_count = m - free_count;
+        printf("Iter %zu: free=%zu, active=%zu, released=%zu\n",
+               iter, free_count, active_count, released_this_iter);
+      }
+
+      if (free_count == 0) break;
+
+      // Map free-set indices
+      size_t *fmap = (size_t *) malloc(free_count * sizeof(size_t));
+      {
+        size_t fi = 0;
+        for (size_t i = 0; i < m; ++i)
+          if (!active[i]) fmap[fi++] = i;
+      }
+
+      // Build Qf / cf for free set
+      gsl_matrix *Qf = gsl_matrix_alloc(free_count, free_count);
+      gsl_vector *cf = gsl_vector_alloc(free_count);
+
+      for (size_t i = 0; i < free_count; ++i) {
+        gsl_vector_set(cf, i, gsl_vector_get(c, fmap[i]));
+        for (size_t j = 0; j < free_count; ++j) {
+          gsl_matrix_set(Qf, i, j, gsl_matrix_get(Q, fmap[i], fmap[j]));
+        }
+      }
+
+      // Solve Qf * xf = cf
+      gsl_permutation *perm = gsl_permutation_alloc(free_count);
+      int signum;
+      gsl_linalg_LU_decomp(Qf, perm, &signum);
+      gsl_vector *xf = gsl_vector_alloc(free_count);
+      gsl_linalg_LU_solve(Qf, perm, cf, xf);
+      gsl_permutation_free(perm);
+
+      // Assign back, clamp negatives
+      for (size_t i = 0; i < free_count; ++i) {
+        double val = gsl_vector_get(xf, i);
+        if (val <= tol_zero) {
+          gsl_vector_set(x, fmap[i], 0.0);
+          active[fmap[i]] = 1;
+          changed = 1;
+        } else {
+          gsl_vector_set(x, fmap[i], val);
+        }
+      }
+
+      gsl_vector_free(xf);
+      gsl_matrix_free(Qf);
+      gsl_vector_free(cf);
+      free(fmap);
+
+      if (verbose && !changed) {
+        printf("No changes in iteration %zu -> stopping.\n", iter);
+      }
+  }
+
+  free(active);
+
+  if(iter > max_iter){
+    if (verbose) {
+      printf("Failed to converge in %zu iterations.\n", iter);
+    }
+    return 1;
+  }
+
+  if (verbose) {
+    printf("Converged in %zu iterations.\n", iter);
+  }
+  return 0;
 }
 
 /* ============================================================================
@@ -468,7 +544,8 @@ int reflectivity_inversion_reg(const csr_matrix *F,
     gsl_vector *X=gsl_vector_alloc(m);
     compute_normal_eqs_simple(F,ETA,ATA,ATb);
     add_regularization(ATA, regtype, lambda_L2, lambda_smoothness);
-    solve_normal_eqs_nonneg_qp(ATA,ATb,X);
+    solve_normal_eqs_nonneg_qp(ATA,ATb,X, 1e-10, 1e-14, 2, 1);
+    //solve_normal_eqs(ATA,ATb,X);
     for (size_t j=0;j<m;j++) x_out[j]=gsl_vector_get(X,j);
     compute_Neff(F,N_out);
     double *residuals=malloc(n*sizeof(double));

@@ -4613,17 +4613,8 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   double *V = calloc(alldata->options.nLayers, sizeof(double));
   double *W = calloc(alldata->options.nLayers, sizeof(double));
 
-  // initialize speed field with the direct estimate:
+  // dealias velocity using the direct estimate:
   vol2birdCalcProfilesDirect(alldata, iProfileType);
-
-  for (size_t i = 0; i < alldata->options.nLayers; i++) {
-    U[i] = alldata->profiles.profile[i * alldata->profiles.nColsProfile + 2];
-    V[i] = alldata->profiles.profile[i * alldata->profiles.nColsProfile + 3];
-    W[i] = alldata->profiles.profile[i * alldata->profiles.nColsProfile + 4];
-    if(U[i]==NODATA || U[i] == UNDETECT) U[i]=0;
-    if(V[i]==NODATA || V[i] == UNDETECT) V[i]=0;
-    if(W[i]==NODATA || W[i] == UNDETECT) W[i]=0;
-  }
 
   // reset the flagPositionVDifMax bit set by the direct fit above
   for (int iPoint = 0; iPoint < alldata->points.nRowsPoints; iPoint++) {
@@ -4632,7 +4623,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   }
 
   // clear direct profile data initialization
-  // we retain the dealiased radial velocity (vradd) of the direct fit in the points array.
+  // we only retain the dealiased radial velocity (vradd) of the direct fit in the points array.
   for (int iRowProfile = 0; iRowProfile < alldata->profiles.nRowsProfile; iRowProfile++) {
     for (int iColProfile = 0; iColProfile < alldata->profiles.nColsProfile; iColProfile++) {
       alldata->profiles.profile[iRowProfile*alldata->profiles.nColsProfile + iColProfile] = NODATA;
