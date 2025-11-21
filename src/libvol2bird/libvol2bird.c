@@ -157,6 +157,8 @@ int vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType);
 
 int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType);
 
+int vol2birdLoadInverseData(vol2bird_t *alldata, int iProfileType, int iQuantityType, double* range, double* azim, double* elev, double* z, double* vrad, double* refHeight, csr_matrix **F);
+
 #ifdef IRIS
 PolarVolume_t* vol2birdGetIRISVolume(char* filenames[], int nInputFiles);
 #endif
@@ -4593,20 +4595,67 @@ int vol2birdCalcProfilesDirect(vol2bird_t *alldata, int iProfileType) {
   return(0);
 }
 
+int vol2birdLoadInverseData(vol2bird_t *alldata, int iProfileType, int iQuantityType, double* range, double* azim, double* elev, double* z, double* vrad, double* refHeight, csr_matrix **F){
+
+  int nPoints = alldata->points.nPointsWrittenTotal;
+  int iPointIncluded = 0;
+  double dbzValue = NAN;
+
+  // build up data vectors from points array
+  for (int iPoint = 0; iPoint < nPoints; iPoint++) {
+
+    unsigned int gateCode = (unsigned int) alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol];
+
+    if (includeGate(iProfileType, iQuantityType, gateCode, alldata) == TRUE) {
+      // copy azimuth angle from the 'points' array
+      range[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.rangeCol];
+      // copy azimuth angle from the 'points' array
+      azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol] * PI/180;
+      // copy elevation angle from the 'points' array, convert to radians
+      elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol] * PI/180;
+      // copy reflectivity factor from the 'points' array and convert to linear Z
+      dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];
+      if (isnan(dbzValue) == TRUE) {
+        z[iPointIncluded] = 0;
+      } else {
+        z[iPointIncluded] = exp(0.1 * log(10) * dbzValue);
+      }
+      // copy the observed vrad value at this [azimuth, elevation] - NOTE: we use the dealiased value obtained from the
+      // previous direct fit.
+      vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vraddValueCol];
+      // copy the reference height value at this [azimuth, elevation]
+      refHeight[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.heightValueCol];
+      // raise the counter
+      iPointIncluded += 1;
+    }
+  } // endfor (iPoint = 0; iPoint < nPoints; iPoint++) {
+
+  vol2bird_printf("CSR matrix contains %i/%i points for iProfileType=%i\n",iPointIncluded,nPoints,iProfileType);
+
+  *F = build_F_csr(iPointIncluded, refHeight, range, elev,
+                              alldata->options.layerThickness,
+                              alldata->options.nLayers,
+                              alldata->misc.radarHeight,
+                              alldata->misc.beamWidth,
+                              exp(-2) // ~0.13, equal to the 2 sigma points
+  );
+
+  return iPointIncluded;
+}
+
 int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   // NOTE: do not forget to convert dbz to z and convert NaN to zero.
+  //int nPoints = alldata->points.nPointsWrittenTotal;
   int nPoints = alldata->points.nPointsWrittenTotal;
+  csr_matrix *F = NULL;
 
   // allocate input data arrays and initialize with zeros:
   double *range = calloc(nPoints, sizeof(double));
   double *azim = calloc(nPoints, sizeof(double));
   double *elev = calloc(nPoints, sizeof(double));
   double *refHeight = calloc(nPoints, sizeof(double));
-  double *nyquist = calloc(nPoints, sizeof(double));
-  int *k = calloc(nPoints, sizeof(int));
   double *z = calloc(nPoints, sizeof(double));
   double *vrad = calloc(nPoints, sizeof(double));
-  int *includedIndex = calloc(nPoints, sizeof(int));
 
   // allocate output data arrays and initialize with zeros:
   double *U = calloc(alldata->options.nLayers, sizeof(double));
@@ -4636,70 +4685,30 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   double *sigma = calloc(alldata->options.nLayers, sizeof(double));
   double *sigma_eta = calloc(alldata->options.nLayers, sizeof(double));
 
-  if (range == NULL || azim == NULL || elev == NULL || refHeight == NULL ||
-      nyquist == NULL || k == NULL || vrad == NULL || includedIndex == NULL ||
+  if (range == NULL || azim == NULL || elev == NULL || refHeight == NULL || vrad == NULL ||
       U == NULL || V == NULL || W == NULL || N == NULL || N_eta == NULL ||
       sigma == NULL || sigma_eta == NULL){
     vol2bird_err_printf("vol2birdCalcProfilesInverse: memory allocation failed\n");
     return(1);
   }
 
-  int iPointIncluded = 0;
-  double dbzValue = NAN;
-
-  // build up data vectors from points array
-  for (int iPoint = 0; iPoint < nPoints; iPoint++) {
-
-    unsigned int gateCode = (unsigned int) alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.gateCodeCol];
-
-    if (includeGate(iProfileType, 1, gateCode, alldata) == TRUE) {
-      // copy azimuth angle from the 'points' array
-      range[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.rangeCol];
-      // copy azimuth angle from the 'points' array
-      azim[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.azimAngleCol] * PI/180;
-      // copy elevation angle from the 'points' array, convert to radians
-      elev[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.elevAngleCol] * PI/180;
-      // copy reflectivity factor from the 'points' array and convert to linear Z
-      dbzValue = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.dbzValueCol];
-      if (isnan(dbzValue) == TRUE) {
-        z[iPointIncluded] = 0;
-      } else {
-        z[iPointIncluded] = exp(0.1 * log(10) * dbzValue);
-      }
-      // copy the observed vrad value at this [azimuth, elevation] - NOTE: we use the dealiased value obtained from the
-      // previous direct fit.
-      vrad[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.vraddValueCol];
-      // copy the reference height value at this [azimuth, elevation]
-      refHeight[iPointIncluded] = alldata->points.points[iPoint * alldata->points.nColsPoints + alldata->points.heightValueCol];
-      // keep a record of which index was just included
-      includedIndex[iPointIncluded] = iPoint;
-      // raise the counter
-      iPointIncluded += 1;
-    }
-  } // endfor (iPoint = 0; iPoint < nPoints; iPoint++) {
-
-  vol2bird_printf("CSR matrix contains %i/%i points for iProfileType=%i\n",iPointIncluded,nPoints,iProfileType);
-
-  //resetting nPoints to the number of included points
-  nPoints = iPointIncluded;
-
-  csr_matrix *F = build_F_csr(nPoints, refHeight, range, elev,
-                              alldata->options.layerThickness,
-                              alldata->options.nLayers,
-                              alldata->misc.radarHeight,
-                              alldata->misc.beamWidth,
-                              exp(-2) // ~0.13, equal to the 2 sigma points
-  );
-
   // ensure lambda scales with grid spacing
   double lambda_L2_eff = alldata->options.lambda_L2 * alldata->options.layerThickness;
   double lambda_smoothness_eff = alldata->options.lambda_smoothness * alldata->options.layerThickness;
 
   int result = 1;
+
+  // load reflectivity data and build F-matrix:
+  vol2birdLoadInverseData(alldata, iProfileType, 0, range, azim, elev, z, vrad, refHeight, &F);
+  // solve the inversion problem:
   result = reflectivity_inversion_reg(F,
                                       z, z_out, N_eta, sigma_eta,
                                       alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
   vol2bird_err_printf("Stop reason reflectivity inversion: %i\n", result);
+
+  // load radial velocity data and re-build F-matrix:
+  csr_free(F);
+  vol2birdLoadInverseData(alldata, iProfileType, 1, range, azim, elev, z, vrad, refHeight, &F);
 
   result = 1;
   result = radar_inversion_full_reg(F, azim, elev, vrad, z_out,
@@ -4743,11 +4752,9 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   free(azim);
   free(elev);
   free(refHeight);
-  free(nyquist);
-  free(k);
   free(z);
   free(vrad);
-  free(includedIndex);
+  csr_free(F);
 
   // free output arrays
   free(U);
