@@ -44,6 +44,24 @@ void csr_matvec(const csr_matrix *mat, const double *x, double *y) {
     }
 }
 
+/* Weight and renormalize CSR matrix (n x m) by dense vector x (length m) */
+void csr_reweight(csr_matrix *mat, const double *x) {
+  for (size_t i = 0; i < mat->nrows; i++) {
+    double norm = 0.0;
+    for (size_t jj = mat->row_ptr[i]; jj < mat->row_ptr[i+1]; jj++) {
+      // apply weighting
+      mat->values[jj] = mat->values[jj] * x[mat->col_idx[jj]];
+      // track row sum
+      norm += mat->values[jj];
+    }
+    // renormalize by row sum
+    for (size_t jj = mat->row_ptr[i]; jj < mat->row_ptr[i+1]; jj++) {
+      mat->values[jj] /= norm;
+    }
+  }
+}
+
+
 /**
  * Build the CSR matrix F from points/layers using threshold
  */
@@ -460,9 +478,9 @@ void compute_stddev_per_altitude(const csr_matrix *F,
 /* ============================================================================
  * High-level velocity inversion driver
  * ==========================================================================*/
-int radar_inversion_full_reg(const csr_matrix *F,
+int radar_inversion_full_reg(csr_matrix *F,
                          const double *M1, const double *M2,
-                         const double *VRAD,
+                         const double *VRAD, const double *Z,
                          double *U_out, double *V_out, double *W_out,
                          double *N_out, double *sigma_out,
                          double vel_tol,
@@ -481,6 +499,13 @@ int radar_inversion_full_reg(const csr_matrix *F,
     gsl_vector *ATb=gsl_vector_alloc(3*m);
     gsl_vector *X=gsl_vector_alloc(3*m);
 
+    // compute effective sample size on original F-matrix
+    compute_Neff(F,N_out);
+
+    // re-weight F-matrix by the inverse solution to the reflectivity,
+    // effectively a weighted averaged of speed by reflectivity.
+    csr_reweight(F, Z);
+
     compute_normal_eqs(F,A1,A2,A3,VRAD,ATA,ATb);
     add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
     solve_normal_eqs(ATA,ATb,X);
@@ -491,7 +516,6 @@ int radar_inversion_full_reg(const csr_matrix *F,
     }
 
     /* outputs */
-    compute_Neff(F,N_out);
     double *residuals=malloc(n*sizeof(double));
     compute_residuals(F,A1,A2,A3,U_out,V_out,W_out,VRAD,residuals);
     compute_stddev_per_altitude(F,residuals,sigma_out);

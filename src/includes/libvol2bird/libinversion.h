@@ -61,6 +61,10 @@ void csr_free(csr_matrix *mat);
 /* Multiply CSR matrix by dense vector */
 void csr_matvec(const csr_matrix *mat, const double *x, double *y);
 
+/* Re-weight and normalize CSR matrix by dense vector */
+void csr_reweight(csr_matrix *mat, const double *x);
+
+
 /* Build csr matrix from vol2bird points array */
 csr_matrix *build_F_csr(size_t nPoints,
                         double* refHeight,
@@ -126,8 +130,10 @@ void compute_stddev_per_altitude(const csr_matrix *F,
  *  - M2: elevation angle
  *  - M3: Nyquist velocity
  *  - VRAD: Radial velocity
+ *  - Z: linear reflectivity (obtained from reflectivity inversion step)
  *  - regularization_type: one of REG_NONE, REG_L2, REG_SMOOTHNESS
- *  - lambda: regularization strength
+ *  - lambda_L2: regularization strength L2 term
+ *  - lambda_smoothness: regularization strength smoothness term
  *
  * Outputs:
  *  - U,V,W: velocity components per altitude bin
@@ -137,9 +143,9 @@ void compute_stddev_per_altitude(const csr_matrix *F,
  * @param vel_tol  early-stop tolerance for ||delta velocity||_inf
  * @return stop_reason: 0=k stable, 1=vel tol reached, 2=max_iter reached
  */
-int radar_inversion_full_reg(const csr_matrix *F,
+int radar_inversion_full_reg(csr_matrix *F,
                          const double *M1, const double *M2,
-                         const double *VRAD,
+                         const double *VRAD, const double *Z,
                          double *U_out, double *V_out, double *W_out,
                          double *N_out, double *sigma_out,
                          double vel_tol,
