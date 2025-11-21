@@ -1097,6 +1097,7 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
 
         nScansUsed+=1;
     }
+
     RAVE_OBJECT_RELEASE(scan);
   }
 
@@ -1104,6 +1105,42 @@ static vol2birdScanUse_t* determineScanUse(PolarVolume_t* volume, vol2bird_t* al
   alldata->misc.nyquistMin = nyquistMin;
   alldata->misc.nyquistMinUsed = nyquistMinUsed;
   alldata->misc.nyquistMax = nyquistMax;
+
+  // When using Mistnet and mistNetElevsOnly==TRUE, drop non-mistnet elevations.
+  if(alldata->options.useMistNet && alldata->options.mistNetElevsOnly){
+
+    PolarVolume_t* volume_mistnet = NULL;
+    PolarVolume_t* volume_select = NULL;
+    volume_select = PolarVolume_selectScansByScanUse(volume, scanUse, alldata->misc.nScansUsed);
+    volume_mistnet = PolarVolume_selectScansByElevation(volume_select, alldata->options.mistNetElevs, alldata->options.mistNetNElevs);
+
+    int printWarning = FALSE;
+    // buffer to accumulate warning message:
+    char buffer[1024];
+    // initialize the buffer (ensure it's empty initially)
+    buffer[0] = '\0';
+    for(int iScan = 0; iScan < PolarVolume_getNumberOfScans(volume); iScan++){
+      PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
+      if(PolarVolume_indexOf(volume_mistnet, scan) == -1){
+        char scanMsg[16]; // Temporary buffer to format each scan number
+        snprintf(scanMsg, sizeof(scanMsg), "%i ", iScan + 1); // Formatted scan number
+        strcat(buffer, scanMsg); // Append each scan number to the main buffer
+        printWarning = TRUE;
+        if(scanUse[iScan].useScan){
+          // set useScan to FALSE:
+          scanUse[iScan].useScan = FALSE;
+          // descrease nScansUsed counter by one:
+          nScansUsed--;
+        }
+
+      }
+      RAVE_OBJECT_RELEASE(scan);
+    }
+    if(printWarning) vol2bird_err_printf( "Warning: Ignoring scan(s) not used as MistNet input: %s...\n", buffer);
+
+    RAVE_OBJECT_RELEASE(volume_select);
+    RAVE_OBJECT_RELEASE(volume_mistnet);
+  }
 
   // FIXME: better to make scanUse a struct that contains both the array of vol2birdScanUse_t objects
   // and the number nScansUSed, which now is stored ad hoc under alldata->misc
@@ -4040,27 +4077,6 @@ int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, 
             RAVE_OBJECT_RELEASE(volume_select);
             RAVE_OBJECT_RELEASE(volume_mistnet);
             return -1;
-    }
-
-    // set scanUse to false for scans not entering the MistNet segmentation model
-    if(alldata->options.mistNetElevsOnly){
-        int printWarning = FALSE;
-        // buffer to accumulate warning message:
-        char buffer[1024];
-        // initialize the buffer (ensure it's empty initially)
-        buffer[0] = '\0';
-        for(int iScan = 0; iScan < PolarVolume_getNumberOfScans(volume); iScan++){
-            PolarScan_t* scan = PolarVolume_getScan(volume, iScan);
-            if(PolarVolume_indexOf(volume_mistnet, scan) == -1){
-                char scanMsg[16]; // Temporary buffer to format each scan number
-                snprintf(scanMsg, sizeof(scanMsg), "%i ", iScan + 1); // Formatted scan number
-                strcat(buffer, scanMsg); // Append each scan number to the main buffer
-                printWarning = TRUE;
-                scanUse[iScan].useScan = FALSE;
-            }
-            RAVE_OBJECT_RELEASE(scan);
-        }
-        if(printWarning) vol2bird_err_printf( "Warning: Ignoring scan(s) not used as MistNet input: %s...\n", buffer);
     }
 
     // convert polar volume into 3D tensor array
