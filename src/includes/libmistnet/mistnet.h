@@ -55,7 +55,7 @@ extern "C"
 {
 #endif
 MISTNET_API int (MISTNET_PTR _mistnet_run_mistnet)(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
-HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size) 
+HOST_API int mistnet_run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size)
 {
   MISTNET_CHECK_LOADED
   return _mistnet_run_mistnet(tensor_in, tensor_out, model_path, tensor_size);

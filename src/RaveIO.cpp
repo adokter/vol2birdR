@@ -129,7 +129,7 @@ private:
     alldata->options.cellEtaMin = 11500.0;
     alldata->options.requireVrad = FALSE;
     alldata->options.dealiasVrad = TRUE;
-    alldata->options.dealiasRecycle = TRUE;
+    alldata->options.dealiasRecycle = FALSE;
     alldata->options.dualPol = TRUE;
     alldata->options.singlePol = TRUE;
     alldata->options.dbzThresMin = 0.0;
@@ -148,6 +148,12 @@ private:
     alldata->options.mistNetElevsOnly = TRUE;
     alldata->options.useMistNet = FALSE;
     strcpy(alldata->options.mistNetPath, "/opt/vol2bird/etc/mistnet_nexrad.pt");
+    strcpy(alldata->options.groundHeightParam, "HGHT");
+    alldata->options.heightReference = 0;
+    alldata->options.profileMethod = 0;
+    alldata->options.lambda_L2 = 0.1;
+    alldata->options.lambda_smoothness = 0.1;
+    alldata->options.regularization = 3;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -245,6 +251,12 @@ public:
     _alldata.options.mistNetElevsOnly = other._alldata.options.mistNetElevsOnly;
     _alldata.options.useMistNet = other._alldata.options.useMistNet;
     strcpy(_alldata.options.mistNetPath, other._alldata.options.mistNetPath);
+    strcpy(_alldata.options.groundHeightParam, other._alldata.options.groundHeightParam);
+    _alldata.options.heightReference = other._alldata.options.heightReference;
+    _alldata.options.profileMethod = other._alldata.options.profileMethod;
+    _alldata.options.lambda_L2 = other._alldata.options.lambda_L2;
+    _alldata.options.lambda_smoothness = other._alldata.options.lambda_smoothness;
+    _alldata.options.regularization = other._alldata.options.regularization;
 
     // ------------------------------------------------------------- //
     //              vol2bird options from constants.h                //
@@ -640,6 +652,104 @@ public:
     strcpy(_alldata.options.mistNetPath, v.c_str());
   }
 
+  std::string get_groundHeightParam() {
+    return std::string(_alldata.options.groundHeightParam);
+  }
+  void set_groundHeightParam(std::string v) {
+    strcpy(_alldata.options.groundHeightParam, v.c_str());
+  }
+
+  std::string get_heightReference() {
+    if (_alldata.options.heightReference == 0) {
+      return std::string("sea");
+    } else if (_alldata.options.heightReference == 1) {
+      return std::string("antenna");
+    } else if (_alldata.options.heightReference == 2) {
+      return std::string("ground");
+    } else {
+      return std::string("invalid");
+    }
+  }
+
+  void set_heightReference(std::string v) {
+    if (v == "sea") {
+        _alldata.options.heightReference = 0;
+    } else if (v == "antenna") {
+        _alldata.options.heightReference = 1;
+    } else if (v == "ground") {
+        _alldata.options.heightReference = 2;
+    } else {
+        throw std::runtime_error("Invalid heightReference value: must be 'sea', 'antenna', or 'ground'.");
+    }
+  }
+
+  std::string get_profileMethod() {
+    if (_alldata.options.profileMethod == 0) {
+      return std::string("direct");
+    } else if (_alldata.options.profileMethod == 1) {
+      return std::string("inverse");
+    } else {
+      return std::string("invalid");
+    }
+  }
+
+  void set_profileMethod(std::string v) {
+    if (v == "direct") {
+        _alldata.options.profileMethod = 0;
+    } else if (v == "inverse") {
+        _alldata.options.profileMethod = 1;
+    } else {
+        throw std::runtime_error("Invalid profileMethod value: must be 'direct' or 'inverse'.");
+    }
+  }
+
+  double get_lambda_L2() {
+    return _alldata.options.lambda_L2;
+  }
+  void set_lambda_L2(double v) {
+    if (v > 0){
+        _alldata.options.lambda_L2 = v;
+    } else{
+        throw std::runtime_error("Invalid lambda_L2 value: the regularization parameter must be a positive number.");
+    }
+  }
+
+  double get_lambda_smoothness() {
+    return _alldata.options.lambda_smoothness;
+  }
+  void set_lambda_smoothness(double v) {
+    if (v > 0){
+      _alldata.options.lambda_smoothness = v;
+    } else{
+      throw std::runtime_error("Invalid lambda_smoothness value: the regularization parameter must be a positive number.");
+    }
+  }
+
+  std::string get_regularization() {
+    if (_alldata.options.regularization == 1) {
+      return std::string("L2");
+    } else if (_alldata.options.regularization == 2) {
+      return std::string("smoothness");
+    } else if (_alldata.options.regularization == 3) {
+      return std::string("mixed");
+    } else {
+      return std::string("invalid");
+    }
+  }
+
+  void set_regularization(std::string v) {
+    if (v == "L2") {
+        _alldata.options.regularization = 1;
+    } else if (v == "smoothness") {
+        _alldata.options.regularization = 2;
+    } else if (v == "mixed") {
+      _alldata.options.regularization = 3;
+    } else {
+        throw std::runtime_error("Invalid regularization type: must be 'L2', 'smoothness' or 'mixed'.");
+    }
+  }
+
+
   double get_constant_areaCellMin() {
     return _alldata.constants.areaCellMin;
   }
@@ -804,7 +914,7 @@ public:
     if (volume == NULL) {
       throw std::runtime_error("Could not read file(s)");
     }
-    
+
     // copy input filename to misc.filename_pvol
     strcpy(config.alldata()->misc.filename_pvol, fileIn[0]);
 
@@ -916,7 +1026,7 @@ public:
       } else {
           result = saveToODIM((RaveCoreObject*)config.alldata()->vp, vpOutName.c_str());
       }
-      
+
       if (result == FALSE) {
         RAVE_OBJECT_RELEASE(volume);
         throw std::runtime_error(std::string("Can not write : ") + vpOutName);
@@ -1049,6 +1159,12 @@ RCPP_MODULE(Vol2BirdConfig) {
       .property("mistNetElevsOnly", &Vol2BirdConfig::get_mistNetElevsOnly, &Vol2BirdConfig::set_mistNetElevsOnly)
       .property("useMistNet", &Vol2BirdConfig::get_useMistNet, &Vol2BirdConfig::set_useMistNet)
       .property("mistNetPath", &Vol2BirdConfig::get_mistNetPath, &Vol2BirdConfig::set_mistNetPath)
+      .property("groundHeightParam", &Vol2BirdConfig::get_groundHeightParam, &Vol2BirdConfig::set_groundHeightParam)
+      .property("heightReference", &Vol2BirdConfig::get_heightReference, &Vol2BirdConfig::set_heightReference)
+      .property("profileMethod", &Vol2BirdConfig::get_profileMethod, &Vol2BirdConfig::set_profileMethod)
+      .property("lambda_L2", &Vol2BirdConfig::get_lambda_L2, &Vol2BirdConfig::set_lambda_L2)
+      .property("lambda_smoothness", &Vol2BirdConfig::get_lambda_smoothness, &Vol2BirdConfig::set_lambda_smoothness)
+      .property("regularization", &Vol2BirdConfig::get_regularization, &Vol2BirdConfig::set_regularization)
       .property("constant_areaCellMin", &Vol2BirdConfig::get_constant_areaCellMin, &Vol2BirdConfig::set_constant_areaCellMin)
       .property("constant_cellClutterFractionMax", &Vol2BirdConfig::get_constant_cellClutterFractionMax, &Vol2BirdConfig::set_constant_cellClutterFractionMax)
       .property("constant_chisqMin", &Vol2BirdConfig::get_constant_chisqMin, &Vol2BirdConfig::set_constant_chisqMin)
