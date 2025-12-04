@@ -1,6 +1,6 @@
 #' The default branch
 #' @keywords internal
-branch <- "main"
+branch <- "inversion" # FIXME, change to main when pushing to main branch
 supported_pytorch_versions=c("1.10.2", "1.12.1", "2.7.1")
 
 #' Contains a list of 'MistNet' libraries for the various OS's
