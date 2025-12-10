@@ -3,6 +3,8 @@
 
 * Improve messaging when reading ill-formatted ODIM hdf5 file (#136).
 
+* Abort graciously when encountering invalid ray indices in legacy NEXRAD files (#147).
+
 # vol2birdR 1.2.1
 * Fixes a bucket link to `unidata-nexard-level2` in the documentation (#129).
 
