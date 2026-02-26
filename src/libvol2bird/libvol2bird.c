@@ -4730,7 +4730,9 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   status = radar_inversion_full_reg(F, azim, elev, vrad, z_out,
                                     U, V, W, N, sigma,
                                     1e-3, alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
-  if(status != GSL_SUCCESS) goto exit;
+  if(status != GSL_SUCCESS){
+    vol2bird_err_printf("Warning: continuing despite failed velocity inversion (FIXME)\n");
+  }
 
   //---------------------------------------------//
   //         Fill the profile arrays             //
