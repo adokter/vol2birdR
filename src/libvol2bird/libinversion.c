@@ -245,13 +245,38 @@ void compute_normal_eqs(const csr_matrix *F,
 }
 
 /* Solve ATA * X = ATb using LU decomposition */
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_errno.h>
+#include <stdio.h>
+
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_errno.h>
+#include <stdio.h>
+
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_errno.h>
+#include <stdio.h>
+
 int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X) {
-    gsl_permutation *perm = gsl_permutation_alloc(X->size);
-    int signum;
-    gsl_linalg_LU_decomp(ATA, perm, &signum);
-    gsl_linalg_LU_solve(ATA, perm, ATb, X);
+  const double tol_sing = 1e-12;  // tolerance for singularity detection
+  gsl_permutation *perm = gsl_permutation_alloc(X->size);
+  int signum;
+
+  // LU decomposition
+  gsl_linalg_LU_decomp(ATA, perm, &signum);
+
+  // Check for singular matrix
+  int status = gsl_matrix_check_singular(ATA, tol_sing);
+  if (status != GSL_SUCCESS) {
     gsl_permutation_free(perm);
-    return 0;
+    return status;
+  }
+
+  // Solve system using LU factors
+  status = gsl_linalg_LU_solve(ATA, perm, ATb, X);
+
+  gsl_permutation_free(perm);
+  return status;
 }
 
 /*
@@ -274,6 +299,7 @@ int solve_normal_eqs_nonneg_qp(
     int max_iter,
     int verbose)
 {
+  const double tol_sing = 1e-12; // tolerance for singular detection
   size_t m = Q->size1;
   gsl_vector_set_zero(x);
 
@@ -285,7 +311,17 @@ int solve_normal_eqs_nonneg_qp(
     gsl_vector *x_ls = gsl_vector_alloc(m);
     int signum;
     gsl_linalg_LU_decomp(Qcopy, perm, &signum);
+
+    // Check for singular matrix
+    if (gsl_matrix_check_singular(Qcopy, tol_sing) != GSL_SUCCESS) {
+      gsl_vector_free(x_ls);
+      gsl_permutation_free(perm);
+      gsl_matrix_free(Qcopy);
+      return GSL_EDOM;
+    }
+
     gsl_linalg_LU_solve(Qcopy, perm, c, x_ls);
+
     // Clip negatives to zero
     for (size_t i = 0; i < m; ++i) {
       double val = gsl_vector_get(x_ls, i);
@@ -386,6 +422,17 @@ int solve_normal_eqs_nonneg_qp(
       gsl_permutation *perm = gsl_permutation_alloc(free_count);
       int signum;
       gsl_linalg_LU_decomp(Qf, perm, &signum);
+
+      // Check for singular matrix
+      if (gsl_matrix_check_singular(Qf, tol_sing) != GSL_SUCCESS) {
+        gsl_vector_free(cf);
+        gsl_matrix_free(Qf);
+        gsl_permutation_free(perm);
+        free(fmap);
+        free(active);
+        return GSL_EDOM;
+      }
+
       gsl_vector *xf = gsl_vector_alloc(free_count);
       gsl_linalg_LU_solve(Qf, perm, cf, xf);
       gsl_permutation_free(perm);
@@ -408,7 +455,7 @@ int solve_normal_eqs_nonneg_qp(
       free(fmap);
 
       if (verbose && !changed) {
-        printf("No changes in iteration %zu -> stopping.\n", iter);
+        vol2bird_printf("No changes in iteration %zu -> stopping.\n", iter);
       }
   }
 
@@ -416,15 +463,33 @@ int solve_normal_eqs_nonneg_qp(
 
   if(iter > max_iter){
     if (verbose) {
-      printf("Failed to converge in %zu iterations.\n", iter);
+      vol2bird_printf("Failed to converge in %zu iterations.\n", iter);
     }
     return 1;
   }
 
   if (verbose) {
-    printf("Converged in %zu iterations.\n", iter);
+    vol2bird_printf("Converged in %zu iterations.\n", iter);
   }
   return 0;
+}
+
+/**
+ * Check for singular or nearly singular (LU-decomposed) matrix.
+ *
+ * Returns:
+ *   GSL_SUCCESS  -> matrix is OK
+ *   GSL_EDOM     -> diagonal of U has zero or near-zero magnitude
+ */
+int gsl_matrix_check_singular(const gsl_matrix *M, double tol_sing) {
+  size_t n = M->size1;
+  for (size_t i = 0; i < n; ++i) {
+    double diag = gsl_matrix_get(M, i, i);
+    if (fabs(diag) < tol_sing) {
+      return GSL_EDOM;
+    }
+  }
+  return GSL_SUCCESS;
 }
 
 /* ============================================================================
@@ -488,6 +553,7 @@ int radar_inversion_full_reg(csr_matrix *F,
                          double lambda_L2,
                          double lambda_smoothness)
 {
+    int status = GSL_SUCCESS;
     size_t n=F->nrows, m=F->ncols;
     double *A1=malloc(n*sizeof(double)), *A2=malloc(n*sizeof(double)), *A3=malloc(n*sizeof(double));
     for (size_t i=0;i<n;i++) {
@@ -508,7 +574,12 @@ int radar_inversion_full_reg(csr_matrix *F,
 
     compute_normal_eqs(F,A1,A2,A3,VRAD,ATA,ATb);
     add_regularization_velocity(ATA, m, regtype, lambda_L2, lambda_smoothness);
-    solve_normal_eqs(ATA,ATb,X);
+    status = solve_normal_eqs(ATA,ATb,X);
+    if (status != GSL_SUCCESS){
+        vol2bird_err_printf("Error: Singular matrix detected in velocity inversion. Check regularization parameter settings.\n");
+        goto exit;
+    }
+
     for (size_t j=0;j<m;j++) {
         U_out[j]=gsl_vector_get(X,j);
         V_out[j]=gsl_vector_get(X,m+j);
@@ -520,10 +591,12 @@ int radar_inversion_full_reg(csr_matrix *F,
     compute_residuals(F,A1,A2,A3,U_out,V_out,W_out,VRAD,residuals);
     compute_stddev_per_altitude(F,residuals,sigma_out);
     free(residuals);
+
     /* clean */
-    free(A1); free(A2); free(A3);
-    gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
-    return 0;
+    exit:
+        free(A1); free(A2); free(A3);
+        gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
+        return status;
 }
 
 /* ============================================================================
@@ -562,13 +635,19 @@ int reflectivity_inversion_reg(const csr_matrix *F,
                            double lambda_L2,
                            double lambda_smoothness)
 {
+    int status = GSL_SUCCESS;
     size_t m=F->ncols, n=F->nrows;
     gsl_matrix *ATA=gsl_matrix_alloc(m,m);
     gsl_vector *ATb=gsl_vector_alloc(m);
     gsl_vector *X=gsl_vector_alloc(m);
     compute_normal_eqs_simple(F,ETA,ATA,ATb);
     add_regularization(ATA, regtype, lambda_L2, lambda_smoothness);
-    solve_normal_eqs_nonneg_qp(ATA,ATb,X, 1e-10, 1e-14, 2, 1);
+    status = solve_normal_eqs_nonneg_qp(ATA,ATb,X, 1e-10, 1e-14, 2, 1);
+    if (status != GSL_SUCCESS){
+        vol2bird_err_printf("Error: Singular matrix detected in reflectivity inversion. Check regularization parameter settings.\n");
+        goto exit;
+    }
+
     //solve_normal_eqs(ATA,ATb,X);
     for (size_t j=0;j<m;j++) x_out[j]=gsl_vector_get(X,j);
     compute_Neff(F,N_out);
@@ -578,6 +657,8 @@ int reflectivity_inversion_reg(const csr_matrix *F,
         residuals[i]=ETA[i]-residuals[i];
     compute_stddev_per_altitude(F,residuals,sigma_out);
     free(residuals);
-    gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
-    return 0;
+
+    exit:
+        gsl_matrix_free(ATA); gsl_vector_free(ATb); gsl_vector_free(X);
+        return 0;
 }

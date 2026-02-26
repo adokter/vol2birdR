@@ -4660,6 +4660,9 @@ int vol2birdLoadInverseData(vol2bird_t *alldata, int iProfileType, int iQuantity
 }
 
 int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
+  // exit status:
+  int status = 0;
+
   // NOTE: do not forget to convert dbz to z and convert NaN to zero.
   //int nPoints = alldata->points.nPointsWrittenTotal;
   int nPoints = alldata->points.nPointsWrittenTotal;
@@ -4712,27 +4715,22 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
   double lambda_L2_eff = alldata->options.lambda_L2 * alldata->options.layerThickness;
   double lambda_smoothness_eff = alldata->options.lambda_smoothness * alldata->options.layerThickness;
 
-  int result = 1;
-
   // load reflectivity data and build F-matrix:
   vol2birdLoadInverseData(alldata, iProfileType, 0, range, azim, elev, z, vrad, refHeight, &F);
   // solve the inversion problem:
-  result = reflectivity_inversion_reg(F,
+  status = reflectivity_inversion_reg(F,
                                       z, z_out, N_eta, sigma_eta,
                                       alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
-  vol2bird_err_printf("Stop reason reflectivity inversion: %i\n", result);
+  if(status != GSL_SUCCESS) goto exit;
 
   // load radial velocity data and re-build F-matrix:
   csr_free(F);
   vol2birdLoadInverseData(alldata, iProfileType, 1, range, azim, elev, z, vrad, refHeight, &F);
 
-  result = 1;
-  result = radar_inversion_full_reg(F, azim, elev, vrad, z_out,
+  status = radar_inversion_full_reg(F, azim, elev, vrad, z_out,
                                     U, V, W, N, sigma,
                                     1e-3, alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
-  vol2bird_err_printf("Stop reason speed inversion: %i\n", result);
-
-
+  if(status != GSL_SUCCESS) goto exit;
 
   //---------------------------------------------//
   //         Fill the profile arrays             //
@@ -4763,37 +4761,39 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
     alldata->profiles.profile[iLayer * alldata->profiles.nColsProfile + 12] = alldata->misc.dbzFactor * z_out[iLayer]/alldata->options.birdRadarCrossSection;
   }
 
-  // free data input arrays
-  free(range);
-  free(azim);
-  free(elev);
-  free(refHeight);
-  free(z);
-  free(vrad);
-  csr_free(F);
+  exit:
+    // free data input arrays
+    free(range);
+    free(azim);
+    free(elev);
+    free(refHeight);
+    free(z);
+    free(vrad);
+    csr_free(F);
 
-  // free output arrays
-  free(U);
-  free(V);
-  free(W);
-  free(z_out);
-  free(N);
-  free(N_eta);
-  free(sigma);
-  free(sigma_eta);
+    // free output arrays
+    free(U);
+    free(V);
+    free(W);
+    free(z_out);
+    free(N);
+    free(N_eta);
+    free(sigma);
+    free(sigma_eta);
 
-  return(0);
+    return(status);
 }
 
 
-void vol2birdCalcProfiles(vol2bird_t *alldata) {
+int vol2birdCalcProfiles(vol2bird_t *alldata) {
 
   int iPoint;
   int iProfileType;
+  int status = 0;
 
   if (alldata->misc.initializationSuccessful == FALSE) {
     vol2bird_err_printf( "You need to initialize vol2bird before you can use it. Aborting.\n");
-    return;
+    return 1;
   }
 
   // calculate the profiles in reverse order, because you need the result
@@ -4832,11 +4832,12 @@ void vol2birdCalcProfiles(vol2bird_t *alldata) {
     }
 
     if(alldata->options.profileMethod == 1){
-      vol2birdCalcProfilesInverse(alldata, iProfileType);
+      status = vol2birdCalcProfilesInverse(alldata, iProfileType);
     } else{
-      vol2birdCalcProfilesDirect(alldata, iProfileType);
+      status = vol2birdCalcProfilesDirect(alldata, iProfileType);
     }
 
+    if (status != 0) return(status);
 
     if (alldata->options.printProfileVar == TRUE) {
       printProfile(alldata);

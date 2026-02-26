@@ -22,6 +22,7 @@
 #include <gsl/gsl_permutation.h>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_blas.h>
+#include <gsl/gsl_errno.h>
 
 /* -------------------------------------------------------------------------- */
 /* Supported regularization types                                             */
@@ -64,7 +65,6 @@ void csr_matvec(const csr_matrix *mat, const double *x, double *y);
 /* Re-weight and normalize CSR matrix by dense vector */
 void csr_reweight(csr_matrix *mat, const double *x);
 
-
 /* Build csr matrix from vol2bird points array */
 csr_matrix *build_F_csr(size_t nPoints,
                         double* refHeight,
@@ -95,6 +95,9 @@ void compute_normal_eqs(const csr_matrix *F,
 
 /* Solve dense normal equations ATA * X = ATb */
 int solve_normal_eqs(gsl_matrix *ATA, gsl_vector *ATb, gsl_vector *X);
+
+/* check for singularity */
+int gsl_matrix_check_singular(const gsl_matrix *M, double tol_sing);
 
 /* -------------------------------------------------------------------------- */
 /* Folding update and residual statistics                                     */

@@ -464,7 +464,7 @@ radarDataFormat determineRadarFormat(char* filename);
 
 int isRegularFile(const char *path);
 
-void vol2birdCalcProfiles(vol2bird_t* alldata);
+int vol2birdCalcProfiles(vol2bird_t* alldata);
 
 float* vol2birdGetProfile(int iProfileType, vol2bird_t* alldata);
 

@@ -902,6 +902,7 @@ public:
     PolarVolume_t *volume = NULL;
     char *fileIn[INPUTFILESMAX];
     int initSuccessful = 0;
+    int profileSuccessful = 0;
 
     if (files.size() == 0) {
       throw std::invalid_argument("Must specify at least one input filename");
@@ -950,7 +951,11 @@ public:
       saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
     }
 
-    vol2birdCalcProfiles(config.alldata());
+    profileSuccessful = vol2birdCalcProfiles(config.alldata()) == 0;
+    if (profileSuccessful == FALSE) {
+      RAVE_OBJECT_RELEASE(volume);
+      throw std::runtime_error("Failed to calculate profile");
+    }
 
     const char *date;
     const char *time;
