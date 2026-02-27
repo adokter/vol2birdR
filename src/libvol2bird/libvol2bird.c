@@ -4879,6 +4879,8 @@ int vol2birdCalcProfiles(vol2bird_t *alldata) {
 
   } // endfor (iProfileType = nProfileTypes; iProfileType > 0; iProfileType--)
 
+  return(status);
+
 } // vol2birdCalcProfiles
 
 
