@@ -4732,6 +4732,7 @@ int vol2birdCalcProfilesInverse(vol2bird_t *alldata, int iProfileType) {
                                     1e-3, alldata->options.regularization, lambda_L2_eff, lambda_smoothness_eff);
   if(status != GSL_SUCCESS){
     vol2bird_err_printf("Warning: continuing despite failed velocity inversion (FIXME)\n");
+    status=1234567;
   }
 
   //---------------------------------------------//
@@ -4839,7 +4840,9 @@ int vol2birdCalcProfiles(vol2bird_t *alldata) {
       status = vol2birdCalcProfilesDirect(alldata, iProfileType);
     }
 
-    if (status != 0) return(status);
+    // FIXME: using exit status 1234567 for failed velocity inversion only
+    // FIXME: continuing to generate a profile in that case
+    if (status != 1234567 & status != 0) return(status);
 
     if (alldata->options.printProfileVar == TRUE) {
       printProfile(alldata);
