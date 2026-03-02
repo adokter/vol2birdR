@@ -4843,6 +4843,8 @@ int vol2birdCalcProfiles(vol2bird_t *alldata) {
     // FIXME: using exit status 1234567 for failed velocity inversion only
     // FIXME: continuing to generate a profile in that case
     if (status != 1234567 & status != 0) return(status);
+    // ignore exit status for failed velocity inversion (FIXME)
+    if (status == 1234567) status = 0;
 
     if (alldata->options.printProfileVar == TRUE) {
       printProfile(alldata);
