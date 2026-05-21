@@ -1,5 +1,9 @@
 # vol2birdR 1.2.1.9000 (development version)
-* add KHDC radar station info (#148)
+* Add TDWR radar station info (#104).
+
+* Align radar locations and antenna heights with latest metadata provided by NCEI (#144).
+
+* add missing KHDC radar station info (#148).
 
 * Fixes a rare segfault identified on Mac when reading a corrupted NEXRAD file (#102).
 
