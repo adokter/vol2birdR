@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-latest, macos-13, macos-latest]
+        os: [windows-2022, ubuntu-latest, macos-15-intel, macos-latest]
         include:
           - os: windows-2022
             cuda: 0
@@ -38,7 +38,7 @@ jobs:
             flavor: Release
             artifacts: libmistnet.so
             upload: Linux
-          - os: macos-13
+          - os: macos-15-intel
             library: libmistnet.dylib
             test: 
             make: make
