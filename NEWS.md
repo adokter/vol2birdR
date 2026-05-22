@@ -1,4 +1,6 @@
 # vol2birdR 1.2.1.9000 (development version)
+* fix beam width attribute in polar volume object (#153).
+
 * Add TDWR radar station info (#104).
 
 * Align radar locations and antenna heights with latest metadata provided by NCEI (#144).
