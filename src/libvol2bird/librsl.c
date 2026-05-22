@@ -466,6 +466,11 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
         PolarVolume_addAttribute(volume, attr_wavelength);
     }
     RAVE_OBJECT_RELEASE(attr_wavelength);
+
+    // fourth, copy beamwidth from ray header
+    if (rslRay->h.beam_width > 0){
+        PolarVolume_setBeamwidth(volume, rslRay->h.beam_width*PI/180);
+    }
         
     // read the RSL scans (sweeps) and add them to RAVE polar volume
     int result;
