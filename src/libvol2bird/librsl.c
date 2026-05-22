@@ -285,7 +285,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     PolarScan_setElangle(scan, (double) rslVol->sweep[iScan]->h.elev*PI/180);
 
     // add attribute Beamwidth to scan
-    PolarScan_setBeamwidth(scan, (double) rslVol->sweep[iScan]->h.beam_width);
+    PolarScan_setBeamwidth(scan, (double) rslVol->sweep[iScan]->h.beam_width*PI/180);
 
     // add attribute Nyquist velocity to scan (from radial velocity sweep)
     if(iScan > radar->v[VR_INDEX]->h.nsweeps-1){
