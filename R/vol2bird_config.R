@@ -36,6 +36,9 @@
 #' * `dualPol`: Logical. Whether to use dual-pol moments for filtering meteorological echoes. Default `TRUE`
 #' * `elevMax`: Numeric. The minimum scan elevation in degrees used for constructing the bird density profile
 #' * `elevMin`: Numeric. The maximum scan elevation in degrees used for constructing the bird density profile
+#' * `groundHeightParam`: Character. The scan parameter name of the polar volume containing ground height information. Default `HGHT`.
+#' * `heightReference`: Character. One of `sea`, `antenna` or `ground` for specifying the reference height for
+#' the profile altitude bins. Default `sea` level.
 #' * `layerThickness`: Numeric. The width/thickness of an altitude layer in m. Default 200
 #' * `mistNetPath`: Character. Path of 'MistNet' segmentation model in pytorch (.pt) format
 #' * `nLayers`: Integer. The number of layers in an altitude profile. Default 25

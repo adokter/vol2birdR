@@ -255,3 +255,7 @@
 // require that radial velocity and spectrum width pixels rendered as mistnet input
 // have a valid corresponding reflectivity value
 #define MISTNET_REQUIRE_DBZ 0
+// height reference used, 0 for sea level, 1 for antenna level, 2 for ground level
+#define HEIGHT_REFERENCE 0
+// scan parameter name containing ground height data in m relative to sea level
+#define GROUND_HEIGHT_PARAM "HGHT"
