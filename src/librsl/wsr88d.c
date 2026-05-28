@@ -1176,7 +1176,7 @@ float wsr88d_get_wavelength(Wsr88d_ray *ray)
   nyquist = wsr88d_get_nyquist(ray);
     /* If required info to determine wavelength does not exist,
          just use 10 cm. All wsr88d radars are 10cm. MJK */
-  if ((prf == 0) || (nyquist == 0.0)) wavelength = 0.10;
+  if ((prf == 0) || (nyquist == 0.0)) wavelength = 0.1071;
   else wavelength = 4*nyquist/prf;
   return wavelength;
 }
