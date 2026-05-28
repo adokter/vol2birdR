@@ -5,7 +5,7 @@
 \title{Install 'MistNet' libraries from files}
 \usage{
 install_mistnet_from_file(
-  version = "1.12.1",
+  version = "2.7.1",
   libtorch,
   libmistnet,
   mistnet_model = NULL,

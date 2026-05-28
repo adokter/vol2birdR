@@ -251,9 +251,9 @@ test_that("dealiasVrad",{
 
 test_that("dealiasRecycle",{
   a<-Vol2BirdConfig$new()
-  expect_equal(a$dealiasRecycle, TRUE)
-  a$dealiasRecycle<-FALSE
   expect_equal(a$dealiasRecycle, FALSE)
+  a$dealiasRecycle<-TRUE
+  expect_equal(a$dealiasRecycle, TRUE)
 })
 
 test_that("dualPol",{
