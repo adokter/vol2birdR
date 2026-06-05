@@ -285,7 +285,7 @@ PolarScan_t* PolarScan_RSL2Rave(Radar *radar, int iScan, float rangeMax){
     PolarScan_setElangle(scan, (double) rslVol->sweep[iScan]->h.elev*PI/180);
 
     // add attribute Beamwidth to scan
-    PolarScan_setBeamwidth(scan, (double) rslVol->sweep[iScan]->h.beam_width);
+    PolarScan_setBeamwidth(scan, (double) rslVol->sweep[iScan]->h.beam_width*PI/180);
 
     // add attribute Nyquist velocity to scan (from radial velocity sweep)
     if(iScan > radar->v[VR_INDEX]->h.nsweeps-1){
@@ -466,6 +466,11 @@ PolarVolume_t* PolarVolume_RSL2Rave(Radar* radar, float rangeMax){
         PolarVolume_addAttribute(volume, attr_wavelength);
     }
     RAVE_OBJECT_RELEASE(attr_wavelength);
+
+    // fourth, copy beamwidth from ray header
+    if (rslRay->h.beam_width > 0){
+        PolarVolume_setBeamwidth(volume, rslRay->h.beam_width*PI/180);
+    }
         
     // read the RSL scans (sweeps) and add them to RAVE polar volume
     int result;

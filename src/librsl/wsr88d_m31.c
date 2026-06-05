@@ -335,9 +335,7 @@ void wsr88d_load_ray_hdr(Wsr88d_ray_m31 *wsr88d_ray, Ray *ray)
     ray->h.azim_rate = vcp_data.azim_rate[elev_index];
     ray->h.fix_angle = vcp_data.fixed_angle[elev_index];
     ray->h.vel_res = vcp_data.vel_res;
-    if (ray_hdr.azm_res != 1)
-	ray->h.beam_width = 1.0;
-    else ray->h.beam_width = 0.5;
+    ray->h.beam_width = 0.95;
 
     /* For convenience, use message type 1 routines to get some values.
      * First load VCP and elevation numbers into a msg 1 ray.

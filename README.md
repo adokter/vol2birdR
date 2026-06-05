@@ -43,8 +43,8 @@ Alternatively, you can install the latest development version from
 [GitHub](https://github.com/adokter/bioRad) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("adokter/vol2birdR")
+# install.packages("pak")
+pak::pak("adokter/vol2birdR")
 ```
 
 For Linux and for installation of the development version the GNU
