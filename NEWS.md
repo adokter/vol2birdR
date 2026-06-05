@@ -1,11 +1,22 @@
-# vol2birdR 1.2.1.9000 (development version)
-* fix beam width attribute in polar volume object (#153).
+# vol2birdR 1.3.0
 
-* Add TDWR radar station info (#104).
+## New Features
+
+* Add functionality to create profiles relative to ground level and antenna level (in addition to default sea level) (#138, #142).
+
+* Add configuration options `groundHeightParam` to specify the scan parameter containing digital elevation information
+for ground level profiles, and option `heightReference` to specify the reference height (`sea`, `ground` or `antenna`) (#138, #142).
+
+* Add TDWR radar station info (#104). Note: wavelength of TDWR stations no parsing correctly yet
 
 * Align radar locations and antenna heights with latest metadata provided by NCEI (#144).
 
 * add missing KHDC radar station info (#148).
+
+* Distinguish between stdout and stderr messages (#142, 67e021f).
+
+## Bugfixes
+* fix beam width attribute in polar volume object (#153).
 
 * Fixes a rare segfault identified on Mac when reading a corrupted NEXRAD file (#102).
 
