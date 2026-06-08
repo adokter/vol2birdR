@@ -5260,7 +5260,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // set here and not in vol2birdLoadConfig(), which has no access to the volume
 
     //FIXME: add mistNetNElevs (mistnet elevations) to the task_args string
-    snprintf(alldata->misc.task_args,3000,
+    int task_args_len = snprintf(alldata->misc.task_args, sizeof(alldata->misc.task_args),
         "azimMax=%f,azimMin=%f,layerThickness=%f,nLayers=%i,rangeMax=%f,"
         "rangeMin=%f,elevMax=%f,elevMin=%f,radarWavelength=%f,"
         "useClutterMap=%i,clutterMap=%s,fitVrad=%i,exportBirdProfileAsJSONVar=%i,"
@@ -5332,6 +5332,13 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->options.groundHeightParam,
         heightReferenceStr(alldata->options.heightReference)
     );
+
+    // Using the snprintf return value both detects truncation of the task_args
+    // metadata string and silences -Wformat-truncation (which, at the default
+    // level, only warns about bounded calls whose return value is unused).
+    if (task_args_len < 0 || (size_t)task_args_len >= sizeof(alldata->misc.task_args)) {
+        vol2bird_err_printf("Warning: task_args metadata string was truncated.\n");
+    }
 
     if (scanUse == (vol2birdScanUse_t*) NULL){
         vol2bird_err_printf( "Error: no valid scans found in polar volume, aborting ...\n");
