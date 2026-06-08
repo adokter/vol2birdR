@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,26 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.1" id="vol2birdr-121">vol2birdR 1.2.1<a class="anchor" aria-label="anchor" href="#vol2birdr-121"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.3.0" id="vol2birdr-130">vol2birdR 1.3.0<a class="anchor" aria-label="anchor" href="#vol2birdr-130"></a></h2>
+<div class="section level3">
+<h3 id="new-features-1-3-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-3-0"></a></h3>
+<ul><li><p>Add functionality to create profiles relative to ground level and antenna level (in addition to default sea level) (<a href="https://github.com/adokter/vol2birdR/issues/138" class="external-link">#138</a>, <a href="https://github.com/adokter/vol2birdR/issues/142" class="external-link">#142</a>).</p></li>
+<li><p>Add configuration options <code>groundHeightParam</code> to specify the scan parameter containing digital elevation information for ground level profiles, and option <code>heightReference</code> to specify the reference height (<code>sea</code>, <code>ground</code> or <code>antenna</code>) (<a href="https://github.com/adokter/vol2birdR/issues/138" class="external-link">#138</a>, <a href="https://github.com/adokter/vol2birdR/issues/142" class="external-link">#142</a>).</p></li>
+<li><p>Add TDWR radar station info (<a href="https://github.com/adokter/vol2birdR/issues/104" class="external-link">#104</a>). Note: wavelength of TDWR stations no parsing correctly yet</p></li>
+<li><p>Align radar locations and antenna heights with latest metadata provided by NCEI (<a href="https://github.com/adokter/vol2birdR/issues/144" class="external-link">#144</a>).</p></li>
+<li><p>add missing KHDC radar station info (<a href="https://github.com/adokter/vol2birdR/issues/148" class="external-link">#148</a>).</p></li>
+<li><p>Distinguish between stdout and stderr messages (<a href="https://github.com/adokter/vol2birdR/issues/142" class="external-link">#142</a>, 67e021f).</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bugfixes-1-3-0">Bugfixes<a class="anchor" aria-label="anchor" href="#bugfixes-1-3-0"></a></h3>
+<ul><li><p>fix beam width attribute in polar volume object (<a href="https://github.com/adokter/vol2birdR/issues/153" class="external-link">#153</a>).</p></li>
+<li><p>Fixes a rare segfault identified on Mac when reading a corrupted NEXRAD file (<a href="https://github.com/adokter/vol2birdR/issues/102" class="external-link">#102</a>).</p></li>
+<li><p>Improve messaging when reading ill-formatted ODIM hdf5 file (<a href="https://github.com/adokter/vol2birdR/issues/136" class="external-link">#136</a>).</p></li>
+<li><p>Abort graciously when encountering invalid ray indices in legacy NEXRAD files (<a href="https://github.com/adokter/vol2birdR/issues/147" class="external-link">#147</a>).</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.2.1" id="vol2birdr-121">vol2birdR 1.2.1<a class="anchor" aria-label="anchor" href="#vol2birdr-121"></a></h2><p class="text-muted">CRAN release: 2025-09-02</p>
 <ul><li>Fixes a bucket link to <code>unidata-nexard-level2</code> in the documentation (<a href="https://github.com/adokter/vol2birdR/issues/129" class="external-link">#129</a>).</li>
 </ul></div>
     <div class="section level2">
