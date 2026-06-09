@@ -2,14 +2,14 @@
 
 ## New Features
 
-* Add functionality to create profiles relative to ground level and antenna level (in addition to default sea level) (#138, #142).
+* Add functionality to create profiles relative to ground level and antenna level (in addition to pre-existing default: sea level) (#138, #142).
 
-* Add configuration options `groundHeightParam` to specify the scan parameter containing digital elevation information
-for ground level profiles, and option `heightReference` to specify the reference height (`sea`, `ground` or `antenna`) (#138, #142).
+* Add configuration options to `vol2bird_config()`: (1) `groundHeightParam` to specify the scan parameter containing digital elevation information
+for ground level profiles. (2) `heightReference` to specify the reference height (`sea`, `ground` or `antenna`) (#138, #142).
 
-* Add `height_reference` as an output column, adopting VPTS CSV v1.1 format (#154).
+* Add `height_reference` as an output column to csv profile output, adopting VPTS CSV v1.1 format (#154).
 
-* Add TDWR radar station info (#104). Note: wavelength of TDWR stations not yet parsing correctly yet
+* Add TDWR radar station info (#104). Caution: wavelength of TDWR stations not parsing correctly yet (#155).
 
 * Align radar locations and antenna heights with latest metadata provided by NCEI (#144).
 
@@ -18,6 +18,7 @@ for ground level profiles, and option `heightReference` to specify the reference
 * Distinguish between stdout and stderr messages (#142, 67e021f).
 
 ## Bugfixes
+
 * fix beam width attribute in polar volume object (#153).
 
 * Fixes a rare segfault identified on Mac when reading a corrupted NEXRAD file (#102).
