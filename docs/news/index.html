@@ -39,7 +39,8 @@
 <h3 id="new-features-1-3-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-3-0"></a></h3>
 <ul><li><p>Add functionality to create profiles relative to ground level and antenna level (in addition to default sea level) (<a href="https://github.com/adokter/vol2birdR/issues/138" class="external-link">#138</a>, <a href="https://github.com/adokter/vol2birdR/issues/142" class="external-link">#142</a>).</p></li>
 <li><p>Add configuration options <code>groundHeightParam</code> to specify the scan parameter containing digital elevation information for ground level profiles, and option <code>heightReference</code> to specify the reference height (<code>sea</code>, <code>ground</code> or <code>antenna</code>) (<a href="https://github.com/adokter/vol2birdR/issues/138" class="external-link">#138</a>, <a href="https://github.com/adokter/vol2birdR/issues/142" class="external-link">#142</a>).</p></li>
-<li><p>Add TDWR radar station info (<a href="https://github.com/adokter/vol2birdR/issues/104" class="external-link">#104</a>). Note: wavelength of TDWR stations no parsing correctly yet</p></li>
+<li><p>Add <code>height_reference</code> as an output column, adopting VPTS CSV v1.1 format (<a href="https://github.com/adokter/vol2birdR/issues/154" class="external-link">#154</a>).</p></li>
+<li><p>Add TDWR radar station info (<a href="https://github.com/adokter/vol2birdR/issues/104" class="external-link">#104</a>). Note: wavelength of TDWR stations not yet parsing correctly yet</p></li>
 <li><p>Align radar locations and antenna heights with latest metadata provided by NCEI (<a href="https://github.com/adokter/vol2birdR/issues/144" class="external-link">#144</a>).</p></li>
 <li><p>add missing KHDC radar station info (<a href="https://github.com/adokter/vol2birdR/issues/148" class="external-link">#148</a>).</p></li>
 <li><p>Distinguish between stdout and stderr messages (<a href="https://github.com/adokter/vol2birdR/issues/142" class="external-link">#142</a>, 67e021f).</p></li>
@@ -50,6 +51,8 @@
 <li><p>Fixes a rare segfault identified on Mac when reading a corrupted NEXRAD file (<a href="https://github.com/adokter/vol2birdR/issues/102" class="external-link">#102</a>).</p></li>
 <li><p>Improve messaging when reading ill-formatted ODIM hdf5 file (<a href="https://github.com/adokter/vol2birdR/issues/136" class="external-link">#136</a>).</p></li>
 <li><p>Abort graciously when encountering invalid ray indices in legacy NEXRAD files (<a href="https://github.com/adokter/vol2birdR/issues/147" class="external-link">#147</a>).</p></li>
+<li><p>Fix console print formatting (<a href="https://github.com/adokter/vol2birdR/issues/139" class="external-link">#139</a>).</p></li>
+<li><p>Bump to latest versions of Github runner images for continuous integration of tests (<a href="https://github.com/adokter/vol2birdR/issues/150" class="external-link">#150</a>, <a href="https://github.com/adokter/vol2birdR/issues/151" class="external-link">#151</a>).</p></li>
 </ul></div>
 </div>
     <div class="section level2">

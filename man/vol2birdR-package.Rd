@@ -30,7 +30,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Adriaan M. Dokter \email{vol2birdr@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID}) (vol2birdR maintainer and author of vol2bird library)
+\strong{Maintainer}: Adriaan M. Dokter \email{vol2birdr@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID}) (vol2birdR author and maintainer and author of vol2bird library)
 
 Authors:
 \itemize{
