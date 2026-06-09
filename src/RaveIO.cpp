@@ -129,7 +129,7 @@ private:
     alldata->options.cellEtaMin = 11500.0;
     alldata->options.requireVrad = FALSE;
     alldata->options.dealiasVrad = TRUE;
-    alldata->options.dealiasRecycle = TRUE;
+    alldata->options.dealiasRecycle = FALSE;
     alldata->options.dualPol = TRUE;
     alldata->options.singlePol = TRUE;
     alldata->options.dbzThresMin = 0.0;
