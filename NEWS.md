@@ -7,7 +7,9 @@
 * Add configuration options `groundHeightParam` to specify the scan parameter containing digital elevation information
 for ground level profiles, and option `heightReference` to specify the reference height (`sea`, `ground` or `antenna`) (#138, #142).
 
-* Add TDWR radar station info (#104). Note: wavelength of TDWR stations no parsing correctly yet
+* Add `height_reference` as an output column, adopting VPTS CSV v1.1 format (#154).
+
+* Add TDWR radar station info (#104). Note: wavelength of TDWR stations not yet parsing correctly yet
 
 * Align radar locations and antenna heights with latest metadata provided by NCEI (#144).
 
@@ -23,6 +25,10 @@ for ground level profiles, and option `heightReference` to specify the reference
 * Improve messaging when reading ill-formatted ODIM hdf5 file (#136).
 
 * Abort graciously when encountering invalid ray indices in legacy NEXRAD files (#147).
+
+* Fix console print formatting (#139).
+
+* Bump to latest versions of Github runner images for continuous integration of tests (#150, #151).
 
 # vol2birdR 1.2.1
 * Fixes a bucket link to `unidata-nexard-level2` in the documentation (#129).
