@@ -251,9 +251,9 @@ test_that("dealiasVrad",{
 
 test_that("dealiasRecycle",{
   a<-Vol2BirdConfig$new()
-  expect_equal(a$dealiasRecycle, TRUE)
-  a$dealiasRecycle<-FALSE
   expect_equal(a$dealiasRecycle, FALSE)
+  a$dealiasRecycle<-TRUE
+  expect_equal(a$dealiasRecycle, TRUE)
 })
 
 test_that("dualPol",{
@@ -436,4 +436,27 @@ test_that("constant_vradMin",{
   expect_equal(a$constant_vradMin, 1.0, tolerance=0.0001)
   a$constant_vradMin<-1.1
   expect_equal(a$constant_vradMin, 1.1, tolerance=0.0001)
+})
+
+test_that("groundHeightParam",{
+  a<-Vol2BirdConfig$new()
+  expect_equal(a$groundHeightParam, "HGHT")
+  a$groundHeightParam<-"HGHT_GROUND"
+  expect_equal(a$groundHeightParam, "HGHT_GROUND")
+})
+
+test_that("heightReference",{
+  a<-Vol2BirdConfig$new()
+  expect_equal(a$heightReference, "sea")
+  a$heightReference<-"antenna"
+  expect_equal(a$heightReference, "antenna")
+  a$heightReference<-"ground"
+  expect_equal(a$heightReference, "ground")
+  a$heightReference<-"sea"
+  expect_equal(a$heightReference, "sea")
+})
+
+test_that("heightReference invalid value",{
+  a<-Vol2BirdConfig$new()
+  expect_error(a$heightReference<-"space")
 })

@@ -65,9 +65,13 @@ std::string trim_newline(const std::string& input) {
   return input;
 }
 
-void Vol2Bird_Rprintf(const char* msg) {
+void Vol2Bird_message(const char* msg) {
   Rcpp::Function message("message");
   message(trim_newline(msg));
+}
+
+void Vol2Bird_Rprintf(const char* msg) {
+  Rprintf("%s", msg);
 }
 
 void RSL_Rprintf(const char* msg) {
@@ -98,7 +102,7 @@ void cpp_vol2bird_initialize() {
   // called upon package load to remember the thread ID of the main thread
   HL_init();
   vol2bird_set_printf(Vol2Bird_Rprintf);
-  vol2bird_set_err_printf(Vol2Bird_Rprintf);
+  vol2bird_set_err_printf(Vol2Bird_message);
 #ifdef ENABLE_IRIS2ODIM
   Iris_set_printf(IRIS2ODIM_Rprintf);
 #endif

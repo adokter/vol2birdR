@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">vol2birdR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,6 +89,10 @@ this threshold will be considered clutter-contaminated. Default 0.1</p></li>
 <li><p><code>dualPol</code>: Logical. Whether to use dual-pol moments for filtering meteorological echoes. Default <code>TRUE</code></p></li>
 <li><p><code>elevMax</code>: Numeric. The minimum scan elevation in degrees used for constructing the bird density profile</p></li>
 <li><p><code>elevMin</code>: Numeric. The maximum scan elevation in degrees used for constructing the bird density profile</p></li>
+<li><p><code>groundHeightParam</code>: Character. The scan parameter name of the polar volume containing ground height information
+in units of meters relative to mean sea level. Default <code>HGHT</code>.</p></li>
+<li><p><code>heightReference</code>: Character. One of <code>sea</code>, <code>antenna</code> or <code>ground</code> for specifying the reference height for
+the profile altitude bins. Default <code>sea</code> level.</p></li>
 <li><p><code>layerThickness</code>: Numeric. The width/thickness of an altitude layer in m. Default 200</p></li>
 <li><p><code>mistNetPath</code>: Character. Path of 'MistNet' segmentation model in pytorch (.pt) format</p></li>
 <li><p><code>nLayers</code>: Integer. The number of layers in an altitude profile. Default 25</p></li>
@@ -190,7 +194,7 @@ in a terminal, since large amounts of data will be dumped into the console.</p><
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ clutterValueMin                : num 0.1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ dbzThresMin                    : num 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ dbzType                        : chr "DBZH"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dealiasRecycle                 : logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dealiasRecycle                 : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ dealiasVrad                    : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ dualPol                        : logi TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ elevMax                        : num 90</span>
@@ -198,6 +202,8 @@ in a terminal, since large amounts of data will be dumped into the console.</p><
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ etaMax                         : num 36000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ exportBirdProfileAsJSONVar     : logi FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ fitVrad                        : logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ groundHeightParam              : chr "HGHT"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ heightReference                : chr "sea"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ layerThickness                 : num 200</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ maxNyquistDealias              : num 25</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ minNyquist                     : num 5</span>

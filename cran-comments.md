@@ -1,3 +1,3 @@
-# vol2birdR 1.2.0
-* fixes a segfault bug on windows
-* migrate to upgraded remote aws bucket unidata-nexrad-level2
+# vol2birdR 1.3.0
+* various bugfixes
+* new functionality for profiling relative to ground level
