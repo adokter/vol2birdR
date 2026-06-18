@@ -437,3 +437,26 @@ test_that("constant_vradMin",{
   a$constant_vradMin<-1.1
   expect_equal(a$constant_vradMin, 1.1, tolerance=0.0001)
 })
+
+test_that("groundHeightParam",{
+  a<-Vol2BirdConfig$new()
+  expect_equal(a$groundHeightParam, "HGHT")
+  a$groundHeightParam<-"HGHT_GROUND"
+  expect_equal(a$groundHeightParam, "HGHT_GROUND")
+})
+
+test_that("heightReference",{
+  a<-Vol2BirdConfig$new()
+  expect_equal(a$heightReference, "sea")
+  a$heightReference<-"antenna"
+  expect_equal(a$heightReference, "antenna")
+  a$heightReference<-"ground"
+  expect_equal(a$heightReference, "ground")
+  a$heightReference<-"sea"
+  expect_equal(a$heightReference, "sea")
+})
+
+test_that("heightReference invalid value",{
+  a<-Vol2BirdConfig$new()
+  expect_error(a$heightReference<-"space")
+})

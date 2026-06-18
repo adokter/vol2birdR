@@ -104,6 +104,8 @@ static int verticalProfile_AddCustomField(VerticalProfile_t* self, RaveField_t* 
 
 static int profileArray2RaveField(vol2bird_t* alldata, int idx_profile, int idx_quantity, const char* quantity, RaveDataType raveType);
 
+static const char* heightReferenceStr(int heightReference);
+
 static int mapVolumeToProfile(VerticalProfile_t* vp, PolarVolume_t* volume);
 
 PolarScanParam_t* PolarScan_newParam(PolarScan_t *scan, const char *quantity, RaveDataType type);
@@ -3158,6 +3160,7 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     RaveAttribute_t* attr_filename_pvol = RaveAttributeHelp_createString("how/filename_pvol", alldata->misc.filename_pvol);
     RaveAttribute_t* attr_filename_vp = RaveAttributeHelp_createString("how/filename_vp", alldata->misc.filename_vp);
     RaveAttribute_t* attr_vcp = RaveAttributeHelp_createLong("how/vcp", alldata->misc.vcp);
+    RaveAttribute_t* attr_height_reference = RaveAttributeHelp_createString("how/height_reference", heightReferenceStr(alldata->options.heightReference));
 
     //add /how and /what attributes to the vertical profile object
     VerticalProfile_addAttribute(alldata->vp, attr_beamwidth);
@@ -3177,6 +3180,7 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     VerticalProfile_addAttribute(alldata->vp, attr_filename_pvol);
     VerticalProfile_addAttribute(alldata->vp, attr_filename_vp);
     VerticalProfile_addAttribute(alldata->vp, attr_vcp);
+    VerticalProfile_addAttribute(alldata->vp, attr_height_reference);
 
     //-------------------------------------------//
     //   map the profile data to rave fields     //
@@ -3237,6 +3241,7 @@ int mapDataToRave(PolarVolume_t* volume, vol2bird_t* alldata) {
     RAVE_OBJECT_RELEASE(attr_filename_pvol);
     RAVE_OBJECT_RELEASE(attr_filename_vp);
     RAVE_OBJECT_RELEASE(attr_vcp);
+    RAVE_OBJECT_RELEASE(attr_height_reference);
 
     RAVE_OBJECT_RELEASE(attr_startdate);
     RAVE_OBJECT_RELEASE(attr_starttime);
@@ -3308,6 +3313,19 @@ void nanify_str(char* buff, const char* fmt, double v) {
   }
 }
 
+// maps the integer heightReference option (0/1/2) to its string
+// representation, matching set_/get_heightReference in RaveIO.cpp and the
+// R-level vol2bird_config() character value. Used for the CSV column, the
+// how/height_reference attribute and the task_args provenance string.
+static const char* heightReferenceStr(int heightReference) {
+    switch (heightReference) {
+        case 0:  return "sea";
+        case 1:  return "antenna";
+        case 2:  return "ground";
+        default: return "";
+    }
+}
+
 void nanify_vpts(char* buff, const char* fmt, double v) {
   if (v == NODATA) {
     strcpy(buff, "");
@@ -3348,7 +3366,8 @@ void create_profile_printout_str(char* printbuffer, int buflen, const char* date
 
 
 void write_line_vpts_profile(char* printbuffer, int buflen,
-    char* radar_name, char* datetime, float HGHT, float u, float v,
+    char* radar_name, char* datetime, float HGHT, const char* height_reference,
+    float u, float v,
     float w, float ff, float dd, float sd_vvp, char* gap, float dbz,
     float eta, float dens, float DBZH, float n, float n_dbz, float n_all,
     float n_dbz_all, float rcs, float sd_vvp_thresh, int vcp, float latitude,
@@ -3385,8 +3404,8 @@ void write_line_vpts_profile(char* printbuffer, int buflen,
   nanify_vpts(s_height, "%5.f", height);
   nanify_vpts(s_wavelength, "%5.1f", wavelength);
 
-  snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"",
-    radar_name, datetime, s_HGHT, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
+  snprintf(printbuffer, buflen, "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,\"%s\"",
+    radar_name, datetime, s_HGHT, height_reference, s_u, s_v, s_w, s_ff, s_dd, s_sd_vvp, gap, s_dbz, s_eta, s_dens, s_DBZH, s_n, s_n_dbz,
     s_n_all, s_n_dbz_all, s_rcs, s_sd_vvp_thresh, s_vcp, s_lat, s_lon, s_height, s_wavelength, get_filename(fileIn));
 }
 
@@ -3539,7 +3558,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
     radar_name = alldata->misc.radarName;
     fileIn = alldata->misc.filename_pvol;
 
-    fprintf(fp,"radar,datetime,height,u,v,w,ff,dd,sd_vvp,gap,eta,dens,dbz,dbz_all,n,n_dbz,n_all,n_dbz_all,rcs,sd_vvp_threshold,vcp,radar_latitude,radar_longitude,radar_height,radar_wavelength,source_file\n");
+    fprintf(fp,"radar,datetime,height,height_reference,u,v,w,ff,dd,sd_vvp,gap,eta,dens,dbz,dbz_all,n,n_dbz,n_all,n_dbz_all,rcs,sd_vvp_threshold,vcp,radar_latitude,radar_longitude,radar_height,radar_wavelength,source_file\n");
 
     int iRowProfile;
     int iCopied = 0;
@@ -3557,6 +3576,7 @@ int saveToCSV(const char *filename, vol2bird_t* alldata, PolarVolume_t* pvol){
         radar_name,                                                             //radar*
         datetime,                                                               //datetime*
         profileBio[0 + iCopied],                                                //height*
+        heightReferenceStr(alldata->options.heightReference),                   //height_reference
         profileBio[2 + iCopied],                                                //u
         profileBio[3 + iCopied],                                                //v
         profileBio[4 + iCopied],                                                //w
@@ -5665,7 +5685,7 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
     // set here and not in vol2birdLoadConfig(), which has no access to the volume
 
     //FIXME: add mistNetNElevs (mistnet elevations) to the task_args string
-    snprintf(alldata->misc.task_args,3000,
+    int task_args_len = snprintf(alldata->misc.task_args, sizeof(alldata->misc.task_args),
         "azimMax=%f,azimMin=%f,layerThickness=%f,nLayers=%i,rangeMax=%f,"
         "rangeMin=%f,elevMax=%f,elevMin=%f,radarWavelength=%f,"
         "useClutterMap=%i,clutterMap=%s,fitVrad=%i,exportBirdProfileAsJSONVar=%i,"
@@ -5679,7 +5699,8 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         "chisqMin=%f,clutterValueMin=%f,dbzThresMin=%f,"
         "fringeDist=%f,nBinsGap=%i,nPointsIncludedMin=%i,nNeighborsMin=%i,"
         "nObsGapMin=%i,nAzimNeighborhood=%i,nRangNeighborhood=%i,nCountMin=%i,"
-        "refracIndex=%f,cellStdDevMax=%f,absVDifMax=%f,vradMin=%f",
+        "refracIndex=%f,cellStdDevMax=%f,absVDifMax=%f,vradMin=%f,"
+        "groundHeightParam=%s,heightReference=%s",
 
         alldata->options.azimMax,
         alldata->options.azimMin,
@@ -5732,8 +5753,17 @@ int vol2birdSetUp(PolarVolume_t* volume, vol2bird_t* alldata) {
         alldata->constants.refracIndex,
         alldata->options.cellStdDevMax,
         alldata->constants.absVDifMax,
-        alldata->constants.vradMin
+        alldata->constants.vradMin,
+        alldata->options.groundHeightParam,
+        heightReferenceStr(alldata->options.heightReference)
     );
+
+    // Using the snprintf return value both detects truncation of the task_args
+    // metadata string and silences -Wformat-truncation (which, at the default
+    // level, only warns about bounded calls whose return value is unused).
+    if (task_args_len < 0 || (size_t)task_args_len >= sizeof(alldata->misc.task_args)) {
+        vol2bird_err_printf("Warning: task_args metadata string was truncated.\n");
+    }
 
     if (scanUse == (vol2birdScanUse_t*) NULL){
         vol2bird_err_printf( "Error: no valid scans found in polar volume, aborting ...\n");

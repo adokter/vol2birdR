@@ -126,11 +126,11 @@
 // name of the parameter containing the static cluttermap
 #define CLUTNAME "OCCULT"
 // Name of the program, to be stored as task attribute in ODIM
-#define PROGRAM "vol2bird"
+#define PROGRAM "vol2birdR"
 // Version of the program, to be stored as task_version attribute in ODIM
-#define VERSION "0.6.0.9201"
+#define VERSION "1.3.0.9000"
 // Date of latest version of the program
-#define VERSIONDATE "03-May-2023"
+#define VERSIONDATE "10-Jun-2026"
 
 
 //-------------------------------------------------------//
