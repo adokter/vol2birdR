@@ -9,15 +9,15 @@ double distance2range(double distance,double elev);
 
 double range2distance(double range,double elev);
 
-double range2height(double range,double elev);
+double range2height(double range, double elev);
+
+double beamWidth(double range, double beamAngle);
+
+double beamProfile(double height, double elev, double range, double antenna, double beamAngle);
 
 double*** init3DTensor(int dim1, int dim2, int dim3, double init);
 
 float**** create4DTensor(float *array, int dim1, int dim2, int dim3, int dim4);
-
-PolarVolume_t* PolarVolume_selectScansByElevation(PolarVolume_t* volume, float elevs[], int nElevs);
-
-PolarVolume_t* PolarVolume_selectScansByScanUse(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, int nScansUsed);
 
 int polarVolumeTo3DTensor(PolarVolume_t* pvol, double ****tensor, int dim, long res, int nParam);
 
@@ -29,7 +29,12 @@ void free3DTensor(double ***tensor, int dim1, int dim2);
 
 void free4DTensor(float ****tensor, int dim1, int dim2, int dim3);
 
-#ifdef MISTNET 
-int segmentScansUsingMistnet(PolarVolume_t* volume, vol2birdScanUse_t *scanUse, vol2bird_t* alldata);
+#ifdef MISTNET
+int run_mistnet(float* tensor_in, float** tensor_out, const char* model_path, int tensor_size);
 #endif
 
+PolarScan_t* PolarVolume_getScanClosestToElevation_vol2bird(PolarVolume_t* volume, double elev);
+
+int addTensorToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int dim2, int dim3, int dim4, long res);
+
+int addClassificationToPolarVolume(PolarVolume_t* pvol, float ****tensor, int dim1, int dim2, int dim3, int dim4, long res);

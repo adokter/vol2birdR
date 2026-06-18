@@ -43,6 +43,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
+# build directory for mistnet c++ code
+/build/
+
 # Custom
 .cproject
 .project

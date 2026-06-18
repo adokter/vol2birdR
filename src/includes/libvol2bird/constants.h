@@ -9,7 +9,7 @@
 #define AREACELL 0.5
 // initialization value of rain segmentation field (CELL)
 #define CELLINIT -1
-// minimum standard deviation of the fit
+// minimum standard deviation of the velocity fit
 #define CHISQMIN 1e-5
 // cells with clutter fractions above this value are likely not birds
 #define CLUTPERCCELL 0.5
@@ -217,8 +217,8 @@
 #define REQUIRE_VRAD 0
 // whether we should dealias the radial velocities
 #define DEALIAS_VRAD 1
-// whether we should dealias all data once (default), or dealias for each profile individually
-#define DEALIAS_RECYCLE 1
+// whether we should dealias all data once, or dealias for each profile individually (default).
+#define DEALIAS_RECYCLE 0
 // Test dealiasing field velocities up to VMAX m/s 
 #define DEALIAS_VMAX 50.0
 // Test field velocities increase in steps VMAX/VAF
