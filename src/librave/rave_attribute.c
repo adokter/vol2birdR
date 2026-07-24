@@ -454,7 +454,8 @@ int RaveAttribute_shiftArray(RaveAttribute_t* attr, int nx)
 int RaveAttributeHelp_extractGroupAndName(
   const char* attrname, char** group, char** name)
 {
-  char *n1 = NULL, *n2 = NULL, *p = NULL;
+  char *n1 = NULL, *n2 = NULL;
+  const char *p = NULL;
   int slen = 0, n1len = 0, n2len = 0;
   int result = 0;
   RAVE_ASSERT((attrname != NULL), "attrname == NULL");

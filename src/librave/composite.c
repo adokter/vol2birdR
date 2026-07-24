@@ -682,10 +682,10 @@ static char* CompositeInternal_getTypeAndIdFromSource(const char* source, const 
 {
   char* result = NULL;
   if (source != NULL && id != NULL) {
-    char* p = strstr(source, id);
+    const char* p = strstr(source, id);
     if (p != NULL) {
       int len = 0;
-      char* pbrk = NULL;
+      const char* pbrk = NULL;
       len = strlen(p);
       pbrk = strpbrk((const char*)p, ",");
 
@@ -706,10 +706,10 @@ static char* CompositeInternal_getIdFromSource(const char* source, const char* i
 {
   char* result = NULL;
   if (source != NULL && id != NULL) {
-    char* p = strstr(source, id);
+    const char* p = strstr(source, id);
     if (p != NULL) {
       int len = 0;
-      char* pbrk = NULL;
+      const char* pbrk = NULL;
       p += strlen(id);
       len = strlen(p);
       pbrk = strpbrk((const char*)p, ",");
