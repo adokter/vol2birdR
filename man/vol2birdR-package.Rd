@@ -34,6 +34,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Adriaan M. Dokter \email{vol2birdr@cornell.edu} (\href{https://orcid.org/0000-0001-6573-066X}{ORCID}) (vol2birdR author and maintainer and author of vol2bird library)
   \item Anders Henja \email{anders.henja@gmail.com} (vol2birdR package author and author of RAVE and HLHDF libraries)
 }
 

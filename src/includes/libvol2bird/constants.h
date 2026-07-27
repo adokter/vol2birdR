@@ -128,9 +128,9 @@
 // Name of the program, to be stored as task attribute in ODIM
 #define PROGRAM "vol2birdR"
 // Version of the program, to be stored as task_version attribute in ODIM
-#define VERSION "1.3.0.9000"
+#define VERSION "1.3.1"
 // Date of latest version of the program
-#define VERSIONDATE "10-Jun-2026"
+#define VERSIONDATE "27-Jul-2026"
 
 
 //-------------------------------------------------------//

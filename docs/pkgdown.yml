@@ -1,9 +1,9 @@
 pandoc: 3.6.2
-pkgdown: 2.1.2
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   vol2birdR: vol2birdR.html
-last_built: 2026-06-09T13:26Z
+last_built: 2026-07-27T17:59Z
 urls:
   reference: https://adriaandokter.com/vol2bird/reference
   article: https://adriaandokter.com/vol2bird/articles
