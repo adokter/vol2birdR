@@ -1,0 +1,116 @@
+# Introduction to vol2birdR
+
+vol2birdR is an R package for calculating vertical profiles and other
+biological scatterers from weather radar data. The original **vol2bird**
+is written as a C-package and has been migrated to also work as an R
+package.
+
+## Introduction
+
+The vol2birdR package provides necessary functions to process polar
+volume data of C-band and S-band radars into vertical profiles of
+biological scatterers. This package also enables libtorch and the
+MistNet model for segmentation of meteorological and biological signals.
+
+## Calculating vertical profiles
+
+First, define a configuration instance, and modify configuration
+settings according to needs.
+
+    # load the library
+    library(vol2birdR)
+
+    # create a configuration instance
+    config<-vol2bird_config()
+
+    # modify the configuration instance as needed
+    # in this example we set the maximum range to 25 km:
+    config$rangeMax <- 25000
+
+The configuration object can be modified heavily. Learn more about the
+available options in the documentation of
+[`vol2bird_config()`](https://adriaandokter.com/vol2bird/reference/vol2bird_config.md)
+
+Note that configuration objects are copied by reference by default, and
+true copies that can be used independently should be assigned using:
+
+    config <- vol2bird_config()
+    config_copy <- vol2bird_config(config)
+
+Finally, the vertical profile can be calculated using function
+[`vol2bird()`](https://adriaandokter.com/vol2bird/reference/vol2bird.md):
+
+    vol2bird(file="/your/input/pvolfile",config=config, vpfile="/your/output/vpfile")
+
+The input pvolfile needs to be in ODIM HDF5 format, IRIS RAW format, or
+NEXRAD format. The output vpfile containing the profile will be in ODIM
+HDF5 format.
+
+## MistNet
+
+### Installation
+
+MistNet is a deep convolution neural net for segmenting out rain in
+S-band radar data, see the publication at
+<https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13280>.
+To use MistNet, follow the following additional installation steps:
+
+After installing and loading vol2birdR, run
+[`install_mistnet()`](https://adriaandokter.com/vol2bird/reference/install_mistnet.md)
+from R. This will download libtorch from the download section of
+<https://pytorch.org> as well as a wrapper library from AWS that enables
+the mistnet functionality:
+
+    # STEP 1: install mistnet libraries
+    library(vol2birdR)
+    install_mistnet()
+
+After completing this step, the following command should evaluate to
+`TRUE`:
+
+    mistnet_exists()
+
+Next, the pytorch mistnet model needs to be downloaded, which is hosted
+at <http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt>. Note that this
+file is large, over 500Mb. It can be downloaded directly from R using
+[`install_mistnet_model()`](https://adriaandokter.com/vol2bird/reference/install_mistnet_model.md):
+
+    # STEP 2: download mistnet model:
+    # install mistnet model into vol2birdR package:
+    install_mistnet_model()
+
+[`install_mistnet_model()`](https://adriaandokter.com/vol2bird/reference/install_mistnet_model.md)
+installs the model by default into the vol2birdR package directory. As a
+result, when reinstalling vol2birdR the model file will have to be
+re-downloaded as well.
+
+Alternatively, you can store the model in an alternative location
+outside the vol2birdR package directory. This has the advantage that you
+don’t have to re-download the model when reinstalling vol2birdR. Simply
+store the path of the mistnet_nexrad.pt file in the `mistNetPath`
+element of your configuration object (see
+[`vol2bird_config()`](https://adriaandokter.com/vol2bird/reference/vol2bird_config.md))
+
+vol2birdR will automatically locate the file if it is located at
+`/opt/vol2bird/etc/mistnet_nexrad.pt`, which can be done as follows:
+
+    # create the directory
+    # (in case of a permission-denied error, create the directory manually)
+    dir.create("/opt/vol2bird/etc", recursive=TRUE)
+
+    # download the model
+    install_mistnet_model(path="/opt/vol2bird/etc/mistnet_nexrad.pt")
+
+### Using MistNet
+
+After installing the MistNet libraries and model file, a profile can be
+calculated as follows:
+
+    # define configuration object:
+    config <- vol2bird_config()
+
+    # enable MistNet:
+    config$useMistNet <- TRUE
+
+    # calculate the profile:
+    vol2bird(file="/your/input/pvolfile", config=config, vpfile="/your/output/vpfile")
