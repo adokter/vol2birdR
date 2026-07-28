@@ -1,3 +1,7 @@
+# vol2birdR 1.3.1
+
+* No changes for users, fixes compiler warnings as requested by CRAN (#160).
+
 # vol2birdR 1.3.0
 
 ## New Features

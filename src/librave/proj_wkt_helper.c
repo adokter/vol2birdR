@@ -33,11 +33,11 @@ typedef struct Proj4DefIdToWktIdMapping {
 static int RaveWkt_getDoubleFromString(const char* str, const char* defid, double* v)
 {
   int result = 0;
-  char* ptr = strstr(str, defid);
+  const char* ptr = strstr(str, defid);
   char found[512];
   if (ptr != NULL) {
-    char* optr = ptr + strlen(defid) + 1; /* 1 for = sign */
-    char* eptr = strpbrk(optr, " \t");
+    const char* optr = ptr + strlen(defid) + 1; /* 1 for = sign */
+    const char* eptr = strpbrk(optr, " \t");
     size_t len = strlen(optr);
     double dvalue = 0.0;
     if (eptr != NULL) {

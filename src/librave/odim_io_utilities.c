@@ -285,10 +285,10 @@ int OdimIoUtilities_getIdFromSource(const char* source, const char* id, char* bu
 {
   int result = 0;
   if (source != NULL && id != NULL) {
-    char* p = strstr(source, id);
+    const char* p = strstr(source, id);
     if (p != NULL) {
       int len = 0;
-      char* pbrk = NULL;
+      const char* pbrk = NULL;
       p += strlen(id);
       len = strlen(p);
       pbrk = strpbrk((const char*)p, ",");
