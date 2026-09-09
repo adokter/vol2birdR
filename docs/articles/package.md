@@ -24,10 +24,7 @@ To use this functionality you will have to install the mistnet software
 as part of running the vol2birdR library. This is easilly done by
 calling install_mistnet after the library has been loaded.
 
-``` r
-library(vol2birdR)
-install_mistnet()
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`vol2birdR`](https://github.com/adokter/vol2birdR/)`)`` `[`install_mistnet`](https://adriaandokter.com/vol2bird/reference/install_mistnet.md)`(``)`
 
 This will download libtorch from the download section of
 <https://pytorch.org> as well as a wrapper library from our AWS that
@@ -45,14 +42,7 @@ First you create the configuration instance and modify configuration
 according to needs. Then the actual processor is initiated and then the
 processing is performed.
 
-``` r
-library(vol2birdR)
-config<-Vol2BirdConfig$new()
-config$verbose<-TRUE
-config$useMistNet<-TRUE
-processor<-Vol2Bird$new()
-processor$process(c("/...../volume.h5"),config,"vp.h5","pvol.h5")
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`vol2birdR`](https://github.com/adokter/vol2birdR/)`)`` ``config``<-``Vol2BirdConfig``$``new``(``)`` ``config``$``verbose``<-``TRUE`` ``config``$``useMistNet``<-``TRUE`` ``processor``<-``Vol2Bird``$``new``(``)`` ``processor``$``process``(`[`c`](https://rdrr.io/r/base/c.html)`(``"/...../volume.h5"``)``,``config``,``"vp.h5"``,``"pvol.h5"``)`
 
 Let’s break down the above example.
 
@@ -65,12 +55,7 @@ documentation about the config-class. In this example, the configuration
 is set to printout verbose output and that the torch library (mistnet)
 should be used using the mistnet model downloaded earlier.
 
-``` r
-config<-Vol2BirdConfig$new()
-config$verbose<-TRUE
-config$useMistNet<-TRUE
-config$mistNetPath<-"/home/docuser/etc/mistnet_nexrad.pt"
-```
+`config``<-``Vol2BirdConfig``$``new``(``)`` ``config``$``verbose``<-``TRUE`` ``config``$``useMistNet``<-``TRUE`` ``config``$``mistNetPath``<-``"/home/docuser/etc/mistnet_nexrad.pt"`
 
 In the final step the processing is performed where the input is a ODIM
 H5 volume, above defined configuration and output is a vertical profile
@@ -84,20 +69,13 @@ certain information to what type of processing that should be performed.
 In some cases it might be necessary to copy configuration instances for
 whatever reason. In these cases you can’t just assign the instances like
 
-``` r
-config<-Vol2BirdConfig$new()
-extraconfig<-config
-```
+`config``<-``Vol2BirdConfig``$``new``(``)`` ``extraconfig``<-``config`
 
 When doing like this, the config and extraconfig instances will both
 refer to the same object. To avoid this, use either clone or the copy
 constructor like
 
-``` r
-config<-Vol2BirdConfig$new()
-extraconfig<-config$clone()             # Clone method
-otherconfig<-Vol2BirdConfig$new(config) # Copy constructor
-```
+`config``<-``Vol2BirdConfig``$``new``(``)`` ``extraconfig``<-``config``$``clone``(``)`` ``# Clone method`` ``otherconfig``<-``Vol2BirdConfig``$``new``(``config``)`` ``# Copy constructor`
 
 Copyright 2010-2021 Adriaan M. Dokter (Cornell lab of Ornithology,
 University of Amsterdam) & Netherlands eScience Centre
