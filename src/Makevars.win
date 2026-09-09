@@ -14,12 +14,16 @@ OBJECTS = $(SOURCES:.cpp=.o) $(OBJECTS_C)
 
 H5_API_CFLAGS=-DH5_USE_110_API
 
-# Override CFLAGS to include suppression flags after default flags
+# Suppress -Wstrict-prototypes for the bundled C sources (librave/libhlhdf/librsl
+# use legacy non-prototype declarations). This must be appended to CFLAGS: R builds
+# the command line as $(PKG_CFLAGS) $(CPICFLAGS) $(SHLIB_CFLAGS) $(CFLAGS), so a
+# -Wno- flag placed in PKG_CFLAGS/SHLIB_CFLAGS is overridden by the -Wstrict-prototypes
+# that arrives later in CFLAGS.
+#
+# Do NOT add this to CXXFLAGS/PKG_CXXFLAGS: -Wstrict-prototypes is a C/ObjC-only
+# option, so g++ emits "command-line option is valid for C/ObjC but not for C++",
+# which R CMD check reports as a significant warning.
 override CFLAGS += -Wno-strict-prototypes
-override CXXFLAGS += -Wno-strict-prototypes
-override PKG_CFLAGS += -Wno-strict-prototypes
-override PKG_CXXFLAGS += -Wno-strict-prototypes
-override SHLIB_CFLAGS += -Wno-strict-prototypes
 
 PKG_CPPFLAGS=-D__USE_MINGW_ANSI_STDIO $(H5_API_CFLAGS)
 

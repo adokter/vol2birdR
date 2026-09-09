@@ -181,7 +181,11 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
         with_hdf5_fortran="no"
     else
         dnl Get the h5cc output
-        HDF5_SHOW=$(eval $H5CC -show)
+        dnl HDF5 2.x is built with CMake and reports flag lists separated by
+        dnl semicolons (e.g. "-lz;-ldl;-lm"). Autotools-era HDF5 used spaces.
+        dnl Normalise ';' to ' ' so each flag becomes its own shell word,
+        dnl otherwise a single unlinkable token poisons every later link test.
+        HDF5_SHOW=$(eval $H5CC -show | $SED -e 's/;/ /g')
 
         dnl Get the actual compiler used
         HDF5_CC=$(eval $H5CC -show | $AWK '{print $[]1}')
@@ -211,7 +215,8 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
         dnl
         HDF5_tmp_flags=$(eval $H5CC -showconfig \
             | $GREP 'FLAGS\|Extra libraries:' \
-            | $AWK -F: '{printf("%s "), $[]2}' )
+            | $AWK -F: '{printf("%s "), $[]2}' \
+            | $SED -e 's/;/ /g' )
 
         dnl Find the installation directory and append include/
         HDF5_tmp_inst=$(eval $H5CC -showconfig \
@@ -224,13 +229,15 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
         dnl Now sort the flags out based upon their prefixes
         for arg in $HDF5_SHOW $HDF5_tmp_flags ; do
           case "$arg" in
-            -I*) echo $HDF5_CPPFLAGS | $GREP -e "$arg" 2>&1 >/dev/null \
+            dnl Match on whole words: a plain substring test would treat
+            dnl "-lm" as already present in "-lmisc" and silently drop it.
+            -I*) echo " $HDF5_CPPFLAGS " | $GREP -e " $arg " 2>&1 >/dev/null \
                   || HDF5_CPPFLAGS="$arg $HDF5_CPPFLAGS"
               ;;
-            -L*) echo $HDF5_LDFLAGS | $GREP -e "$arg" 2>&1 >/dev/null \
+            -L*) echo " $HDF5_LDFLAGS " | $GREP -e " $arg " 2>&1 >/dev/null \
                   || HDF5_LDFLAGS="$arg $HDF5_LDFLAGS"
               ;;
-            -l*) echo $HDF5_LIBS | $GREP -e "$arg" 2>&1 >/dev/null \
+            -l*) echo " $HDF5_LIBS " | $GREP -e " $arg " 2>&1 >/dev/null \
                   || HDF5_LIBS="$arg $HDF5_LIBS"
               ;;
           esac
