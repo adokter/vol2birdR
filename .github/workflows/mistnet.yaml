@@ -3,16 +3,12 @@ on:
     branches:
       - main
       - agl-profile
-      - fix_cran_builds
 
 name: Mistnet
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    # Only the Linux entry sets matrix.container; for all other platforms this is
-    # empty and the job runs directly on the runner as before.
-    container: ${{ matrix.container }}
     strategy:
       matrix:
         os: [windows-2022, ubuntu-latest, macos-15-intel, macos-latest]
@@ -20,7 +16,7 @@ jobs:
           - os: windows-2022
             cuda: 0
             library: mistnet.dll
-            test:
+            test: 
             make: "& 'C:/Program Files/Microsoft Visual Studio/2022/Enterprise/MSBuild/Current/Bin/MSBuild' mistnet.sln /t:Build /p:Configuration=Release"
             build: build/Release
             cmakevars:
@@ -29,29 +25,22 @@ jobs:
             fixlib:
             flavor: Release
             artifacts: mistnet.dll
-            upload: Windows
-          # The Linux artifact is built inside an Ubuntu 22.04 container rather than
-          # directly on the runner for backward compatibility. Specifically, libmistnet.so
-          # records the highest GLIBCXX symbol version of the toolchain that built it.
-          # A library built against GLIBCXX_3.4.32 (Ubuntu 24.04 / GCC 13+) cannot be
-          # dlopen'd on Ubuntu 22.04, which provides at most GLIBCXX_3.4.30, whereas
-          # one built against 3.4.30 loads fine on 22.04, 24.04 and Fedora alike.
+            upload: Windows        
           - os: ubuntu-latest
-            container: ubuntu:22.04
             library: libmistnet.so
-            test:
+            test: 
             make: make
             build: build
             cmakevars:
             libext:
             exeext:
-            fixlib: patchelf --set-rpath '$ORIGIN/.' libmistnet.so
+            fixlib: chrpath -r '$ORIGIN/.' libmistnet.so
             flavor: Release
             artifacts: libmistnet.so
             upload: Linux
           - os: macos-15-intel
             library: libmistnet.dylib
-            test:
+            test: 
             make: make
             build: build
             cmakevars:
@@ -63,7 +52,7 @@ jobs:
             upload: macOS
           - os: macos-latest
             library: libmistnet.dylib
-            test:
+            test: 
             make: make
             build: build
             cmakevars:
@@ -74,39 +63,20 @@ jobs:
             artifacts: libmistnet.dylib
             upload: macOS-arm64
     steps:
-      # The ubuntu:22.04 container is bare: no compiler, cmake, git, unzip or CA
-      # certificates. Install the toolchain before checkout, because actions/checkout
-      # falls back to a slower REST-API download when git is missing.
-      - name: Bootstrap container toolchain
-        if: matrix.container != ''
-        run: |
-          apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-            build-essential cmake git ca-certificates unzip patchelf
-          patchelf --version
-          cmake --version | head -1
-          gcc --version | head -1
-
       - uses: actions/checkout@v3
 
       - name: Create environment
         run: cmake -E make_directory ${{runner.workspace}}/build
 
-      # Only needed when building directly on the runner; the container image
-      # installs patchelf in the bootstrap step above.
-      - name: Install patchelf
-        if: startsWith(matrix.os, 'ubuntu') && matrix.container == ''
+      - name: Install chrpath
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
-          sudo apt-get install -y patchelf
+          sudo apt-get install -y chrpath
 
-      # Reclaim space before the ~170MB libtorch download and its multi-GB extraction.
-      # This ran on the host previously; inside the container /usr/share/dotnet is not
-      # visible, so the equivalent host path is mounted-in and cleared instead. The
-      # container shares the runner's underlying disk, so this still frees real space.
-      - name: Free up disk space
+      - name: Free up 24GB of disk space
         if: startsWith(matrix.os, 'ubuntu')
-        run: rm -rf /__w/_tool/dotnet /usr/share/dotnet || true
+        run: sudo rm -rf /usr/share/dotnet
 
       - name: Run cmake
         working-directory: ${{runner.workspace}}/build
