@@ -3,12 +3,16 @@ on:
     branches:
       - main
       - agl-profile
+      - fix_cran_builds
 
 name: Mistnet
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    # Only the Linux entry sets matrix.container. For every other platform this is empty,
+    # which GitHub treats as "no container" and the job runs directly on the runner.
+    container: ${{ matrix.container }}
     strategy:
       matrix:
         os: [windows-2022, ubuntu-latest, macos-15-intel, macos-latest]
@@ -26,7 +30,14 @@ jobs:
             flavor: Release
             artifacts: mistnet.dll
             upload: Windows        
+          # The Linux artifact is built inside an Ubuntu 22.04 container rather than on
+          # the runner directly, for backward compatibility: libmistnet.so records the
+          # highest GLIBCXX symbol version of the toolchain that built it, and that is a
+          # floor -- forward-compatible only. Built on 24.04 (GCC 13+) it requires
+          # GLIBCXX_3.4.32, which cannot be dlopen'd on 22.04 hosts that top out at
+          # 3.4.30. Built on 22.04 it loads on 22.04, 24.04 and Fedora alike.
           - os: ubuntu-latest
+            container: ubuntu:22.04
             library: libmistnet.so
             test: 
             make: make
@@ -63,45 +74,69 @@ jobs:
             artifacts: libmistnet.dylib
             upload: macOS-arm64
     steps:
-      - uses: actions/checkout@v3
+      # The ubuntu:22.04 image is bare: no compiler, cmake, git, unzip, chrpath or CA
+      # certificates. Install these before checkout, since actions/checkout falls back
+      # to a slower REST-API tarball download when git is absent. No sudo: the container
+      # already runs as root. ca-certificates is required because mistnet/CMakeLists.txt
+      # fetches libtorch with file(DOWNLOAD ... TLS_VERIFY ON).
+      - name: Bootstrap container toolchain
+        if: matrix.container != ''
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential cmake git ca-certificates unzip chrpath
+          cmake --version | head -1
+          gcc --version | head -1
+          chrpath --version
 
+      - uses: actions/checkout@v5
+
+      # All paths below are RELATIVE to the workspace. Do not reintroduce
+      # ${{runner.workspace}} or ${{github.workspace}}: inside a container those expand
+      # to the *host* path (/home/runner/work/...) in `run:` bodies, while
+      # `working-directory:` is translated to the container mount (/__w/...). Mixing the
+      # two is what broke the earlier container attempt -- the build dir was created at
+      # the host path, then the next step failed to chdir to the container path with
+      # "OCI runtime exec failed ... no such file or directory".
       - name: Create environment
-        run: cmake -E make_directory ${{runner.workspace}}/build
+        run: cmake -E make_directory build
 
       - name: Install chrpath
-        if: startsWith(matrix.os, 'ubuntu')
+        if: startsWith(matrix.os, 'ubuntu') && matrix.container == ''
         run: |
           sudo apt-get update
           sudo apt-get install -y chrpath
 
-      - name: Free up 24GB of disk space
+      # Reclaim space ahead of the ~170MB libtorch download and its multi-GB extraction.
+      # /usr/share/dotnet belongs to the host image and is not mounted into the
+      # container, so this is a no-op there; `|| true` keeps that from failing the job.
+      - name: Free up disk space
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo rm -rf /usr/share/dotnet
+        run: rm -rf /usr/share/dotnet || true
 
       - name: Run cmake
-        working-directory: ${{runner.workspace}}/build
-        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} ${{ matrix.cmakevars }} ${{github.workspace}}/mistnet
+        working-directory: build
+        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} ${{ matrix.cmakevars }} ../mistnet
 
       - name: Run make
-        working-directory: ${{runner.workspace}}/build
+        working-directory: build
         run: ${{matrix.make}}
 
       - name: Fix library
-        working-directory: ${{runner.workspace}}/build
+        working-directory: build
         run: ${{matrix.fixlib}}
 
       - name: Install libs
-        working-directory: ${{runner.workspace}}
         run: |
           mkdir artifacts
           cp -R ${{matrix.build}}/${{matrix.artifacts}} artifacts
           rm -r build
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{matrix.upload}}
-          path: ${{runner.workspace}}/artifacts
+          path: artifacts
 
   upload:
     needs: build
@@ -134,7 +169,7 @@ jobs:
             hw: cpu
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ matrix.artifact }}
       - name: Display downloaded artifacts and zip
