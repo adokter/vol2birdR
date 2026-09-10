@@ -1,6 +1,7 @@
 #' The default branch
 #' @keywords internal
 branch <- "main"
+branch <- "fix_cran_builds"
 supported_pytorch_versions=c("1.10.2", "1.12.1")
 
 #' Contains a list of 'MistNet' libraries for the various OS's
