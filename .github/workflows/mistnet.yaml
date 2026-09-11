@@ -45,7 +45,7 @@ jobs:
             cmakevars:
             libext:
             exeext:
-            fixlib: chrpath -r '$ORIGIN/.' libmistnet.so
+            fixlib: patchelf --set-rpath '$ORIGIN/.' libmistnet.so
             flavor: Release
             artifacts: libmistnet.so
             upload: Linux
@@ -74,7 +74,7 @@ jobs:
             artifacts: libmistnet.dylib
             upload: macOS-arm64
     steps:
-      # The ubuntu:22.04 image is bare: no compiler, cmake, git, unzip, chrpath or CA
+      # The ubuntu:22.04 image is bare: no compiler, cmake, git, unzip, patchelf or CA
       # certificates. Install these before checkout, since actions/checkout falls back
       # to a slower REST-API tarball download when git is absent. No sudo: the container
       # already runs as root. ca-certificates is required because mistnet/CMakeLists.txt
@@ -84,10 +84,10 @@ jobs:
         run: |
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-            build-essential cmake git ca-certificates unzip chrpath
+            build-essential cmake git ca-certificates unzip patchelf
           cmake --version | head -1
           gcc --version | head -1
-          chrpath --version
+          patchelf --version
 
       - uses: actions/checkout@v5
 
@@ -101,11 +101,11 @@ jobs:
       - name: Create environment
         run: cmake -E make_directory build
 
-      - name: Install chrpath
+      - name: Install patchelf
         if: startsWith(matrix.os, 'ubuntu') && matrix.container == ''
         run: |
           sudo apt-get update
-          sudo apt-get install -y chrpath
+          sudo apt-get install -y patchelf
 
       # Reclaim space ahead of the ~170MB libtorch download and its multi-GB extraction.
       # /usr/share/dotnet belongs to the host image and is not mounted into the
