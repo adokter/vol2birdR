@@ -7,6 +7,18 @@
 install_config
 }
 \description{
-Contains a list of 'MistNet' libraries for the various OS's
+Note that not every 'LibTorch' version is available for every platform, so this
+list is deliberately ragged: version \code{"2.1.2"} carries only an Intel macOS
+entry (it is the last release 'PyTorch' shipped an x86_64 macOS build for), while
+\code{"2.14.0"} covers every platform except Intel macOS. Use
+\code{\link{supported_pytorch_versions_for_platform}} rather than assuming a
+version is installable everywhere.
+}
+\details{
+The urls here must stay in step with the version table in
+\code{mistnet/CMakeLists.txt}, which downloads 'LibTorch' to compile
+\code{libmistnet} in CI. A mismatch yields a successful build followed by a
+load-time failure, which is why the \code{libmistnet} artifacts are version
+suffixed.
 }
 \keyword{internal}

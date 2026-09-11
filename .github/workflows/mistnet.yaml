@@ -16,7 +16,26 @@ jobs:
     strategy:
       matrix:
         os: [windows-2022, ubuntu-latest, macos-15-intel, macos-latest]
+        # No single LibTorch version covers every platform, so version is a real matrix
+        # dimension and the impossible pairings are excluded below. 2.1.2 exists here
+        # solely because it is the last release with an x86_64 macOS build.
+        libtorch: ["1.12.1", "2.1.2", "2.14.0"]
+        exclude:
+          - { os: windows-2022, libtorch: "2.1.2" }
+          - { os: ubuntu-latest, libtorch: "2.1.2" }
+          - { os: macos-latest, libtorch: "2.1.2" }
+          - { os: macos-15-intel, libtorch: "2.14.0" }
         include:
+          # Suffix appended to artifact names, matching the existing `_1_10_2`
+          # convention. 1.12.1 stays UNVERSIONED: released versions of the package
+          # already fetch `Linux-cpu.zip` and friends, so renaming those would break
+          # installs in the wild.
+          - libtorch: "1.12.1"
+            tag: ""
+          - libtorch: "2.1.2"
+            tag: "_2_1_2"
+          - libtorch: "2.14.0"
+            tag: "_2_14_0"
           - os: windows-2022
             cuda: 0
             library: mistnet.dll
@@ -31,11 +50,7 @@ jobs:
             artifacts: mistnet.dll
             upload: Windows        
           # The Linux artifact is built inside an Ubuntu 22.04 container rather than on
-          # the runner directly, for backward compatibility: libmistnet.so records the
-          # highest GLIBCXX symbol version of the toolchain that built it, and that is a
-          # floor -- forward-compatible only. Built on 24.04 (GCC 13+) it requires
-          # GLIBCXX_3.4.32, which cannot be dlopen'd on 22.04 hosts that top out at
-          # 3.4.30. Built on 22.04 it loads on 22.04, 24.04 and Fedora alike.
+          # the runner directly, for backward compatibility.
           - os: ubuntu-latest
             container: ubuntu:22.04
             library: libmistnet.so
@@ -74,11 +89,7 @@ jobs:
             artifacts: libmistnet.dylib
             upload: macOS-arm64
     steps:
-      # The ubuntu:22.04 image is bare: no compiler, cmake, git, unzip, patchelf or CA
-      # certificates. Install these before checkout, since actions/checkout falls back
-      # to a slower REST-API tarball download when git is absent. No sudo: the container
-      # already runs as root. ca-certificates is required because mistnet/CMakeLists.txt
-      # fetches libtorch with file(DOWNLOAD ... TLS_VERIFY ON).
+      # Add basic tools to The ubuntu:22.04 image
       - name: Bootstrap container toolchain
         if: matrix.container != ''
         run: |
@@ -91,13 +102,7 @@ jobs:
 
       - uses: actions/checkout@v5
 
-      # All paths below are RELATIVE to the workspace. Do not reintroduce
-      # ${{runner.workspace}} or ${{github.workspace}}: inside a container those expand
-      # to the *host* path (/home/runner/work/...) in `run:` bodies, while
-      # `working-directory:` is translated to the container mount (/__w/...). Mixing the
-      # two is what broke the earlier container attempt -- the build dir was created at
-      # the host path, then the next step failed to chdir to the container path with
-      # "OCI runtime exec failed ... no such file or directory".
+      # All paths below are RELATIVE to the workspace.
       - name: Create environment
         run: cmake -E make_directory build
 
@@ -116,7 +121,7 @@ jobs:
 
       - name: Run cmake
         working-directory: build
-        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} ${{ matrix.cmakevars }} ../mistnet
+        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} -DLIBTORCH_VERSION=${{matrix.libtorch}} ${{ matrix.cmakevars }} ../mistnet
 
       - name: Run make
         working-directory: build
@@ -135,7 +140,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v5
         with:
-          name: ${{matrix.upload}}
+          name: ${{matrix.upload}}${{matrix.tag}}
           path: artifacts
 
   upload:
@@ -143,30 +148,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name:
-          [
-            macOS,
-            Linux,
-            Windows,
-            macOS-arm64
-          ]
+        # One entry per artifact the build job actually produces, so this list must be
+        # kept in step with the build matrix and its excludes. `artifact` is the
+        # upload-artifact name; `dest` is the S3 filename, where the version suffix
+        # follows `-cpu` to match the existing `Linux-cpu_1_10_2.zip` convention.
+        # The unsuffixed names are LibTorch 1.12.1 and must stay that way -- released
+        # versions of the package fetch them by that exact name.
         include:
-          - name: macOS
-            artifact: macOS
-            upload: macOS
-            hw: cpu
-          - name: Linux
-            artifact: Linux
-            upload: Linux
-            hw: cpu
-          - name: Windows
-            artifact: Windows
-            upload: Windows
-            hw: cpu
-          - name: macOS-arm64
-            artifact: macOS-arm64
-            upload: macOS-arm64
-            hw: cpu
+          - { artifact: macOS, dest: macOS-cpu }
+          - { artifact: Linux, dest: Linux-cpu }
+          - { artifact: Windows, dest: Windows-cpu }
+          - { artifact: macOS-arm64, dest: macOS-arm64-cpu }
+          - { artifact: macOS_2_1_2, dest: macOS-cpu_2_1_2 }
+          - { artifact: Linux_2_14_0, dest: Linux-cpu_2_14_0 }
+          - { artifact: Windows_2_14_0, dest: Windows-cpu_2_14_0 }
+          - { artifact: macOS-arm64_2_14_0, dest: macOS-arm64-cpu_2_14_0 }
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v5
@@ -179,7 +175,7 @@ jobs:
         with:
           command: cp
           source: ${{ matrix.artifact }}.zip
-          destination: s3://vol2bird-builds/vol2birdr/${{ github.ref }}/latest/${{ matrix.upload }}-${{ matrix.hw }}.zip
+          destination: s3://vol2bird-builds/vol2birdr/${{ github.ref }}/latest/${{ matrix.dest }}.zip
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1

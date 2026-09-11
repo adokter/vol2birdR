@@ -4,7 +4,10 @@
 \alias{get_install_urls}
 \title{List of installation files to download}
 \usage{
-get_install_urls(version = "1.10.2", type = install_type(version = version))
+get_install_urls(
+  version = default_pytorch_version(),
+  type = install_type(version = version)
+)
 }
 \arguments{
 \item{version}{The 'LibTorch' version to install.}
