@@ -121,7 +121,7 @@ jobs:
 
       - name: Run cmake
         working-directory: build
-        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} -DLIBTORCH_VERSION=${{matrix.libtorch}} ${{ matrix.cmakevars }} ../mistnet
+        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} "-DLIBTORCH_VERSION=${{matrix.libtorch}}" ${{ matrix.cmakevars }} ../mistnet
 
       - name: Run make
         working-directory: build
