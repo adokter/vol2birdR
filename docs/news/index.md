@@ -1,10 +1,5 @@
 # Changelog
 
-## vol2birdR 1.3.2
-
-- No changes for users, fixes compiler error and warnings requested by
-  CRAN ([\#162](https://github.com/adokter/vol2birdR/issues/162)).
-
 ## vol2birdR 1.3.1
 
 CRAN release: 2026-07-27

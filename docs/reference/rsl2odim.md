@@ -75,7 +75,7 @@ source <- "https://unidata-nexrad-level2.s3.amazonaws.com/2022/10/01/KBGM/KBGM20
 download.file(source, destfile = nexrad_file, mode="wb")
 # convert NEXRAD file to ODIM hdf5 format:
 rsl2odim(nexrad_file, pvolfile_out = odim_file)
-#> Filename = /var/folders/85/mhhbjmj50wnb0_g0kntpzrw80000gr/T//Rtmph9F8tN/KBGM20221001_000243_V06, callid = KBGM
+#> Filename = /var/folders/85/mhhbjmj50wnb0_g0kntpzrw80000gr/T//Rtmpwe6s5O/KBGM20221001_000243_V06, callid = KBGM
 #> Reading RSL polar volume with nominal time 20221001-000243, source: RAD:KBGM,PLC:BINGHAMTON,state:NY,radar_name:KBGM
 # clean up
 file.remove(nexrad_file)

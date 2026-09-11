@@ -6,7 +6,7 @@ Installs 'LibTorch' and 'MistNet' dependencies from files.
 
 ``` r
 install_mistnet_from_file(
-  version = "1.12.1",
+  version = default_pytorch_version(),
   libtorch,
   libmistnet,
   mistnet_model = NULL,
@@ -57,10 +57,10 @@ highly platform dependent, and should be checked through
 
     > get_install_urls()
     $libtorch
-    [1] "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip"
+    [1] "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-2.14.0%2Bcpu.zip"
 
     $libmistnet
-    [1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip"
+    [1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu_2_14_0.zip"
 
     $mistnet_model
     [1] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
@@ -69,14 +69,14 @@ In a terminal, download above zip-files.
 
     %> mkdir /tmp/myfiles
     %> cd /tmp/myfiles
-    %> wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.10.2%2Bcpu.zip
-    %> wget https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu.zip
+    %> wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-2.14.0%2Bcpu.zip
+    %> wget https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/Linux-cpu_2_14_0.zip
     %> wget http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt
 
 Then in R, type:
 
-    > install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
-         libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
+    > install_mistnet_from_file(libtorch="file:///tmp/myfiles/libtorch-shared-with-deps-2.14.0+cpu.zip",
+         libmistnet="file:///tmp/myfiles/Linux-cpu_2_14_0.zip",
          mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 
 ## See also
@@ -89,10 +89,10 @@ Then in R, type:
 # get paths to files to be downloaded
 get_install_urls()
 #> $libtorch
-#> [1] "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.10.2.zip"
+#> [1] "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-2.14.0.zip"
 #> 
 #> $libmistnet
-#> [1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/macOS-cpu_1_10_2.zip"
+#> [1] "https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/main/latest/macOS-arm64-cpu_2_14_0.zip"
 #> 
 #> $mistnet_model
 #> [1] "http://mistnet.s3.amazonaws.com/mistnet_nexrad.pt"
@@ -101,8 +101,8 @@ get_install_urls()
 # then install with:
 if (FALSE) { # \dontrun{
 install_mistnet_from_file(
-     libtorch="file:///tmp/myfiles/libtorch-cxx11-abi-shared-with-deps-1.10.2+cpu.zip",
-     libmistnet="file:///tmp/myfiles/Linux-cpu.zip",
+     libtorch="file:///tmp/myfiles/libtorch-shared-with-deps-2.14.0+cpu.zip",
+     libmistnet="file:///tmp/myfiles/Linux-cpu_2_14_0.zip",
      mistnet_model="file:///tmp/myfiles/mistnet_nexrad.pt")
 } # }
 ```
