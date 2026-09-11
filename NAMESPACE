@@ -18,6 +18,8 @@ import(methods)
 import(pkgbuild)
 importFrom(assertthat,assert_that)
 importFrom(rlang,abort)
-importFrom(utils,capture.output)
-importFrom(utils,str)
+importFrom(utils,
+  capture.output,
+  str
+)
 useDynLib(vol2birdR, .registration = TRUE)

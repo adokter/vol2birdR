@@ -1,2 +1,3 @@
-# vol2birdR 1.3.1
-* fixes compiler warnings as requested by CRAN
+# vol2birdR 1.3.2
+* fixes build and compiler warnings as requested by CRAN
+* upgrade to most recent pytorch library

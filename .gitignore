@@ -54,5 +54,10 @@ config.status
 *.o
 *.so
 
+# autoreconf leftovers. Note the tracked, pre-generated `configure` (which is what
+# CRAN actually runs) must NOT be ignored -- only autoconf's cache and backup file.
+autom4te.cache/
+configure~
+
 # Mac OS
 .DS_Store

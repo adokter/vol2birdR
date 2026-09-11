@@ -1,3 +1,12 @@
+# vol2birdR development version
+
+* No changes for users, fixes compiler error and warnings requested by CRAN (#162).
+
+* vol2birdR now uses 'LibTorch' 2.14.0 by default for mistnet runs, up from 1.12.1. This fixes
+a failure to load 'MistNet' on recent Linux distributions such as Fedora 44. On Intel macOS the
+default is upgraded to 'LibTorch' 2.1.2, the most recent release for which 'PyTorch'
+publishes an x86_64 macOS build.
+
 # vol2birdR 1.3.1
 
 * No changes for users, fixes compiler warnings as requested by CRAN (#160).

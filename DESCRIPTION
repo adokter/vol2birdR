@@ -1,8 +1,8 @@
 Package: vol2birdR
 Type: Package
 Title: Vertical Profiles of Biological Signals in Weather Radar Data
-Version: 1.3.1.9000
-Date: 2026-07-27
+Version: 1.3.2
+Date: 2026-09-09
 Authors@R: c(
     person("Anders", "Henja", , "anders.henja@gmail.com", role = "aut",
            comment = "vol2birdR package author and author of RAVE and HLHDF libraries"),
@@ -69,4 +69,4 @@ Suggests:
 Config/testthat/edition: 3
 Copyright: file COPYRIGHTS
 Encoding: UTF-8
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

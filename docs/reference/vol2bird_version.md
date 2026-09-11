@@ -18,5 +18,5 @@ an object of class
 ``` r
 # check installed 'vol2bird' version:
 vol2bird_version()
-#> [1] ‘1.3.1’
+#> [1] ‘1.3.1.9000’
 ```

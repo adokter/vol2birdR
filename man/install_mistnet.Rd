@@ -5,10 +5,10 @@
 \title{Install 'MistNet' libraries}
 \usage{
 install_mistnet(
-  version = "1.12.1",
+  version = default_pytorch_version(),
   reinstall = FALSE,
   path = install_path(),
-  timeout = 360,
+  timeout = 1800,
   ...
 )
 }

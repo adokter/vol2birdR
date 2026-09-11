@@ -3,16 +3,39 @@ on:
     branches:
       - main
       - agl-profile
+      - fix_cran_builds
 
 name: Mistnet
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    # Only the Linux entry sets matrix.container. For every other platform this is empty,
+    # which GitHub treats as "no container" and the job runs directly on the runner.
+    container: ${{ matrix.container }}
     strategy:
       matrix:
         os: [windows-2022, ubuntu-latest, macos-15-intel, macos-latest]
+        # No single LibTorch version covers every platform, so version is a real matrix
+        # dimension and the impossible pairings are excluded below. 2.1.2 exists here
+        # solely because it is the last release with an x86_64 macOS build.
+        libtorch: ["1.12.1", "2.1.2", "2.14.0"]
+        exclude:
+          - { os: windows-2022, libtorch: "2.1.2" }
+          - { os: ubuntu-latest, libtorch: "2.1.2" }
+          - { os: macos-latest, libtorch: "2.1.2" }
+          - { os: macos-15-intel, libtorch: "2.14.0" }
         include:
+          # Suffix appended to artifact names, matching the existing `_1_10_2`
+          # convention. 1.12.1 stays UNVERSIONED: released versions of the package
+          # already fetch `Linux-cpu.zip` and friends, so renaming those would break
+          # installs in the wild.
+          - libtorch: "1.12.1"
+            tag: ""
+          - libtorch: "2.1.2"
+            tag: "_2_1_2"
+          - libtorch: "2.14.0"
+            tag: "_2_14_0"
           - os: windows-2022
             cuda: 0
             library: mistnet.dll
@@ -26,7 +49,10 @@ jobs:
             flavor: Release
             artifacts: mistnet.dll
             upload: Windows        
+          # The Linux artifact is built inside an Ubuntu 22.04 container rather than on
+          # the runner directly, for backward compatibility.
           - os: ubuntu-latest
+            container: ubuntu:22.04
             library: libmistnet.so
             test: 
             make: make
@@ -34,7 +60,7 @@ jobs:
             cmakevars:
             libext:
             exeext:
-            fixlib: chrpath -r '$ORIGIN/.' libmistnet.so
+            fixlib: patchelf --set-rpath '$ORIGIN/.' libmistnet.so
             flavor: Release
             artifacts: libmistnet.so
             upload: Linux
@@ -63,78 +89,83 @@ jobs:
             artifacts: libmistnet.dylib
             upload: macOS-arm64
     steps:
-      - uses: actions/checkout@v3
+      # Add basic tools to The ubuntu:22.04 image
+      - name: Bootstrap container toolchain
+        if: matrix.container != ''
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential cmake git ca-certificates unzip patchelf
+          cmake --version | head -1
+          gcc --version | head -1
+          patchelf --version
 
+      - uses: actions/checkout@v5
+
+      # All paths below are RELATIVE to the workspace.
       - name: Create environment
-        run: cmake -E make_directory ${{runner.workspace}}/build
+        run: cmake -E make_directory build
 
-      - name: Install chrpath
-        if: startsWith(matrix.os, 'ubuntu')
+      - name: Install patchelf
+        if: startsWith(matrix.os, 'ubuntu') && matrix.container == ''
         run: |
           sudo apt-get update
-          sudo apt-get install -y chrpath
+          sudo apt-get install -y patchelf
 
-      - name: Free up 24GB of disk space
+      # Reclaim space ahead of the ~170MB libtorch download and its multi-GB extraction.
+      # /usr/share/dotnet belongs to the host image and is not mounted into the
+      # container, so this is a no-op there; `|| true` keeps that from failing the job.
+      - name: Free up disk space
         if: startsWith(matrix.os, 'ubuntu')
-        run: sudo rm -rf /usr/share/dotnet
+        run: rm -rf /usr/share/dotnet || true
 
       - name: Run cmake
-        working-directory: ${{runner.workspace}}/build
-        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} ${{ matrix.cmakevars }} ${{github.workspace}}/mistnet
+        working-directory: build
+        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.flavor}} "-DLIBTORCH_VERSION=${{matrix.libtorch}}" ${{ matrix.cmakevars }} ../mistnet
 
       - name: Run make
-        working-directory: ${{runner.workspace}}/build
+        working-directory: build
         run: ${{matrix.make}}
 
       - name: Fix library
-        working-directory: ${{runner.workspace}}/build
+        working-directory: build
         run: ${{matrix.fixlib}}
 
       - name: Install libs
-        working-directory: ${{runner.workspace}}
         run: |
           mkdir artifacts
           cp -R ${{matrix.build}}/${{matrix.artifacts}} artifacts
           rm -r build
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: ${{matrix.upload}}
-          path: ${{runner.workspace}}/artifacts
+          name: ${{matrix.upload}}${{matrix.tag}}
+          path: artifacts
 
   upload:
     needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        name:
-          [
-            macOS,
-            Linux,
-            Windows,
-            macOS-arm64
-          ]
+        # One entry per artifact the build job actually produces, so this list must be
+        # kept in step with the build matrix and its excludes. `artifact` is the
+        # upload-artifact name; `dest` is the S3 filename, where the version suffix
+        # follows `-cpu` to match the existing `Linux-cpu_1_10_2.zip` convention.
+        # The unsuffixed names are LibTorch 1.12.1 and must stay that way -- released
+        # versions of the package fetch them by that exact name.
         include:
-          - name: macOS
-            artifact: macOS
-            upload: macOS
-            hw: cpu
-          - name: Linux
-            artifact: Linux
-            upload: Linux
-            hw: cpu
-          - name: Windows
-            artifact: Windows
-            upload: Windows
-            hw: cpu
-          - name: macOS-arm64
-            artifact: macOS-arm64
-            upload: macOS-arm64
-            hw: cpu
+          - { artifact: macOS, dest: macOS-cpu }
+          - { artifact: Linux, dest: Linux-cpu }
+          - { artifact: Windows, dest: Windows-cpu }
+          - { artifact: macOS-arm64, dest: macOS-arm64-cpu }
+          - { artifact: macOS_2_1_2, dest: macOS-cpu_2_1_2 }
+          - { artifact: Linux_2_14_0, dest: Linux-cpu_2_14_0 }
+          - { artifact: Windows_2_14_0, dest: Windows-cpu_2_14_0 }
+          - { artifact: macOS-arm64_2_14_0, dest: macOS-arm64-cpu_2_14_0 }
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ matrix.artifact }}
       - name: Display downloaded artifacts and zip
@@ -144,7 +175,7 @@ jobs:
         with:
           command: cp
           source: ${{ matrix.artifact }}.zip
-          destination: s3://vol2bird-builds/vol2birdr/${{ github.ref }}/latest/${{ matrix.upload }}-${{ matrix.hw }}.zip
+          destination: s3://vol2bird-builds/vol2birdr/${{ github.ref }}/latest/${{ matrix.dest }}.zip
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1

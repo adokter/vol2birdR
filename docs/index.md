@@ -21,17 +21,12 @@ Windows).
 For OS X and Windows, you can install the released version of
 ‘vol2birdR’ from [CRAN](https://CRAN.R-project.org) with:
 
-``` r
-install.packages("vol2birdR")
-```
+[`install.packages`](https://rdrr.io/r/utils/install.packages.html)`(``"vol2birdR"``)`
 
 Alternatively, you can install the latest development version from
 [GitHub](https://github.com/adokter/bioRad) with:
 
-``` r
-# install.packages("pak")
-pak::pak("adokter/vol2birdR")
-```
+`# install.packages("pak")`` ``pak``::`[`pak`](https://pak.r-lib.org/reference/pak.html)`(``"adokter/vol2birdR"``)`
 
 For Linux and for installation of the development version the GNU
 Scientific Library (GSL), PROJ and HDF5 libraries need to be installed
@@ -87,9 +82,7 @@ Homebrew.
 
 Then load the package with:
 
-``` r
-library(vol2birdR)
-```
+[`library`](https://rdrr.io/r/base/library.html)`(`[`vol2birdR`](https://github.com/adokter/vol2birdR/)`)`
 
 ### MistNet installation
 
