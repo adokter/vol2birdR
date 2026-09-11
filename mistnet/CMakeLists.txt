@@ -54,9 +54,22 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # Not every version covers every platform, hence a table rather than string
 # substitution into a single template. An empty URL means "this version has no build
 # for this platform" and is a hard error below.
+#
+# Each branch also sets MISTNET_CXX_STANDARD, because the C++ standard we must compile
+# with is dictated by the LibTorch headers rather than by our own source (src/mistnet.cpp
+# itself uses nothing newer than C++11).
+#
+# For 2.14.0 this is a hard floor: its ATen.h contains `#error C++20 or later compatible
+# compiler is required to use ATen`, and its headers use C++20 syntax (`operator<=>`,
+# `std::strong_ordering`, `requires` clauses) that a C++17 front-end cannot even parse.
+#
+# For 1.12.1 and 2.1.2 the value 17 is NOT a floor -- it is the setting these artifacts
+# have always been built and shipped with, kept deliberately.
 set(LIBTORCH_VERSION "1.12.1" CACHE STRING "LibTorch version to build against")
 
 if(LIBTORCH_VERSION STREQUAL "1.12.1")
+    # Historical setting, not a floor -- see the note above.
+    set(MISTNET_CXX_STANDARD 17)
     set(LIBTORCH_URL_MACOS_X86_64 "https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.12.1.zip")
     # pytorch.org shipped no arm64 macOS build at this version; this is a locally
     # patched rebuild. Retired from 2.14.0 onwards, where an official build exists.
@@ -64,6 +77,8 @@ if(LIBTORCH_VERSION STREQUAL "1.12.1")
     set(LIBTORCH_URL_WINDOWS      "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.12.1%2Bcpu.zip")
     set(LIBTORCH_URL_LINUX        "https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.12.1%2Bcpu.zip")
 elseif(LIBTORCH_VERSION STREQUAL "2.1.2")
+    # 17 IS a genuine floor here: the 2.0 series made C++17 mandatory.
+    set(MISTNET_CXX_STANDARD 17)
     # Intel macOS only: 2.1.2 is the last PyTorch release shipping an x86_64 macOS
     # build. Every other platform is served by 2.14.0, so those URLs are left empty
     # deliberately rather than pointing at a version nobody should be using.
@@ -72,6 +87,8 @@ elseif(LIBTORCH_VERSION STREQUAL "2.1.2")
     set(LIBTORCH_URL_WINDOWS      "")
     set(LIBTORCH_URL_LINUX        "")
 elseif(LIBTORCH_VERSION STREQUAL "2.14.0")
+    # Hard floor, enforced by an #error in ATen.h. Not a preference.
+    set(MISTNET_CXX_STANDARD 20)
     # No Intel macOS build exists in this series -- see the 2.1.2 branch above.
     set(LIBTORCH_URL_MACOS_X86_64 "")
     set(LIBTORCH_URL_MACOS_ARM64  "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-2.14.0.zip")
@@ -150,5 +167,8 @@ target_include_directories(mistnet PUBLIC
 )
 
 target_link_libraries(mistnet ${TORCH_LIBRARIES})
-set_property(TARGET mistnet PROPERTY CXX_STANDARD 17)
 
+# Driven by LIBTORCH_VERSION rather than hard-coded: 2.14.0 requires C++20, while
+# 1.12.1 and 2.1.2 stay at the 17 they have always been built with.
+set_property(TARGET mistnet PROPERTY CXX_STANDARD ${MISTNET_CXX_STANDARD})
+set_property(TARGET mistnet PROPERTY CXX_STANDARD_REQUIRED ON)

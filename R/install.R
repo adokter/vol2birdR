@@ -29,8 +29,7 @@ install_config <- list(
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-arm64-2.14.0.zip",
           path = "libtorch/",
           filter = ".dylib",
-          # TODO(md5): fill in before release -- a NULL hash SKIPS verification.
-          md5hash = NULL
+          md5hash = d60d6fca6355bb30b78ba7dac27a405d
         ),
         "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-arm64-cpu_2_14_0.zip", branch)
       ),
@@ -39,8 +38,7 @@ install_config <- list(
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-2.14.0%2Bcpu.zip",
           path = "libtorch/",
           filter = ".dll",
-          # TODO(md5): fill in before release -- a NULL hash SKIPS verification.
-          md5hash = NULL
+          md5hash = 9a5fb58960f171d4f1f6eacb6e9f825b
         ),
         "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Windows-cpu_2_14_0.zip", branch)
       ),
@@ -49,8 +47,7 @@ install_config <- list(
           path = "libtorch/",
           # 2.x dropped the `cxx11-abi` infix from the Linux archive name.
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-2.14.0%2Bcpu.zip",
-          # TODO(md5): fill in before release -- a NULL hash SKIPS verification.
-          md5hash = NULL
+          md5hash = 3ca823f55a77e87770be4b0060a8bbcf
         ),
         "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/Linux-cpu_2_14_0.zip", branch)
       )
@@ -66,8 +63,7 @@ install_config <- list(
           url = "https://download.pytorch.org/libtorch/cpu/libtorch-macos-2.1.2.zip",
           path = "libtorch/",
           filter = ".dylib",
-          # TODO(md5): fill in before release -- a NULL hash SKIPS verification.
-          md5hash = NULL
+          md5hash = aa53d847fa40b5720dcf264c648b85b0
         ),
         "libmistnet" = sprintf("https://s3.amazonaws.com/vol2bird-builds/vol2birdr/refs/heads/%s/latest/macOS-cpu_2_1_2.zip", branch)
       )
