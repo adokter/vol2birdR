@@ -26,6 +26,11 @@ else
   AC_MSG_ERROR([hdf5 does not seem to be installed on your platform.])
 fi
 
+dnl H5_USE_110_API (HDF5's own) maps the unversioned names to their pre-1.12 forms, while
+dnl USE_HDF5_1_12_API (libhlhdf's own) selects its native 1.12+ call shapes. HDF5 2.x no
+dnl longer guarantees the 1.10 compatibility layer, so >= 2.0 uses the latter. Upstream
+dnl hlhdf made the same change, having previously tested only (major >= 1 && minor >= 12),
+dnl which silently skipped 2.0-2.2.
 if test "$hdf5_version_sufficient" = "yes"; then 
   AX_COMPARE_VERSION(
 	[$HDF5_VERSION], 
@@ -33,6 +38,9 @@ if test "$hdf5_version_sufficient" = "yes"; then
 	[1.12.0], 
 	[HDF5_API_VERS_USE="-DH5_USE_110_API"],
         [HDF5_API_VERS_USE=""])
+  if test $HDF5_MAJOR_VERSION -ge 2; then
+    HDF5_API_VERS_USE="-DUSE_HDF5_1_12_API"
+  fi
 fi
 
 : ${R_HOME=`R RHOME`}
