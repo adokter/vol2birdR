@@ -4477,6 +4477,9 @@ x$ax_compare_version_B" | sed 's/^ *//' | sort -r | sed "s/x${ax_compare_version
     else HDF5_API_VERS_USE=""
   fi
 
+  if test $HDF5_MAJOR_VERSION -ge 2; then
+    HDF5_API_VERS_USE="-DUSE_HDF5_1_12_API"
+  fi
 fi
 
 : ${R_HOME=`R RHOME`}
