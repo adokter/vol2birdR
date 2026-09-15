@@ -1,4 +1,4 @@
-# vol2birdR development version
+# vol2birdR 1.3.2
 
 * No changes for users, fixes compiler error and warnings requested by CRAN (#165).
 
@@ -8,6 +8,9 @@
 a failure to load 'MistNet' on recent Linux distributions such as Fedora 44. On Intel macOS the
 default is upgraded to 'LibTorch' 2.1.2, the most recent release for which 'PyTorch'
 publishes an x86_64 macOS build (#158).
+
+* `configure` now reports the HDF5 flags it detected and warns when the HDF5 library
+cannot be linked.
 
 # vol2birdR 1.3.1
 

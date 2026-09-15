@@ -1,4 +1,4 @@
-AC_INIT([volbirdr],[0.1])
+AC_INIT([volbirdR],[1.3.2])
 
 dnl This configure script uses three different scripts (free software) for finding dependencies
 dnl tools/m4/ax_lib_hdf5.m4 for identifying HDF5 include & libraries.
@@ -12,6 +12,27 @@ m4_include([tools/m4/ax_compare_version.m4])
 m4_include([tools/m4/check_proj.m4])
 
 AX_LIB_HDF5()
+
+dnl AX_LIB_HDF5 (tools/m4/ax_lib_hdf5.m4, third-party, kept in sync with upstream)
+dnl sets LIBS=$HDF5_LIBS before its own link tests, and below we fold the HDF5 flags
+dnl into LIBS for every later probe. A broken HDF5 link line therefore makes checks
+dnl for *unrelated* libraries fail, and whichever one is fatal first gets the blame --
+dnl historically proj (#162). Report what h5cc actually said: we cannot reproduce
+dnl every CRAN build machine, so the check log is the only evidence available.
+AC_MSG_NOTICE([HDF5 diagnostics: h5cc = ${H5CC:-<none>}])
+AC_MSG_NOTICE([HDF5 diagnostics: h5cc -show = ${HDF5_SHOW:-<empty>}])
+AC_MSG_NOTICE([HDF5 diagnostics: HDF5_CPPFLAGS = ${HDF5_CPPFLAGS:-<empty>}])
+AC_MSG_NOTICE([HDF5 diagnostics: HDF5_LDFLAGS = ${HDF5_LDFLAGS:-<empty>}])
+AC_MSG_NOTICE([HDF5 diagnostics: HDF5_LIBS = ${HDF5_LIBS:-<empty>}])
+
+dnl AX_LIB_HDF5 warns only when the header AND the link both fail (a single "&&"),
+dnl so the failure mode we actually hit -- hdf5.h found but -lhdf5 unlinkable -- goes
+dnl unreported. Warn on it explicitly. Deliberately a warning, not an error: a
+dnl platform might link successfully despite the probe failing, and we do not want to
+dnl break builds that currently work.
+if test "$ac_cv_hadf5_h" = "yes" && test "$ac_cv_libhdf5" = "no"; then
+  AC_MSG_WARN([hdf5.h was found but linking against -lhdf5 failed.])
+fi
 
 hdf5_version_sufficient=no
 if test "$with_hdf5" = "yes"; then 
