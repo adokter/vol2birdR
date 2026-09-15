@@ -1,5 +1,26 @@
 # Changelog
 
+## vol2birdR 1.3.2
+
+- No changes for users, fixes compiler error and warnings requested by
+  CRAN ([\#165](https://github.com/adokter/vol2birdR/issues/165)).
+
+- keep using HDF5 1.12 API for HDF5\>=2 versions
+  ([\#162](https://github.com/adokter/vol2birdR/issues/162)).
+
+- vol2birdR now uses ‘LibTorch’ 2.14.0 by default for mistnet runs, up
+  from 1.12.1. This fixes a failure to load ‘MistNet’ on recent Linux
+  distributions such as Fedora 44. On Intel macOS the default is
+  upgraded to ‘LibTorch’ 2.1.2, the most recent release for which
+  ‘PyTorch’ publishes an x86_64 macOS build
+  ([\#158](https://github.com/adokter/vol2birdR/issues/158)).
+
+- `configure` now reports the HDF5 flags it detected and warns when the
+  HDF5 library cannot be linked. Fixes a configuration failure on Debian
+  and Ubuntu, where the core HDF5 library is named `libhdf5_serial`
+  rather than `libhdf5`
+  ([\#162](https://github.com/adokter/vol2birdR/issues/162)).
+
 ## vol2birdR 1.3.1
 
 CRAN release: 2026-07-27
