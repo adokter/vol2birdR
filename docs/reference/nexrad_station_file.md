@@ -30,10 +30,10 @@ file, and allows one to set the path to a different location file.
 ``` r
 # return current location file
 nexrad_station_file()
-#> [1] "/private/var/folders/85/mhhbjmj50wnb0_g0kntpzrw80000gr/T/RtmpWORY0r/temp_libpath7ff771a0e75/vol2birdR/librsl/wsr88d_locations.dat"
+#> [1] "/private/var/folders/85/mhhbjmj50wnb0_g0kntpzrw80000gr/T/RtmpSi1sd7/temp_libpath1958568576c7/vol2birdR/librsl/wsr88d_locations.dat"
 # store nexrad station file path
 file_path <- nexrad_station_file()
 # set station location file
 nexrad_station_file(file_path)
-#> [1] "/private/var/folders/85/mhhbjmj50wnb0_g0kntpzrw80000gr/T/RtmpWORY0r/temp_libpath7ff771a0e75/vol2birdR/librsl/wsr88d_locations.dat"
+#> [1] "/private/var/folders/85/mhhbjmj50wnb0_g0kntpzrw80000gr/T/RtmpSi1sd7/temp_libpath1958568576c7/vol2birdR/librsl/wsr88d_locations.dat"
 ```
