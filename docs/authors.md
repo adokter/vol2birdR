@@ -66,7 +66,10 @@ Henja A, Dokter A (2026). *vol2birdR: Vertical Profiles of Biological
 Signals in Weather Radar Data*. R package version 1.3.2,
 <https://github.com/adokter/vol2birdR/>.
 
-@Manual{, title = {vol2birdR: Vertical Profiles of Biological Signals in
-Weather Radar Data}, author = {Anders Henja and Adriaan M. Dokter}, year
-= {2026}, note = {R package version 1.3.2}, url =
-{https://github.com/adokter/vol2birdR/}, }
+@Manual{,\
+  title = {vol2birdR: Vertical Profiles of Biological Signals in Weather Radar Data},\
+  author = {Anders Henja and Adriaan M. Dokter},\
+  year = {2026},\
+  note = {R package version 1.3.2},\
+  url = {https://github.com/adokter/vol2birdR/},\
+}
