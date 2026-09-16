@@ -4515,12 +4515,12 @@ RBIN="${R_HOME}/bin/R"
 : ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
 
 # HDF5_LIBS is in bad order and some linkers might obstruct. Reverse it.
-# The core HDF5 library is not always called "hdf5": Debian and Ubuntu ship the
-# serial and MPI builds side by side as libhdf5_serial and libhdf5_openmpi, so
-# -lhdf5 does not resolve there. Keep whatever core library h5cc reported and
-# only discard the high-level (hdf5_hl) variants, which we do not use, plus the
-# unversioned -lhdf5 that AX_LIB_HDF5 appends unconditionally. Falling back to
-# -lhdf5 preserves the previous behaviour when no core library is listed (#162).
+# The core HDF5 library is not always called "hdf5": Debian and Ubuntu install
+# the non-MPI and MPI builds alongside each other as libhdf5_serial and
+# libhdf5_openmpi, so -lhdf5 does not resolve there. Keep whatever core library
+# h5cc reported and discard only the high-level (hdf5_hl) variants, which we do
+# not use, plus the unversioned -lhdf5 that AX_LIB_HDF5 appends unconditionally.
+# Falling back to -lhdf5 keeps the previous behaviour when none is listed (#162).
 NEW_HDF5_LIBS=""
 HDF5_CORE_LIB=""
 for x in $HDF5_LIBS; do

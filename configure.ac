@@ -17,19 +17,13 @@ dnl AX_LIB_HDF5 (tools/m4/ax_lib_hdf5.m4, third-party, kept in sync with upstrea
 dnl sets LIBS=$HDF5_LIBS before its own link tests, and below we fold the HDF5 flags
 dnl into LIBS for every later probe. A broken HDF5 link line therefore makes checks
 dnl for *unrelated* libraries fail, and whichever one is fatal first gets the blame --
-dnl historically proj (#162). Report what h5cc actually said: we cannot reproduce
-dnl every CRAN build machine, so the check log is the only evidence available.
+dnl historically proj (#162).
 AC_MSG_NOTICE([HDF5 diagnostics: h5cc = ${H5CC:-<none>}])
 AC_MSG_NOTICE([HDF5 diagnostics: h5cc -show = ${HDF5_SHOW:-<empty>}])
 AC_MSG_NOTICE([HDF5 diagnostics: HDF5_CPPFLAGS = ${HDF5_CPPFLAGS:-<empty>}])
 AC_MSG_NOTICE([HDF5 diagnostics: HDF5_LDFLAGS = ${HDF5_LDFLAGS:-<empty>}])
 AC_MSG_NOTICE([HDF5 diagnostics: HDF5_LIBS = ${HDF5_LIBS:-<empty>}])
 
-dnl AX_LIB_HDF5 warns only when the header AND the link both fail (a single "&&"),
-dnl so the failure mode we actually hit -- hdf5.h found but -lhdf5 unlinkable -- goes
-dnl unreported. Warn on it explicitly. Deliberately a warning, not an error: a
-dnl platform might link successfully despite the probe failing, and we do not want to
-dnl break builds that currently work.
 if test "$ac_cv_hadf5_h" = "yes" && test "$ac_cv_libhdf5" = "no"; then
   AC_MSG_WARN([hdf5.h was found but linking against -lhdf5 failed.])
 fi
@@ -81,12 +75,12 @@ RBIN="${R_HOME}/bin/R"
 : ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
 
 # HDF5_LIBS is in bad order and some linkers might obstruct. Reverse it.
-# The core HDF5 library is not always called "hdf5": Debian and Ubuntu ship the
-# serial and MPI builds side by side as libhdf5_serial and libhdf5_openmpi, so
-# -lhdf5 does not resolve there. Keep whatever core library h5cc reported and
-# only discard the high-level (hdf5_hl) variants, which we do not use, plus the
-# unversioned -lhdf5 that AX_LIB_HDF5 appends unconditionally. Falling back to
-# -lhdf5 preserves the previous behaviour when no core library is listed (#162).
+# The core HDF5 library is not always called "hdf5": Debian and Ubuntu install
+# the non-MPI and MPI builds alongside each other as libhdf5_serial and
+# libhdf5_openmpi, so -lhdf5 does not resolve there. Keep whatever core library
+# h5cc reported and discard only the high-level (hdf5_hl) variants, which we do
+# not use, plus the unversioned -lhdf5 that AX_LIB_HDF5 appends unconditionally.
+# Falling back to -lhdf5 keeps the previous behaviour when none is listed (#162).
 NEW_HDF5_LIBS=""
 HDF5_CORE_LIB=""
 for x in $HDF5_LIBS; do
