@@ -9,7 +9,6 @@ a failure to load 'MistNet' on recent Linux distributions such as Fedora 44. On 
 default is upgraded to 'LibTorch' 2.1.2, the most recent release for which 'PyTorch'
 publishes an x86_64 macOS build (#158).
 
-
 * `configure` now reports the HDF5 flags it detected and warns when the HDF5 library
 cannot be linked. Fixes a configuration failure on Debian and Ubuntu, where the core HDF5 library is
 named `libhdf5_serial` rather than `libhdf5` (#162).
