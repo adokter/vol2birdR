@@ -3344,6 +3344,23 @@ int saveToODIM(RaveCoreObject* object, const char* filename){
     //keep deprecated wavelength attribute, as expected by bioRad
     RaveIO_setOdimVersion(raveio, RaveIO_ODIM_Version_2_3);
 
+    //Use 8-byte file offsets and lengths instead of RaveIO's 4-byte default.
+    //
+    //RaveIO_constructor sets sizeof_addr = sizeof_size = 4, which caps the file
+    //at 4 GB. That is far more than we need for a profile, but the 4-byte
+    //*length* size also limits how large an internal HDF5 structure may declare
+    //itself to be. With HDF5 2.x, writing the 9th attribute to a group exceeds
+    //the default compact-storage limit (max_compact = 8) and triggers a
+    //conversion to dense storage, which allocates a fractal heap. That heap's
+    //declared maximum size does not fit in a 4-byte length field, so
+    //H5HF__hdr_create fails with "max. heap size too large for file" and the
+    //whole write is aborted. /how carries 9+ attributes, so this always hits.
+    //
+    //HDF5 1.x tolerated the same combination, which is why this only appeared
+    //on newer systems (e.g. Debian with HDF5 2.2.0) and not in CI images
+    //shipping HDF5 1.x. 8 is HDF5's own default and matches the files we read.
+    RaveIO_setSizes(raveio, (size_t)8, (size_t)8);
+
     //set the object to be saved
     RaveIO_setObject(raveio, object);
 

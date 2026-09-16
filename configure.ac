@@ -1,4 +1,4 @@
-AC_INIT([volbirdr],[0.1])
+AC_INIT([volbirdR],[1.3.2])
 
 dnl This configure script uses three different scripts (free software) for finding dependencies
 dnl tools/m4/ax_lib_hdf5.m4 for identifying HDF5 include & libraries.
@@ -13,6 +13,21 @@ m4_include([tools/m4/check_proj.m4])
 
 AX_LIB_HDF5()
 
+dnl AX_LIB_HDF5 (tools/m4/ax_lib_hdf5.m4, third-party, kept in sync with upstream)
+dnl sets LIBS=$HDF5_LIBS before its own link tests, and below we fold the HDF5 flags
+dnl into LIBS for every later probe. A broken HDF5 link line therefore makes checks
+dnl for *unrelated* libraries fail, and whichever one is fatal first gets the blame --
+dnl historically proj (#162).
+AC_MSG_NOTICE([HDF5 diagnostics: h5cc = ${H5CC:-<none>}])
+AC_MSG_NOTICE([HDF5 diagnostics: h5cc -show = ${HDF5_SHOW:-<empty>}])
+AC_MSG_NOTICE([HDF5 diagnostics: HDF5_CPPFLAGS = ${HDF5_CPPFLAGS:-<empty>}])
+AC_MSG_NOTICE([HDF5 diagnostics: HDF5_LDFLAGS = ${HDF5_LDFLAGS:-<empty>}])
+AC_MSG_NOTICE([HDF5 diagnostics: HDF5_LIBS = ${HDF5_LIBS:-<empty>}])
+
+if test "$ac_cv_hadf5_h" = "yes" && test "$ac_cv_libhdf5" = "no"; then
+  AC_MSG_WARN([hdf5.h was found but linking against -lhdf5 failed.])
+fi
+
 hdf5_version_sufficient=no
 if test "$with_hdf5" = "yes"; then 
   AC_MSG_RESULT([Found hdf5 with version: $HDF5_VERSION])
@@ -26,6 +41,11 @@ else
   AC_MSG_ERROR([hdf5 does not seem to be installed on your platform.])
 fi
 
+dnl H5_USE_110_API (HDF5's own) maps the unversioned names to their pre-1.12 forms, while
+dnl USE_HDF5_1_12_API (libhlhdf's own) selects its native 1.12+ call shapes. HDF5 2.x no
+dnl longer guarantees the 1.10 compatibility layer, so >= 2.0 uses the latter. Upstream
+dnl hlhdf made the same change, having previously tested only (major >= 1 && minor >= 12),
+dnl which silently skipped 2.0-2.2.
 if test "$hdf5_version_sufficient" = "yes"; then 
   AX_COMPARE_VERSION(
 	[$HDF5_VERSION], 
@@ -33,6 +53,9 @@ if test "$hdf5_version_sufficient" = "yes"; then
 	[1.12.0], 
 	[HDF5_API_VERS_USE="-DH5_USE_110_API"],
         [HDF5_API_VERS_USE=""])
+  if test $HDF5_MAJOR_VERSION -ge 2; then
+    HDF5_API_VERS_USE="-DUSE_HDF5_1_12_API"
+  fi
 fi
 
 : ${R_HOME=`R RHOME`}
@@ -51,20 +74,39 @@ RBIN="${R_HOME}/bin/R"
 : ${CXX=`"${RBIN}" CMD config CXX`}
 : ${CXXFLAGS=`"${RBIN}" CMD config CXXFLAGS`}
 
-# HDF5_LIBS is in bad order and some linkers might obstruct. Reverse it
+# HDF5_LIBS is in bad order and some linkers might obstruct. Reverse it.
+# The core HDF5 library is not always called "hdf5": Debian and Ubuntu install
+# the non-MPI and MPI builds alongside each other as libhdf5_serial and
+# libhdf5_openmpi, so -lhdf5 does not resolve there. Keep whatever core library
+# h5cc reported and discard only the high-level (hdf5_hl) variants, which we do
+# not use, plus the unversioned -lhdf5 that AX_LIB_HDF5 appends unconditionally.
+# Falling back to -lhdf5 keeps the previous behaviour when none is listed (#162).
 NEW_HDF5_LIBS=""
+HDF5_CORE_LIB=""
 for x in $HDF5_LIBS; do
   case "$x" in
+    -lhdf5)
+      # Unlinkable on Debian; re-added below if no core library is found.
+      ;;
+    -lhdf5*hl*|-lhdf5*fortran*|-lhdf5*cpp*|-lhdf5*java*|-lhdf5*tools*)
+      # Not the core C library: high level, Fortran, C++, Java and tools
+      # variants, under any distribution specific name such as hdf5_serial_hl.
+      ;;
     -lhdf5*)
-      # HDF5_LIBS contains -hdf5xx and we don't want that since we aren't interested in hdf5_hl...
+      # The real core library, e.g. -lhdf5_serial on Debian.
+      HDF5_CORE_LIB="$x"
       ;;
     *)
       NEW_HDF5_LIBS="$x $NEW_HDF5_LIBS"
       ;;
   esac
 done
+if test -z "$HDF5_CORE_LIB"; then
+  HDF5_CORE_LIB="-lhdf5"
+fi
+AC_MSG_NOTICE([HDF5 diagnostics: linking against core library $HDF5_CORE_LIB])
 
-VOL2BIRD_LIBS="-lhdf5 $NEW_HDF5_LIBS -lz -lm"
+VOL2BIRD_LIBS="$HDF5_CORE_LIB $NEW_HDF5_LIBS -lz -lm"
 VOL2BIRD_LDFLAGS="$HDF5_LDFLAGS"
 VOL2BIRD_CPPFLAGS="$HDF5_CPPFLAGS"
 

@@ -13,6 +13,7 @@
 <url><loc>https://adriaandokter.com/vol2bird/reference/Vol2Bird-class.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/Vol2Bird.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/Vol2BirdConfig-class.html</loc></url>
+<url><loc>https://adriaandokter.com/vol2bird/reference/assert_version_available.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/branch.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/cpp_mistnet_init.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/cpp_printMemory.html</loc></url>
@@ -21,6 +22,7 @@
 <url><loc>https://adriaandokter.com/vol2bird/reference/cpp_vol2bird_namespace__store_main_thread_id.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/cpp_vol2bird_set_wsr88d_site_location.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/cpp_vol2bird_version.html</loc></url>
+<url><loc>https://adriaandokter.com/vol2bird/reference/default_pytorch_version.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/get_install_urls.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/index.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/install_config.html</loc></url>
@@ -30,6 +32,7 @@
 <url><loc>https://adriaandokter.com/vol2bird/reference/install_mistnet_nexrad.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/install_os.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/install_path.html</loc></url>
+<url><loc>https://adriaandokter.com/vol2bird/reference/install_platform.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/install_type.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/lib_installed.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/load_volume.html</loc></url>
@@ -42,6 +45,7 @@
 <url><loc>https://adriaandokter.com/vol2bird/reference/nexrad_station_file.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/rsl2odim.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/skip_if_no_temp_access.html</loc></url>
+<url><loc>https://adriaandokter.com/vol2bird/reference/supported_pytorch_versions_for_platform.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/torch_install_path.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/vol2birdR-package.html</loc></url>
 <url><loc>https://adriaandokter.com/vol2bird/reference/vol2bird_config.html</loc></url>

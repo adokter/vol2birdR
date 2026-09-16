@@ -7,7 +7,10 @@ order to proceed with
 ## Usage
 
 ``` r
-get_install_urls(version = "1.10.2", type = install_type(version = version))
+get_install_urls(
+  version = default_pytorch_version(),
+  type = install_type(version = version)
+)
 ```
 
 ## Arguments

@@ -872,7 +872,11 @@ public:
     }
 
     if (!volOutName.empty()) {
-      saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
+      if (saveToODIM((RaveCoreObject*) volume, volOutName.c_str()) == FALSE) {
+        vol2birdTearDown(config.alldata());
+        RAVE_OBJECT_RELEASE(volume);
+        throw std::runtime_error(std::string("Can not write : ") + volOutName);
+      }
     }
 
     vol2birdCalcProfiles(config.alldata());
@@ -953,6 +957,7 @@ public:
       }
       
       if (result == FALSE) {
+        vol2birdTearDown(config.alldata());
         RAVE_OBJECT_RELEASE(volume);
         throw std::runtime_error(std::string("Can not write : ") + vpOutName);
       }
@@ -990,11 +995,14 @@ public:
       }
     }
 
-    saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
+    int result = saveToODIM((RaveCoreObject*) volume, volOutName.c_str());
     if(config.alldata()->options.useMistNet) {
       vol2birdTearDown(config.alldata());
     }
     RAVE_OBJECT_RELEASE(volume);
+    if (result == FALSE) {
+      throw std::runtime_error(std::string("Can not write : ") + volOutName);
+    }
   }
 };
 
